@@ -88,24 +88,27 @@ def sync_stories():
     idx = ["# User Stories", "", "← [README](../../README.md) · [правила](../rules/README.md)", "",
            "> Сгенерировано из `html-view/stories.py` — правьте там.", "",
            "Истории пользователей по компонентам: роль, цель, критерии приёмки (включая ошибки), связанные требования спек и процесс в нотации BPMN.", "",
-           "| Роль | Кто |", "|---|---|"] + [f"| {k} | {v} |" for k, v in ROLES.items()] + ["", "| Компонент | Историй | Процесс |", "|---|---|---|"]
+           "| Роль | Кто |", "|---|---|"] + [f"| {k} | {v} |" for k, v in ROLES.items()] + ["", "| Компонент | Историй | Процессов BPMN |", "|---|---|---|"]
     for slug, name, *_ in COMPONENTS:
         lst = STORIES.get(slug, [])
         if not lst:
             continue
-        idx.append(f"| [{name}]({slug}.md) | {len(lst)} | {'BPMN' if slug in BPMN else '—'} |")
+        procs = BPMN.get(slug, [])
+        idx.append(f"| [{name}]({slug}.md) | {len(lst)} | {len(procs) or '—'} |")
         L = [f"# User Stories: {name}", "", "← [Все истории](README.md) · [потоки](../flows/" + slug + ".md)", "",
              "> Сгенерировано из `html-view/stories.py` — правьте там.", ""]
-        if slug in BPMN:
-            L += ["## Процесс (BPMN)", "", f"<!-- bpmn:{slug} -->", "", "| Шаг | Дорожка | Тип | Переходы | Артефакты |", "|---|---|---|---|---|"]
-            arts = ARTIFACTS.get(slug, {})
-            lanes = BPMN[slug]["lanes"]
-            names = {s[0]: s[3] for s in BPMN[slug]["steps"]}
-            typ = {"start": "начало", "task": "задача", "gateway": "развилка", "end": "конец", "error": "ошибка"}
-            for sid, lane, ty, label, nxt in BPMN[slug]["steps"]:
+        typ = {"start": "начало", "task": "задача", "gateway": "развилка", "end": "конец", "error": "ошибка"}
+        for i, pr in enumerate(procs):
+            L += [f"## Процесс {i + 1}. {pr['title']}", "", "Покрывает истории: " + ", ".join(f"[{s}](#{s.lower()})" for s in pr["stories"]), "",
+                  f"<!-- bpmn:{slug}:{i} -->", "", "| Шаг | Дорожка | Тип | Переходы | Артефакты шага |", "|---|---|---|---|---|"]
+            names = {s[0]: s[3] for s in pr["steps"]}
+            for sid, lane, ty, label, nxt in pr["steps"]:
                 tr = "; ".join(f"{lab + ' → ' if lab else '→ '}{names[x]}" for x, lab in nxt) or "—"
-                L.append(f"| {label} | {lanes[lane]} | {typ[ty]} | {tr} | {', '.join(arts.get(sid, [])) or '—'} |")
+                L.append(f"| {label} | {pr['lanes'][lane]} | {typ[ty]} | {tr} | {', '.join(pr['artifacts'].get(sid, [])) or '—'} |")
             L.append("")
+        loose = [s[0] for s in lst if not any(s[0] in pr["stories"] for pr in procs)]
+        if loose:
+            print("⚠️ истории без процесса BPMN:", slug, loose)
         L += ["## Сводка", "", "| История | Персона | Хочу | Точка входа | Требований |", "|---|---|---|---|---|"]
         L += [f"| [{s[0]}](#{s[0].lower()}) | {PERSONAS.get(s[1], (ROLES.get(s[1], s[1]),))[0]} | {s[2]} | {s[6] if len(s) > 6 else '—'} | {len(s[5]) or '⚠️ 0'} |" for s in lst]
         L += ["", "## Истории", ""]
@@ -181,13 +184,72 @@ def stories_coverage() -> str:
     L += ["", f"## Истории с менее чем 3 критериями приёмки ({len(few)})", "", "Нет альтернативных потоков или исключений ([шаг 4](../rules/us-methodology.md)).", ""]
     L += [f"- [{sid}]({c}.md) — {n}" for c, sid, n in few] or ["— нет"]
     L += ["", f"## Истории без требований ({len(noreq)})", ""] + ([f"- [{sid}]({c}.md)" for c, sid in noreq] or ["— нет"])
+    nobp = [(c, s[0]) for c, _ in comps for s in STORIES[c] if not any(s[0] in pr["stories"] for pr in BPMN.get(c, []))]
+    L += ["", f"## Истории без процесса BPMN ({len(nobp)})", ""] + ([f"- [{sid}]({c}.md)" for c, sid in nobp] or ["— нет"])
     total = sum(len(STORIES[c]) for c, _ in comps)
     L += ["", f"Всего историй: **{total}**, персон: **{len(roles)}**, компонентов с историями: **{len(comps)}**."]
     return "\n".join(L) + "\n"
 
 
+SPEC_KIND = {"icplan-integration": "icplan", "agent-registry": "icplan", "control-plane": "icplan", "icplan-agent-autopickup": "icplan",
+             "platform-infrastructure": "infra"}  # docs/rules/spec-kinds.md
+CFG_ROLES = {"service": ["Разработчик", "DevOps-инженер"], "icplan": ["Разработчик", "Администратор"], "infra": ["DevOps-инженер"]}
+XC_ROLES = {"Хранилища данных": ["Архитектор", "DevOps-инженер"], "Интерфейсы обмена": ["Архитектор", "Разработчик"],
+            "Поведение при отказах зависимостей": ["DevOps-инженер", "Тестировщик"], "Нагрузка и производительность": ["DevOps-инженер", "Тестировщик"],
+            "Развёртывание": ["DevOps-инженер"]}
+PERSONA_ROLE = {"П": "Пользователь", "А": "Администратор", "Б": "Безопасность", "Э": "DevOps-инженер", "ВП": "Владелец продукта",
+                "QA": "Тестировщик", "Аг": "Разработчик", "АгР": "Разработчик"}
+APPR_HEAD = "| Требование | Роль | Кто | Тип | Дата | Решение | Комментарий |\n|---|---|---|---|---|---|---|\n"
+
+
+def required_approvals(spec: Path) -> list:
+    """[(ID, имя требования, роль)] — обязательные подтверждения по docs/rules/spec-kinds.md."""
+    cap = spec.parent.name
+    t = spec.read_text(encoding="utf-8")
+    out = []
+    for block in re.split(r"\n### Requirement: ", t)[1:]:
+        name = block.split("\n", 1)[0].strip()
+        m = re.search(r"`(R-[A-Z]+-\d+)`", block)
+        if not m:
+            continue
+        if name == "Конфигурация модуля":
+            roles = CFG_ROLES[SPEC_KIND.get(cap, "service")]
+        elif name in XC_ROLES:
+            roles = XC_ROLES[name]
+        else:
+            roles = ["Аналитик историй", "Тестировщик"] + [PERSONA_ROLE[s[1]] for lst in STORIES.values() for s in lst if f"{cap}: {name}" in s[5] and s[1] in PERSONA_ROLE]
+        if cap in ("guardrails", "agent-sandbox"):
+            roles.append("Безопасность")
+        out += [(m.group(1), name, r) for r in dict.fromkeys(roles)]
+    return out
+
+
+def sync_approvals():
+    """approvals.md каждой спеки: добавить строки ⏳ для недостающих обязательных подтверждений, решения не трогать."""
+    for spec in ROOT.glob("openspec/changes/*/specs/*/spec.md"):
+        f = spec.parent / "approvals.md"
+        rows = [l for l in f.read_text(encoding="utf-8").splitlines() if l.startswith("| R-")] if f.exists() else []
+        have = {tuple(c.strip() for c in l.strip("|").split("|")[:2]) for l in rows}
+        for rid, name, role in required_approvals(spec):
+            if (rid, role) not in have:
+                rows.append(f"| {rid} | {role} | — | — | — | ⏳ | {name} |")
+        rows.sort(key=lambda l: (int(re.search(r"R-[A-Z]+-(\d+)", l).group(1)), l))
+        cap = spec.parent.name
+        body = (f"# {cap} — подтверждения требований\n\n← [spec.md](spec.md) · [правило](../../../../../docs/rules/spec-kinds.md#approvals)\n\n"
+                "Строки ⏳ добавляет сборка по обязательным ролям; роль меняет только свою строку: кто, 👤 / 🤖, дата, ✅ / ❌, комментарий.\n\n" + APPR_HEAD + "\n".join(rows) + "\n")
+        _write_if_changed(f, body)
+
+
+def approval_stats(folder: Path) -> tuple:
+    f = folder / "approvals.md"
+    rows = [l for l in f.read_text(encoding="utf-8").splitlines() if l.startswith("| R-")] if f.exists() else []
+    ok = sum(1 for l in rows if "| ✅ |" in l)
+    return ok, len(rows), sum(1 for l in rows if "| ❌ |" in l)
+
+
 def copy_sources():
     sync_stories()
+    sync_approvals()
     check_req_tasks()
     shutil.rmtree(SRC, ignore_errors=True)
     files = []
@@ -200,7 +262,7 @@ def copy_sources():
         dst = SRC / ("overview.md" if rel.as_posix() == "README.md" else rel)
         dst.parent.mkdir(parents=True, exist_ok=True)
         txt = relink_readme(f.read_text(encoding="utf-8"), f)
-        txt = re.sub(r"<!-- bpmn:([a-z-]+) -->", lambda m: bpmn_svg(BPMN[m.group(1)]) if m.group(1) in BPMN else "", txt)
+        txt = re.sub(r"<!-- bpmn:([a-z-]+):(\d+) -->", lambda m: bpmn_svg(BPMN[m.group(1)][int(m.group(2))]) if m.group(1) in BPMN else "", txt)
         txt = txt.replace("<!-- docgraph -->", graph_svg(docgraph.LAYERS, docgraph.EDGES))
         dst.write_text(txt, encoding="utf-8")
     shutil.copy2(HERE / "home.md", SRC / "index.md")
@@ -249,6 +311,8 @@ def write_pagebar_map():
                  ("Пользовательские требования без User Story", r["no_us"]),
                  ("Открыто в последнем ревью — готовность не выше 90", r["review_open"])]
         qhtml += "".join(f'<div class="oq-list"><b>{h}:</b><ul>' + "".join(f"<li>{html.escape(x)}</li>" for x in xs) + "</ul></div>" for h, xs in lists if xs)
+        ok, al, bad = r["approvals"]
+        qhtml += f'<div class="oq-list"><b>Подтверждения ролей:</b> {ok} из {al}' + (f', замечаний {bad}' if bad else '') + ' — <a href="{appr}">кто подтвердил →</a></div>' 
         rd[sp] = ('<div class="rd-head"><span class="about-label">Готовность спеки</span>' + rd_bar(r, True)
                   + "".join((f'<span class="rd-part">{k} <b>{v}</b>/{m}</span>' if m else f'<span class="rd-part rd-neg">{k} <b>{v}</b></span>') for k, (v, m) in r["parts"].items() if m or v) + qhtml
                   + f'<a class="side-all" href="{{rules}}">критерии →</a></div>')
@@ -506,8 +570,12 @@ def _spec_readiness(spec: str) -> dict:
     cut = pct - 90 if rev and pct > 90 else 0  # потолок 90, пока в последнем ревью есть открытое
     pct -= cut
     parts["Потолок без ревью"] = (-cut, 0)
+    a_ok, a_all, a_bad = approval_stats(folder)
+    cut2 = pct - 90 if a_ok < a_all and pct > 90 else 0  # потолок 90, пока не все обязательные роли подтвердили
+    pct -= cut2
+    parts["Потолок без подтверждений"] = (-cut2, 0)
     return {"pct": pct, "base": base, "oq": (n_q, n_d), "parts": parts, "reqs": len(reqs), "single": sum(1 for r in reqs if r.count("#### Scenario:") == 1),
-            "dup": dup, "no_us": no_us, "review_open": rev}
+            "dup": dup, "no_us": no_us, "review_open": rev, "approvals": (a_ok, a_all, a_bad)}
 
 
 def rd_bar(r: dict, wide: bool = False) -> str:
@@ -669,7 +737,7 @@ def spec_family(path: str) -> list:
     out = [path]
     if path.endswith("/spec.md"):
         base = path[: -len("spec.md")]
-        out += [base + n for n in ("interfaces.md", "traceability.md", "open-questions.md") if (SRC / (base + n)).exists()]
+        out += [base + n for n in ("interfaces.md", "traceability.md", "open-questions.md", "approvals.md") if (SRC / (base + n)).exists()]
     return out
 
 
@@ -681,7 +749,7 @@ def nav_yaml() -> str:
         used.add(path)
         return f"{' ' * indent}- {q(label)}: {path}"
 
-    LBL = {"interfaces.md": "Интерфейсы, данные, отказы", "traceability.md": "Трассировка (RTM)", "open-questions.md": "Открытые вопросы"}
+    LBL = {"interfaces.md": "Интерфейсы, данные, отказы", "traceability.md": "Трассировка (RTM)", "open-questions.md": "Открытые вопросы", "approvals.md": "Подтверждения"}
     L = ["nav:", item(2, "Главная", "index.md")]
     for slug, name, st, g, desc, links, docs, tids in COMPONENTS:
         L.append(f"  - {q(name)}:")

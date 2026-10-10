@@ -100,5 +100,5 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     rd = DATA.get("readiness", {}).get(src)
     if rd:
         oq_url = _rel(page.url, page.file.src_uri.rsplit("/", 1)[0] + "/open-questions")
-        bar += rd.replace("{rules}", _rel(page.url, "docs/rules/spec-criteria/")).replace("{oq}", oq_url)
+        bar += rd.replace("{rules}", _rel(page.url, "docs/rules/spec-criteria/")).replace("{oq}", oq_url).replace("{appr}", _rel(page.url, page.file.src_uri.rsplit("/", 1)[0] + "/approvals"))
     return bar + "\n\n" + markdown

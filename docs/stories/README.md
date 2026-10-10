@@ -17,16 +17,16 @@
 | Б | Безопасность |
 | QA | Тестировщик |
 
-| Компонент | Историй | Процесс |
+| Компонент | Историй | Процессов BPMN |
 |---|---|---|
-| [ICPlan](icplan.md) | 29 | BPMN |
-| [Platform module](platform-module.md) | 7 | BPMN |
-| [Agent Runner](agent-runner.md) | 6 | BPMN |
-| [Sandbox](sandbox.md) | 7 | BPMN |
-| [Harness](harness.md) | 7 | BPMN |
-| [Memory](memory.md) | 4 | BPMN |
-| [MCP / Tools](mcp-tools.md) | 5 | BPMN |
-| [Guardrails](guardrails.md) | 6 | BPMN |
-| [LiteLLM gateway](llm-gateway.md) | 5 | BPMN |
-| [Observability](observability.md) | 5 | BPMN |
-| [Инфраструктура](infrastructure.md) | 7 | BPMN |
+| [ICPlan](icplan.md) | 29 | 4 |
+| [Platform module](platform-module.md) | 7 | 2 |
+| [Agent Runner](agent-runner.md) | 6 | 2 |
+| [Sandbox](sandbox.md) | 7 | 2 |
+| [Harness](harness.md) | 7 | 2 |
+| [Memory](memory.md) | 10 | 1 |
+| [MCP / Tools](mcp-tools.md) | 5 | 2 |
+| [Guardrails](guardrails.md) | 6 | 2 |
+| [LiteLLM gateway](llm-gateway.md) | 5 | 2 |
+| [Observability](observability.md) | 5 | 2 |
+| [Инфраструктура](infrastructure.md) | 7 | 3 |

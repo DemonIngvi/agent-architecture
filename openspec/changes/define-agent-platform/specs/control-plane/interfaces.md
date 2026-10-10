@@ -15,28 +15,30 @@
 
 ## Параметры модуля
 
-| Параметр | Что задаёт | Уровень | Хранилище | По умолчанию |
-|---|---|---|---|---|
-| `model_alias` | Алиас модели агента | L1 | S2 | team-default |
-| `fallback` | Резервная модель | L0 | S9 | нет |
-| `budget.daily_usd` | Дневной бюджет агента | L1 | S2 | 5 $ |
-| `budget.per_run_tokens` | Токены на один запуск | L1 | S2 | 200 000 |
-| `rate_limit` | Запросов в минуту | L1 | S2 | 60 |
-| `limits.max_steps` | Шагов цикла на запуск | L1 | S2 | 30 |
-| `limits.timeout_s` | Время запуска | L1 | S2 | 1800 |
-| `concurrency` | Параллельных запусков агента | L1 | S2 | 1 |
-| `sandbox_profile` | Профиль среды: образ, CPU, RAM, диск | L1 | S2 | light |
-| `sandbox.egress_allow` | Разрешённые хосты | L1 | S2 | только платформа |
-| `sandbox.pool.size` | Готовых контейнеров | L1 | S2 | 2 |
-| `memory_profile.read` | Какие уровни памяти читать | L1 | S2 | M2, M3, M5, M6 |
-| `memory_profile.write` | Какие уровни агент пишет | L1 | S2 | M3 |
-| `memory.m2_last_runs` | Сколько прошлых запусков в контекст | L1 | S2 | 3 |
-| `memory.retention` | Сроки хранения уровней | L1 | S2 | M1 30 д, M2 180 д |
-| `guardrails.tools_allow` | Разрешённые тулы | L1 | S2 | из определения |
-| `guardrails.approval` | Тулы с подтверждением человека | L1 | S2 | запись в задачу, push |
-| `guardrails.approval_timeout` | Сколько ждать подтверждения | L1 | S2 | 24 ч |
-| `repos` | Репозитории, доступ, префикс ветки | L1 | S2 | нет |
-| `version` | Версия определения агента | L1 | S2 | последняя |
+Значения и границы пересматриваются по статистике запусков (3.9) и нагрузочному тесту (4.8); правило — [виды спек, таблица параметров](../../../../../docs/rules/spec-kinds.md#params).
+
+| Параметр | Что задаёт | Уровень | Хранилище | По умолчанию | Почему так по умолчанию | Мин | Макс | На что опираться при выборе |
+|---|---|---|---|---|---|---|---|---|
+| `model_alias` | Алиас модели агента | L1 | S2 | team-default | см. `agent.model` (agent-registry) | алиас из `model_list` | алиас из `model_list` | см. agent-registry |
+| `fallback` | Резервная модель | L0 | S9 | нет | см. `fallbacks` (llm-gateway) | нет | список алиасов | см. llm-gateway |
+| `budget.daily_usd` | Дневной бюджет агента | L1 | S2 | 5 $ | ~10 запусков × ~55 тыс. токенов ≈ 2–4 $ на средних моделях + запас | 0 $ | `project_month` / 20 рабочих дней | фактические затраты агента (3.9); 0 — агент фактически выключен |
+| `budget.per_run_tokens` | Токены на один запуск | L1 | S2 | 200 000 | см. `limits.max_tokens` (agent-harness) | 20 000 | окно модели | см. agent-harness |
+| `rate_limit` | Запросов в минуту | L1 | S2 | 60 | шаг агента — 1 вызов модели в 1–5 с | 10 | rpm ключа провайдера / число агентов | лимиты аккаунта провайдера |
+| `limits.max_steps` | Шагов цикла на запуск | L1 | S2 | 30 | см. agent-harness | 5 | 200 | см. agent-harness |
+| `limits.timeout_s` | Время запуска | L1 | S2 | 1800 | см. `timeout_s` (agent-runner) | 60 | 14400 | см. agent-runner |
+| `concurrency` | Параллельных запусков агента | L1 | S2 | 1 | см. agent-runner | 1 | `global_max` | см. agent-runner |
+| `sandbox_profile` | Профиль среды: образ, CPU, RAM, диск | L1 | S2 | light | light = 1 CPU, 1 ГБ, 2 ГБ (agent-sandbox) | light | heavy | standard / heavy — для сборки кода |
+| `sandbox.egress_allow` | Разрешённые хосты | L1 | S2 | только платформа | см. agent-sandbox | только платформа | список доменов | см. agent-sandbox |
+| `sandbox.pool.size` | Готовых контейнеров | L1 | S2 | 2 | см. agent-sandbox | 0 | `global_max` | см. agent-sandbox |
+| `memory_profile.read` | Какие уровни памяти читать | L1 | S2 | M2, M3, M5, M6 | см. agent-memory | M3 | M0–M6 | см. agent-memory |
+| `memory_profile.write` | Какие уровни агент пишет | L1 | S2 | M3 | см. agent-memory | нет | M3, M4 | см. agent-memory |
+| `memory.m2_last_runs` | Сколько прошлых запусков в контекст | L1 | S2 | 3 | см. agent-memory | 0 | 10 | см. agent-memory |
+| `memory.retention` | Сроки хранения уровней | L1 | S2 | M1 30 д, M2 180 д | см. agent-memory | M1 7 д, M2 30 д | M1 90 д, M2 365 д | см. agent-memory |
+| `guardrails.tools_allow` | Разрешённые тулы | L1 | S2 | из определения | см. `agent.tools` (agent-registry) | нет | тулы агента | см. agent-registry |
+| `guardrails.approval` | Тулы с подтверждением человека | L1 | S2 | запись в задачу, push | необратимые и видимые людям действия | пусто | все тулы агента | уровень автономии (guardrails) |
+| `guardrails.approval_timeout` | Сколько ждать подтверждения | L1 | S2 | 24 ч | рабочий день + ночь | 15 мин | 72 ч | доступность людей; не больше `checkpoint.ttl` |
+| `repos` | Репозитории, доступ, префикс ветки | L1 | S2 | нет | наименьшие права | нет | репозитории проекта | только репозитории задачи агента |
+| `version` | Версия определения агента | L1 | S2 | последняя | см. `agent.version` (agent-registry) | 1 | последняя | см. agent-registry |
 
 ## Хранилища данных
 
