@@ -34,7 +34,7 @@ def natural(p: Path):
 
 
 def copy_sources():
-    shutil.rmtree(BUILD, ignore_errors=True)
+    shutil.rmtree(SRC, ignore_errors=True)
     for item in SOURCES:
         src = ROOT / item
         if src.is_file():
@@ -85,17 +85,24 @@ def nav_yaml() -> str:
     return "\n".join(L) + "\n"
 
 
-def write_config():
+def write_config(serve: bool = False):
     cfg = (HERE / "mkdocs.base.yml").read_text(encoding="utf-8")
+    if serve:
+        # Локально сайт в корне, а не под /agent-architecture/ (путь GitHub Pages)
+        cfg = re.sub(r"(?m)^site_url:.*$", "site_url: http://127.0.0.1:8000/", cfg)
+        # Пересобирать при правке исходных .md: hook копирует их перед каждой сборкой
+        watch = "\n".join(f"  - {q((ROOT / s).as_posix())}" for s in SOURCES)
+        cfg += f"\nhooks:\n  - {q((HERE / 'hooks.py').as_posix())}\nwatch:\n{watch}\n"
     (BUILD / "mkdocs.yml").write_text(cfg + "\n" + nav_yaml(), encoding="utf-8")
 
 
 def main():
+    serve = len(sys.argv) > 1 and sys.argv[1] == "serve"
     copy_sources()
-    write_config()
+    write_config(serve)
     cmd = [sys.executable, "-m", "mkdocs"]
-    if len(sys.argv) > 1 and sys.argv[1] == "serve":
-        subprocess.run(cmd + ["serve", "-f", str(BUILD / "mkdocs.yml")], check=True)
+    if serve:
+        subprocess.run(cmd + ["serve", "-f", str(BUILD / "mkdocs.yml"), "-a", "127.0.0.1:8000"], check=True)
     else:
         subprocess.run(cmd + ["build", "-f", str(BUILD / "mkdocs.yml"), "-d", str(SITE), "--clean"], check=True)
         print(f"Готово: {SITE / 'index.html'}")

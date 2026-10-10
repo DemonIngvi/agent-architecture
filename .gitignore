@@ -35,3 +35,4 @@ tmp/
 # Сборка HTML-view
 html-view/.build/
 html-view/site/
+html-view/.venv/

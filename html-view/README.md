@@ -5,12 +5,15 @@ HTML-сайт документации на MkDocs Material. Источник �
 - Сайт: https://demoningvi.github.io/agent-architecture/
 - Публикуется автоматически при push в `main` ([workflow](../.github/workflows/pages.yml)).
 
-Локально:
+Локально (Windows) — двойной клик по [serve.cmd](serve.cmd): при первом запуске создаёт `html-view/.venv` и ставит MkDocs, затем открывает http://127.0.0.1:8000. Правки в `.md` появляются на странице сами. Остановить — Ctrl+C в окне.
+
+Вручную:
 
 ```bash
-pip install -r html-view/requirements.txt
-python html-view/build.py serve   # http://127.0.0.1:8000
-python html-view/build.py         # статический сайт в html-view/site
+python -m venv html-view/.venv
+html-view/.venv/Scripts/python -m pip install -r html-view/requirements.txt
+html-view/.venv/Scripts/python html-view/build.py serve   # http://127.0.0.1:8000
+html-view/.venv/Scripts/python html-view/build.py         # статический сайт в html-view/site
 ```
 
 Меню строится автоматически: новые задачи в `docs/tasks/` и новые changes в `openspec/changes/` появляются на сайте сами.
