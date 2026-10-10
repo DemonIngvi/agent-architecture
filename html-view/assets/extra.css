@@ -170,3 +170,9 @@
 .md-typeset .home-title { text-align: center; font-weight: 800; color: var(--md-default-fg-color); margin-bottom: 1rem; }
 .hero-below { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--md-default-fg-color--lightest); }
 @media (max-width: 960px) { .io { grid-template-columns: 1fr; } }
+
+/* Позиция в системе — над схемой */
+.position { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; margin: -0.4rem 0 1.2rem;
+  padding: 0.6rem 0.9rem; border-radius: 0.7rem; border: 1px solid var(--md-default-fg-color--lightest); }
+.position .about-label { margin: 0; }
+.position .chain { margin: 0; }
