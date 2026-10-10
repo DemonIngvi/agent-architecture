@@ -1,0 +1,67 @@
+site_name: Agent Platform — архитектура
+site_description: Архитектура агентной платформы для ICPlan (It's a Plan)
+site_url: https://demoningvi.github.io/agent-architecture/
+repo_url: https://github.com/DemonIngvi/agent-architecture
+repo_name: DemonIngvi/agent-architecture
+edit_uri: edit/main/
+docs_dir: docs
+
+theme:
+  name: material
+  language: ru
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    logo: material/robot-outline
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: Тёмная тема
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Светлая тема
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - navigation.instant
+    - navigation.tracking
+    - navigation.indexes
+    - toc.follow
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+
+extra_css:
+  - assets/extra.css
+
+markdown_extensions:
+  - tables
+  - admonition
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search:
+      lang: [ru, en]
+
+validation:
+  links:
+    not_found: info
+    unrecognized_links: info

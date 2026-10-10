@@ -1,0 +1,29 @@
+/* ASCII-схемы: моноширинный шрифт с псевдографикой, без переносов */
+.md-typeset pre > code {
+  font-family: "JetBrains Mono", "Cascadia Mono", Consolas, "DejaVu Sans Mono", monospace;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  white-space: pre;
+  font-variant-ligatures: none;
+}
+
+/* Широкий контент — схемы и таблицы помещаются */
+.md-grid {
+  max-width: 1440px;
+}
+
+/* Таблицы на всю ширину, читаемее */
+.md-typeset table:not([class]) {
+  display: table;
+  width: 100%;
+  font-size: 0.7rem;
+}
+.md-typeset table:not([class]) th {
+  background: var(--md-primary-fg-color);
+  color: var(--md-primary-bg-color);
+}
+
+/* Строка навигации «← родитель» */
+.md-typeset p:first-of-type > a:first-child {
+  font-weight: 600;
+}
