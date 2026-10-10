@@ -31,8 +31,8 @@
 
 | ID | Хранилище | Что хранит | Владелец | Резервирование / срок |
 |---|---|---|---|---|
-| S1 | Postgres ICPlan, БД `itsaplan`, схема `public` | задачи, агенты, `agent_run`, `issue_activity`, статусы, документы | ICPlan | pg_dump по расписанию — не реализован (бэклог) |
-| S7 | MinIO (S3), бакет `planner-attachments` | вложения задач, артефакты агентов | ICPlan | бэкап — бэклог |
+| S1 | PostgreSQL 17 (CloudNativePG), БД `itsaplan`, схема `public` | задачи, агенты, `agent_run`, `issue_activity`, статусы, документы | ICPlan | базовые копии + WAL в S3 вне узла |
+| S7 | RustFS (S3 API), бакет `planner-attachments` | вложения задач, артефакты агентов, резервные копии | ICPlan / Инфраструктура | копия вне узла |
 
 ## Интерфейсы обмена
 
@@ -41,8 +41,16 @@
 | I1 | ICPlan Run Queue → Agent Runner | HTTP REST (протокол `@itsaplan/runner`) | JSON `Run` | Bearer API-ключ агента | pull, опрос 3 с | 10 с | backoff до 60 с | аренда запуска: выдаётся одному Runner |
 | I2 | Agent Runner → ICPlan (шаги, итог) | HTTP REST | JSON-пакеты `RunEvent` с `seq`, `RunResult` | Bearer API-ключ агента | асинхронно | 10 с | повтор с дедупликацией по (run_id, seq) | да, по (run_id, seq) |
 | I3 | ICPlan → Agent Runner (approve, отмена) | HTTP REST, опрос состояния запуска | JSON `ApprovalDecision`, статус | Bearer API-ключ агента | pull | 10 с | backoff | да, по (run_id, seq) |
-| I19 | Agent Runner / ICPlan → MinIO | S3 API | файлы | ключи сервиса (Secret) | синхронно | 30 с | 3 раза | да, по ключу объекта |
+| I19 | Agent Runner / ICPlan → объектное хранилище (RustFS) | S3 API | файлы | ключи сервиса (Secret) | синхронно | 30 с | 3 раза | да, по ключу объекта |
 | I20 | ICPlan UI ↔ ICPlan API | HTTP REST (существующий) | JSON | сессия пользователя | синхронно | — | — | — |
+| I21 | Пользователи → Traefik → web / api / mcp | HTTPS (TLS 1.2+), HTTP/2 | HTML / JSON | сессия ICPlan; ACME-сертификат | синхронно | 60 с (ingress) | нет | — |
+
+## Нагрузка и развёртывание
+
+| | |
+|---|---|
+| **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | API ICPlan ~20 RPS пик (UI 8, Runner 3, события 4, MCP 1), p95 < 300 мс; 15 одновременных пользователей |
+| **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | ICPlan: Deployment `web` (1–2), `api` (2), `worker` (1), `bot` (1) в `itsaplan-core`; вход — Traefik Ingress (HTTPS) |
 
 Детали форматов — [потоки](../../../../../docs/flows/icplan.md).
 
@@ -52,4 +60,4 @@
 |---|---|---|---|
 | Runner не в сети | нет опроса дольше порога | агенты платформы «не в сети», запуски ждут | запуск Runner |
 | Несовместимая версия протокола | проверка версии | Runner не берёт запуски | обновление Runner |
-| MinIO недоступен | ошибка I19 | итог публикуется без вложений, повтор загрузки | досылка вложений |
+| Объектное хранилище недоступно | ошибка I19 | итог публикуется без вложений, повтор загрузки | досылка вложений |

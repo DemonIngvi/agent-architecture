@@ -276,3 +276,18 @@ SUB = {
         does=["Считает затраты для задачи и отчётов"],
         why="Один источник правды по деньгам — LiteLLM.", rnd="observability.md"),
 }
+
+
+# --- infrastructure ---
+SUB.update({
+    ("infrastructure", "Traefik"): dict(tech="Traefik v3.7 (в составе k3s), MIT", params=[("entrypoints", "web → websecure (HTTPS)"), ("TLS", "ACME / свой сертификат"), ("маршруты", "web, api, /mcp")],
+        does=["Принимает внешний трафик по HTTPS", "Маршрутизирует на сервисы ICPlan", "Не публикует админки"], why="Встроен в k3s, ingress-nginx архивирован.", rnd="ingress-and-balancing.md"),
+    ("infrastructure", "PgBouncer"): dict(tech="PgBouncer 1.26 (пулер CloudNativePG), ISC", params=[("pool_mode", "transaction"), ("default_pool_size", "30"), ("session-клиенты", "по списку")],
+        does=["Держит пул серверных соединений", "Защищает Postgres от роста числа клиентов"], why="Агенты, Runner и LiteLLM множат соединения.", rnd="ingress-and-balancing.md"),
+    ("infrastructure", "PostgreSQL 17 + pgvector"): dict(tech="PostgreSQL 17 под CloudNativePG v1.30, образ с pgvector", params=[("БД", "itsaplan, litellm"), ("схемы", "public, platform, harness_ckpt"), ("бэкап", "базовые копии + WAL в S3 вне узла")],
+        does=["Хранит данные ICPlan, платформы, LiteLLM, checkpoint"], why="Одна СУБД на всё; оператор даёт бэкап и восстановление.", rnd="data-stores.md"),
+    ("infrastructure", "RustFS"): dict(tech="RustFS 1.0 (S3 API), Apache-2.0", params=[("бакет", "planner-attachments"), ("доступ", "ключи сервисов из Secret")],
+        does=["Хранит вложения, артефакты, копии"], why="Уже в стеке ICPlan; MinIO архивирован.", rnd="data-stores.md"),
+    ("infrastructure", "Резервное хранилище S3 вне узла"): dict(tech="S3-совместимое хранилище вне узла (второй сервер или облако)", params=[("частота", "базовая копия ежедневно, WAL непрерывно"), ("проверка", "раз в месяц")],
+        does=["Хранит копии вне узла"], why="Копии на том же диске — не бэкап.", rnd="data-stores.md"),
+})

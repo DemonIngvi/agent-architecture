@@ -65,6 +65,26 @@ ICPlan назначает агента на задачу. Agent Runner толь�
                  Anthropic │ OpenAI │ local
 ```
 
+## Развёртывание (C4 deployment)
+
+```
+Пользователи ──HTTPS──▶ Traefik (k3s ingress, TLS) ──▶ itsaplan-core: web ×1–2 · api ×2 · worker · bot
+                                                      itsaplan-agents: Runner · LiteLLM ×2 · OPA ×2 · Memory · egress · запуски
+                                                      itsaplan-data: PgBouncer ─▶ PostgreSQL 17 + pgvector (CloudNativePG) · RustFS (S3)
+                                                      копии ─▶ S3 вне узла
+Узел: k3s, 8 vCPU / 32 ГБ / 400 ГБ (один узел для MVP)
+```
+
+| Профиль нагрузки (гипотеза) | Значение |
+|---|---|
+| Пользователи | 50 зарегистрированных, 15 одновременно |
+| API ICPlan | ~20 RPS в пике, p95 < 300 мс |
+| Запуски агентов | ~400 в день, пик 30 в час, 4 активных + очередь |
+| LiteLLM | 0.4–1 RPS, ~55 тыс. токенов/мин |
+| Postgres | ~60 клиентских соединений → PgBouncer ≤ 30 серверных |
+
+Подробно: спека [platform-infrastructure](openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md) и [схема](openspec/changes/define-agent-platform/specs/platform-infrastructure/architecture.md). Технологии — [сводная таблица](docs/TECHNOLOGIES.md). Обоснование: [R&D: профиль нагрузки](docs/rnd/load-profile.md) · [Kubernetes](docs/rnd/kubernetes-runtime.md) · [ingress](docs/rnd/ingress-and-balancing.md) · [СУБД и хранилища](docs/rnd/data-stores.md) · [design D15, D16](openspec/changes/define-agent-platform/design.md).
+
 ## Harness (внутри Sandbox)
 
 Рантайм, который крутит агентский цикл и навязывает агенту все правила. LLM только «думает», всё остальное делает харнес. Границы — на общей схеме выше.
@@ -204,7 +224,7 @@ scheduling:
 |---|---|
 | Рабочие файлы запуска | `/workspace` в Sandbox, удаляется с контейнером |
 | Код | Ветка `agent/<KEY>` + PR в целевой репозиторий; push в защищённые ветки запрещён |
-| Документы, артефакты | Документы и вложения задачи ICPlan (MinIO) |
+| Документы, артефакты | Документы и вложения задачи ICPlan (RustFS, S3 API) |
 | Состояние задачи (M3), лог запуска (M2) | БД ICPlan |
 
 **Доступ к репозиториям:** в определении агента — allowlist `repos: [{repo, access: read|write, branch_prefix}]`. Runner выдаёт короткоживущий токен на запуск, ограниченный этими репозиториями; токен подставляет egress-прокси или credential helper, в env контейнера его нет. Репозитории клонируются в `/workspace` при старте (shallow).

@@ -26,7 +26,7 @@
 | ID | Хранилище | Что хранит | Владелец | Резервирование / срок |
 |---|---|---|---|---|
 | S3 | Postgres ICPlan, схема `platform`, таблицы `run_event`, `scheduler_slot` | события запусков, слоты планировщика | Agent Runner / Observability | события — 90 дней; слоты — оперативные |
-| S6 | Postgres, отдельная БД `litellm` | virtual keys, бюджеты, журнал затрат | LiteLLM | журнал затрат — по политике LiteLLM |
+| S6 | PostgreSQL 17 (тот же кластер), БД `litellm` | virtual keys, бюджеты, журнал затрат | LiteLLM | журнал затрат — по политике LiteLLM |
 
 ## Интерфейсы обмена
 
@@ -35,6 +35,14 @@
 | I2 | Agent Runner → ICPlan (шаги, итог) | HTTP REST | JSON-пакеты `RunEvent` с `seq`, `RunResult` | Bearer API-ключ агента | асинхронно | 10 с | повтор с дедупликацией по (run_id, seq) | да, по (run_id, seq) |
 | I14 | LiteLLM → БД `litellm` | протокол PostgreSQL | таблицы LiteLLM | пароль из Secret | синхронно | 5 с | встроенный | — |
 | I20 | ICPlan UI ↔ ICPlan API | HTTP REST (существующий) | JSON | сессия пользователя | синхронно | — | — | — |
+| I22 | Сервисы → PgBouncer → Postgres | протокол PostgreSQL | SQL | логин / пароль из Secret, роль на схему | синхронно | 5 с на запрос | 1 раз (только чтение) | — |
+
+## Нагрузка и развёртывание
+
+| | |
+|---|---|
+| **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | запись событий ~4 RPS в пике, ~25 МБ/день; таймлайн обновляется < 3 с |
+| **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | таблица событий в Postgres; чтение — через api ICPlan; Langfuse / Prometheus — бэклог |
 
 Детали форматов — [потоки](../../../../../docs/flows/observability.md).
 

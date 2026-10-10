@@ -189,3 +189,22 @@ REFS = {
     "llm-gateway": [("R&D: шлюз к моделям", "docs/rnd/llm-gateway.md"), ("Design D5", D)],
     "observability": [("R&D: наблюдаемость", "docs/rnd/observability.md"), ("Design D12", D)],
 }
+
+
+# --- infrastructure ---
+RATIONALE["infrastructure"] = dict(
+    why=["Готовые решения проекта AI-агент: k3s, k3d локально, Traefik, Helm-чарты, `existingSecret` (решения 7.11–7.14)",
+         "Один узел покрывает профиль нагрузки MVP (R&D «Профиль нагрузки»)",
+         "ingress-nginx и MinIO архивированы — выбраны активно поддерживаемые Traefik и RustFS"],
+    gain=["Один движок локально и на сервере", "Ноль лишних компонентов для ingress", "Пул соединений и бэкапы вне узла"],
+    alts=[("ingress-nginx", "архивирован"), ("MinIO", "архивирован"), ("Docker Compose на сервере", "нет политик, проб, обновлений без простоя"), ("Управляемый k8s", "стоимость и зависимость от облака")],
+    config=[("k3s.version", "Версия кластера", "Совместимость чартов", "v1.37.1+k3s1", "Конфиг деплоя"),
+            ("ingress.host / tls", "Домен и сертификат", "Доступ пользователей по HTTPS", "ACME", "Конфиг деплоя"),
+            ("<сервис>.replicas", "Число реплик", "Обновление без простоя, нагрузка", "api 2, LiteLLM 2, OPA 2, остальные 1", "Конфиг деплоя"),
+            ("<сервис>.resources", "requests / limits", "Сколько ресурсов получает сервис", "по таблице сайзинга", "Конфиг деплоя"),
+            ("pgbouncer.pool_mode / size", "Режим и размер пула", "Защита Postgres от лавины соединений", "transaction / 30", "Конфиг деплоя"),
+            ("postgres.backup.target", "Куда класть копии", "Восстановление после потери узла", "S3 вне узла", "Конфиг деплоя"),
+            ("objectStorage.endpoint", "Адрес S3", "Где лежат вложения", "RustFS в кластере", "Конфиг деплоя"),
+            ("networkPolicy.enabled", "Сетевые политики", "Изоляция зон", "true", "Конфиг деплоя")])
+REFS["infrastructure"] = [("R&D: профиль нагрузки", "docs/rnd/load-profile.md"), ("R&D: ingress и балансировка", "docs/rnd/ingress-and-balancing.md"),
+                          ("R&D: Kubernetes", "docs/rnd/kubernetes-runtime.md"), ("R&D: СУБД и хранилища", "docs/rnd/data-stores.md"), ("Design D15, D16", D)]

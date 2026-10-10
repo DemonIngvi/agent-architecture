@@ -42,6 +42,13 @@
 | I11 | Harness → Memory API | HTTP REST | JSON `M3Record`, контекст | токен запуска | синхронно | 2 с | 2 раза | запись M3 — upsert по (задача, область) |
 | I12 | Harness → checkpointer | протокол PostgreSQL к схеме `harness_ckpt` | LangGraph checkpoint | роль только на свою схему | синхронно | 5 с | 2 раза | да, по (thread, step) |
 
+## Нагрузка и развёртывание
+
+| | |
+|---|---|
+| **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | шаг цикла 5–20 с; ~0.1 RPS к LiteLLM на запуск; до 200 тыс. токенов на запуск |
+| **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | процесс внутри контейнера sandbox, образ `harness:<версия>`; ресурсы — профиль sandbox |
+
 Детали форматов — [потоки](../../../../../docs/flows/harness.md).
 
 ## Отказы (FMEA)

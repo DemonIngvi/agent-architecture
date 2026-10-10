@@ -332,3 +332,32 @@ IO = {
     "observability": (["`RunEvent`", "Spend log LiteLLM", "Решения guardrails"],
                       ["Таймлайн и затраты в задаче"]),
 }
+
+
+# --- infrastructure ---
+COMPONENTS.append(("infrastructure", "Инфраструктура", "part", "G3",
+    "Кластер k3s, Helm, Traefik ingress, PostgreSQL (CloudNativePG) с PgBouncer, RustFS, секреты, бэкапы, сетевые политики, профиль нагрузки.",
+    ["icplan", "agent-runner", "llm-gateway", "sandbox"],
+    [("Спека", f"{DAP}/specs/platform-infrastructure/spec.md"), ("Схема развёртывания", f"{DAP}/specs/platform-infrastructure/architecture.md")],
+    ["4.6", "4.7", "4.8"]))
+BY_SLUG["infrastructure"] = COMPONENTS[-1]
+BLOCKS["infrastructure"] = [
+    [B("Пользователи", "HTTPS", "user")],
+    "↓ HTTPS (I21)",
+    Z("Узел k3s (8 vCPU / 32 ГБ / 400 ГБ)", [
+        [B("Traefik", "ingress, TLS ACME; публично web, api, mcp", "core", "part")],
+        "↓ Service (ClusterIP) — балансировка по репликам",
+        Z("itsaplan-core", [[B("ICPlan web ×1–2", "", "ext", to="icplan"), B("ICPlan api ×2", "+ MCP, Platform module", "ext", to="icplan"), B("worker, bot", "", "ext", to="icplan")]]),
+        Z("itsaplan-agents", [[B("Agent Runner", "", "ext", to="agent-runner"), B("LiteLLM ×2", "", "ext", to="llm-gateway"), B("OPA ×2", "", "ext", to="guardrails")],
+                              [B("Memory API", "", "ext", to="memory"), B("Egress-прокси", "", "ext", to="sandbox"), B("Запуски (Pod / Docker)", "", "ext", to="sandbox")]]),
+        "↓ PostgreSQL через PgBouncer (I22) · S3 API (I19)",
+        Z("itsaplan-data", [[B("PgBouncer", "transaction pool ≤ 30", "core", "todo"), B("PostgreSQL 17 + pgvector", "CloudNativePG; БД itsaplan, litellm", "store", "part"), B("RustFS", "S3: вложения, артефакты, копии", "store", "part")]]),
+    ], cls="icplan"),
+    "↓ копии вне узла",
+    [B("Резервное хранилище S3 вне узла", "базовые копии + WAL, копия RustFS", "core", "todo"), B("Prometheus / Grafana / Loki", "мониторинг", "back")],
+]
+ABOUT["infrastructure"] = ([("Пользователи", None), ("Инфраструктура", "infrastructure"), ("ICPlan", "icplan"), ("Agent Runner", "agent-runner")],
+    "Основание платформы: где и как всё запущено, как распределяется нагрузка, где лежат данные и как они сохраняются.",
+    ["Кластер k3s на одном узле, namespaces по зонам", "Вход только через Traefik по HTTPS", "Балансировка между репликами — Service",
+     "PostgreSQL 17 под CloudNativePG, пул PgBouncer", "RustFS (S3) для вложений и копий", "Секреты, сетевые политики, бэкапы вне узла"])
+IO["infrastructure"] = (["Helm-чарты, values, Secret", "Запросы пользователей (HTTPS)"], ["Работающие сервисы", "Резервные копии вне узла"])

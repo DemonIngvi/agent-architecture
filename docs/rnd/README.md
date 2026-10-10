@@ -18,6 +18,10 @@
 | [Защита от зацикливания и перерасхода](runaway-protection.md) | Guardrails | Детерминированные лимиты и бюджеты | D6 |
 | [Хранение конфигурации](config-storage.md) | Platform module | БД ICPlan + YAML экспорт | D9 |
 | [Шлюз к моделям](llm-gateway.md) | LiteLLM gateway | LiteLLM Proxy | D5 |
+| [Профиль нагрузки и ёмкость](load-profile.md) | Инфраструктура | Один узел k3s для MVP, гипотезы нагрузки | D16 |
+| [Ingress и балансировка](ingress-and-balancing.md) | Инфраструктура | Traefik, Service, PgBouncer | D15 |
+| [Kubernetes и развёртывание](kubernetes-runtime.md) | Инфраструктура | k3s + Helm, k3d локально | D15 |
+| [СУБД и хранилища](data-stores.md) | Инфраструктура | PostgreSQL 17 + CloudNativePG, RustFS | D4, D15 |
 | [Наблюдаемость](observability.md) | Observability | Таблица событий в MVP, Langfuse позже | D12 |
 
 Источники — по состоянию на октябрь 2026; часть ссылок на внутренние документы проекта AI-агент (`D:\АИ агент\Архитектура`).

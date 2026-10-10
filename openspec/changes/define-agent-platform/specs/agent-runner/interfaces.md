@@ -50,7 +50,16 @@
 | I6 | Agent Runner → Docker Engine API | HTTP поверх unix-сокета (позже K8s API) | JSON Docker API | доступ к сокету | синхронно | 30 с | 1 раз | create — нет; destroy — да |
 | I7 | Agent Runner ↔ Harness | HTTP внутри сети sandbox; события — NDJSON-поток | `RunBundle`, `RunEvent`, `RunResult`, `ApprovalDecision` | одноразовый токен запуска | поток | = `timeout_s` | переподключение с последнего `seq` | да, по `seq` |
 | I18 | Agent Runner → git-провайдер (токены) | HTTPS REST (GitHub App / Gitea API) | JSON | ключ приложения (Secret) | синхронно | 10 с | 2 раза | да |
-| I19 | Agent Runner / ICPlan → MinIO | S3 API | файлы | ключи сервиса (Secret) | синхронно | 30 с | 3 раза | да, по ключу объекта |
+| I19 | Agent Runner / ICPlan → объектное хранилище (RustFS) | S3 API | файлы | ключи сервиса (Secret) | синхронно | 30 с | 3 раза | да, по ключу объекта |
+| I22 | Сервисы → PgBouncer → Postgres | протокол PostgreSQL | SQL | логин / пароль из Secret, роль на схему | синхронно | 5 с на запрос | 1 раз (только чтение) | — |
+| I23 | Agent Runner → Kubernetes API (этап 4) | HTTPS REST (client-go) | JSON манифесты Pod / Job | ServiceAccount с правами только на namespace `itsaplan-agents` | синхронно | 30 с | 1 раз | create — нет |
+
+## Нагрузка и развёртывание
+
+| | |
+|---|---|
+| **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | опрос очереди ~0.3 RPS на агента; до 6 запусков в очереди, 4 активны; старт запуска после взятия < 5 с (с пулом < 1 с) |
+| **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | Deployment `agent-runner` в `itsaplan-agents`, 1 реплика (MVP), 2 — с общими слотами; requests 0.1 CPU / 128 МиБ, limits 0.5 / 512 МиБ; без ingress |
 
 Детали форматов — [потоки](../../../../../docs/flows/agent-runner.md).
 

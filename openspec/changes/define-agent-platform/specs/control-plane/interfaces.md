@@ -43,7 +43,7 @@
 | ID | Хранилище | Что хранит | Владелец | Резервирование / срок |
 |---|---|---|---|---|
 | S2 | Postgres ICPlan, схема `platform` | настройки агентов, версии, профили sandbox и памяти, данные guardrails, параметры планирования | Platform module | вместе с S1 |
-| S6 | Postgres, отдельная БД `litellm` | virtual keys, бюджеты, журнал затрат | LiteLLM | журнал затрат — по политике LiteLLM |
+| S6 | PostgreSQL 17 (тот же кластер), БД `litellm` | virtual keys, бюджеты, журнал затрат | LiteLLM | журнал затрат — по политике LiteLLM |
 | S9 | Конфиг деплоя: `values.yaml` (git, без секретов) + Secret / `.env` (вне git) | параметры платформы, адреса, переключатели guardrails, секреты | эксплуатация | версии в git; секреты — вне git |
 
 ## Интерфейсы обмена
@@ -54,6 +54,14 @@
 | I15 | Platform module → LiteLLM admin API | HTTP REST `/key/generate`, `/key/update` | JSON | master key (Secret) | синхронно | 5 с | 3 раза | да, по алиасу ключа |
 | I16 | Platform module + git (Rego) → OPA | OPA bundles API, HTTP pull | tar.gz bundle | токен bundle-сервера | опрос 30 с | 10 с | встроенный в OPA | да |
 | I20 | ICPlan UI ↔ ICPlan API | HTTP REST (существующий) | JSON | сессия пользователя | синхронно | — | — | — |
+| I22 | Сервисы → PgBouncer → Postgres | протокол PostgreSQL | SQL | логин / пароль из Secret, роль на схему | синхронно | 5 с на запрос | 1 раз (только чтение) | — |
+
+## Нагрузка и развёртывание
+
+| | |
+|---|---|
+| **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | единицы изменений в день; раздача в LiteLLM / OPA — секунды |
+| **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | модуль ICPlan api (`itsaplan-core`); OPA забирает bundle по HTTP раз в 30 с |
 
 Детали форматов — [потоки](../../../../../docs/flows/platform-module.md).
 

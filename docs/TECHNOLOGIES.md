@@ -1,0 +1,79 @@
+# Сводная таблица технологий
+
+← [README](../README.md) · [architecture.md](../architecture.md) · [R&D](rnd/README.md)
+
+Какое ПО выбрано, для чего, версия, лицензия, репозиторий и откуда качать. Данные репозиториев — GitHub API на **10.10.2026**. Статус — по Tech Radar: **Adopt** (используем), **Trial** (пробуем в задаче), **Assess** (изучаем), **Hold** (не используем / отложено).
+
+## Платформа
+
+| Технология | Назначение / компонент | Версия | Лицензия | Репозиторий | Откуда качать | Статус | R&D |
+|---|---|---|---|---|---|---|---|
+| It's a Plan (наш форк) | ICPlan — трекер, UI, очередь | upstream v1.4.0 | AGPL-3.0 | [croffasia/itsaplan](https://github.com/croffasia/itsaplan) · форк [DemonIngvi/itsaplan-app](https://github.com/DemonIngvi/itsaplan-app) | `ghcr.io/croffasia/itsaplan-{api,web,worker,bot}`; сборка из форка | Adopt | [трекер](rnd/tracker-choice.md) |
+| Bun | рантайм api / worker ICPlan | 1.4.x | MIT | [oven-sh/bun](https://github.com/oven-sh/bun) | в образах ICPlan; [bun.sh](https://bun.sh) | Adopt (в составе ICPlan) | — |
+| Elysia | HTTP-фреймворк api ICPlan | 1.4.x | MIT | [elysiajs/elysia](https://github.com/elysiajs/elysia) | npm `elysia` | Adopt (в составе) | — |
+| Next.js | web ICPlan | 16.x | MIT | [vercel/next.js](https://github.com/vercel/next.js) | npm `next` | Adopt (в составе) | — |
+| Drizzle ORM | ORM ICPlan, Platform module | 0.45.x | Apache-2.0 | [drizzle-team/drizzle-orm](https://github.com/drizzle-team/drizzle-orm) | npm `drizzle-orm` | Adopt | — |
+| Go | Agent Runner | 1.2x | BSD-3-Clause | [golang/go](https://github.com/golang/go) | [go.dev/dl](https://go.dev/dl/), образ `golang` | Adopt | [Runner](rnd/runner-and-scheduling.md) |
+| Python | Harness, Memory API, mock-LLM | 3.12+ | PSF-2.0 | [python/cpython](https://github.com/python/cpython) | [python.org](https://www.python.org/downloads/), образ `python` | Adopt | — |
+| LangGraph | Harness: агентский цикл | закрепить в задаче 1.3 (cli 0.4.33) | MIT | [langchain-ai/langgraph](https://github.com/langchain-ai/langgraph) | PyPI `langgraph` | Adopt | [фреймворк](rnd/harness-framework.md) |
+| LangChain MCP (`langchain.mcp`) | Tool Executor: MCP-тулы в LangGraph | в составе `langchain` v1 | MIT | [langchain-ai/langchain](https://github.com/langchain-ai/langchain/tree/master/libs/langchain_v1/langchain/mcp) | PyPI `langchain[mcp]` | Trial | [MCP](rnd/mcp-vs-direct.md) |
+| MCP Python SDK | протокол MCP (зависимость `langchain[mcp]`) | v2.3.0 | MIT | [modelcontextprotocol/python-sdk](https://github.com/modelcontextprotocol/python-sdk) | PyPI `mcp` | Adopt (косвенно) | [MCP](rnd/mcp-vs-direct.md) |
+| langchain-mcp-adapters | адаптер MCP → LangChain | 0.3.2 | MIT | [langchain-ai/langchain-mcp-adapters](https://github.com/langchain-ai/langchain-mcp-adapters) | — | **Hold — архивирован**: перенесён в `langchain[mcp]` ([гайд миграции](https://docs.langchain.com/oss/python/migrate/langchain-mcp-adapters)) | — |
+| LiteLLM Proxy | LLM gateway: алиасы, бюджеты, fallback | закреплена v1.77.3-stable; актуальная v1.104.2 — пересмотреть (1.1) | MIT ядро + платные enterprise-функции | [BerriAI/litellm](https://github.com/BerriAI/litellm) | `ghcr.io/berriai/litellm` | Adopt | [шлюз](rnd/llm-gateway.md) |
+| Open Policy Agent | Guardrails G1 / G2 | v1.21.1 | Apache-2.0 | [open-policy-agent/opa](https://github.com/open-policy-agent/opa) | `openpolicyagent/opa` | Adopt | [движок](rnd/guardrails-engine.md) |
+| Langfuse | LLM-трейсы, evals | v4.56.0 | MIT ядро + EE | [langfuse/langfuse](https://github.com/langfuse/langfuse) | `langfuse/langfuse` | Assess (бэклог) | [наблюдаемость](rnd/observability.md) |
+| text-embeddings-inference | эмбеддинги для M4 / RAG | закреплена cpu-1.9.4 | Apache-2.0 | [huggingface/text-embeddings-inference](https://github.com/huggingface/text-embeddings-inference) | `ghcr.io/huggingface/text-embeddings-inference` | Assess (бэклог) | [RAG](rnd/rag.md) |
+
+## Данные
+
+| Технология | Назначение / компонент | Версия | Лицензия | Репозиторий | Откуда качать | Статус | R&D |
+|---|---|---|---|---|---|---|---|
+| PostgreSQL | СУБД: ICPlan, платформа, LiteLLM, checkpoint | 17 | PostgreSQL License | [postgres/postgres](https://github.com/postgres/postgres) (зеркало) | `pgvector/pgvector:pg17` (сейчас); `ghcr.io/cloudnative-pg/postgresql:17` (CNPG) | Adopt | [СУБД](rnd/data-stores.md) |
+| pgvector | векторы для M4 | — | PostgreSQL License | [pgvector/pgvector](https://github.com/pgvector/pgvector) | в образе `pgvector/pgvector:pg17` | Assess | [RAG](rnd/rag.md) |
+| CloudNativePG | оператор Postgres: бэкап, пулер | v1.30.1 | Apache-2.0 | [cloudnative-pg/cloudnative-pg](https://github.com/cloudnative-pg/cloudnative-pg) | Helm `cloudnative-pg.github.io/charts` | Trial (4.7) | [СУБД](rnd/data-stores.md) |
+| PgBouncer | пул соединений Postgres | 1.26.0 | ISC | [pgbouncer/pgbouncer](https://github.com/pgbouncer/pgbouncer) | в составе Pooler CloudNativePG | Adopt | [балансировка](rnd/ingress-and-balancing.md) |
+| RustFS | объектное хранилище (S3) | 1.0.x | Apache-2.0 | [rustfs/rustfs](https://github.com/rustfs/rustfs) | `rustfs/rustfs` | Adopt | [СУБД](rnd/data-stores.md) |
+| SeaweedFS | запасное S3-хранилище | 4.48 | Apache-2.0 | [seaweedfs/seaweedfs](https://github.com/seaweedfs/seaweedfs) | `chrislusf/seaweedfs` | Assess | [СУБД](rnd/data-stores.md) |
+| MinIO | S3-хранилище | 2025-10-15 | AGPL-3.0 | [minio/minio](https://github.com/minio/minio) | — | **Hold — архивирован** | [СУБД](rnd/data-stores.md) |
+
+## Инфраструктура
+
+| Технология | Назначение / компонент | Версия | Лицензия | Репозиторий | Откуда качать | Статус | R&D |
+|---|---|---|---|---|---|---|---|
+| k3s | кластер Kubernetes | v1.37.1+k3s1 | Apache-2.0 | [k3s-io/k3s](https://github.com/k3s-io/k3s) | `curl -sfL https://get.k3s.io` | Adopt | [Kubernetes](rnd/kubernetes-runtime.md) |
+| k3d | локальный кластер (k3s в Docker) | v5.9.0 | MIT | [k3d-io/k3d](https://github.com/k3d-io/k3d) | GitHub Releases | Adopt | [Kubernetes](rnd/kubernetes-runtime.md) |
+| Helm | упаковка и развёртывание | v4.3.0 | Apache-2.0 | [helm/helm](https://github.com/helm/helm) | [get.helm.sh](https://get.helm.sh) | Adopt | [Kubernetes](rnd/kubernetes-runtime.md) |
+| Traefik | ingress, TLS | v3.7 (в составе k3s) | MIT | [traefik/traefik](https://github.com/traefik/traefik) | в составе k3s | Adopt | [ingress](rnd/ingress-and-balancing.md) |
+| ingress-nginx | ingress | controller-v1.15.1 | Apache-2.0 | [kubernetes/ingress-nginx](https://github.com/kubernetes/ingress-nginx) | — | **Hold — архивирован** | [ingress](rnd/ingress-and-balancing.md) |
+| Docker Engine (Moby) | контейнеры, sandbox (этапы 1–3) | 29.x | Apache-2.0 | [moby/moby](https://github.com/moby/moby) | [docs.docker.com/engine/install](https://docs.docker.com/engine/install/) | Adopt | [изоляция](rnd/sandbox-isolation.md) |
+| Squid / mitmproxy | egress-прокси с allowlist | 7.7 / 12.2 | GPL-2.0 / MIT | [squid-cache/squid](https://github.com/squid-cache/squid) · [mitmproxy/mitmproxy](https://github.com/mitmproxy/mitmproxy) | пакеты ОС / PyPI | Assess (решение в 4.2) | [изоляция](rnd/sandbox-isolation.md) |
+| Firecracker | microVM — будущий провайдер sandbox | v1.17.0 | Apache-2.0 | [firecracker-microvm/firecracker](https://github.com/firecracker-microvm/firecracker) | GitHub Releases | Assess | [изоляция](rnd/sandbox-isolation.md) |
+| k6 | нагрузочный тест | v2.3.0 | AGPL-3.0 | [grafana/k6](https://github.com/grafana/k6) | `grafana/k6` | Trial (4.8) | [нагрузка](rnd/load-profile.md) |
+| Prometheus | метрики | v3.15.0 | Apache-2.0 | [prometheus/prometheus](https://github.com/prometheus/prometheus) | `prom/prometheus` | Hold (бэклог) | — |
+| Grafana | дашборды | v13.2.3 | AGPL-3.0 | [grafana/grafana](https://github.com/grafana/grafana) | `grafana/grafana` | Hold (бэклог) | — |
+| Loki | логи | v3.7.8 | AGPL-3.0 | [grafana/loki](https://github.com/grafana/loki) | `grafana/loki` | Hold (бэклог) | — |
+| Gitea | git и CI | v28.1.0 | MIT | [go-gitea/gitea](https://github.com/go-gitea/gitea) | `gitea/gitea` | Hold (бэклог) | — |
+| Argo CD | GitOps | v3.5.4 | Apache-2.0 | [argoproj/argo-cd](https://github.com/argoproj/argo-cd) | Helm `argoproj.github.io/argo-helm` | Hold (бэклог) | [Kubernetes](rnd/kubernetes-runtime.md) |
+| Sealed Secrets | секреты для GitOps | v0.40.0 | Apache-2.0 | [bitnami-labs/sealed-secrets](https://github.com/bitnami-labs/sealed-secrets) | GitHub Releases | Hold (бэклог) | — |
+| Trivy | сканирование образов | v0.75.0 | Apache-2.0 | [aquasecurity/trivy](https://github.com/aquasecurity/trivy) | `aquasec/trivy` | Hold (бэклог) | — |
+
+## Документация
+
+| Технология | Назначение | Версия | Лицензия | Репозиторий | Откуда качать | Статус |
+|---|---|---|---|---|---|---|
+| OpenSpec | спеки SDD | v1.14.1 | MIT | [Fission-AI/OpenSpec](https://github.com/Fission-AI/OpenSpec) | npm `@fission-ai/openspec` | Adopt |
+| MkDocs | генератор сайта | 1.6.1 | BSD-2-Clause | [mkdocs/mkdocs](https://github.com/mkdocs/mkdocs) | PyPI `mkdocs` | Adopt (версия закреплена) |
+| Material for MkDocs | тема сайта | 9.7.7 | MIT | [squidfunk/mkdocs-material](https://github.com/squidfunk/mkdocs-material) | PyPI `mkdocs-material` | Adopt |
+
+## Лицензионные риски
+
+| Лицензия | Где | Что значит для нас |
+|---|---|---|
+| AGPL-3.0 | It's a Plan (форк) | доработки форка, доступного пользователям по сети, должны быть открыты — репозиторий форка держим доступным пользователям |
+| AGPL-3.0 | Grafana, Loki, k6 | используем без изменений — обязательств по раскрытию нет |
+| MIT ядро + коммерческие функции | LiteLLM, Langfuse | используем только открытые функции; enterprise — отдельное решение |
+| GPL-2.0 | Squid | отдельный процесс без изменений — обязательств нет |
+
+## Архивированные проекты (не использовать)
+
+ingress-nginx → Traefik; MinIO → RustFS; langchain-mcp-adapters → `langchain[mcp]` (официальный перенос в LangChain).

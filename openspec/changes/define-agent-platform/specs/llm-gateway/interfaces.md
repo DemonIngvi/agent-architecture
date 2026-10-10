@@ -27,7 +27,7 @@
 
 | ID | Хранилище | Что хранит | Владелец | Резервирование / срок |
 |---|---|---|---|---|
-| S6 | Postgres, отдельная БД `litellm` | virtual keys, бюджеты, журнал затрат | LiteLLM | журнал затрат — по политике LiteLLM |
+| S6 | PostgreSQL 17 (тот же кластер), БД `litellm` | virtual keys, бюджеты, журнал затрат | LiteLLM | журнал затрат — по политике LiteLLM |
 | S9 | Конфиг деплоя: `values.yaml` (git, без секретов) + Secret / `.env` (вне git) | параметры платформы, адреса, переключатели guardrails, секреты | эксплуатация | версии в git; секреты — вне git |
 
 ## Интерфейсы обмена
@@ -38,6 +38,14 @@
 | I13 | LiteLLM → провайдеры / mock | HTTPS API провайдера; HTTP для mock | провайдерский JSON | ключ провайдера в LiteLLM (Secret) | синхронно / стрим | 120 с | + fallback-модель | нет |
 | I14 | LiteLLM → БД `litellm` | протокол PostgreSQL | таблицы LiteLLM | пароль из Secret | синхронно | 5 с | встроенный | — |
 | I15 | Platform module → LiteLLM admin API | HTTP REST `/key/generate`, `/key/update` | JSON | master key (Secret) | синхронно | 5 с | 3 раза | да, по алиасу ключа |
+| I22 | Сервисы → PgBouncer → Postgres | протокол PostgreSQL | SQL | логин / пароль из Secret, роль на схему | синхронно | 5 с на запрос | 1 раз (только чтение) | — |
+
+## Нагрузка и развёртывание
+
+| | |
+|---|---|
+| **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | 0.4–1 RPS, ~55 тыс. токенов/мин в пике; ответ модели 5–20 с, стрим |
+| **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | LiteLLM — Deployment `litellm` в `itsaplan-agents`, 2 реплики за Service ClusterIP; БД `litellm` через PgBouncer; админка без ingress |
 
 Детали форматов — [потоки](../../../../../docs/flows/llm-gateway.md).
 

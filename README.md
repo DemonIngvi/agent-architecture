@@ -11,6 +11,7 @@
 - План работ по документации — [docs/PLAN.md](docs/PLAN.md)
 - Roadmap MVP с оценками — [docs/ROADMAP.md](docs/ROADMAP.md)
 - Сводная таблица задач — [docs/TASKS.md](docs/TASKS.md)
+- Сводная таблица технологий (ПО, лицензии, откуда качать) — [docs/TECHNOLOGIES.md](docs/TECHNOLOGIES.md)
 - Дальний бэклог и техдолг — [docs/BACKLOG.md](docs/BACKLOG.md)
 
 ## Как это работает

@@ -18,3 +18,5 @@
 | Хранилища данных | техническое | [R&D: автоподхват](../../../../../docs/rnd/autopickup-rules.md) | [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md), [3.1](../../../../../docs/tasks/3.1-icplan-autodelegate-status.md) | 3 |
 | Интерфейсы обмена | техническое | [R&D: автоподхват](../../../../../docs/rnd/autopickup-rules.md) | [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md), [3.1](../../../../../docs/tasks/3.1-icplan-autodelegate-status.md) | 3 |
 | Поведение при отказах зависимостей | [US-ICP-01](../../../../../docs/stories/icplan.md) | [R&D: автоподхват](../../../../../docs/rnd/autopickup-rules.md) | [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md), [3.1](../../../../../docs/tasks/3.1-icplan-autodelegate-status.md) | 3 |
+| Нагрузка и производительность | техническое | [R&D: автоподхват](../../../../../docs/rnd/autopickup-rules.md) | [4.8](../../../../../docs/tasks/4.8-load-test.md) | 3 |
+| Развёртывание | техническое | [R&D: автоподхват](../../../../../docs/rnd/autopickup-rules.md) | [4.6](../../../../../docs/tasks/4.6-k8s-helm-ingress.md) | 3 |

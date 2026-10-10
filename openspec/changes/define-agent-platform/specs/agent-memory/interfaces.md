@@ -27,7 +27,7 @@
 
 | ID | Хранилище | Что хранит | Владелец | Резервирование / срок |
 |---|---|---|---|---|
-| S1 | Postgres ICPlan, БД `itsaplan`, схема `public` | задачи, агенты, `agent_run`, `issue_activity`, статусы, документы | ICPlan | pg_dump по расписанию — не реализован (бэклог) |
+| S1 | PostgreSQL 17 (CloudNativePG), БД `itsaplan`, схема `public` | задачи, агенты, `agent_run`, `issue_activity`, статусы, документы | ICPlan | базовые копии + WAL в S3 вне узла |
 | S4 | Postgres ICPlan, схема `platform`, таблица `memory_m3`; позже pgvector для M4 | состояние задач (M3); факты (M4) | Memory | M3 — до закрытия задачи |
 
 ## Интерфейсы обмена
@@ -36,6 +36,14 @@
 |---|---|---|---|---|---|---|---|---|
 | I11 | Harness → Memory API | HTTP REST | JSON `M3Record`, контекст | токен запуска | синхронно | 2 с | 2 раза | запись M3 — upsert по (задача, область) |
 | I2 | Agent Runner → ICPlan (шаги, итог) | HTTP REST | JSON-пакеты `RunEvent` с `seq`, `RunResult` | Bearer API-ключ агента | асинхронно | 10 с | повтор с дедупликацией по (run_id, seq) | да, по (run_id, seq) |
+| I22 | Сервисы → PgBouncer → Postgres | протокол PostgreSQL | SQL | логин / пароль из Secret, роль на схему | синхронно | 5 с на запрос | 1 раз (только чтение) | — |
+
+## Нагрузка и развёртывание
+
+| | |
+|---|---|
+| **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | ~1 RPS чтения и записи; M3 до 10 КБ на задачу; p95 < 200 мс |
+| **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | Memory API — Deployment в `itsaplan-agents`, 1–2 реплики, Service ClusterIP; данные — Postgres через PgBouncer |
 
 Детали форматов — [потоки](../../../../../docs/flows/memory.md).
 

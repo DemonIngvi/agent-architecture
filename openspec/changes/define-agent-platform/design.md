@@ -32,7 +32,7 @@ Runner работает с интерфейсом `create / claim / exec / destr
 Агентский цикл — граф LangGraph: `context → llm → tools → context`. Hooks (G2) реализуются как узлы/обёртки графа до и после `llm` и `tools`. LLM-клиент настроен на endpoint LiteLLM (OpenAI-совместимый API).
 - Альтернативы: Claude Agent SDK (готовые hooks/skills, но завязка на формат Anthropic), свой минимальный цикл (решение проекта AI-агент; без `interrupt`, checkpointer и стрима — всё писать самим).
 - Почему LangGraph: `interrupt` для approve (G2), checkpointer в Postgres для возобновления, стрим шагов для таймлайна. Версию фиксируем, LangGraph держим за своим интерфейсом harness.
-- Следствие: скиллы и MCP подключаем сами — MCP через адаптер langchain-mcp, скилл = промпт-фрагмент + набор тулов.
+- Следствие: скиллы и MCP подключаем сами — MCP через `langchain[mcp]` (`langchain.mcp`; архивный `langchain-mcp-adapters` перенесён туда), скилл = промпт-фрагмент + набор тулов.
 
 ### D3. Go для Runner, TypeScript для Platform module (в ICPlan), Python для Harness
 Go — долгоживущий Runner, конкурентность, работа с Docker/K8s API. Platform module — модуль форка ICPlan на его стеке. Python — экосистема LLM (LangGraph, LiteLLM, MCP).
@@ -71,13 +71,19 @@ Agent Runner работает как внешний раннер ICPlan: опр�
 Гибрид по правилам R1–R7 (`architecture.md`, раздел «MCP или прямой вызов»): решает модель — тул; тул для нескольких агентов или с секретом — MCP; детерминированное, пакетное и внутреннее — прямой вызов; админ-функции — отдельные MCP по уровню доверия.
 
 ### D11. Рабочие данные
-Workspace эфемерный; код — ветка `agent/<KEY>` + PR; документы и артефакты — в задачу ICPlan (MinIO); M2/M3 — БД. Доступ к репозиториям — allowlist агента и короткоживущий токен на запуск через прокси. Общая папка на хосте (проект AI-агент) отклонена: изоляция и масштабирование.
+Workspace эфемерный; код — ветка `agent/<KEY>` + PR; документы и артефакты — в задачу ICPlan (RustFS, S3 API); M2/M3 — БД. Доступ к репозиториям — allowlist агента и короткоживущий токен на запуск через прокси. Общая папка на хосте (проект AI-агент) отклонена: изоляция и масштабирование.
 
 ### D12. Observability
 MVP — таблица событий запуска в БД ICPlan → таймлайн в задаче. Langfuse — после MVP (тяжёлый self-host: Postgres + ClickHouse + Redis + S3). Prometheus / Grafana / Loki — в бэклоге.
 
 ### D14. Очередь и планирование запусков
 Очередь запусков — в ICPlan; Agent Runner забирает запуски и решает, когда стартовать, планировщиком со слотами (вариант B): запуск стартует, только когда свободны все его слоты — глобальный (`global_max`), агента (`parallel`, `max`), модели (`models.<alias>.max`), задачи (`per_issue: 1`). Режим `scheduling.mode: sequential | parallel` переключает всю платформу. Порядок `fifo | priority`. Несколько экземпляров Runner делят слоты через блокировку в Postgres. Сравнение вариантов A/B/C — [R&D](../../../docs/rnd/runner-and-scheduling.md).
+
+### D15. Развёртывание и инфраструктура
+k3s на одном узле; namespaces `itsaplan-core`, `itsaplan-data`, `itsaplan-agents`, `itsaplan-platform`; Helm-чарты с `existingSecret`; Traefik (в k3s) — ingress и TLS, админки без ingress; Service — балансировка по репликам; PostgreSQL 17 + pgvector под CloudNativePG с пулером PgBouncer (transaction); RustFS (S3) для вложений и копий; бэкап вне узла; NetworkPolicy по списку интерфейсов. Локально — compose (этапы 1–2) и k3d. Отклонены: ingress-nginx и MinIO (архивированы). R&D: [Kubernetes](../../../docs/rnd/kubernetes-runtime.md), [ingress](../../../docs/rnd/ingress-and-balancing.md), [СУБД](../../../docs/rnd/data-stores.md).
+
+### D16. Профиль нагрузки
+Базовые гипотезы: 15 одновременных пользователей, ~20 RPS на API ICPlan (p95 < 300 мс), до 6 запусков в очереди и 4 активных, ~1 RPS и ~55 тыс. токенов/мин к LiteLLM; узел 8 vCPU / 32 ГБ / 400 ГБ. Подтверждаются нагрузочным тестом (задача 4.8). R&D: [профиль нагрузки](../../../docs/rnd/load-profile.md).
 
 ### D13. RAG
 Не в MVP: документы — через `get_document`, код — агентный поиск. RAG (pgvector + локальный эмбеддер) — механизм чтения M4/M6, вводится по мере роста корпуса.

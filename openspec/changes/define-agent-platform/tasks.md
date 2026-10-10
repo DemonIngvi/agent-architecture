@@ -41,6 +41,10 @@
 - [ ] 4.4 Platform module в ICPlan: Перенести настройки из YAML в ICPlan: бюджеты, профили, данные guardrails, версии — с UI. Подробно: [docs/tasks/4.4-platform-module.md](../../../docs/tasks/4.4-platform-module.md)
 - [ ] 4.5 LiteLLM: бюджеты, fallback, G4: Контроль трат и устойчивость к сбоям провайдера; базовая защита содержимого. Подробно: [docs/tasks/4.5-litellm-budgets-fallback-g4.md](../../../docs/tasks/4.5-litellm-budgets-fallback-g4.md)
 
+- [ ] 4.6 Kubernetes: k3s, Helm, namespaces, Traefik, сетевые политики. Подробно: [docs/tasks/4.6-k8s-helm-ingress.md](../../../docs/tasks/4.6-k8s-helm-ingress.md)
+- [ ] 4.7 Postgres (CloudNativePG), PgBouncer, RustFS, бэкап вне узла. Подробно: [docs/tasks/4.7-postgres-storage-backup.md](../../../docs/tasks/4.7-postgres-storage-backup.md)
+- [ ] 4.8 Нагрузочный тест и подтверждение профиля. Подробно: [docs/tasks/4.8-load-test.md](../../../docs/tasks/4.8-load-test.md)
+
 ## Workflow follow-up
 
 - Архивировать change после ревью (`/opsx:archive`).

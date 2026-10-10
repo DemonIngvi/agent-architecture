@@ -21,6 +21,8 @@
 | **Интерфейсы capability** | `.../specs/<cap>/interfaces.md` | уровни L0–L3, параметры, хранилища S, интерфейсы I, FMEA | коды S и I — единые для всех спек | spec.md, flows, rationale.py |
 | **Трассировка (RTM)** | `.../specs/<cap>/traceability.md` | требование → обоснование → задача → сценарии | разрывы явно; без задачи — решение «не в MVP» | spec.md, docs/tasks, R&D |
 | **User Stories** | `docs/stories/<компонент>.md` (генерируется из `html-view/stories.py`) | роли, процесс BPMN (дорожки, события, задачи, развилки, ошибки), истории «Как… хочу… чтобы…», критерии приёмки, связанные требования | правим `stories.py`; каждая история ссылается на требования спек; ветки ошибок обязательны | spec.md, traceability.md (колонка US), задачи |
+| **Технологии** | `docs/TECHNOLOGIES.md` | таблица: технология, назначение / компонент, версия, лицензия, репозиторий, откуда качать, статус Tech Radar, R&D; лицензионные риски; архивированные проекты | данные GitHub API с датой; новая технология — только с R&D | R&D, design, interfaces.md |
+| **Методология SDD** | `docs/rules/sdd-methodology.md` | практики (OpenSpec, Spec Kit, EARS), шаблоны текста, цикл | — | spec-criteria.md |
 | **Граф связности** | `docs/rules/doc-graph.md` + `html-view/docgraph.py` | слои и связи документов | при новом типе документа — новый узел и связи | change-process.md |
 | **Ревью** | `docs/reviews/<дата>-<тема>.md` | роли, сквозные замечания, по спекам, итог | статусы ✅ / ❓ / 📌 | спеки, задачи («Что проработать») |
 | **Design** | `openspec/changes/<change>/design.md` | Context, Goals, Decisions (D-номера), Risks, Open Questions | у решения — альтернативы и ссылка на R&D | R&D, architecture.md |

@@ -25,3 +25,4 @@
 | [Guardrails](guardrails.md) | 4 | BPMN |
 | [LiteLLM gateway](llm-gateway.md) | 4 | BPMN |
 | [Observability](observability.md) | 3 | BPMN |
+| [Инфраструктура](infrastructure.md) | 5 | BPMN |

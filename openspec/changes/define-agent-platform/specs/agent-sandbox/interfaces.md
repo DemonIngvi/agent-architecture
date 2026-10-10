@@ -40,6 +40,13 @@
 | I17 | Sandbox → egress-прокси → внешние хосты | HTTP / HTTPS (CONNECT) | — | allowlist хостов, подстановка секретов | синхронно | по хосту | нет | — |
 | I18 | Agent Runner → git-провайдер (токены) | HTTPS REST (GitHub App / Gitea API) | JSON | ключ приложения (Secret) | синхронно | 10 с | 2 раза | да |
 
+## Нагрузка и развёртывание
+
+| | |
+|---|---|
+| **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | до 6 контейнеров одновременно + пул 2 на профиль; обычный 0.3 ГБ / 0.2 CPU, «coder» 1–2 ГБ / 1–2 CPU |
+| **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | этапы 1–3 — Docker на узле; этап 4 — Pod на запуск в `itsaplan-agents`, NetworkPolicy только к egress-прокси; egress-прокси — Deployment 1 реплика |
+
 Детали форматов — [потоки](../../../../../docs/flows/sandbox.md).
 
 ## Отказы (FMEA)

@@ -31,7 +31,7 @@
 
 | ID | Хранилище | Что хранит | Владелец | Резервирование / срок |
 |---|---|---|---|---|
-| S1 | Postgres ICPlan, БД `itsaplan`, схема `public` | задачи, агенты, `agent_run`, `issue_activity`, статусы, документы | ICPlan | pg_dump по расписанию — не реализован (бэклог) |
+| S1 | PostgreSQL 17 (CloudNativePG), БД `itsaplan`, схема `public` | задачи, агенты, `agent_run`, `issue_activity`, статусы, документы | ICPlan | базовые копии + WAL в S3 вне узла |
 
 ## Интерфейсы обмена
 
@@ -39,6 +39,13 @@
 |---|---|---|---|---|---|---|---|---|
 | I20 | ICPlan UI ↔ ICPlan API | HTTP REST (существующий) | JSON | сессия пользователя | синхронно | — | — | — |
 | I1 | ICPlan Run Queue → Agent Runner | HTTP REST (протокол `@itsaplan/runner`) | JSON `Run` | Bearer API-ключ агента | pull, опрос 3 с | 10 с | backoff до 60 с | аренда запуска: выдаётся одному Runner |
+
+## Нагрузка и развёртывание
+
+| | |
+|---|---|
+| **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | срабатывание правила на каждый перевод статуса (~100 в час в пике); постановка в очередь < 1 с |
+| **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | часть api / worker ICPlan (`itsaplan-core`) |
 
 Детали форматов — [потоки](../../../../../docs/flows/icplan.md).
 

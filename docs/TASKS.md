@@ -139,6 +139,16 @@
 | ⬜ | Агрегаты затрат по запуску, задаче, агенту, модели | [задача 3.5](tasks/3.5-icplan-type-actions-cost.md) |
 | ⬜ | Срок хранения событий | [задача 3.3](tasks/3.3-run-events-timeline.md) |
 
+## Инфраструктура
+
+| Статус | Задача | Где |
+|---|---|---|
+| ⚠️ | Локальный k3d-кластер, чарты `itsaplan`, `litellm`, `platform-infra`, Traefik с клиентским сертификатом (проект AI-агент 7.11–7.14) | [R&D: Kubernetes](rnd/kubernetes-runtime.md) |
+| ⚠️ | Postgres 17 + pgvector и RustFS в compose ICPlan | [R&D: СУБД](rnd/data-stores.md) |
+| ⬜ | k3s, Helm, namespaces, Traefik, сетевые политики | [задача 4.6](tasks/4.6-k8s-helm-ingress.md) |
+| ⬜ | CloudNativePG, PgBouncer, RustFS, бэкап вне узла | [задача 4.7](tasks/4.7-postgres-storage-backup.md) |
+| ⬜ | Нагрузочный тест и подтверждение профиля | [задача 4.8](tasks/4.8-load-test.md) |
+
 ## Интеграция (сквозное)
 
 | Статус | Задача | Где |

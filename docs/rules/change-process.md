@@ -31,6 +31,8 @@
 | Новый блок на схеме компонента | components.py (BLOCKS) → subcomponents.py (SUB) |
 | Новый тип данных | flows → спека (сценарии) → IO в components.py |
 | Новый компонент | README → architecture.md → components.py (COMPONENTS, BLOCKS, ABOUT, IO) → rationale.py → flows → спека → R&D |
+| Новая технология / версия | R&D → TECHNOLOGIES.md (лицензия, источник) → design → interfaces.md → задачи |
+| Изменение профиля нагрузки | R&D «Профиль нагрузки» → требования «Нагрузка и производительность» всех спек → ёмкость в platform-infrastructure → лимиты планировщика |
 | Новое хранилище или интерфейс | inventory (S / I коды) → `interfaces.md` всех затронутых спек → flows → требование «Хранилища данных» / «Интерфейсы обмена» |
 | Новая зависимость модуля | FMEA в `interfaces.md` → требование «Поведение при отказах» (сценарий) |
 | Новое требование | `traceability.md` (задача и обоснование) → при разрыве — задача или «не в MVP» |

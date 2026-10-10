@@ -27,7 +27,7 @@
 
 | ID | Хранилище | Что хранит | Владелец | Резервирование / срок |
 |---|---|---|---|---|
-| S1 | Postgres ICPlan, БД `itsaplan`, схема `public` | задачи, агенты, `agent_run`, `issue_activity`, статусы, документы | ICPlan | pg_dump по расписанию — не реализован (бэклог) |
+| S1 | PostgreSQL 17 (CloudNativePG), БД `itsaplan`, схема `public` | задачи, агенты, `agent_run`, `issue_activity`, статусы, документы | ICPlan | базовые копии + WAL в S3 вне узла |
 
 ## Интерфейсы обмена
 
@@ -35,6 +35,13 @@
 |---|---|---|---|---|---|---|---|---|
 | I9 | Harness → MCP-серверы | MCP Streamable HTTP, JSON-RPC 2.0 | `tools/list`, `tools/call` | токен подставляет egress-прокси | синхронно | 30 с | чтение — 2 раза; запись — нет | запись — нет |
 | I17 | Sandbox → egress-прокси → внешние хосты | HTTP / HTTPS (CONNECT) | — | allowlist хостов, подстановка секретов | синхронно | по хосту | нет | — |
+
+## Нагрузка и развёртывание
+
+| | |
+|---|---|
+| **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | вызовы MCP ~1 RPS; таймаут 30 с |
+| **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | MCP `itsaplan-core` — часть api ICPlan; внешние MCP — через egress-прокси |
 
 Детали форматов — [потоки](../../../../../docs/flows/mcp-tools.md).
 

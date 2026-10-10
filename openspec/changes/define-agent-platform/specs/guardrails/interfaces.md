@@ -48,6 +48,13 @@
 | I16 | Platform module + git (Rego) → OPA | OPA bundles API, HTTP pull | tar.gz bundle | токен bundle-сервера | опрос 30 с | 10 с | встроенный в OPA | да |
 | I8 | Harness → LiteLLM | HTTP, OpenAI Chat Completions, SSE-стрим | JSON + `metadata.run_id` | Bearer virtual key (подставляет egress-прокси) | синхронно / стрим | 120 с | 2 раза с backoff | нет — повтор = новые затраты |
 
+## Нагрузка и развёртывание
+
+| | |
+|---|---|
+| **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | OPA 1–2 RPS, p95 < 50 мс, таймаут 200 мс; хуки G4 в LiteLLM на каждый вызов |
+| **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | OPA — Deployment `opa` в `itsaplan-agents`, 2 реплики, Service ClusterIP; Rego — bundle; без ingress |
+
 Детали форматов — [потоки](../../../../../docs/flows/guardrails.md).
 
 ## Отказы (FMEA)
