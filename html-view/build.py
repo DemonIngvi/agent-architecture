@@ -191,6 +191,8 @@ def write_component_pages():
             for t in ts)
         about = (
             '<div class="about"><div class="about-main">'
+            '<div class="about-label">Позиция в системе</div>'
+            f'<div class="chain">{"<span class=ch-arrow>→</span>".join(ch)}</div>'
             '<div class="about-label">Для чего</div>'
             f'<p class="purpose">{esc(purpose)}</p>'
             '<div class="about-label">Что делает</div>'
@@ -208,11 +210,9 @@ def write_component_pages():
             f'<div class="side-card"><div class="side-head"><span class="dtype dtype-task">ЗАДАЧИ</span>'
             f'<a class="side-all" href="{href(page, task_page)}">все →</a></div><ul>{task_links}</ul></div>'
             '</aside></div>')
-        position = ('<div class="position"><span class="about-label">Позиция в системе</span>'
-                    f'<div class="chain">{"<span class=ch-arrow>→</span>".join(ch)}</div></div>')
-        body = [f"# {name}", "", head, "", position, "",
-                f'<div class="map">{render_rows(BLOCKS.get(slug, []), page)}</div>', "",
-                "## О компоненте", "", about, ""]
+        body = [f"# {name}", "", head, "", about, "",
+                "## Устройство", "",
+                f'<div class="map">{render_rows(BLOCKS.get(slug, []), page)}</div>', ""]
         (SRC / page).parent.mkdir(parents=True, exist_ok=True)
         (SRC / page).write_text("\n".join(body), encoding="utf-8")
 
