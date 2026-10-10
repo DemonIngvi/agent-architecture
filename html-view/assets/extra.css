@@ -191,3 +191,22 @@
 
 .md-typeset .tb-help { font-size: 0.58rem; opacity: 0.45; margin-left: 0.3rem; color: var(--md-default-fg-color); text-decoration: underline dotted; }
 .md-typeset .tb-help:hover { opacity: 0.9; }
+
+/* ===== Готовность спек ===== */
+.md-typeset .rd { display: inline-flex; align-items: center; gap: 0.4rem; vertical-align: middle; margin-left: 0.3rem; }
+.md-typeset .rd-track { width: 4.5rem; height: 0.45rem; border-radius: 1rem; background: var(--md-default-fg-color--lightest); overflow: hidden; display: inline-block; }
+.md-typeset .rd-wide .rd-track { width: 10rem; height: 0.6rem; }
+.md-typeset .rd-fill { display: block; height: 100%; border-radius: 1rem; }
+.md-typeset .rd-pct { font-size: 0.68rem; min-width: 2.2rem; }
+.md-typeset .rd-name { font-size: 0.62rem; opacity: 0.7; }
+.rd-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.9rem; margin: -0.6rem 0 1.2rem;
+  padding: 0.5rem 0.8rem; border-radius: 0.7rem; background: var(--md-code-bg-color); border: 1px solid var(--md-default-fg-color--lightest); }
+.rd-head .about-label { margin: 0; }
+.md-typeset .rd-part { font-size: 0.62rem; opacity: 0.8; }
+.rd-scale { margin: 0.5rem 0 1rem; max-width: 36rem; }
+.rd-grad { height: 0.6rem; border-radius: 1rem;
+  background: linear-gradient(90deg, #d32f2f 0%, #d32f2f 40%, #ef6c00 40%, #ef6c00 60%, #f9a825 60%, #f9a825 75%, #7cb342 75%, #7cb342 90%, #2e7d32 90%); }
+.rd-marks { position: relative; height: 0.9rem; font-size: 0.55rem; opacity: 0.6; }
+.rd-marks span { position: absolute; transform: translateX(-50%); }
+.rd-legend { font-size: 0.62rem; opacity: 0.85; }
+.md-typeset .side-card li .rd { margin-left: 0.4rem; }

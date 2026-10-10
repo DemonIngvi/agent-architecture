@@ -80,4 +80,7 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     nav.append(f'<a class="tb-help" href="{_rel(page.url, "docs/rules/")}" title="Правила работы с документацией">правила</a>')
     bar = (f'<div class="topbar"><span class="tb-nav">{"".join(nav)}</span>'
            f'<span class="tb-types">{ctx}{"".join(types)}</span></div>')
+    rd = DATA.get("readiness", {}).get(src)
+    if rd:
+        bar += rd.replace("{rules}", _rel(page.url, "docs/rules/spec-criteria/"))
     return bar + "\n\n" + markdown

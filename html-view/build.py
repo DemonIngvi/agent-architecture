@@ -104,7 +104,13 @@ def write_pagebar_map():
         for _, p in refs:
             if p.startswith("docs/rnd/"):
                 pages.setdefault(p, slug)
-    data = {"pages": pages, "names": {c[0]: c[1] for c in COMPONENTS}}
+    rd = {}
+    for sp in all_specs():
+        r = spec_readiness(sp)
+        rd[sp] = ('<div class="rd-head"><span class="about-label">Готовность спеки</span>' + rd_bar(r, True)
+                  + "".join(f'<span class="rd-part">{k} <b>{v}</b>/{m}</span>' for k, (v, m) in r["parts"].items())
+                  + f'<a class="side-all" href="{{rules}}">критерии →</a></div>')
+    data = {"pages": pages, "names": {c[0]: c[1] for c in COMPONENTS}, "readiness": rd}
     (BUILD / "pagebar.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
 
@@ -215,6 +221,57 @@ def rationale_md(slug: str) -> list:
     return L + [""]
 
 
+# ---------- Готовность спек ----------
+RD_BANDS = [(90, "#2e7d32", "готова"), (75, "#7cb342", "почти"), (60, "#f9a825", "в работе"), (40, "#ef6c00", "черновик"), (0, "#d32f2f", "заготовка")]
+
+
+def rd_color(p: int):
+    return next((c, n) for lim, c, n in RD_BANDS if p >= lim)
+
+
+def spec_readiness(spec: str) -> dict:
+    """Процент готовности спеки по критериям docs/rules/spec-criteria.md."""
+    t = (SRC / spec).read_text(encoding="utf-8")
+    reqs = re.split(r"\n### Requirement: ", t)[1:]
+    cap = Path(spec).parent.name
+    purpose = re.search(r"## Purpose\n\n([^\n]+)", t)
+    fmt = 0
+    fmt += 5 if purpose and len(purpose.group(1)) >= 50 else 0
+    fmt += 5 if reqs and all(re.search(r"\b(SHALL|MUST)\b", r.split("####")[0]) for r in reqs) else 0
+    fmt += 5 if reqs and all("#### Scenario:" in r for r in reqs) else 0
+    fmt += 5 if reqs and all(len(r.split("#### Scenario:")[0]) <= 520 for r in reqs) else 0
+    cov = round(40 * sum(min(r.count("#### Scenario:"), 3) / 3 for r in reqs) / len(reqs)) if reqs else 0
+    link = f"specs/{cap}/spec.md"
+    srcs = list((SRC / "docs/tasks").glob("*.md")) + [SRC / Path(spec).parents[2] / "tasks.md"]
+    trace = 15 if any(f.exists() and link in f.read_text(encoding="utf-8") for f in srcs) else 0
+    why = 10 if "Обоснование:" in t else 0
+    slug = next((c[0] for c in COMPONENTS for _, pth in c[6] if pth == spec), None)
+    conn = 5 if (SRC / Path(spec).parent / "architecture.md").exists() else 0
+    conn += 5 if link in (SRC / "architecture.md").read_text(encoding="utf-8") else 0
+    conn += 5 if slug and (SRC / f"docs/flows/{slug}.md").exists() else 0
+    parts = {"Формат": (fmt, 20), "Сценарии": (cov, 40), "Трассировка": (trace, 15), "Обоснование": (why, 10), "Связность": (conn, 15)}
+    total = sum(v for v, _ in parts.values())
+    return {"pct": total, "parts": parts, "reqs": len(reqs), "single": sum(1 for r in reqs if r.count("#### Scenario:") == 1)}
+
+
+def rd_bar(r: dict, wide: bool = False) -> str:
+    c, name = rd_color(r["pct"])
+    tip = " · ".join(f"{k} {v}/{m}" for k, (v, m) in r["parts"].items())
+    cls = "rd rd-wide" if wide else "rd"
+    return (f'<span class="{cls}" title="{tip}"><span class="rd-track"><span class="rd-fill" style="width:{r["pct"]}%;background:{c}"></span></span>'
+            f'<b class="rd-pct" style="color:{c}">{r["pct"]}%</b>' + (f'<span class="rd-name">{name}</span>' if wide else "") + "</span>")
+
+
+def rd_scale() -> str:
+    marks = "".join(f'<span style="left:{lim}%">{lim}</span>' for lim, _, _ in RD_BANDS[::-1] if lim)
+    names = " · ".join(f'<span style="color:{c}">■</span> {n} {lim}+' for lim, c, n in RD_BANDS[::-1])
+    return f'<div class="rd-scale"><div class="rd-grad"></div><div class="rd-marks">{marks}</div><div class="rd-legend">{names}</div></div>'
+
+
+def all_specs() -> list:
+    return sorted(p.relative_to(SRC).as_posix() for p in (SRC / "openspec/changes").glob("*/specs/*/spec.md"))
+
+
 def write_component_pages():
     tasks = task_files()
     for slug, name, st, g, desc, links, docs, tids in COMPONENTS:
@@ -234,7 +291,7 @@ def write_component_pages():
                 ch.append(f'<a class="ch-item" href="{href(page, f"components/{s}/index.md")}">{esc(label)}</a>')
             else:
                 ch.append(f'<span class="ch-item ch-plain">{esc(label)}</span>')
-        spec_links = "".join(f'<li><a href="{href(page, p)}">{esc(l)}</a></li>' for l, p in docs_ok)
+        spec_links = "".join(f'<li><a href="{href(page, p)}">{esc(l)}</a>' + (rd_bar(spec_readiness(p)) if p.endswith("/spec.md") else "") + '</li>' for l, p in docs_ok)
         task_links = "".join(
             f'<li><a href="{href(page, tasks[t])}"><span class="tid">{t}</span> {esc(title_of(SRC / tasks[t], t).split(". ", 1)[-1])}</a></li>'
             for t in ts)
@@ -279,10 +336,11 @@ def write_component_pages():
         # Вкладка «Спеки»: страница компонента
         d = f"specs-by-component/{slug}"
         L = [f"# Спеки: {name}", "",
-             desc, "", "| Документ | Тип |", "|---|---|"]
+             desc, "", "| Документ | Тип | Готовность |", "|---|---|---|"]
         for label, p in docs_ok:
             kind = "схема" if p.endswith("architecture.md") else "proposal" if p.endswith("proposal.md") else "спека"
-            L.append(f"| [{label}]({rel(d, p)}) | {kind} |")
+            rdy = rd_bar(spec_readiness(p)) if p.endswith("/spec.md") else ""
+            L.append(f"| [{label}]({rel(d, p)}) | {kind} | {rdy} |")
         (SRC / d).mkdir(parents=True, exist_ok=True)
         (SRC / d / "index.md").write_text("\n".join(L) + "\n", encoding="utf-8")
 
@@ -328,6 +386,16 @@ def write_component_pages():
         (SRC / d / "index.md").write_text("\n".join(L) + "\n", encoding="utf-8")
 
     # Обзорные страницы вкладок «Спеки» и «Задачи»
+    specs = all_specs()
+    rows = []
+    for sp in specs:
+        r = spec_readiness(sp)
+        rows.append(f"| [{Path(sp).parent.name}]({rel('specs-by-component', sp)}) | {Path(sp).parts[2]} | {r['reqs']} | {r['single']} | {rd_bar(r)} |")
+    avg = round(sum(spec_readiness(s)["pct"] for s in specs) / len(specs)) if specs else 0
+    readiness_md = ["## Готовность спек", "", f"Средняя готовность: {rd_bar({'pct': avg, 'parts': {}}, True)}", "", rd_scale(), "",
+                    "Считается по [критериям полноты](" + rel("specs-by-component", "docs/rules/spec-criteria.md") + "): формат 20, сценарии 40, трассировка 15, обоснование 10, связность 15. Наведите на шкалу — разбивка.", "",
+                    "| Спека | Change | Требований | С одним сценарием | Готовность |", "|---|---|---|---|---|"] + rows + [""]
+
     for d, title, sub in (("rnd-by-component", "R&D по компонентам", "Исследования и выбор технологий по каждому компоненту."),
                           ("specs-by-component", "Спеки по компонентам", "Требования (OpenSpec) и схемы каждого компонента."),
                           ("tasks-by-component", "Задачи по компонентам", "Доработки каждого компонента. Порядок и оценки — в Roadmap.")):
@@ -335,6 +403,8 @@ def write_component_pages():
         for slug, name, st, g, desc, *_ in COMPONENTS:
             L.append(f'<a class="card" href="{slug}/"><i class="st st-{st}"></i><b>{esc(name)}</b><small>{esc(desc)}</small></a>')
         L.append("</div>")
+        if d == "specs-by-component":
+            L += [""] + readiness_md
         (SRC / d / "index.md").write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
