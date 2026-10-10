@@ -8,7 +8,8 @@ hide:
   <p>Платформа запуска LLM-агентов для задач таск-трекера ICPlan: изоляция каждого запуска, контроль моделей и затрат, guardrails, память.</p>
   <div class="hero-actions">
     <a class="md-button md-button--primary" href="docs/ROADMAP/">Roadmap MVP</a>
-    <a class="md-button" href="docs/TASKS/">Задачи</a>
+    <a class="md-button" href="tasks-by-component/">Задачи</a>
+    <a class="md-button" href="specs-by-component/">Спеки</a>
     <a class="md-button" href="architecture/">Схемы C1 / C2</a>
     <a class="md-button" href="docs/HOW-TO-READ/">Как читать</a>
   </div>
@@ -19,7 +20,7 @@ hide:
   <span><i class="st st-part"></i>частично</span>
   <span><i class="st st-todo"></i>не начато</span>
   <span><b class="g">G1–G4</b> точки guardrails</span>
-  <span>Клик по блоку — страница компонента: спеки, задачи, связи</span>
+  <span>Клик по блоку — схема компонента · спеки и задачи — во вкладках сверху</span>
 </div>
 
 <div class="map">

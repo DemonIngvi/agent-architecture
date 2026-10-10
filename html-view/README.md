@@ -16,4 +16,6 @@ html-view/.venv/Scripts/python html-view/build.py serve   # http://127.0.0.1:800
 html-view/.venv/Scripts/python html-view/build.py         # статический сайт в html-view/site
 ```
 
-Меню строится автоматически: новые задачи в `docs/tasks/` и новые changes в `openspec/changes/` появляются на сайте сами.
+Сайт разделён на вкладки по типу документации: **Архитектура** (карта и блочная схема каждого компонента), **Спеки**, **Задачи**, **Справка**. Внизу страницы компонента — панель перехода к его спекам и задачам.
+
+Меню строится автоматически: новые задачи в `docs/tasks/` и новые changes в `openspec/changes/` появляются на сайте сами. Компоненты, их привязка к спекам и задачам и блочные схемы — в [components.py](components.py) (`COMPONENTS`, `BLOCKS`).

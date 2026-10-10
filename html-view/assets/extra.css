@@ -90,3 +90,30 @@
 }
 .md-typeset .card > .g { align-self: flex-start; }
 .hero h1 { color: var(--md-default-fg-color); }
+
+/* ===== Страница компонента ===== */
+.crow { display: grid; gap: 0.6rem; }
+.comp-head { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; margin: -0.4rem 0 1rem; }
+.comp-head .pill { font-size: 0.68rem; padding: 0.15rem 0.6rem; border-radius: 1rem; background: var(--md-default-fg-color--lightest); }
+.comp-desc { opacity: 0.8; }
+.zone-plain { border-color: var(--md-default-fg-color--lighter); }
+.md-typeset .blk.ext { border-style: dashed; border-color: var(--md-primary-fg-color--light); background: transparent; }
+.md-typeset .blk .go { font-size: 0.6rem; color: var(--md-primary-fg-color); margin-top: auto; }
+.md-typeset .blk.store { border-left: 4px solid #6d4c41; }
+.md-typeset .blk.user { background: var(--md-default-fg-color--lightest); border: none; text-align: center; align-items: center; }
+.md-typeset .blk.back { opacity: 0.55; border-style: dotted; }
+.tag-back { font-size: 0.55rem; text-transform: uppercase; letter-spacing: .05em; opacity: .8; }
+.md-typeset .blk.core { border-width: 1.5px; }
+
+/* Панель перехода в другой тип документации */
+.doclinks { margin-top: 2rem; padding: 1rem; border-radius: 0.9rem;
+  background: var(--md-code-bg-color); border: 1px solid var(--md-default-fg-color--lightest); }
+.doclinks-title { font-weight: 700; font-size: 0.8rem; margin-bottom: 0.7rem; }
+.doclinks-title span { font-weight: 400; opacity: 0.6; }
+.doclinks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; }
+.md-typeset .dtype { align-self: flex-start; font-size: 0.58rem; font-weight: 800; letter-spacing: .08em;
+  padding: 0.05rem 0.45rem; border-radius: 0.3rem; color: #fff; }
+.dtype-spec { background: #6a1b9a; }
+.dtype-task { background: #00897b; }
+.dtype-ref { background: #546e7a; }
+@media (max-width: 960px) { .crow, .doclinks-grid { grid-template-columns: 1fr !important; } }
