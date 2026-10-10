@@ -117,3 +117,22 @@
 .dtype-task { background: #00897b; }
 .dtype-ref { background: #546e7a; }
 @media (max-width: 960px) { .crow, .doclinks-grid { grid-template-columns: 1fr !important; } }
+
+/* ===== Верхняя панель: назад / выше / типы документации ===== */
+.md-typeset .topbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.5rem;
+  margin: -0.6rem 0 1.2rem; padding: 0.45rem 0.6rem; border-radius: 0.7rem;
+  background: var(--md-code-bg-color); border: 1px solid var(--md-default-fg-color--lightest); }
+.md-typeset .tb-nav, .md-typeset .tb-types { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.md-typeset .tb-btn { font-size: 0.66rem; padding: 0.2rem 0.6rem; border-radius: 0.4rem;
+  border: 1px solid var(--md-default-fg-color--lighter); color: var(--md-default-fg-color); }
+.md-typeset .tb-btn:hover { border-color: var(--md-accent-fg-color); color: var(--md-accent-fg-color); }
+.md-typeset .tb-ctx { font-size: 0.66rem; font-weight: 700; opacity: 0.7; margin-right: 0.2rem; }
+.md-typeset .tb-type { font-size: 0.6rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  padding: 0.22rem 0.6rem; border-radius: 0.4rem; color: #fff; opacity: 0.55; }
+.md-typeset .tb-type:hover, .md-typeset .tb-type.active { opacity: 1; color: #fff; }
+.md-typeset .tb-type.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px currentColor; }
+.t-arch { background: #3f51b5; } .t-spec { background: #6a1b9a; } .t-task { background: #00897b; } .t-ref { background: #546e7a; }
+.md-typeset .tb-type.t-arch.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #3f51b5; }
+.md-typeset .tb-type.t-spec.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #6a1b9a; }
+.md-typeset .tb-type.t-task.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #00897b; }
+.md-typeset .tb-type.t-ref.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #546e7a; }

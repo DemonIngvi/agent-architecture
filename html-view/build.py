@@ -5,6 +5,7 @@
     python html-view/build.py           # сборка в html-view/site
     python html-view/build.py serve     # локальный просмотр на http://127.0.0.1:8000
 """
+import json
 import os
 import re
 import shutil
@@ -75,6 +76,24 @@ def copy_sources():
     (SRC / "assets").mkdir(parents=True, exist_ok=True)
     shutil.copy2(HERE / "assets" / "extra.css", SRC / "assets" / "extra.css")
     write_component_pages()
+    write_pagebar_map()
+
+
+def write_pagebar_map():
+    """src-путь страницы → slug компонента: по нему верхняя панель строит ссылки на типы документации."""
+    tasks = task_files()
+    pages = {}
+    for slug, name, st, g, desc, links, docs, tids in COMPONENTS:
+        for p in [f"components/{slug}/index.md", f"specs-by-component/{slug}/index.md", f"tasks-by-component/{slug}/index.md"]:
+            pages[p] = slug
+        for _, p in docs:
+            pages.setdefault(p, slug)
+        for t in tids:
+            if t in tasks:
+                pages[tasks[t]] = slug
+    pages.setdefault(f"{AP}/tasks.md", "icplan")
+    data = {"pages": pages, "names": {c[0]: c[1] for c in COMPONENTS}}
+    (BUILD / "pagebar.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
 
 def rel(from_dir: str, target: str) -> str:
@@ -161,14 +180,13 @@ def write_component_pages():
                  f'<b>Общие схемы C1 / C2</b><small>текстовые схемы всей платформы</small></a>',
                  "</div></div>"]
         body = ["---", "hide:", "  - toc", "---", "", f"# {name}", "", head, "",
-                f'<div class="map">{render_rows(BLOCKS.get(slug, []), page)}</div>', "", "".join(panel), ""]
+                f'<div class="map">{render_rows(BLOCKS.get(slug, []), page)}</div>', ""]
         (SRC / page).parent.mkdir(parents=True, exist_ok=True)
         (SRC / page).write_text("\n".join(body), encoding="utf-8")
 
         # Вкладка «Спеки»: страница компонента
         d = f"specs-by-component/{slug}"
         L = [f"# Спеки: {name}", "",
-             f"[← Архитектура компонента]({rel(d, page)}) · [Задачи компонента →]({rel(d, task_page)})", "",
              desc, "", "| Документ | Тип |", "|---|---|"]
         for label, p in docs_ok:
             kind = "схема" if p.endswith("architecture.md") else "proposal" if p.endswith("proposal.md") else "спека"
@@ -179,7 +197,6 @@ def write_component_pages():
         # Вкладка «Задачи»: страница компонента
         d = f"tasks-by-component/{slug}"
         L = [f"# Задачи: {name}", "",
-             f"[← Архитектура компонента]({rel(d, page)}) · [Спеки компонента →]({rel(d, spec_page)})", "",
              "| # | Задача | Этап | Человек | Агент | Токены |", "|---|---|---|---|---|---|"]
         for t in ts:
             m = task_meta(tasks[t])
@@ -254,7 +271,9 @@ def write_config(serve: bool = False):
         # Пересобирать при правке исходных .md: hook копирует их перед каждой сборкой
         watched = [ROOT / s for s in SOURCES] + [HERE / "home.md", HERE / "assets", HERE / "components.py"]
         watch = "\n".join(f"  - {q(p.as_posix())}" for p in watched)
-        cfg += f"\nhooks:\n  - {q((HERE / 'hooks.py').as_posix())}\nwatch:\n{watch}\n"
+        cfg += f"\nwatch:\n{watch}\n"
+    hooks = [HERE / "pagebar.py"] + ([HERE / "hooks.py"] if serve else [])
+    cfg += "\nhooks:\n" + "".join(f"  - {q(h.as_posix())}\n" for h in hooks)
     (BUILD / "mkdocs.yml").write_text(cfg + "\n" + nav_yaml(), encoding="utf-8")
 
 
