@@ -35,18 +35,29 @@ def natural(p: Path):
 
 def copy_sources():
     shutil.rmtree(SRC, ignore_errors=True)
+    files = []
     for item in SOURCES:
         src = ROOT / item
-        if src.is_file():
-            (SRC / item).parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, SRC / item)
-        else:
-            for f in src.rglob("*.md"):
-                dst = SRC / f.relative_to(ROOT)
-                dst.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(f, dst)
+        files += [src] if src.is_file() else list(src.rglob("*.md"))
+    for f in files:
+        rel = f.relative_to(ROOT)
+        # Корневой README на сайте — страница «Компоненты» (overview.md); главная — карта из home.md
+        dst = SRC / ("overview.md" if rel.as_posix() == "README.md" else rel)
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_text(relink_readme(f.read_text(encoding="utf-8"), f), encoding="utf-8")
+    shutil.copy2(HERE / "home.md", SRC / "index.md")
     (SRC / "assets").mkdir(parents=True, exist_ok=True)
     shutil.copy2(HERE / "assets" / "extra.css", SRC / "assets" / "extra.css")
+
+
+def relink_readme(text: str, src: Path) -> str:
+    """Ссылки на корневой README.md ведут на overview.md."""
+    def fix(m):
+        target = m.group(2)
+        if (src.parent / target).resolve() == (ROOT / "README.md").resolve():
+            target = target[: -len("README.md")] + "overview.md"
+        return f"]({target}{m.group(3) or ''}"
+    return re.sub(r"\]\(()((?:\.\./)*README\.md)(#[^)]*)?\)", lambda m: fix(m) + ")", text)
 
 
 def q(s: str) -> str:
@@ -55,8 +66,9 @@ def q(s: str) -> str:
 
 def nav_yaml() -> str:
     L = ["nav:",
-         f"  - Главная: README.md",
+         "  - Главная: index.md",
          "  - Обзор:",
+         "    - Компоненты: overview.md",
          "    - Как читать: docs/HOW-TO-READ.md",
          "    - Архитектура: architecture.md",
          "    - Формат схем: FORMAT.md",
@@ -91,7 +103,8 @@ def write_config(serve: bool = False):
         # Локально сайт в корне, а не под /agent-architecture/ (путь GitHub Pages)
         cfg = re.sub(r"(?m)^site_url:.*$", "site_url: http://127.0.0.1:8000/", cfg)
         # Пересобирать при правке исходных .md: hook копирует их перед каждой сборкой
-        watch = "\n".join(f"  - {q((ROOT / s).as_posix())}" for s in SOURCES)
+        watched = [ROOT / s for s in SOURCES] + [HERE / "home.md", HERE / "assets"]
+        watch = "\n".join(f"  - {q(p.as_posix())}" for p in watched)
         cfg += f"\nhooks:\n  - {q((HERE / 'hooks.py').as_posix())}\nwatch:\n{watch}\n"
     (BUILD / "mkdocs.yml").write_text(cfg + "\n" + nav_yaml(), encoding="utf-8")
 
