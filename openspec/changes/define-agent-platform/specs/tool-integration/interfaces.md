@@ -29,7 +29,7 @@
 
 | ID | Хранилище | Что хранит | Владелец | Резервирование / срок |
 |---|---|---|---|---|
-| S1 | PostgreSQL 17 (CloudNativePG), БД `itsaplan`, схема `public` | задачи, агенты, `agent_run`, `issue_activity`, статусы, документы | ICPlan | базовые копии + WAL в S3 вне узла |
+| S1 | PostgreSQL 17 (CloudNativePG), БД `itsaplan`, схема `public` | MCP-серверы проекта, тулы и навыки, ссылки на секреты | ICPlan | базовые копии + WAL в S3 вне узла |
 
 ## Интерфейсы обмена
 

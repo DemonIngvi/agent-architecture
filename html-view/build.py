@@ -199,11 +199,18 @@ XC_ROLES = {"Хранилища данных": ["Архитектор", "DevOps-
             "Развёртывание": ["DevOps-инженер"]}
 PERSONA_ROLE = {"П": "Пользователь", "А": "Администратор", "Б": "Безопасность", "Э": "DevOps-инженер", "ВП": "Владелец продукта",
                 "QA": "Тестировщик", "Аг": "Разработчик", "АгР": "Разработчик"}
-APPR_HEAD = "| Требование | Роль | Кто | Тип | Дата | Решение | Комментарий |\n|---|---|---|---|---|---|---|\n"
+APPR_HEAD = "| Требование | Роль | Кто | Тип | Дата | Решение | Версия текста | Комментарий |\n|---|---|---|---|---|---|---|---|\n"
+
+
+def req_version(block: str) -> str:
+    """Короткий хэш текста требования (без строки ID): изменился текст — подтверждение устарело."""
+    import hashlib
+    body = re.sub(r'<a id="r-[a-z]+-\d+"></a>[^\n]*', "", block)
+    return hashlib.sha1(re.sub(r"\s+", " ", body).strip().encode("utf-8")).hexdigest()[:8]
 
 
 def required_approvals(spec: Path) -> list:
-    """[(ID, имя требования, роль)] — обязательные подтверждения по docs/rules/spec-kinds.md."""
+    """[(ID, имя требования, роль, версия текста)] — обязательные подтверждения по docs/rules/spec-kinds.md."""
     cap = spec.parent.name
     t = spec.read_text(encoding="utf-8")
     out = []
@@ -212,6 +219,7 @@ def required_approvals(spec: Path) -> list:
         m = re.search(r"`(R-[A-Z]+-\d+)`", block)
         if not m:
             continue
+        ver = req_version(block)
         if name == "Конфигурация модуля":
             roles = CFG_ROLES[SPEC_KIND.get(cap, "service")]
         elif name in XC_ROLES:
@@ -220,23 +228,38 @@ def required_approvals(spec: Path) -> list:
             roles = ["Аналитик историй", "Тестировщик"] + [PERSONA_ROLE[s[1]] for lst in STORIES.values() for s in lst if f"{cap}: {name}" in s[5] and s[1] in PERSONA_ROLE]
         if cap in ("guardrails", "agent-sandbox"):
             roles.append("Безопасность")
-        out += [(m.group(1), name, r) for r in dict.fromkeys(roles)]
+        out += [(m.group(1), name, r, ver) for r in dict.fromkeys(roles)]
     return out
 
 
+STALE_WITHOUT_VERSION = {"agent-runner", "guardrails"}  # одноразовая миграция: текст изменён после подтверждения
+
+
 def sync_approvals():
-    """approvals.md каждой спеки: добавить строки ⏳ для недостающих обязательных подтверждений, решения не трогать."""
+    """approvals.md: строки ⏳ для недостающих подтверждений; решение по изменённому тексту требования сбрасывается в ⏳."""
     for spec in ROOT.glob("openspec/changes/*/specs/*/spec.md"):
-        f = spec.parent / "approvals.md"
-        rows = [l for l in f.read_text(encoding="utf-8").splitlines() if l.startswith("| R-")] if f.exists() else []
-        have = {tuple(c.strip() for c in l.strip("|").split("|")[:2]) for l in rows}
-        for rid, name, role in required_approvals(spec):
-            if (rid, role) not in have:
-                rows.append(f"| {rid} | {role} | — | — | — | ⏳ | {name} |")
-        rows.sort(key=lambda l: (int(re.search(r"R-[A-Z]+-(\d+)", l).group(1)), l))
         cap = spec.parent.name
+        f = spec.parent / "approvals.md"
+        old = {}
+        for l in (f.read_text(encoding="utf-8").splitlines() if f.exists() else []):
+            if l.startswith("| R-"):
+                c = [x.strip() for x in l.strip().strip("|").split("|")]
+                if len(c) == 7:  # старый формат без версии
+                    c = c[:6] + ["?"] + c[6:]
+                old[(c[0], c[1])] = c
+        rows = []
+        for rid, name, role, ver in required_approvals(spec):
+            c = old.get((rid, role)) or [rid, role, "—", "—", "—", "⏳", ver, name]
+            if c[6] == "?":
+                c[6] = "" if (cap in STALE_WITHOUT_VERSION and name == "Конфигурация модуля") else ver
+            if c[6] != ver and c[5] != "⏳":
+                c = [rid, role, "—", "—", "—", "⏳", ver, f"{name} (текст изменён после решения «{c[5]}» от {c[2]})"]
+            c[6] = ver
+            rows.append("| " + " | ".join(c) + " |")
+        rows.sort(key=lambda l: (int(re.search(r"R-[A-Z]+-(\d+)", l).group(1)), l))
         body = (f"# {cap} — подтверждения требований\n\n← [spec.md](spec.md) · [правило](../../../../../docs/rules/spec-kinds.md#approvals)\n\n"
-                "Строки ⏳ добавляет сборка по обязательным ролям; роль меняет только свою строку: кто, 👤 / 🤖, дата, ✅ / ❌, комментарий.\n\n" + APPR_HEAD + "\n".join(rows) + "\n")
+                "Строки ⏳ добавляет сборка по обязательным ролям; роль меняет только свою строку: кто, 👤 / 🤖, дата, ✅ / ❌, комментарий. "
+                "«Версия текста» — хэш требования: если текст изменился после решения, сборка сбрасывает решение в ⏳.\n\n" + APPR_HEAD + "\n".join(rows) + "\n")
         _write_if_changed(f, body)
 
 

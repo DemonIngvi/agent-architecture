@@ -43,7 +43,7 @@
 | I9 | Harness → MCP-серверы | MCP Streamable HTTP, JSON-RPC 2.0 | `tools/list`, `tools/call` | токен подставляет egress-прокси | синхронно | 30 с | чтение — 2 раза; запись — нет | запись — нет |
 | I10 | Harness → OPA (G2) | HTTP REST `POST /v1/data/agent/g2` | JSON `PolicyInput` / `PolicyDecision` | внутренняя сеть | синхронно | 200 мс | нет → `on_engine_error` | чтение |
 | I11 | Harness → Memory API | HTTP REST | JSON `M3Record`, контекст | токен запуска | синхронно | 2 с | 2 раза | запись M3 — upsert по (задача, область) |
-| I12 | Harness → checkpointer | протокол PostgreSQL к схеме `harness_ckpt` | LangGraph checkpoint | роль только на свою схему | синхронно | 5 с | 2 раза | да, по (thread, step) |
+| I12 | Harness → Agent Runner (checkpoint) | HTTP внутри сети sandbox: `PUT / GET /runs/{id}/checkpoint`; в схему `harness_ckpt` пишет Runner | LangGraph checkpoint | одноразовый токен запуска (учётных данных БД в sandbox нет) | синхронно | 5 с | 3 раза | да, по (run_id, step) |
 
 ## Нагрузка и развёртывание
 
