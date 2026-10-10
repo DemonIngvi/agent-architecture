@@ -29,33 +29,33 @@
 | История | Персона | Хочу | Точка входа | Требований |
 |---|---|---|---|---|
 | [US-ICP-01](#us-icp-01) | Пользователь ICPlan | создать задачу нужного типа и чтобы она сама прошла шаги процесса с агентами | создание задачи: доска, Telegram-бот, API; перевод в колонку | 4 |
-| [US-ICP-08](#us-icp-08) | Пользователь ICPlan | сам поручить задачу конкретному агенту, минуя процесс | карточка задачи: поле «делегат» | 3 |
-| [US-ICP-09](#us-icp-09) | Пользователь ICPlan | задать агенту вопрос или поручение упоминанием в комментарии | комментарий с упоминанием | 3 |
-| [US-ICP-19](#us-icp-19) | Пользователь ICPlan | поставить агенту регулярную работу по расписанию | настройки агента: расписание (`agent_schedule`) | 2 |
+| [US-ICP-08](#us-icp-08) | Пользователь ICPlan | сам поручить задачу конкретному агенту, минуя процесс | карточка задачи: поле «делегат» | 4 |
+| [US-ICP-09](#us-icp-09) | Пользователь ICPlan | задать агенту вопрос или поручение упоминанием в комментарии | комментарий с упоминанием | 4 |
+| [US-ICP-19](#us-icp-19) | Пользователь ICPlan | поставить агенту регулярную работу по расписанию | настройки агента: расписание (`agent_schedule`) | 3 |
 | [US-ICP-02](#us-icp-02) | Пользователь ICPlan | видеть, как агент работает над задачей | карточка задачи: таймлайн | 2 |
-| [US-ICP-10](#us-icp-10) | Пользователь ICPlan | читать чат задачи с агентом и писать в него указания во время работы | чат агента в задаче; Telegram-бот | 2 |
+| [US-ICP-10](#us-icp-10) | Пользователь ICPlan | читать чат задачи с агентом и писать в него указания во время работы | чат агента в задаче; Telegram-бот | 3 |
 | [US-ICP-11](#us-icp-11) | Пользователь ICPlan | ответить на вопрос агента | уведомление; чат; комментарий; Telegram-бот | 3 |
 | [US-ICP-03](#us-icp-03) | Пользователь ICPlan | получить уведомление, когда агент ждёт моего решения или закончил | уведомления ICPlan, Telegram | 2 |
-| [US-ICP-12](#us-icp-12) | Пользователь ICPlan | видеть сводку по своим задачам с агентами: что выполняется и в очереди, сколько идёт, сколько открыто и закрыто, сколько потрачено токенов и денег | дашборд проекта; «Мои задачи» | 2 |
-| [US-ICP-13](#us-icp-13) | Пользователь ICPlan | принять результат агента или вернуть его с заметкой, что не выполнено | карточка задачи: кнопки «принято / не выполнено»; чат | ⚠️ 0 |
-| [US-ICP-14](#us-icp-14) | Пользователь ICPlan | остановить процесс по задаче и при необходимости возобновить | карточка задачи; сводка | 1 |
+| [US-ICP-12](#us-icp-12) | Пользователь ICPlan | видеть сводку по своим задачам с агентами: что выполняется и в очереди, сколько идёт, сколько открыто и закрыто, сколько потрачено токенов и денег | дашборд проекта; «Мои задачи» | 3 |
+| [US-ICP-13](#us-icp-13) | Пользователь ICPlan | принять результат агента или вернуть его с заметкой, что не выполнено | карточка задачи: кнопки «принято / не выполнено»; чат | 2 |
+| [US-ICP-14](#us-icp-14) | Пользователь ICPlan | остановить процесс по задаче и при необходимости возобновить | карточка задачи; сводка | 2 |
 | [US-ICP-04](#us-icp-04) | Пользователь ICPlan | отменить текущую работу агента | карточка задачи, чат | 2 |
-| [US-ICP-15](#us-icp-15) | Пользователь ICPlan | обязать процесс по задаче проверяться со мной перед каждым переходом | карточка задачи: переключатель «проверять со мной» | ⚠️ 0 |
-| [US-ICP-16](#us-icp-16) | Пользователь ICPlan | повторить шаг после ошибки или перезапустить задачу с выбранного шага | карточка задачи | 2 |
+| [US-ICP-15](#us-icp-15) | Пользователь ICPlan | обязать процесс по задаче проверяться со мной перед каждым переходом | карточка задачи: переключатель «проверять со мной» | 2 |
+| [US-ICP-16](#us-icp-16) | Пользователь ICPlan | повторить шаг после ошибки или перезапустить задачу с выбранного шага | карточка задачи | 3 |
 | [US-ICP-17](#us-icp-17) | Пользователь ICPlan | передать текущий шаг задачи другому агенту или человеку | карточка задачи: поле «делегат» / «исполнитель» | 1 |
 | [US-ICP-18](#us-icp-18) | Пользователь ICPlan | понять, почему агент не берёт задачу | карточка задачи | 4 |
 | [US-ICP-20](#us-icp-20) | Администратор платформы | создать ИИ-агента платформы: имя, модель, инструкция, тулы, навыки, MCP, проекты | Команда → ИИ-агенты | 5 |
 | [US-ICP-21](#us-icp-21) | Администратор платформы | изменить настройки агента | Команда → ИИ-агенты → агент | 3 |
-| [US-ICP-22](#us-icp-22) | Администратор платформы | выключить агента и включить обратно | Команда → ИИ-агенты | 1 |
+| [US-ICP-22](#us-icp-22) | Администратор платформы | выключить агента и включить обратно | Команда → ИИ-агенты | 2 |
 | [US-ICP-23](#us-icp-23) | Администратор платформы | удалить агента | Команда → ИИ-агенты | 1 |
-| [US-ICP-24](#us-icp-24) | Администратор платформы | проверить агента на тестовой задаче до подключения к процессу | агент → «проверить» | 2 |
+| [US-ICP-24](#us-icp-24) | Администратор платформы | проверить агента на тестовой задаче до подключения к процессу | агент → «проверить» | 3 |
 | [US-ICP-28](#us-icp-28) | Администратор платформы | видеть статистику агентов: запуски, успешные, возвращённые пользователем, время, затраты | Команда → ИИ-агенты → статистика | 2 |
 | [US-ICP-05](#us-icp-05) | Администратор платформы | создать процесс для типа задачи: шаги-колонки, агенты, переходы при успехе и ошибке, следующий процесс | Настройки проекта → Процессы | 3 |
-| [US-ICP-25](#us-icp-25) | Администратор платформы | изменить процесс | Настройки проекта → Процессы | 1 |
+| [US-ICP-25](#us-icp-25) | Администратор платформы | изменить процесс | Настройки проекта → Процессы | 2 |
 | [US-ICP-26](#us-icp-26) | Администратор платформы | подключить агента к шагу процесса или отключить | Настройки проекта → Процессы → шаг | 2 |
 | [US-ICP-27](#us-icp-27) | Администратор платформы | настроить Действие «делегировать агенту» по условию | Настройки проекта → Действия | 1 |
 | [US-ICP-07](#us-icp-07) | Агент-исполнитель | брать следующую задачу из своей очереди по всем процессам, где я исполнитель шага | очередь запусков (Runner) | 2 |
-| [US-ICP-29](#us-icp-29) | Агент-исполнитель | получить полный контекст задачи: описание, комментарии, вложения, итог прошлого шага, заметки пользователя | задание запуска (`Run`) | 2 |
+| [US-ICP-29](#us-icp-29) | Агент-исполнитель | получить полный контекст задачи: описание, комментарии, вложения, итог прошлого шага, заметки пользователя | задание запуска (`Run`) | 3 |
 | [US-ICP-06](#us-icp-06) | Эксплуатация (DevOps) | видеть, в сети ли платформа агентов | Команда → ИИ-агенты | 2 |
 
 ## Истории
@@ -89,7 +89,7 @@
 - [ ] Задача в процессе → явный делегат важнее агента шага, шаг не меняется
 - [ ] Агент выключен или не в проекте → делегат не ставится, причина в карточке
 
-**Требования:** [Приоритет правил](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Получение запуска из очереди (pull)](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Запуск из очереди ICPlan](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
+**Требования:** [Приоритет правил](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Получение запуска из очереди (pull)](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Запуск из очереди ICPlan](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md) · [Триггеры запуска ICPlan](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
 
 ### US-ICP-09 {#us-icp-09}
 
@@ -103,7 +103,7 @@
 - [ ] Упомянут агент без доступа к проекту → ответ «нет доступа», запуска нет
 - [ ] Упоминание при активном запуске этого агента по задаче → сообщение попадает в текущий запуск, второго нет
 
-**Требования:** [Получение запуска из очереди (pull)](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Стрим шагов и итог в задачу](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Один запуск на задачу](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
+**Требования:** [Получение запуска из очереди (pull)](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Стрим шагов и итог в задачу](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Один запуск на задачу](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md) · [Триггеры запуска ICPlan](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
 
 ### US-ICP-19 {#us-icp-19}
 
@@ -117,7 +117,7 @@
 - [ ] Предыдущий запуск ещё идёт → новый не создаётся, запись «пропущено»
 - [ ] Агент выключен → срабатывание пропущено с записью в истории
 
-**Требования:** [Получение запуска из очереди (pull)](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Один запуск на задачу](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
+**Требования:** [Получение запуска из очереди (pull)](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Один запуск на задачу](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md) · [Триггеры запуска ICPlan](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
 
 ### US-ICP-02 {#us-icp-02}
 
@@ -146,7 +146,7 @@
 - [ ] Запуск уже завершён → сообщение начинает новый запуск с контекстом чата
 - [ ] Агент на паузе ожидания → сообщение считается ответом
 
-**Требования:** [Стрим шагов и итог в задачу](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Подтверждения и ответы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md)
+**Требования:** [Стрим шагов и итог в задачу](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Подтверждения и ответы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Указания пользователя во время запуска](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md)
 
 ### US-ICP-11 {#us-icp-11}
 
@@ -189,7 +189,7 @@
 - [ ] Нет запусков за период → пустая сводка с пояснением
 - [ ] Данные затрат недоступны (LiteLLM) → показываются без затрат с пометкой
 
-**Требования:** [Затраты](../../openspec/changes/define-agent-platform/specs/observability/spec.md) · [События запуска](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
+**Требования:** [Сводка и статистика агентов](../../openspec/changes/define-agent-platform/specs/observability/spec.md) · [Затраты](../../openspec/changes/define-agent-platform/specs/observability/spec.md) · [События запуска](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
 
 ### US-ICP-13 {#us-icp-13}
 
@@ -204,7 +204,7 @@
 - [ ] Возвратов больше лимита шага → переход при ошибке, владельцу процесса
 - [ ] Оценка без прав (не исполнитель и не владелец) → недоступна
 
-**Требования:** ⚠️ нет — открытый вопрос, см. open-questions спек
+**Требования:** [Вердикт по результату](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Проверка пользователем перед переходом](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
 
 ### US-ICP-14 {#us-icp-14}
 
@@ -219,7 +219,7 @@
 - [ ] «Возобновить» → запуск агента текущего шага
 - [ ] Остановленная задача видна в сводке как «остановлена»
 
-**Требования:** [Отмена из ICPlan](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md)
+**Требования:** [Отмена из ICPlan](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Остановка и возобновление процесса по задаче](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
 
 ### US-ICP-04 {#us-icp-04}
 
@@ -247,7 +247,7 @@
 - [ ] «Не выполнено» → возврат на шаг с заметкой (как US-ICP-13)
 - [ ] Нет ответа дольше таймаута → напоминание, задача не двигается
 
-**Требования:** ⚠️ нет — открытый вопрос, см. open-questions спек
+**Требования:** [Проверка пользователем перед переходом](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Вердикт по результату](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
 
 ### US-ICP-16 {#us-icp-16}
 
@@ -261,7 +261,7 @@
 - [ ] «Начать с шага N» → задача в колонке шага N, запуск его агента
 - [ ] Лимит запусков шага исчерпан → повтор только владельцем процесса
 
-**Требования:** [Переход по итогу запуска](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Передача результата следующему этапу](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Переход по итогу запуска](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Передача результата следующему этапу](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Повтор шага](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
 
 ### US-ICP-17 {#us-icp-17}
 
@@ -331,7 +331,7 @@
 - [ ] Активные запуски доделываются или отменяются — по выбору при выключении
 - [ ] Включён → ожидающие задачи встают в очередь
 
-**Требования:** [Запуск из очереди ICPlan](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
+**Требования:** [Выключение агента](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Запуск из очереди ICPlan](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
 
 ### US-ICP-23 {#us-icp-23}
 
@@ -359,7 +359,7 @@
 - [ ] Можно выбрать mock-модель → без затрат
 - [ ] Тест упал → видно на каком шаге и почему
 
-**Требования:** [Mock-модель для разработки](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md) · [Стрим шагов](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md)
+**Требования:** [Проверка агента в чате](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Mock-модель для разработки](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md) · [Стрим шагов](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md)
 
 ### US-ICP-28 {#us-icp-28}
 
@@ -373,7 +373,7 @@
 - [ ] Переход к задачам с возвратами
 - [ ] Агент без запусков → нули, не ошибка
 
-**Требования:** [Затраты](../../openspec/changes/define-agent-platform/specs/observability/spec.md) · [События запуска](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
+**Требования:** [Сводка и статистика агентов](../../openspec/changes/define-agent-platform/specs/observability/spec.md) · [Затраты](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
 
 ### US-ICP-05 {#us-icp-05}
 
@@ -402,7 +402,7 @@
 - [ ] Задачи в работе доделывают текущий шаг, дальше идут по новой версии
 - [ ] Удалён шаг, на котором стоят задачи → сохранение требует выбрать, куда их перевести
 
-**Требования:** [Определение процесса](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Определение процесса](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Изменение процесса](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
 
 ### US-ICP-26 {#us-icp-26}
 
@@ -458,7 +458,7 @@
 - [ ] Нет прошлых запусков → задание без них
 - [ ] Вложение недоступно → в задании пометка, работа продолжается
 
-**Требования:** [Передача результата следующему этапу](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [История запусков в контексте](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md)
+**Требования:** [Передача результата следующему этапу](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [История запусков в контексте](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · [MCP-сервер ICPlan](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md)
 
 ### US-ICP-06 {#us-icp-06}
 

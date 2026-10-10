@@ -131,7 +131,7 @@ def check_req_tasks() -> list:
     for spec in ROOT.glob("openspec/changes/*/specs/*/spec.md"):
         for rid, impl in re.findall(r'<a id="r-[a-z]+-\d+"></a>\*\*ID:\*\* `(R-[A-Z]+-\d+)` · \*\*Реализует задача:\*\* ([^\n]*)', spec.read_text(encoding="utf-8")):
             req_side[rid] = set(re.findall(r"tasks/(\d\.\d)-", impl))
-            if not req_side[rid] and "BACKLOG" not in impl:
+            if not req_side[rid] and "BACKLOG" not in impl and "есть в ICPlan" not in impl:
                 issues.append(f"{rid}: нет задачи")
         if spec.read_text(encoding="utf-8").count("### Requirement:") != len(re.findall(r'<a id="r-', spec.read_text(encoding="utf-8"))):
             issues.append(f"{spec.parent.name}: не у всех требований есть ID")
@@ -466,7 +466,7 @@ def _spec_readiness(spec: str) -> dict:
     ts = task_side(); ok2 = 0
     for rid, impl in re.findall(r'`(R-[A-Z]+-\d+)` · \*\*Реализует задача:\*\* ([^\n]*)', t):
         tasks = set(re.findall(r"tasks/(\d\.\d)-", impl))
-        ok2 += 1 if ("BACKLOG" in impl and not tasks) or (tasks and tasks <= ts.get(rid, set())) else 0
+        ok2 += 1 if (("BACKLOG" in impl or "есть в ICPlan" in impl) and not tasks) or (tasks and tasks <= ts.get(rid, set())) else 0
     trace = round(20 * ok2 / len(reqs)) if reqs else 0  # двусторонняя связь требование ↔ задача
     why = (5 if "Обоснование:" in t else 0) + (5 if rows and all("⚠️ нет |" not in l for l in rows) else 0)
     itf = folder / "interfaces.md"
