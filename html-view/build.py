@@ -15,6 +15,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+from rationale import RATIONALE  # noqa: E402
 from components import ABOUT, AP, IO, BLOCKS, BY_SLUG, COMPONENTS, STATUS  # noqa: E402
 
 ROOT = HERE.parent
@@ -166,6 +167,26 @@ def render_rows(rows: list, page: str) -> str:
     return "".join(out)
 
 
+def cell(s: str) -> str:
+    return s.replace("|", "/")
+
+
+def rationale_md(slug: str) -> list:
+    """Нижний блок страницы компонента: почему так и полная конфигурация."""
+    r = RATIONALE.get(slug)
+    if not r:
+        return []
+    L = ["## Почему так", "", "**Почему выбран**", ""] + [f"- {x}" for x in r["why"]]
+    L += ["", "**Что даёт**", ""] + [f"- {x}" for x in r["gain"]]
+    L += ["", "**Отвергнутые альтернативы**", "", "| Вариант | Почему нет |", "|---|---|"]
+    L += [f"| {cell(a)} | {cell(b)} |" for a, b in r["alts"]]
+    L += ["", "## Конфигурация", "",
+          "Что можно настроить и как это влияет на результат работы агента.", "",
+          "| Параметр | Что задаёт | Как влияет на результат | По умолчанию | Где задаётся |", "|---|---|---|---|---|"]
+    L += [f"| `{cell(n)}` | {cell(w)} | {cell(e)} | {cell(d)} | {cell(where)} |" for n, w, e, d, where in r["config"]]
+    return L + [""]
+
+
 def write_component_pages():
     tasks = task_files()
     for slug, name, st, g, desc, links, docs, tids in COMPONENTS:
@@ -213,6 +234,7 @@ def write_component_pages():
         body = [f"# {name}", "", head, "", about, "",
                 "## Устройство", "",
                 f'<div class="map">{render_rows(BLOCKS.get(slug, []), page)}</div>', ""]
+        body += rationale_md(slug)
         (SRC / page).parent.mkdir(parents=True, exist_ok=True)
         (SRC / page).write_text("\n".join(body), encoding="utf-8")
 

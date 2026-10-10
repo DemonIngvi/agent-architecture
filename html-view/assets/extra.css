@@ -176,3 +176,6 @@
   padding: 0.6rem 0.9rem; border-radius: 0.7rem; border: 1px solid var(--md-default-fg-color--lightest); }
 .position .about-label { margin: 0; }
 .position .chain { margin: 0; }
+
+.why-platform { margin-top: 2rem; }
+.why-platform h2 { margin-top: 0; }

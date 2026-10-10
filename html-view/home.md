@@ -99,6 +99,23 @@
   <p>Платформа запуска LLM-агентов для задач таск-трекера ICPlan: изоляция каждого запуска, контроль моделей и затрат, guardrails, память.</p>
 </div>
 
+<div class="why-platform">
+  <h2>Зачем платформа</h2>
+  <p>В ICPlan агенты уже есть, но исполняются внутри трекера или CLI на машине оператора. Платформа добавляет то, чего не хватает для работы агентов в процессе:</p>
+  <table>
+    <thead><tr><th>Проблема без платформы</th><th>Что даёт платформа</th><th>Компонент</th></tr></thead>
+    <tbody>
+      <tr><td>Агент исполняется без изоляции, рядом с данными трекера</td><td>Каждый запуск — в своём одноразовом контейнере</td><td><a href="components/sandbox/">Sandbox</a>, <a href="components/agent-runner/">Agent Runner</a></td></tr>
+      <tr><td>Модели вызываются напрямую, затраты не видны</td><td>Одна точка выхода к моделям, бюджеты, учёт по задаче, смена модели без кода</td><td><a href="components/llm-gateway/">LiteLLM gateway</a></td></tr>
+      <tr><td>Нет правил, что агенту можно</td><td>Политики в 4 точках, approve опасных действий, аудит</td><td><a href="components/guardrails/">Guardrails</a></td></tr>
+      <tr><td>Следующий агент не знает, что сделал предыдущий</td><td>Память задачи и истории запусков</td><td><a href="components/memory/">Memory</a></td></tr>
+      <tr><td>Задачу нужно вручную отдавать агенту</td><td>Автоподхват по статусу и типу задачи</td><td><a href="components/icplan/">ICPlan</a></td></tr>
+      <tr><td>Видно только итог работы агента</td><td>Пошаговый таймлайн и затраты в задаче</td><td><a href="components/observability/">Observability</a></td></tr>
+      <tr><td>Настройки агента ограничены моделью и инструкцией</td><td>Бюджеты, профили среды и памяти, правила, версии</td><td><a href="components/platform-module/">Platform module</a></td></tr>
+    </tbody>
+  </table>
+</div>
+
 <div class="legend">
   <span><i class="st st-done"></i>есть</span>
   <span><i class="st st-part"></i>частично</span>
