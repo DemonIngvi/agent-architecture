@@ -72,7 +72,7 @@ def bpmn_svg(proc: dict, artifacts: dict = None) -> str:
             out.append(f'<text x="{x}" y="{ay}" class="b-art">{html.escape(label if len(label) < 34 else label[:32] + "…")}<title>{html.escape(", ".join(arts))}</title></text>')
     out.append("</svg>")
     legend = ('<div class="b-legend"><span><i class="lg lg-start"></i>начало</span><span><i class="lg lg-task"></i>задача</span>'
-              '<span><i class="lg lg-gw"></i>развилка</span><span><i class="lg lg-end"></i>конец</span><span><i class="lg lg-err"></i>ошибка</span><span>📄 артефакт шага</span></div>')
+              '<span><i class="lg lg-gw"></i>развилка</span><span><i class="lg lg-end"></i>конец</span><span><i class="lg lg-err"></i>ошибка</span></div>')
     return '<div class="bpmn-wrap">' + "".join(out) + legend + "</div>"
 
 

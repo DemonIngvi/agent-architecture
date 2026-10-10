@@ -8,6 +8,7 @@
 |---|---|---|---|
 | [Выбор таск-трекера](tracker-choice.md) | ICPlan | Форк It's a Plan | — |
 | [Автоподхват задач агентом](autopickup-rules.md) | ICPlan | Процесс типа задачи (шаг = колонка + агент + переходы) + эффект Действия | — |
+| [Потоки аналогов «трекер + ИИ-агенты»](us-analogs-agent-tracker.md) | ICPlan (истории всех компонентов) | потоки Linear, Copilot, Jira + Rovo, Devin → истории | — |
 | [Runner и очередь запусков](runner-and-scheduling.md) | Agent Runner | Свой Runner как внешний раннер ICPlan; планировщик со слотами (вариант B) | D8, D14 |
 | [Изоляция запусков](sandbox-isolation.md) | Sandbox | Тёплый пул + одноразовые контейнеры | D1 |
 | [Фреймворк агентского цикла](harness-framework.md) | Harness | LangGraph | D2 |

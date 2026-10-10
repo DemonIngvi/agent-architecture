@@ -11,4 +11,4 @@
 | ОВ-platform-infrastructure-3 | Образ CloudNativePG с pgvector | ❓ | нет | [4.7](../../../../../docs/tasks/4.7-postgres-storage-backup.md) | Эксплуатация |
 | ОВ-platform-infrastructure-4 | Совместимость ICPlan и LiteLLM с transaction pooling | ❓ | нет | [4.7](../../../../../docs/tasks/4.7-postgres-storage-backup.md) | Техлид |
 
-Закрытый вопрос удаляется из таблицы, решение записывается в design (D-номер) или в спеку.
+Закрытый вопрос удаляется из таблицы, решение записывается в design (D-номер) или в спеку. Файл правится вручную; источник — ревью, задачи, R&D и истории без требований.

@@ -106,10 +106,15 @@ def sync_stories():
                 tr = "; ".join(f"{lab + ' → ' if lab else '→ '}{names[x]}" for x, lab in nxt) or "—"
                 L.append(f"| {label} | {lanes[lane]} | {typ[ty]} | {tr} | {', '.join(arts.get(sid, [])) or '—'} |")
             L.append("")
-        L += ["## Истории", ""]
-        for sid, role, want, so, crit, reqs in lst:
+        L += ["## Сводка", "", "| История | Персона | Хочу | Точка входа | Требований |", "|---|---|---|---|---|"]
+        L += [f"| [{s[0]}](#{s[0].lower()}) | {PERSONAS.get(s[1], (ROLES.get(s[1], s[1]),))[0]} | {s[2]} | {s[6] if len(s) > 6 else '—'} | {len(s[5]) or '⚠️ 0'} |" for s in lst]
+        L += ["", "## Истории", ""]
+        for sid, role, want, so, crit, reqs, *rest in lst:
             pname = PERSONAS.get(role, (ROLES.get(role, role),))[0]
-            L += [f"### {sid}", "", f"**Как** {pname.lower()} ([персона {role}](personas.md#{role.lower()}-{pname.lower().replace(' ', '-').replace('(', '').replace(')', '')})), **я хочу** {want}, **чтобы** {so}.", "", "**Критерии приёмки:**", ""]
+            L += [f"### {sid} {{#{sid.lower()}}}", "", f"**Как** {pname.lower()} ([персона {role}](personas.md#{role.lower()}-{pname.lower().replace(' ', '-').replace('(', '').replace(')', '')})), **я хочу** {want}, **чтобы** {so}.", ""]
+            if rest and rest[0]:
+                L += [f"**Точка входа:** {rest[0]}", ""]
+            L += ["**Критерии приёмки:**", ""]
             L += [f"- [ ] {c}" for c in crit]
             L += ["", "**Требования:** " + ("⚠️ нет — открытый вопрос, см. open-questions спек" if not reqs else "") + " · ".join(
                 f"[{r.split(': ', 1)[1]}](../../{spec_path_of(r.split(': ', 1)[0])})" if spec_path_of(r.split(": ", 1)[0]) else r for r in reqs), ""]
@@ -195,7 +200,7 @@ def copy_sources():
         dst = SRC / ("overview.md" if rel.as_posix() == "README.md" else rel)
         dst.parent.mkdir(parents=True, exist_ok=True)
         txt = relink_readme(f.read_text(encoding="utf-8"), f)
-        txt = re.sub(r"<!-- bpmn:([a-z-]+) -->", lambda m: bpmn_svg(BPMN[m.group(1)], ARTIFACTS.get(m.group(1))) if m.group(1) in BPMN else "", txt)
+        txt = re.sub(r"<!-- bpmn:([a-z-]+) -->", lambda m: bpmn_svg(BPMN[m.group(1)]) if m.group(1) in BPMN else "", txt)
         txt = txt.replace("<!-- docgraph -->", graph_svg(docgraph.LAYERS, docgraph.EDGES))
         dst.write_text(txt, encoding="utf-8")
     shutil.copy2(HERE / "home.md", SRC / "index.md")

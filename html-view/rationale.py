@@ -178,7 +178,7 @@ RATIONALE = {
 # Подтверждающие документы для блока «Почему так»
 D = "openspec/changes/define-agent-platform/design.md"
 REFS = {
-    "icplan": [("R&D: выбор таск-трекера", "docs/rnd/tracker-choice.md"), ("R&D: автоподхват задач", "docs/rnd/autopickup-rules.md")],
+    "icplan": [("R&D: выбор таск-трекера", "docs/rnd/tracker-choice.md"), ("R&D: автоподхват задач", "docs/rnd/autopickup-rules.md"), ("R&D: потоки аналогов", "docs/rnd/us-analogs-agent-tracker.md")],
     "platform-module": [("R&D: хранение конфигурации", "docs/rnd/config-storage.md"), ("Design D9", D)],
     "agent-runner": [("R&D: Runner и очередь", "docs/rnd/runner-and-scheduling.md"), ("Design D8, D14", D)],
     "sandbox": [("R&D: изоляция запусков", "docs/rnd/sandbox-isolation.md"), ("Design D1", D)],
