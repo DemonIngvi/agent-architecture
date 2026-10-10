@@ -77,6 +77,7 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
         types.append(f'<a class="tb-type t-{key}{active}" href="{_rel(page.url, target)}">{label}</a>')
 
     ctx = f'<span class="tb-ctx">{DATA["names"].get(slug, "")}</span>' if slug else ""
+    nav.append(f'<a class="tb-help" href="{_rel(page.url, "docs/rules/")}" title="Правила работы с документацией">правила</a>')
     bar = (f'<div class="topbar"><span class="tb-nav">{"".join(nav)}</span>'
            f'<span class="tb-types">{ctx}{"".join(types)}</span></div>')
     return bar + "\n\n" + markdown

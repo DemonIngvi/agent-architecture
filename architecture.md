@@ -301,7 +301,7 @@ MVP: таблица событий запуска в БД ICPlan → пошаг�
 ### ICPlan → Run Queue + runner API
 - **Есть:** очередь запусков внешнего агента, опрос по ключу, стрим ответа и тулов.
 - **Доработать:** передача в запуске quality gate и лимитов; события approve/вопрос; затраты запуска.
-- **Спека:** [ici/icplan-integration](openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) — ⚠️ переписать модель с `start_run` (push) на очередь раннера (pull).
+- **Спека:** [ici/icplan-integration](openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) — обновлено: pull через очередь раннера ICPlan.
 
 ### ICPlan → Task UI
 - **Есть:** доска, статусы с автоназначением исполнителя (без запуска агента), комментарии, чат агента, история запусков (итог).
@@ -311,12 +311,12 @@ MVP: таблица событий запуска в БД ICPlan → пошаг�
 ### Platform module (модуль ICPlan)
 - **Есть:** —
 - **Доработать:** модуль в форке ICPlan, своя схема БД: алиасы LLM, бюджеты, профили sandbox и памяти, данные guardrails.
-- **Спека:** [dap/control-plane](openspec/changes/define-agent-platform/specs/control-plane/spec.md) — ⚠️ переписать как модуль ICPlan.
+- **Спека:** [dap/control-plane](openspec/changes/define-agent-platform/specs/control-plane/spec.md) — обновлено: модуль ICPlan.
 
 ### Agent Runner
 - **Есть:** протокол раннера ICPlan (как основа).
 - **Доработать:** работать как внешний раннер ICPlan; на каждый запуск поднимать Sandbox; G1 (допуск, лимиты, $); cleanup.
-- **Спека:** [dap/agent-runner](openspec/changes/define-agent-platform/specs/agent-runner/spec.md) — ⚠️ вход из очереди ICPlan, а не свой API.
+- **Спека:** [dap/agent-runner](openspec/changes/define-agent-platform/specs/agent-runner/spec.md) — обновлено: запуск из очереди ICPlan, планировщик слотов.
 
 ### Sandbox [G3]
 - **Есть:** —

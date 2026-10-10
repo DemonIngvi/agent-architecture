@@ -188,3 +188,6 @@
   padding: 0.5rem 0.8rem; border-radius: 0.7rem; background: var(--md-code-bg-color); }
 .keyparams .about-label { margin: 0 0.3rem 0 0; }
 .md-typeset .kp { font-size: 0.66rem; }
+
+.md-typeset .tb-help { font-size: 0.58rem; opacity: 0.45; margin-left: 0.3rem; color: var(--md-default-fg-color); text-decoration: underline dotted; }
+.md-typeset .tb-help:hover { opacity: 0.9; }

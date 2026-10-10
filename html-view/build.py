@@ -398,7 +398,11 @@ def nav_yaml() -> str:
     L += [item(4, title_of(SRC / p, p).replace("R&D: ", ""), p) for p in left]
     L += ["  - Справка:", item(4, "Компоненты (таблица)", "overview.md"), item(4, "Как читать", "docs/HOW-TO-READ.md"),
           item(4, "Схемы C1 / C2 (текст)", "architecture.md"), item(4, "Бэклог", "docs/BACKLOG.md"),
-          item(4, "План документации", "docs/PLAN.md"), item(4, "Формат схем", "FORMAT.md")]
+          item(4, "План документации", "docs/PLAN.md"), item(4, "Формат схем", "FORMAT.md"),
+          "    - Правила документации:", item(6, "Правила документации", "docs/rules/README.md"),
+          item(6, "Критерии полноты спеки", "docs/rules/spec-criteria.md"), item(6, "Роли", "docs/rules/roles.md"),
+          item(6, "Типы документов", "docs/rules/doc-types.md"), item(6, "Процесс изменения", "docs/rules/change-process.md"),
+          item(6, "Промпты", "docs/rules/prompts.md")]
     return "\n".join(L) + "\n"
 
 
