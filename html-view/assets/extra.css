@@ -210,3 +210,35 @@
 .rd-marks span { position: absolute; transform: translateX(-50%); }
 .rd-legend { font-size: 0.62rem; opacity: 0.85; }
 .md-typeset .side-card li .rd { margin-left: 0.4rem; }
+
+/* ===== BPMN и граф документов ===== */
+.bpmn-wrap { overflow-x: auto; margin: 0.5rem 0 1rem; border: 1px solid var(--md-default-fg-color--lightest); border-radius: 0.7rem; padding: 0.4rem; }
+.bpmn { min-width: 900px; font-family: var(--md-text-font-family, sans-serif); }
+.dgraph { min-width: 1000px; font-family: var(--md-text-font-family, sans-serif); }
+.b-lane0 { fill: var(--md-default-bg-color); }
+.b-lane1 { fill: var(--md-code-bg-color); }
+.b-lanehead { fill: var(--md-primary-fg-color); opacity: 0.12; }
+.b-lanetext { fill: var(--md-default-fg-color); font-size: 11px; font-weight: 700; text-anchor: middle; }
+.b-task { fill: var(--md-default-bg-color); stroke: var(--md-primary-fg-color); stroke-width: 1.6; }
+.b-gw { fill: #fff8e1; stroke: #f9a825; stroke-width: 1.6; }
+.b-gwx { font-size: 14px; text-anchor: middle; fill: #8d6e00; font-weight: 700; }
+.b-start { fill: #e8f5e9; stroke: #2e7d32; stroke-width: 2; }
+.b-end { fill: #eceff1; stroke: #37474f; stroke-width: 4; }
+.b-error { fill: #ffebee; stroke: #c62828; stroke-width: 3; }
+.b-text { fill: var(--md-default-fg-color); font-size: 10.5px; text-anchor: middle; }
+.b-flow, .g-edge { fill: none; stroke: var(--md-default-fg-color--light); stroke-width: 1.4; }
+.g-edge:hover { stroke: var(--md-accent-fg-color); stroke-width: 2.5; }
+.b-arrow { fill: var(--md-default-fg-color--light); }
+.b-flowtext { fill: var(--md-accent-fg-color); font-size: 10px; text-anchor: middle; font-weight: 700; }
+.g-node { fill: var(--md-default-bg-color); stroke: var(--md-primary-fg-color); stroke-width: 1.4; }
+.g-layer { fill: var(--md-default-fg-color); opacity: 0.6; font-size: 11px; text-anchor: middle; font-weight: 700; text-transform: uppercase; }
+.b-legend { display: flex; gap: 1rem; font-size: 0.62rem; opacity: 0.8; padding: 0.3rem 0.4rem; flex-wrap: wrap; }
+.b-legend span { display: inline-flex; align-items: center; gap: 0.3rem; }
+.lg { display: inline-block; width: 0.8rem; height: 0.8rem; }
+.lg-start { border-radius: 50%; border: 2px solid #2e7d32; background: #e8f5e9; }
+.lg-end { border-radius: 50%; border: 3px solid #37474f; }
+.lg-err { border-radius: 50%; border: 2px solid #c62828; background: #ffebee; }
+.lg-task { border-radius: 3px; border: 1.5px solid var(--md-primary-fg-color); }
+.lg-gw { transform: rotate(45deg) scale(0.75); border: 1.5px solid #f9a825; background: #fff8e1; }
+.t-us { background: #1565c0; }
+.md-typeset .tb-type.t-us.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #1565c0; }

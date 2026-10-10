@@ -18,6 +18,11 @@
 | **Proposal** | `openspec/changes/<change>/proposal.md` | Why, What Changes, Capabilities, Impact | capability названа по поведению, не по работе | specs |
 | **Spec** | `openspec/changes/<change>/specs/<cap>/spec.md` | Purpose, Requirements, Scenarios | [критерии полноты](spec-criteria.md) | architecture.md, flows, задачи |
 | **Схема capability** | `.../specs/<cap>/architecture.md` | схема, блоки, расширения, плюсы / минусы по модулям | только схема, без требований | spec.md |
+| **Интерфейсы capability** | `.../specs/<cap>/interfaces.md` | уровни L0–L3, параметры, хранилища S, интерфейсы I, FMEA | коды S и I — единые для всех спек | spec.md, flows, rationale.py |
+| **Трассировка (RTM)** | `.../specs/<cap>/traceability.md` | требование → обоснование → задача → сценарии | разрывы явно; без задачи — решение «не в MVP» | spec.md, docs/tasks, R&D |
+| **User Stories** | `docs/stories/<компонент>.md` (генерируется из `html-view/stories.py`) | роли, процесс BPMN (дорожки, события, задачи, развилки, ошибки), истории «Как… хочу… чтобы…», критерии приёмки, связанные требования | правим `stories.py`; каждая история ссылается на требования спек; ветки ошибок обязательны | spec.md, traceability.md (колонка US), задачи |
+| **Граф связности** | `docs/rules/doc-graph.md` + `html-view/docgraph.py` | слои и связи документов | при новом типе документа — новый узел и связи | change-process.md |
+| **Ревью** | `docs/reviews/<дата>-<тема>.md` | роли, сквозные замечания, по спекам, итог | статусы ✅ / ❓ / 📌 | спеки, задачи («Что проработать») |
 | **Design** | `openspec/changes/<change>/design.md` | Context, Goals, Decisions (D-номера), Risks, Open Questions | у решения — альтернативы и ссылка на R&D | R&D, architecture.md |
 | **Tasks change** | `openspec/changes/<change>/tasks.md` | `## N.` группы, `- [ ] N.M` | одна строка + ссылка на docs/tasks | docs/tasks |
 | **Данные сайта** | `html-view/components.py`, `rationale.py`, `subcomponents.py`, `home.md` | COMPONENTS, BLOCKS, ABOUT, IO, RATIONALE, REFS, SUB | меняются вместе с архитектурой; новый блок схемы с описанием — в SUB | architecture.md, R&D, задачи |

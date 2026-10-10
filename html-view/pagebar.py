@@ -14,6 +14,7 @@ DATA = {"pages": {}, "names": {}}
 TYPES = [  # (ключ, подпись, раздел навигации, URL компонента, URL без компонента)
     ("arch", "Архитектура", "Архитектура", "components/{}/", ""),
     ("flow", "Потоки", "Потоки", "docs/flows/{}/", "docs/flows/"),
+    ("us", "User Stories", "User Stories", "docs/stories/{}/", "docs/stories/"),
     ("spec", "Спеки", "Спеки", "specs-by-component/{}/", "specs-by-component/"),
     ("task", "Задачи", "Задачи", "tasks-by-component/{}/", "tasks-by-component/"),
     ("rnd", "R&D", "R&D", "rnd-by-component/{}/", "rnd-by-component/"),
@@ -58,10 +59,26 @@ def _top_section(page):
     return node.title if node is not page else None
 
 
+def _doc_type(src: str) -> str:
+    if src == "index.md" or src.startswith("components/"):
+        return "Архитектура"
+    if src.startswith("docs/flows/"):
+        return "Потоки"
+    if src.startswith("docs/stories/"):
+        return "User Stories"
+    if src.startswith("specs-by-component/") or "/specs/" in src:
+        return "Спеки"
+    if src.startswith(("tasks-by-component/", "docs/tasks/", "docs/ROADMAP", "docs/TASKS", "docs/BACKLOG")) or src.endswith("/tasks.md"):
+        return "Задачи"
+    if src.startswith(("docs/rnd/", "rnd-by-component/")):
+        return "R&D"
+    return "Справка"
+
+
 def on_page_markdown(markdown, page, config, files, **kwargs):
     src = page.file.src_uri
     slug = DATA["pages"].get(src)
-    current = _top_section(page) or "Архитектура"
+    current = _doc_type(src)
     up = _up(page)
 
     nav = []

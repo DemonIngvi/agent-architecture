@@ -15,6 +15,8 @@
 6. **Отчитаться** пользователю: список изменённых файлов и что в каждом.
 7. **Коммит** с описанием; публикация — push в `main`.
 
+Наглядно связи показаны на [графе связности документов](doc-graph.md).
+
 ## Матрица синхронизации
 
 Изменили слева → проверить справа.
@@ -22,10 +24,15 @@
 | Изменение | Проверить и при необходимости обновить |
 |---|---|
 | Новое решение / смена технологии | R&D → design (D-номер) → architecture.md («Обоснование») → спека (Purpose) → rationale.py (RATIONALE, REFS) → subcomponents.py |
+| Новая или изменённая User Story | `stories.py` (история, процесс BPMN) → spec.md (требования и сценарии) → traceability.md (колонка US) → задачи → ROADMAP / TASKS |
 | Новое требование в спеке | задача (Приёмка, ссылка на требование) → flows (данные) → конфигурация компонента |
 | Новая задача | docs/tasks → ROADMAP (строка и итоги) → TASKS → tasks.md change → components.py (tids) |
 | Новый параметр конфигурации | rationale.py (config) → subcomponents.py (params) → спека (сценарий S9) → architecture.md при необходимости |
 | Новый блок на схеме компонента | components.py (BLOCKS) → subcomponents.py (SUB) |
 | Новый тип данных | flows → спека (сценарии) → IO в components.py |
 | Новый компонент | README → architecture.md → components.py (COMPONENTS, BLOCKS, ABOUT, IO) → rationale.py → flows → спека → R&D |
+| Новое хранилище или интерфейс | inventory (S / I коды) → `interfaces.md` всех затронутых спек → flows → требование «Хранилища данных» / «Интерфейсы обмена» |
+| Новая зависимость модуля | FMEA в `interfaces.md` → требование «Поведение при отказах» (сценарий) |
+| Новое требование | `traceability.md` (задача и обоснование) → при разрыве — задача или «не в MVP» |
+| Ревью | `docs/reviews/` → открытые вопросы в «Что проработать» задач |
 | Новый тип документа | docs/rules/doc-types.md → html-view/build.py (навигация) |

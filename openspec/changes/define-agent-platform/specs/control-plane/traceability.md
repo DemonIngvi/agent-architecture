@@ -1,0 +1,19 @@
+# control-plane — трассировка требований (RTM)
+
+← [spec.md](spec.md) · [интерфейсы и отказы](interfaces.md) · [правила](../../../../../docs/rules/spec-criteria.md)
+
+Вверх — к исследованию и решению, вниз — к задаче реализации (ISO/IEC/IEEE 29148).
+
+| Требование | User Story (вверх) | Обоснование (вверх) | Задача (вниз) | Сценариев |
+|---|---|---|---|---|
+| Настройки агента | [US-PM-01](../../../../../docs/stories/platform-module.md), [US-PM-05](../../../../../docs/stories/platform-module.md) | [R&D: хранение конфигурации](../../../../../docs/rnd/config-storage.md) · [design D9](../../../../../openspec/changes/define-agent-platform/design.md) | [4.4](../../../../../docs/tasks/4.4-platform-module.md) | 3 |
+| Хранение в БД ICPlan | техническое | [R&D: хранение конфигурации](../../../../../docs/rnd/config-storage.md) · [design D9](../../../../../openspec/changes/define-agent-platform/design.md) | [4.4](../../../../../docs/tasks/4.4-platform-module.md) | 3 |
+| Применение к следующему запуску | [US-PM-02](../../../../../docs/stories/platform-module.md) | [R&D: хранение конфигурации](../../../../../docs/rnd/config-storage.md) · [design D9](../../../../../openspec/changes/define-agent-platform/design.md) | [4.4](../../../../../docs/tasks/4.4-platform-module.md) | 3 |
+| Версии определения агента | [US-PM-03](../../../../../docs/stories/platform-module.md) | [R&D: хранение конфигурации](../../../../../docs/rnd/config-storage.md) · [design D9](../../../../../openspec/changes/define-agent-platform/design.md) | [4.4](../../../../../docs/tasks/4.4-platform-module.md) | 3 |
+| Экспорт и импорт YAML | [US-PM-03](../../../../../docs/stories/platform-module.md) | [R&D: хранение конфигурации](../../../../../docs/rnd/config-storage.md) · [design D9](../../../../../openspec/changes/define-agent-platform/design.md) | [4.4](../../../../../docs/tasks/4.4-platform-module.md) | 3 |
+| Раздача настроек исполнителям | [US-PM-04](../../../../../docs/stories/platform-module.md) | [R&D: хранение конфигурации](../../../../../docs/rnd/config-storage.md) · [design D9](../../../../../openspec/changes/define-agent-platform/design.md) | [4.4](../../../../../docs/tasks/4.4-platform-module.md) | 3 |
+| Права на настройки | техническое | [R&D: хранение конфигурации](../../../../../docs/rnd/config-storage.md) · [design D9](../../../../../openspec/changes/define-agent-platform/design.md) | [4.4](../../../../../docs/tasks/4.4-platform-module.md) | 3 |
+| Конфигурация модуля | [US-PM-01](../../../../../docs/stories/platform-module.md) | [R&D: хранение конфигурации](../../../../../docs/rnd/config-storage.md) · [design D9](../../../../../openspec/changes/define-agent-platform/design.md) | [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md), [4.4](../../../../../docs/tasks/4.4-platform-module.md) | 3 |
+| Хранилища данных | техническое | [R&D: хранение конфигурации](../../../../../docs/rnd/config-storage.md) · [design D9](../../../../../openspec/changes/define-agent-platform/design.md) | [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md), [4.4](../../../../../docs/tasks/4.4-platform-module.md) | 3 |
+| Интерфейсы обмена | техническое | [R&D: хранение конфигурации](../../../../../docs/rnd/config-storage.md) · [design D9](../../../../../openspec/changes/define-agent-platform/design.md) | [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md), [4.4](../../../../../docs/tasks/4.4-platform-module.md) | 3 |
+| Поведение при отказах зависимостей | [US-PM-04](../../../../../docs/stories/platform-module.md) | [R&D: хранение конфигурации](../../../../../docs/rnd/config-storage.md) · [design D9](../../../../../openspec/changes/define-agent-platform/design.md) | [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md), [4.4](../../../../../docs/tasks/4.4-platform-module.md) | 3 |

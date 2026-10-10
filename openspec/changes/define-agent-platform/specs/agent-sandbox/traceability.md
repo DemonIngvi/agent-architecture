@@ -1,0 +1,19 @@
+# agent-sandbox — трассировка требований (RTM)
+
+← [spec.md](spec.md) · [интерфейсы и отказы](interfaces.md) · [правила](../../../../../docs/rules/spec-criteria.md)
+
+Вверх — к исследованию и решению, вниз — к задаче реализации (ISO/IEC/IEEE 29148).
+
+| Требование | User Story (вверх) | Обоснование (вверх) | Задача (вниз) | Сценариев |
+|---|---|---|---|---|
+| Среда на каждый запуск | техническое | [R&D: изоляция](../../../../../docs/rnd/sandbox-isolation.md) · [design D1, D7, D11](../../../../../openspec/changes/define-agent-platform/design.md) | [2.2](../../../../../docs/tasks/2.2-sandbox-docker-oneshot.md) | 3 |
+| Тёплый пул | [US-SBX-01](../../../../../docs/stories/sandbox.md) | [R&D: изоляция](../../../../../docs/rnd/sandbox-isolation.md) · [design D1, D7, D11](../../../../../openspec/changes/define-agent-platform/design.md) | [4.1](../../../../../docs/tasks/4.1-sandbox-warm-pool.md) | 3 |
+| Эфемерный workspace | [US-SBX-04](../../../../../docs/stories/sandbox.md) | [R&D: изоляция](../../../../../docs/rnd/sandbox-isolation.md) · [design D1, D7, D11](../../../../../openspec/changes/define-agent-platform/design.md) | [2.2](../../../../../docs/tasks/2.2-sandbox-docker-oneshot.md), [4.2](../../../../../docs/tasks/4.2-egress-repo-access.md) | 3 |
+| Доступ к репозиториям | [US-SBX-02](../../../../../docs/stories/sandbox.md) | [R&D: изоляция](../../../../../docs/rnd/sandbox-isolation.md) · [design D1, D7, D11](../../../../../openspec/changes/define-agent-platform/design.md) | [4.2](../../../../../docs/tasks/4.2-egress-repo-access.md) | 3 |
+| Профиль sandbox | техническое | [R&D: изоляция](../../../../../docs/rnd/sandbox-isolation.md) · [design D1, D7, D11](../../../../../openspec/changes/define-agent-platform/design.md) | [2.2](../../../../../docs/tasks/2.2-sandbox-docker-oneshot.md) | 3 |
+| Сетевая изоляция | [US-SBX-03](../../../../../docs/stories/sandbox.md) | [R&D: изоляция](../../../../../docs/rnd/sandbox-isolation.md) · [design D1, D7, D11](../../../../../openspec/changes/define-agent-platform/design.md) | [4.2](../../../../../docs/tasks/4.2-egress-repo-access.md) | 3 |
+| Секреты | [US-SBX-03](../../../../../docs/stories/sandbox.md) | [R&D: изоляция](../../../../../docs/rnd/sandbox-isolation.md) · [design D1, D7, D11](../../../../../openspec/changes/define-agent-platform/design.md) | [4.2](../../../../../docs/tasks/4.2-egress-repo-access.md) | 3 |
+| Конфигурация модуля | техническое | [R&D: изоляция](../../../../../docs/rnd/sandbox-isolation.md) · [design D1, D7, D11](../../../../../openspec/changes/define-agent-platform/design.md) | [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md), [2.2](../../../../../docs/tasks/2.2-sandbox-docker-oneshot.md) | 3 |
+| Хранилища данных | техническое | [R&D: изоляция](../../../../../docs/rnd/sandbox-isolation.md) · [design D1, D7, D11](../../../../../openspec/changes/define-agent-platform/design.md) | [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md), [2.2](../../../../../docs/tasks/2.2-sandbox-docker-oneshot.md) | 3 |
+| Интерфейсы обмена | техническое | [R&D: изоляция](../../../../../docs/rnd/sandbox-isolation.md) · [design D1, D7, D11](../../../../../openspec/changes/define-agent-platform/design.md) | [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md), [2.2](../../../../../docs/tasks/2.2-sandbox-docker-oneshot.md), [4.2](../../../../../docs/tasks/4.2-egress-repo-access.md) | 3 |
+| Поведение при отказах зависимостей | [US-SBX-01](../../../../../docs/stories/sandbox.md) | [R&D: изоляция](../../../../../docs/rnd/sandbox-isolation.md) · [design D1, D7, D11](../../../../../openspec/changes/define-agent-platform/design.md) | [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md), [2.2](../../../../../docs/tasks/2.2-sandbox-docker-oneshot.md), [4.1](../../../../../docs/tasks/4.1-sandbox-warm-pool.md) | 4 |
