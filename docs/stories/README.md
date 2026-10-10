@@ -20,7 +20,7 @@
 | Компонент | Историй | Процессов BPMN |
 |---|---|---|
 | [ICPlan](icplan.md) | 29 | 4 |
-| [Platform module](platform-module.md) | 7 | 2 |
+| [Platform module](platform-module.md) | 8 | 2 |
 | [Agent Runner](agent-runner.md) | 6 | 2 |
 | [Sandbox](sandbox.md) | 7 | 2 |
 | [Harness](harness.md) | 7 | 2 |

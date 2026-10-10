@@ -280,6 +280,9 @@ def check_docs() -> list:
             issues.append(f"{itf.parent.name}: в FMEA нет отказа своего хранилища")
         if "Почему так по умолчанию" not in t:  # таблица параметров
             issues.append(f"{itf.parent.name}: таблица параметров без обоснований и границ")
+    dt = (ROOT / "docs/flows/data-types.md").read_text(encoding="utf-8") if (ROOT / "docs/flows/data-types.md").exists() else ""
+    codes = {c for itf in ROOT.glob("openspec/changes/*/specs/*/interfaces.md") for c in re.findall(r"^\| (I\d+) \|", itf.read_text(encoding="utf-8"), re.M)}
+    issues += [f"интерфейс {c} не отнесён к типам данных (docs/flows/data-types.md)" for c in sorted(codes) if f"| {c} |" not in dt]  # О-16
     for i in issues:
         print("⚠️ правила:", i)
     return issues
@@ -813,7 +816,7 @@ def nav_yaml() -> str:
         rs = [p for _, p in REFS.get(slug, []) if p.startswith("docs/rnd/") and (SRC / p).exists() and p not in used]
         L += ["    - R&D:", item(6, "R&D " + name, f"rnd-by-component/{slug}/index.md")]
         L += [item(6, title_of(SRC / p, p).replace("R&D: ", ""), p) for p in rs]
-    L += ["  - Обзоры:", item(4, "Сквозной поток", "docs/flows/README.md"), item(4, "Все User Stories", "docs/stories/README.md"), item(4, "Покрытие историй", "docs/stories/coverage.md"),
+    L += ["  - Обзоры:", item(4, "Сквозной поток", "docs/flows/README.md"), item(4, "Типы данных и потоки", "docs/flows/data-types.md"), item(4, "Все User Stories", "docs/stories/README.md"), item(4, "Покрытие историй", "docs/stories/coverage.md"),
           item(4, "Спеки по компонентам", "specs-by-component/index.md"), item(4, "Задачи по компонентам", "tasks-by-component/index.md"),
           item(4, "Roadmap MVP", "docs/ROADMAP.md"), item(4, "Сводная таблица задач", "docs/TASKS.md"), item(4, "Бэклог", "docs/BACKLOG.md"),
           item(4, "R&D по компонентам", "rnd-by-component/index.md"), item(4, "Все R&D", "docs/rnd/README.md"), item(4, "Методология R&D", "docs/rnd/METHOD.md")]
