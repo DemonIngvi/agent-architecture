@@ -550,7 +550,7 @@ def task_side() -> dict:
 
 def review_open(cap: str) -> list:
     """Открытые (❓ / 📌) замечания по спеке в последнем ревью."""
-    revs = sorted((ROOT / "docs/reviews").glob("*.md"))
+    revs = sorted((ROOT / "docs/reviews").glob("*.md"), key=lambda f: (f.name[:10], int(m.group(1)) if (m := re.search(r"-(\d+)\.md$", f.name)) else 1))
     if not revs:
         return []
     out, hdr = [], None
