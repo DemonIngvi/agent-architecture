@@ -18,7 +18,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from rationale import RATIONALE, REFS  # noqa: E402
 from subcomponents import SUB  # noqa: E402
-from stories import ARTIFACTS, BPMN, PERSONAS, ROLES, STORIES  # noqa: E402
+from stories import ARTIFACTS, BPMN, CHAINS, PERSONAS, ROLES, STORIES  # noqa: E402
 from diagrams import bpmn_svg, graph_svg  # noqa: E402
 import docgraph  # noqa: E402
 from components import ABOUT, AP, IO, BLOCKS, BY_SLUG, COMPONENTS, STATUS  # noqa: E402
@@ -109,6 +109,13 @@ def sync_stories():
         loose = [s[0] for s in lst if not any(s[0] in pr["stories"] for pr in procs)]
         if loose:
             print("⚠️ истории без процесса BPMN:", slug, loose)
+        where = {s[0]: c for c, l2 in STORIES.items() for s in l2}
+        if slug == "icplan":
+            L += ["## Сквозная трассировка", "", "Каждая история ICPlan проходит через истории других компонентов и заканчивается логической точкой.", "",
+                  "| История | Цепочка историй | Логическая точка |", "|---|---|---|"]
+            for sid0, (chain, end) in CHAINS.items():
+                L.append(f"| [{sid0}](#{sid0.lower()}) | " + " → ".join(f"[{x}]({where[x]}.md#{x.lower()})" for x in chain) + f" | {end} |")
+            L.append("")
         L += ["## Сводка", "", "| История | Персона | Хочу | Точка входа | Требований |", "|---|---|---|---|---|"]
         L += [f"| [{s[0]}](#{s[0].lower()}) | {PERSONAS.get(s[1], (ROLES.get(s[1], s[1]),))[0]} | {s[2]} | {s[6] if len(s) > 6 else '—'} | {len(s[5]) or '⚠️ 0'} |" for s in lst]
         L += ["", "## Истории", ""]
@@ -117,6 +124,9 @@ def sync_stories():
             L += [f"### {sid} {{#{sid.lower()}}}", "", f"**Как** {pname.lower()} ([персона {role}](personas.md#{role.lower()}-{pname.lower().replace(' ', '-').replace('(', '').replace(')', '')})), **я хочу** {want}, **чтобы** {so}.", ""]
             if rest and rest[0]:
                 L += [f"**Точка входа:** {rest[0]}", ""]
+            used_in = [k for k, (ch, _) in CHAINS.items() if sid in ch and k != sid]
+            if used_in:
+                L += ["**Участвует в цепочках ICPlan:** " + ", ".join(f"[{k}](icplan.md#{k.lower()})" for k in used_in), ""]
             L += ["**Критерии приёмки:**", ""]
             L += [f"- [ ] {c}" for c in crit]
             L += ["", "**Требования:** " + ("⚠️ нет — открытый вопрос, см. open-questions спек" if not reqs else "") + " · ".join(
@@ -283,6 +293,10 @@ def check_docs() -> list:
     dt = (ROOT / "docs/flows/data-types.md").read_text(encoding="utf-8") if (ROOT / "docs/flows/data-types.md").exists() else ""
     codes = {c for itf in ROOT.glob("openspec/changes/*/specs/*/interfaces.md") for c in re.findall(r"^\| (I\d+) \|", itf.read_text(encoding="utf-8"), re.M)}
     issues += [f"интерфейс {c} не отнесён к типам данных (docs/flows/data-types.md)" for c in sorted(codes) if f"| {c} |" not in dt]  # О-16
+    ids = {s[0] for l in STORIES.values() for s in l}  # О-20: сквозная трассировка историй ICPlan
+    issues += [f"история {s[0]} без цепочки сквозной трассировки" for s in STORIES.get("icplan", []) if s[0] not in CHAINS]
+    issues += [f"цепочка {k}: нет истории {x}" for k, (ch, _) in CHAINS.items() for x in ch if x not in ids]
+    issues += [f"цепочка {k} без логической конечной точки" for k, (_, end) in CHAINS.items() if not end.strip()]
     for c in COMPONENTS:  # О-17: техспека у каждого компонента
         ts = ROOT / f"docs/techspec/{c[0]}.md"
         if not ts.exists():

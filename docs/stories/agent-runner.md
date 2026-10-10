@@ -58,6 +58,8 @@
 
 **Точка входа:** очередь ICPlan
 
+**Участвует в цепочках ICPlan:** [US-ICP-01](icplan.md#us-icp-01), [US-ICP-08](icplan.md#us-icp-08), [US-ICP-09](icplan.md#us-icp-09), [US-ICP-19](icplan.md#us-icp-19), [US-ICP-04](icplan.md#us-icp-04), [US-ICP-16](icplan.md#us-icp-16), [US-ICP-17](icplan.md#us-icp-17), [US-ICP-22](icplan.md#us-icp-22), [US-ICP-27](icplan.md#us-icp-27), [US-ICP-07](icplan.md#us-icp-07)
+
 **Критерии приёмки:**
 
 - [ ] Запуск взят → создан sandbox, Harness получил задание
@@ -86,6 +88,8 @@
 
 **Точка входа:** конфиг деплоя
 
+**Участвует в цепочках ICPlan:** [US-ICP-18](icplan.md#us-icp-18), [US-ICP-07](icplan.md#us-icp-07)
+
 **Критерии приёмки:**
 
 - [ ] Слоты модели заняты → запуск ждёт
@@ -113,6 +117,8 @@
 **Как** эксплуатация (devops) ([персона Э](personas.md#э-эксплуатация-devops)), **я хочу** чтобы падение Runner не теряло работу, **чтобы** не перезапускать задачи вручную.
 
 **Точка входа:** —
+
+**Участвует в цепочках ICPlan:** [US-ICP-06](icplan.md#us-icp-06)
 
 **Критерии приёмки:**
 

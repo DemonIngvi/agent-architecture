@@ -85,6 +85,42 @@
 | Действие «делегировать агенту» | Администратор | задача | → Процесс действует | Действие проекта |
 | Процесс действует | ICPlan | конец | — | — |
 
+## Сквозная трассировка
+
+Каждая история ICPlan проходит через истории других компонентов и заканчивается логической точкой.
+
+| История | Цепочка историй | Логическая точка |
+|---|---|---|
+| [US-ICP-01](#us-icp-01) | [US-ICP-01](icplan.md#us-icp-01) → [US-ICP-07](icplan.md#us-icp-07) → [US-GRD-03](guardrails.md#us-grd-03) → [US-RUN-01](agent-runner.md#us-run-01) → [US-SBX-01](sandbox.md#us-sbx-01) → [US-SBX-05](sandbox.md#us-sbx-05) → [US-MEM-07](memory.md#us-mem-07) → [US-MEM-01](memory.md#us-mem-01) → [US-HAR-01](harness.md#us-har-01) → [US-MCP-02](mcp-tools.md#us-mcp-02) → [US-LLM-03](llm-gateway.md#us-llm-03) → [US-OBS-01](observability.md#us-obs-01) → [US-ICP-02](icplan.md#us-icp-02) | итог в задаче; ICPlan переводит задачу на следующий шаг процесса или в «ждёт проверки» (US-ICP-13) |
+| [US-ICP-08](#us-icp-08) | [US-ICP-08](icplan.md#us-icp-08) → [US-ICP-07](icplan.md#us-icp-07) → [US-RUN-01](agent-runner.md#us-run-01) → [US-HAR-01](harness.md#us-har-01) → [US-OBS-01](observability.md#us-obs-01) | итог комментарием в задаче, делегат снят |
+| [US-ICP-09](#us-icp-09) | [US-ICP-09](icplan.md#us-icp-09) → [US-RUN-01](agent-runner.md#us-run-01) → [US-MEM-06](memory.md#us-mem-06) → [US-HAR-01](harness.md#us-har-01) | ответ агента в ветке комментария |
+| [US-ICP-19](#us-icp-19) | [US-ICP-19](icplan.md#us-icp-19) → [US-RUN-01](agent-runner.md#us-run-01) → [US-HAR-01](harness.md#us-har-01) → [US-OBS-01](observability.md#us-obs-01) | итог в задаче расписания; следующее срабатывание — по расписанию |
+| [US-ICP-02](#us-icp-02) | [US-ICP-02](icplan.md#us-icp-02) → [US-HAR-01](harness.md#us-har-01) → [US-OBS-03](observability.md#us-obs-03) → [US-OBS-01](observability.md#us-obs-01) | пользователь видит шаги; при необходимости — указание (US-ICP-10) или отмена (US-ICP-04) |
+| [US-ICP-10](#us-icp-10) | [US-ICP-10](icplan.md#us-icp-10) → [US-HAR-06](harness.md#us-har-06) → [US-MEM-06](memory.md#us-mem-06) → [US-OBS-01](observability.md#us-obs-01) | в таймлайне «указание учтено», агент продолжает |
+| [US-ICP-11](#us-icp-11) | [US-ICP-11](icplan.md#us-icp-11) → [US-ICP-03](icplan.md#us-icp-03) → [US-HAR-07](harness.md#us-har-07) → [US-MEM-06](memory.md#us-mem-06) | агент продолжает работу с ответом в контексте |
+| [US-ICP-03](#us-icp-03) | [US-ICP-03](icplan.md#us-icp-03) → [US-HAR-02](harness.md#us-har-02) → [US-HAR-07](harness.md#us-har-07) | пользователь подтвердил действие (US-HAR-02) или ответил (US-ICP-11) |
+| [US-ICP-12](#us-icp-12) | [US-ICP-12](icplan.md#us-icp-12) → [US-LLM-03](llm-gateway.md#us-llm-03) → [US-OBS-05](observability.md#us-obs-05) | сводка показана; переход к задаче — US-ICP-02 |
+| [US-ICP-13](#us-icp-13) | [US-ICP-13](icplan.md#us-icp-13) → [US-MEM-02](memory.md#us-mem-02) → [US-ICP-07](icplan.md#us-icp-07) | «принято» → следующий шаг; «не выполнено» → новый запуск шага с заметкой (цепочка US-ICP-01) |
+| [US-ICP-14](#us-icp-14) | [US-ICP-14](icplan.md#us-icp-14) → [US-ICP-04](icplan.md#us-icp-04) → [US-SBX-01](sandbox.md#us-sbx-01) | процесс остановлен, среда уничтожена; «возобновить» → запуск текущего шага (US-ICP-01) |
+| [US-ICP-04](#us-icp-04) | [US-ICP-04](icplan.md#us-icp-04) → [US-RUN-01](agent-runner.md#us-run-01) → [US-SBX-01](sandbox.md#us-sbx-01) → [US-OBS-01](observability.md#us-obs-01) | запуск `canceled`, среда уничтожена, запись в истории |
+| [US-ICP-15](#us-icp-15) | [US-ICP-15](icplan.md#us-icp-15) → [US-ICP-13](icplan.md#us-icp-13) | переход по процессу только после «принято» |
+| [US-ICP-16](#us-icp-16) | [US-ICP-16](icplan.md#us-icp-16) → [US-ICP-07](icplan.md#us-icp-07) → [US-RUN-01](agent-runner.md#us-run-01) → [US-MEM-02](memory.md#us-mem-02) → [US-HAR-01](harness.md#us-har-01) | новый запуск шага с итогом ошибки в контексте |
+| [US-ICP-17](#us-icp-17) | [US-ICP-17](icplan.md#us-icp-17) → [US-ICP-07](icplan.md#us-icp-07) → [US-RUN-01](agent-runner.md#us-run-01) | шаг выполняет новый исполнитель; процесс для других задач не изменён |
+| [US-ICP-18](#us-icp-18) | [US-ICP-18](icplan.md#us-icp-18) → [US-GRD-03](guardrails.md#us-grd-03) → [US-ICP-06](icplan.md#us-icp-06) → [US-RUN-03](agent-runner.md#us-run-03) | причина ожидания показана в карточке задачи |
+| [US-ICP-20](#us-icp-20) | [US-ICP-20](icplan.md#us-icp-20) → [US-PM-01](platform-module.md#us-pm-01) → [US-MCP-01](mcp-tools.md#us-mcp-01) → [US-ICP-24](icplan.md#us-icp-24) | агент создан и проверен; подключение к шагу — US-ICP-26 |
+| [US-ICP-21](#us-icp-21) | [US-ICP-21](icplan.md#us-icp-21) → [US-PM-02](platform-module.md#us-pm-02) → [US-MEM-07](memory.md#us-mem-07) | новая версия агента действует со следующего запуска |
+| [US-ICP-22](#us-icp-22) | [US-ICP-22](icplan.md#us-icp-22) → [US-RUN-01](agent-runner.md#us-run-01) | новые запуски не создаются, очередь ждёт включения |
+| [US-ICP-23](#us-icp-23) | [US-ICP-23](icplan.md#us-icp-23) → [US-ICP-26](icplan.md#us-icp-26) | шаги процессов ручные, история задач сохранена |
+| [US-ICP-24](#us-icp-24) | [US-ICP-24](icplan.md#us-icp-24) → [US-LLM-02](llm-gateway.md#us-llm-02) → [US-HAR-01](harness.md#us-har-01) | итог теста в чате; задачи не изменены |
+| [US-ICP-28](#us-icp-28) | [US-ICP-28](icplan.md#us-icp-28) → [US-OBS-05](observability.md#us-obs-05) → [US-LLM-05](llm-gateway.md#us-llm-05) | статистика агента показана; улучшение агента — US-ICP-21 |
+| [US-ICP-05](#us-icp-05) | [US-ICP-05](icplan.md#us-icp-05) → [US-ICP-26](icplan.md#us-icp-26) → [US-ICP-27](icplan.md#us-icp-27) | процесс действует для новых задач этого типа |
+| [US-ICP-25](#us-icp-25) | [US-ICP-25](icplan.md#us-icp-25) → [US-ICP-26](icplan.md#us-icp-26) | новая версия процесса; задачи с удалённых шагов перенесены |
+| [US-ICP-26](#us-icp-26) | [US-ICP-26](icplan.md#us-icp-26) → [US-PM-05](platform-module.md#us-pm-05) | следующий вход задачи в шаг запускает агента |
+| [US-ICP-27](#us-icp-27) | [US-ICP-27](icplan.md#us-icp-27) → [US-ICP-07](icplan.md#us-icp-07) → [US-RUN-01](agent-runner.md#us-run-01) | задача у агента по условию Действия |
+| [US-ICP-07](#us-icp-07) | [US-ICP-07](icplan.md#us-icp-07) → [US-RUN-03](agent-runner.md#us-run-03) → [US-RUN-01](agent-runner.md#us-run-01) | запуск выдан одному Runner с арендой |
+| [US-ICP-29](#us-icp-29) | [US-ICP-29](icplan.md#us-icp-29) → [US-MEM-01](memory.md#us-mem-01) → [US-MEM-02](memory.md#us-mem-02) → [US-MEM-08](memory.md#us-mem-08) → [US-MCP-02](mcp-tools.md#us-mcp-02) | агент начал работу с полным контекстом задачи |
+| [US-ICP-06](#us-icp-06) | [US-ICP-06](icplan.md#us-icp-06) → [US-RUN-05](agent-runner.md#us-run-05) → [US-INF-03](infrastructure.md#us-inf-03) | статус «в сети / не в сети» виден администратору |
+
 ## Сводка
 
 | История | Персона | Хочу | Точка входа | Требований |
@@ -186,6 +222,8 @@
 
 **Точка входа:** карточка задачи: таймлайн
 
+**Участвует в цепочках ICPlan:** [US-ICP-01](icplan.md#us-icp-01)
+
 **Критерии приёмки:**
 
 - [ ] Шаги появляются в задаче по мере работы
@@ -229,6 +267,8 @@
 
 **Точка входа:** уведомления ICPlan, Telegram
 
+**Участвует в цепочках ICPlan:** [US-ICP-11](icplan.md#us-icp-11)
+
 **Критерии приёмки:**
 
 - [ ] Запрос подтверждения или вопрос → уведомление исполнителю задачи
@@ -257,6 +297,8 @@
 **Как** пользователь icplan ([персона П](personas.md#п-пользователь-icplan)), **я хочу** принять результат агента или вернуть его с заметкой, что не выполнено, **чтобы** результат шёл дальше только после моей оценки, а агент учитывал замечания.
 
 **Точка входа:** карточка задачи: кнопки «принято / не выполнено»; чат
+
+**Участвует в цепочках ICPlan:** [US-ICP-15](icplan.md#us-icp-15)
 
 **Критерии приёмки:**
 
@@ -287,6 +329,8 @@
 **Как** пользователь icplan ([персона П](personas.md#п-пользователь-icplan)), **я хочу** отменить текущую работу агента, **чтобы** остановить неверное направление и траты.
 
 **Точка входа:** карточка задачи, чат
+
+**Участвует в цепочках ICPlan:** [US-ICP-14](icplan.md#us-icp-14)
 
 **Критерии приёмки:**
 
@@ -414,6 +458,8 @@
 
 **Точка входа:** агент → «проверить»
 
+**Участвует в цепочках ICPlan:** [US-ICP-20](icplan.md#us-icp-20)
+
 **Критерии приёмки:**
 
 - [ ] Тестовый запуск на выбранной задаче или примере → итог и шаги видны, задача не меняется
@@ -471,6 +517,8 @@
 
 **Точка входа:** Настройки проекта → Процессы → шаг
 
+**Участвует в цепочках ICPlan:** [US-ICP-23](icplan.md#us-icp-23), [US-ICP-05](icplan.md#us-icp-05), [US-ICP-25](icplan.md#us-icp-25)
+
 **Критерии приёмки:**
 
 - [ ] Подключил → следующие входы в шаг запускают агента
@@ -485,6 +533,8 @@
 
 **Точка входа:** Настройки проекта → Действия
 
+**Участвует в цепочках ICPlan:** [US-ICP-05](icplan.md#us-icp-05)
+
 **Критерии приёмки:**
 
 - [ ] Условие выполнено → агент — делегат, запуск в очереди
@@ -498,6 +548,8 @@
 **Как** агент-исполнитель ([персона Аг](personas.md#аг-агент-исполнитель)), **я хочу** брать следующую задачу из своей очереди по всем процессам, где я исполнитель шага, **чтобы** работать без ручной раздачи и не брать одну задачу дважды.
 
 **Точка входа:** очередь запусков (Runner)
+
+**Участвует в цепочках ICPlan:** [US-ICP-01](icplan.md#us-icp-01), [US-ICP-08](icplan.md#us-icp-08), [US-ICP-13](icplan.md#us-icp-13), [US-ICP-16](icplan.md#us-icp-16), [US-ICP-17](icplan.md#us-icp-17), [US-ICP-27](icplan.md#us-icp-27)
 
 **Критерии приёмки:**
 
@@ -526,6 +578,8 @@
 **Как** эксплуатация (devops) ([персона Э](personas.md#э-эксплуатация-devops)), **я хочу** видеть, в сети ли платформа агентов, **чтобы** понимать, почему задачи не берутся.
 
 **Точка входа:** Команда → ИИ-агенты
+
+**Участвует в цепочках ICPlan:** [US-ICP-18](icplan.md#us-icp-18)
 
 **Критерии приёмки:**
 
