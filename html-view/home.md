@@ -1,6 +1,5 @@
 ---
 hide:
-  - navigation
   - toc
 ---
 
@@ -20,7 +19,7 @@ hide:
   <span><i class="st st-part"></i>частично</span>
   <span><i class="st st-todo"></i>не начато</span>
   <span><b class="g">G1–G4</b> точки guardrails</span>
-  <span>Клик по блоку — описание и спека</span>
+  <span>Клик по блоку — страница компонента: спеки, задачи, связи</span>
 </div>
 
 <div class="map">
@@ -32,7 +31,7 @@ hide:
   <div class="flow">↓ задачи, доска, процесс · настройка агентов ↓</div>
 
   <div class="zone zone-icplan">
-    <div class="zone-title">ICPlan <span>It's a Plan · таск-трекер · уже есть, дорабатываем</span></div>
+    <div class="zone-title"><a href="components/icplan/">ICPlan</a> <span>It's a Plan · таск-трекер · уже есть, дорабатываем</span></div>
     <div class="grid4">
       <a class="card" href="openspec/changes/define-agent-platform/specs/control-plane/spec/">
         <i class="st st-done"></i><b>Control Plane UI</b>
@@ -56,11 +55,11 @@ hide:
   <div class="flow">↓ агент, задача из очереди &nbsp;·&nbsp; стрим и результат ↑</div>
 
   <div class="row3">
-    <a class="card card-side" href="openspec/changes/define-agent-platform/specs/control-plane/spec/">
+    <a class="card card-side" href="components/platform-module/">
       <i class="st st-todo"></i><b>Platform module</b>
       <small>Модуль ICPlan: алиасы LLM, бюджеты, профили sandbox и памяти, данные guardrails</small>
     </a>
-    <a class="card card-main" href="openspec/changes/define-agent-platform/specs/agent-runner/spec/">
+    <a class="card card-main" href="components/agent-runner/">
       <i class="st st-todo"></i><b>Agent Runner</b> <span class="g">G1</span>
       <small>Берёт запуск из очереди ICPlan, выдаёт sandbox из тёплого пула, следит за лимитами, возвращает итог</small>
     </a>
@@ -70,15 +69,15 @@ hide:
   <div class="flow">↓ claim из тёплого пула · run · destroy</div>
 
   <div class="row3">
-    <a class="card card-side card-guard" href="openspec/changes/define-agent-platform/specs/guardrails/spec/">
+    <a class="card card-side card-guard" href="components/guardrails/">
       <i class="st st-todo"></i><b>Guardrails</b>
       <small>Rego в git + данные в БД. Каждая точка включается в конфиге деплоя</small>
       <span class="chips"><span class="g">G1</span><span class="g">G2</span><span class="g">G3</span><span class="g">G4</span> OPA</span>
     </a>
 
     <div class="zone zone-sandbox">
-      <div class="zone-title"><a href="openspec/changes/define-agent-platform/specs/agent-sandbox/spec/">Sandbox</a> <span class="g">G3</span> <span>одноразовый контейнер · /workspace</span></div>
-      <a class="card card-harness" href="openspec/changes/define-agent-platform/specs/agent-harness/spec/">
+      <div class="zone-title"><a href="components/sandbox/">Sandbox</a> <span class="g">G3</span> <span>одноразовый контейнер · /workspace</span></div>
+      <a class="card card-harness" href="components/harness/">
         <i class="st st-todo"></i><b>Harness</b> <span class="g">G2</span>
         <small>Агентский цикл на LangGraph: пауза на approve, возобновление, стрим шагов</small>
         <span class="chips"><span class="chip">Context Mgr</span><span class="chip">LLM client</span><span class="chip">Tool Exec</span><span class="chip">hooks</span><span class="chip">M0</span></span>
@@ -86,11 +85,11 @@ hide:
     </div>
 
     <div class="stack">
-      <a class="card" href="openspec/changes/define-agent-platform/specs/agent-memory/spec/">
+      <a class="card" href="components/memory/">
         <i class="st st-part"></i><b>Memory</b>
         <small>M1 M2 M5 M6 есть · M3 первым · M4 с RAG</small>
       </a>
-      <a class="card" href="openspec/changes/define-agent-platform/specs/tool-integration/spec/">
+      <a class="card" href="components/mcp-tools/">
         <i class="st st-part"></i><b>MCP / Tools</b>
         <small><code>itsaplan-core</code> есть · git-провайдер · правила R1–R7</small>
       </a>
@@ -101,11 +100,11 @@ hide:
 
   <div class="row3">
     <div></div>
-    <a class="card card-main" href="openspec/changes/define-agent-platform/specs/llm-gateway/spec/">
+    <a class="card card-main" href="components/llm-gateway/">
       <i class="st st-part"></i><b>LiteLLM gateway</b> <span class="g">G4</span>
       <small>Единственный выход к моделям: алиасы, virtual key на агента, лимиты, fallback. Развёрнут, не подключён</small>
     </a>
-    <a class="card" href="openspec/changes/define-agent-platform/specs/observability/spec/">
+    <a class="card" href="components/observability/">
       <i class="st st-part"></i><b>Observability</b>
       <small>События запуска → таймлайн в задаче, затраты</small>
     </a>
