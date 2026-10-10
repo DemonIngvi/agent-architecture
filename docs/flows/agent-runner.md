@@ -24,7 +24,7 @@
 ```
 pending ─▶ queued ─────────▶ admitted ─▶ running ─▶ succeeded
            (ждёт слот)          │           ├──────▶ waiting_approval ─▶ running
-                                │           └──────▶ failed │ limit │ loop_detected │ cancelled
+                                │           └──────▶ failed │ limit │ loop_detected │ canceled
                                 └─▶ rejected (G1: бюджет, kill switch)
 ```
 

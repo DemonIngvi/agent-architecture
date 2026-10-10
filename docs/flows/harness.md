@@ -113,4 +113,4 @@ RunBundle ─▶ Bootstrap ─▶ Context Manager ─▶ LLM client ──▶ о
   "usage": { "prompt_tokens": 18450, "completion_tokens": 2210, "cost_usd": 0.12, "steps": 9 } }
 ```
 
-Статусы: `succeeded`, `failed`, `limit`, `cancelled`.
+Статусы: `succeeded`, `failed`, `limit`, `canceled`.

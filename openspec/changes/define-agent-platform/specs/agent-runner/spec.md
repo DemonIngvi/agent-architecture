@@ -113,7 +113,7 @@ Runner MUST NOT запускать второй запуск по задаче, 
 <a id="r-run-06"></a>**ID:** `R-RUN-06` · **Реализует задача:** [2.7](../../../../../docs/tasks/2.7-runner-scheduler.md)
 
 ### Requirement: Статусы запуска
-Система SHALL вести статус каждого запуска: `queued`, `starting`, `running`, `succeeded`, `failed`, `cancelled`, `limit_exceeded`, и отдавать его по `run_id` и событиями.
+Система SHALL вести статус каждого запуска: `queued`, `starting`, `running`, `succeeded`, `failed`, `canceled`, `limit_exceeded`, и отдавать его по `run_id` и событиями.
 
 #### Scenario: Запрос статуса
 - **WHEN** ICPlan запрашивает статус по `run_id`
@@ -155,7 +155,7 @@ Runner MUST NOT запускать второй запуск по задаче, 
 
 #### Scenario: Отмена
 - **WHEN** ICPlan отменяет запуск
-- **THEN** агент останавливается, sandbox уничтожается, статус `cancelled`
+- **THEN** агент останавливается, sandbox уничтожается, статус `canceled`
 
 #### Scenario: Повторная отмена
 - **WHEN** отмена приходит для уже отменённого запуска

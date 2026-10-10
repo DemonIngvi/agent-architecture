@@ -231,9 +231,9 @@ def required_approvals(spec: Path) -> list:
             continue
         ver = req_version(block)
         if name == "Конфигурация модуля":
-            roles = CFG_ROLES[SPEC_KIND.get(cap, "service")]
+            roles = list(CFG_ROLES[SPEC_KIND.get(cap, "service")])
         elif name in XC_ROLES:
-            roles = XC_ROLES[name]
+            roles = list(XC_ROLES[name])
         else:
             roles = ["Аналитик историй", "Тестировщик"] + [PERSONA_ROLE[s[1]] for lst in STORIES.values() for s in lst if f"{cap}: {name}" in s[5] and s[1] in PERSONA_ROLE]
         if cap in ("guardrails", "agent-sandbox"):
@@ -286,8 +286,10 @@ def check_docs() -> list:
     for itf in ROOT.glob("openspec/changes/*/specs/*/interfaces.md"):
         t = itf.read_text(encoding="utf-8")
         fm = t.split("## Отказы (FMEA)")[-1] if "## Отказы (FMEA)" in t else ""
-        if re.search(r"^\| S\d+ \|", t, re.M) and not re.search(r"БД|Postgres|хранилищ|RustFS|S3|checkpoint|бандл", fm):  # О-10
-            issues.append(f"{itf.parent.name}: в FMEA нет отказа своего хранилища")
+        stores = t.split("## Хранилища данных")[1].split("\n## ")[0] if "## Хранилища данных" in t else ""
+        for kind, skw, fkw in (("Postgres", r"Postgres|PostgreSQL", r"БД|Postgres"), ("объектное хранилище", r"RustFS", r"RustFS|S3|объектн")):  # О-10
+            if re.search(r"^\| S\d+ \|[^|]*(" + skw + ")", stores, re.M) and not re.search(fkw, fm, re.I):
+                issues.append(f"{itf.parent.name}: в FMEA нет отказа своего хранилища ({kind})")
         if "Почему так по умолчанию" not in t:  # таблица параметров
             issues.append(f"{itf.parent.name}: таблица параметров без обоснований и границ")
     dt = (ROOT / "docs/flows/data-types.md").read_text(encoding="utf-8") if (ROOT / "docs/flows/data-types.md").exists() else ""
