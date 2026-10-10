@@ -45,7 +45,7 @@ RunBundle ─▶ Bootstrap ─▶ Context Manager ─▶ LLM client ──▶ о
 ```json
 { "run_id": "run_01J9Z4K", "status": "succeeded",
   "output": "## Требования\n…",
-  "artifacts": [{ "name": "requirements.md", "url": "minio://attachments/MKT-42/requirements.md" }],
+  "artifacts": [{ "name": "requirements.md", "url": "s3://attachments/MKT-42/requirements.md" }],
   "usage": { "prompt_tokens": 18450, "completion_tokens": 2210, "cost_usd": 0.12, "steps": 9 } }
 ```
 

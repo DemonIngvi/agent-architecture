@@ -7,7 +7,7 @@
 | R&D | Компонент | Решение | Design |
 |---|---|---|---|
 | [Выбор таск-трекера](tracker-choice.md) | ICPlan | Форк It's a Plan | — |
-| [Автоподхват задач агентом](autopickup-rules.md) | ICPlan | Агент-делегат статуса и типа + эффект Действия | — |
+| [Автоподхват задач агентом](autopickup-rules.md) | ICPlan | Процесс типа задачи (шаг = колонка + агент + переходы) + эффект Действия | — |
 | [Runner и очередь запусков](runner-and-scheduling.md) | Agent Runner | Свой Runner как внешний раннер ICPlan; планировщик со слотами (вариант B) | D8, D14 |
 | [Изоляция запусков](sandbox-isolation.md) | Sandbox | Тёплый пул + одноразовые контейнеры | D1 |
 | [Фреймворк агентского цикла](harness-framework.md) | Harness | LangGraph | D2 |
@@ -22,6 +22,7 @@
 | [Ingress и балансировка](ingress-and-balancing.md) | Инфраструктура | Traefik, Service, PgBouncer | D15 |
 | [Kubernetes и развёртывание](kubernetes-runtime.md) | Инфраструктура | k3s + Helm, k3d локально | D15 |
 | [СУБД и хранилища](data-stores.md) | Инфраструктура | PostgreSQL 17 + CloudNativePG, RustFS | D4, D15 |
+| [Рабочее пространство агентов и доступы](agent-workspace.md) | Sandbox, MCP, Platform module | 📌 открыт; рекомендация — каталог проекта + workspace задачи + политика | — |
 | [Наблюдаемость](observability.md) | Observability | Таблица событий в MVP, Langfuse позже | D12 |
 
 Источники — по состоянию на октябрь 2026; часть ссылок на внутренние документы проекта AI-агент (`D:\АИ агент\Архитектура`).

@@ -5,6 +5,7 @@
     python html-view/build.py           # сборка в html-view/site
     python html-view/build.py serve     # локальный просмотр на http://127.0.0.1:8000
 """
+import html
 import json
 import os
 import re
@@ -17,7 +18,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from rationale import RATIONALE, REFS  # noqa: E402
 from subcomponents import SUB  # noqa: E402
-from stories import BPMN, ROLES, STORIES  # noqa: E402
+from stories import ARTIFACTS, BPMN, PERSONAS, ROLES, STORIES  # noqa: E402
 from diagrams import bpmn_svg, graph_svg  # noqa: E402
 import docgraph  # noqa: E402
 from components import ABOUT, AP, IO, BLOCKS, BY_SLUG, COMPONENTS, STATUS  # noqa: E402
@@ -96,26 +97,93 @@ def sync_stories():
         L = [f"# User Stories: {name}", "", "← [Все истории](README.md) · [потоки](../flows/" + slug + ".md)", "",
              "> Сгенерировано из `html-view/stories.py` — правьте там.", ""]
         if slug in BPMN:
-            L += ["## Процесс (BPMN)", "", f"<!-- bpmn:{slug} -->", "", "| Шаг | Дорожка | Тип | Переходы |", "|---|---|---|---|"]
+            L += ["## Процесс (BPMN)", "", f"<!-- bpmn:{slug} -->", "", "| Шаг | Дорожка | Тип | Переходы | Артефакты |", "|---|---|---|---|---|"]
+            arts = ARTIFACTS.get(slug, {})
             lanes = BPMN[slug]["lanes"]
             names = {s[0]: s[3] for s in BPMN[slug]["steps"]}
             typ = {"start": "начало", "task": "задача", "gateway": "развилка", "end": "конец", "error": "ошибка"}
             for sid, lane, ty, label, nxt in BPMN[slug]["steps"]:
                 tr = "; ".join(f"{lab + ' → ' if lab else '→ '}{names[x]}" for x, lab in nxt) or "—"
-                L.append(f"| {label} | {lanes[lane]} | {typ[ty]} | {tr} |")
+                L.append(f"| {label} | {lanes[lane]} | {typ[ty]} | {tr} | {', '.join(arts.get(sid, [])) or '—'} |")
             L.append("")
         L += ["## Истории", ""]
         for sid, role, want, so, crit, reqs in lst:
-            L += [f"### {sid}", "", f"**Как** {ROLES[role].lower()}, **я хочу** {want}, **чтобы** {so}.", "", "**Критерии приёмки:**", ""]
+            pname = PERSONAS.get(role, (ROLES.get(role, role),))[0]
+            L += [f"### {sid}", "", f"**Как** {pname.lower()} ([персона {role}](personas.md#{role.lower()}-{pname.lower().replace(' ', '-').replace('(', '').replace(')', '')})), **я хочу** {want}, **чтобы** {so}.", "", "**Критерии приёмки:**", ""]
             L += [f"- [ ] {c}" for c in crit]
-            L += ["", "**Требования:** " + " · ".join(
+            L += ["", "**Требования:** " + ("⚠️ нет — открытый вопрос, см. open-questions спек" if not reqs else "") + " · ".join(
                 f"[{r.split(': ', 1)[1]}](../../{spec_path_of(r.split(': ', 1)[0])})" if spec_path_of(r.split(": ", 1)[0]) else r for r in reqs), ""]
         _write_if_changed(d / f"{slug}.md", "\n".join(L) + "\n")
     _write_if_changed(d / "README.md", "\n".join(idx) + "\n")
+    _write_if_changed(d / "coverage.md", stories_coverage())
+
+
+
+
+def check_req_tasks() -> list:
+    """Правило трассировки: требование ↔ задача в обе стороны, все требования покрыты задачами."""
+    req_side, task_side, issues = {}, {}, []
+    for spec in ROOT.glob("openspec/changes/*/specs/*/spec.md"):
+        for rid, impl in re.findall(r'<a id="r-[a-z]+-\d+"></a>\*\*ID:\*\* `(R-[A-Z]+-\d+)` · \*\*Реализует задача:\*\* ([^\n]*)', spec.read_text(encoding="utf-8")):
+            req_side[rid] = set(re.findall(r"tasks/(\d\.\d)-", impl))
+            if not req_side[rid] and "BACKLOG" not in impl:
+                issues.append(f"{rid}: нет задачи")
+        if spec.read_text(encoding="utf-8").count("### Requirement:") != len(re.findall(r'<a id="r-', spec.read_text(encoding="utf-8"))):
+            issues.append(f"{spec.parent.name}: не у всех требований есть ID")
+    for tf in ROOT.glob("docs/tasks/*.md"):
+        t, txt = tf.name.split("-")[0], tf.read_text(encoding="utf-8")
+        if "**Статус:** ❌ закрыта" in txt:  # закрытая как дубль: должна ссылаться на существующие требования
+            refs = set(re.findall(r"#(r-[a-z]+-\d+)\)", txt))
+            if not refs:
+                issues.append(f"задача {t} закрыта без ссылки на требование")
+            issues += [f"задача {t} закрыта со ссылкой на несуществующее {r.upper()}" for r in refs if r.upper() not in req_side]
+            continue
+        task_side[t] = set(re.findall(r"\[(R-[A-Z]+-\d+)\]", txt.split("## Зачем")[0]))
+        if not task_side[t]:
+            issues.append(f"задача {t}: нет требований")
+    for rid, ts in req_side.items():
+        issues += [f"{rid} → {t}, но в задаче {t} нет {rid}" for t in ts if rid not in task_side.get(t, set())]
+    for t, rs in task_side.items():
+        issues += [f"задача {t} → {r}, но у {r} нет задачи {t}" for r in rs if t not in req_side.get(r, set())]
+    for l in (ROOT / "docs/TASKS.md").read_text(encoding="utf-8").splitlines():
+        c = re.split(r"(?<!\\)\|", l)
+        if len(c) > 4 and c[1].strip() in ("⬜", "⚠️") and "tasks/" not in c[3] and "tasks.md" not in c[3] and "документация" not in c[4]:
+            issues.append(f"TASKS: открытая строка без документа задачи: {c[2].strip()[:50]}")
+    for f in ("docs/TASKS.md", "docs/ROADMAP.md"):
+        for l in (ROOT / f).read_text(encoding="utf-8").splitlines():
+            if "❗ нет требования" in l:
+                issues.append(f"{f}: строка без требования: {l[:60]}")
+    for i in issues:
+        print("⚠️ трассировка:", i)
+    print(f"трассировка: требований {len(req_side)}, задач {len(task_side)}, замечаний {len(issues)}")
+    return issues
+
+
+def stories_coverage() -> str:
+    """Покрытие историй по методике docs/rules/us-methodology.md, раздел 8."""
+    comps = [(c[0], c[1]) for c in COMPONENTS if STORIES.get(c[0])]
+    roles = list(dict.fromkeys(list(ROLES) + list(PERSONAS)))
+    name = lambda k: (PERSONAS.get(k) or (ROLES.get(k),))[0]
+    L = ["# Покрытие историй", "", "← [Все истории](README.md) · [методика](../rules/us-methodology.md) · [персоны](personas.md)", "",
+         "> Сгенерировано при сборке из `html-view/stories.py`.", "",
+         "## Персона × компонент", "", "Число историй; «·» — проверить, нет ли у персоны цели в этом компоненте ([методика, шаг 1](../rules/us-methodology.md)).", "",
+         "| Персона | " + " | ".join(n for _, n in comps) + " | Всего |", "|---|" + "---|" * (len(comps) + 1)]
+    for r in roles:
+        cnt = [sum(1 for s in STORIES[c] if s[1] == r) for c, _ in comps]
+        L.append(f"| {name(r)} ({r}) | " + " | ".join(str(x) if x else "·" for x in cnt) + f" | **{sum(cnt)}** |")
+    few = [(c, s[0], len(s[4])) for c, _ in comps for s in STORIES[c] if len(s[4]) < 3]
+    noreq = [(c, s[0]) for c, _ in comps for s in STORIES[c] if not s[5]]
+    L += ["", f"## Истории с менее чем 3 критериями приёмки ({len(few)})", "", "Нет альтернативных потоков или исключений ([шаг 4](../rules/us-methodology.md)).", ""]
+    L += [f"- [{sid}]({c}.md) — {n}" for c, sid, n in few] or ["— нет"]
+    L += ["", f"## Истории без требований ({len(noreq)})", ""] + ([f"- [{sid}]({c}.md)" for c, sid in noreq] or ["— нет"])
+    total = sum(len(STORIES[c]) for c, _ in comps)
+    L += ["", f"Всего историй: **{total}**, персон: **{len(roles)}**, компонентов с историями: **{len(comps)}**."]
+    return "\n".join(L) + "\n"
 
 
 def copy_sources():
     sync_stories()
+    check_req_tasks()
     shutil.rmtree(SRC, ignore_errors=True)
     files = []
     for item in SOURCES:
@@ -127,7 +195,7 @@ def copy_sources():
         dst = SRC / ("overview.md" if rel.as_posix() == "README.md" else rel)
         dst.parent.mkdir(parents=True, exist_ok=True)
         txt = relink_readme(f.read_text(encoding="utf-8"), f)
-        txt = re.sub(r"<!-- bpmn:([a-z-]+) -->", lambda m: bpmn_svg(BPMN[m.group(1)]) if m.group(1) in BPMN else "", txt)
+        txt = re.sub(r"<!-- bpmn:([a-z-]+) -->", lambda m: bpmn_svg(BPMN[m.group(1)], ARTIFACTS.get(m.group(1))) if m.group(1) in BPMN else "", txt)
         txt = txt.replace("<!-- docgraph -->", graph_svg(docgraph.LAYERS, docgraph.EDGES))
         dst.write_text(txt, encoding="utf-8")
     shutil.copy2(HERE / "home.md", SRC / "index.md")
@@ -168,8 +236,16 @@ def write_pagebar_map():
     rd = {}
     for sp in all_specs():
         r = spec_readiness(sp)
+        oqf = SRC / Path(sp).parent / "open-questions.md"
+        qs = [l.split("|") for l in oqf.read_text(encoding="utf-8").splitlines() if l.startswith("| ОВ-")] if oqf.exists() else []
+        qhtml = ("<div class=\"oq-list\"><b>Открытые вопросы:</b><ul>" + "".join(f'<li>{q[3].strip()} {html.escape(q[2].strip())}' + (' <i>блокирует</i>' if q[4].strip() == "да" else '') + '</li>' for q in qs)
+                 + f'</ul><a href="{{oq}}">все вопросы →</a></div>') if qs else ""
+        lists = [("Шаблонный текст (совпадает с другой спекой)", [f"{d[0]} ≈ {d[1]} «{d[2]}» {d[3]}%" for d in r["dup"]]),
+                 ("Пользовательские требования без User Story", r["no_us"]),
+                 ("Открыто в последнем ревью — готовность не выше 90", r["review_open"])]
+        qhtml += "".join(f'<div class="oq-list"><b>{h}:</b><ul>' + "".join(f"<li>{html.escape(x)}</li>" for x in xs) + "</ul></div>" for h, xs in lists if xs)
         rd[sp] = ('<div class="rd-head"><span class="about-label">Готовность спеки</span>' + rd_bar(r, True)
-                  + "".join(f'<span class="rd-part">{k} <b>{v}</b>/{m}</span>' for k, (v, m) in r["parts"].items())
+                  + "".join((f'<span class="rd-part">{k} <b>{v}</b>/{m}</span>' if m else f'<span class="rd-part rd-neg">{k} <b>{v}</b></span>') for k, (v, m) in r["parts"].items() if m or v) + qhtml
                   + f'<a class="side-all" href="{{rules}}">критерии →</a></div>')
     data = {"pages": pages, "names": {c[0]: c[1] for c in COMPONENTS}, "readiness": rd}
     (BUILD / "pagebar.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
@@ -290,11 +366,89 @@ def rd_color(p: int):
     return next((c, n) for lim, c, n in RD_BANDS if p >= lim)
 
 
+USER_WORDS = re.compile(r"пользовател|администратор|владел|в задач|истори[ия] задачи|уведомлен|кнопк|экран|UI\b|видит", re.I)
+TECH_REQS = ("Конфигурация модуля", "Хранилища данных", "Интерфейсы обмена", "Поведение при отказах", "Нагрузка и производительность", "Развёртывание")
+_CACHE = {}
+
+
+def _req_bodies() -> dict:
+    """{(cap, имя): нормализованный текст требования} по всем спекам — для проверки уникальности."""
+    if "bodies" not in _CACHE:
+        out = {}
+        for sp in (SRC / "openspec/changes").glob("*/specs/*/spec.md"):
+            for r in re.split(r"\n### Requirement: ", sp.read_text(encoding="utf-8"))[1:]:
+                name, body = r.split("\n", 1)
+                body = re.sub(r'<a id="r-[a-z]+-\d+"></a>[^\n]*', "", body)
+                out[(sp.parent.name, name.strip())] = re.sub(r"\s+", " ", body.lower()).strip()
+        _CACHE["bodies"] = out
+    return _CACHE["bodies"]
+
+
+def duplicates(cap: str) -> list:
+    """Требования спеки, текст которых совпадает с требованием другой спеки больше чем на 80% (по словесным триграммам)."""
+    if "sh" not in _CACHE:
+        def sh(t):
+            w = re.findall(r"\w+", t)
+            return {" ".join(w[i:i + 3]) for i in range(max(len(w) - 2, 1))}
+        _CACHE["sh"] = {k: sh(v) for k, v in _req_bodies().items()}
+    S = _CACHE["sh"]; out = []
+    for (c, n), a in S.items():
+        if c != cap:
+            continue
+        best = max(((2 * len(a & b) / (len(a) + len(b)), c2, n2) for (c2, n2), b in S.items() if c2 != cap), default=(0, "", ""))
+        if best[0] > 0.8:
+            out.append((n, best[1], best[2], round(best[0] * 100)))
+    return out
+
+
+def task_side() -> dict:
+    """{ID требования: {задачи}} по разделам «Закрывает требования» документов задач."""
+    if "tasks" not in _CACHE:
+        side = {}
+        for tf in (ROOT / "docs/tasks").glob("*.md"):
+            txt = tf.read_text(encoding="utf-8")
+            if "**Статус:** ❌ закрыта" in txt:
+                continue
+            for rid in set(re.findall(r"\[(R-[A-Z]+-\d+)\]", txt.split("## Зачем")[0])):
+                side.setdefault(rid, set()).add(tf.name.split("-")[0])
+        _CACHE["tasks"] = side
+    return _CACHE["tasks"]
+
+
+def review_open(cap: str) -> list:
+    """Открытые (❓ / 📌) замечания по спеке в последнем ревью."""
+    revs = sorted((ROOT / "docs/reviews").glob("*.md"))
+    if not revs:
+        return []
+    out, hdr = [], None
+    for l in revs[-1].read_text(encoding="utf-8").splitlines():
+        if not l.startswith("|"):
+            hdr = None; continue
+        c = [x.strip() for x in l.strip().strip("|").split("|")]
+        if hdr is None:
+            hdr = c; continue
+        if set(l) <= set("|-: "):
+            continue
+        col = next((i for i, h in enumerate(hdr) if h in ("Спека", "Спеки")), None)
+        if col is None or len(c) != len(hdr):
+            continue
+        specs = c[col]
+        if (cap in specs or specs.startswith("все")) and re.search("❓|📌", c[-1]):
+            out.append(c[0])
+    return out
+
+
 def spec_readiness(spec: str) -> dict:
     """Процент готовности спеки по docs/rules/spec-criteria.md (раздел 6)."""
+    if ("rd", spec) not in _CACHE:
+        _CACHE[("rd", spec)] = _spec_readiness(spec)
+    return _CACHE[("rd", spec)]
+
+
+def _spec_readiness(spec: str) -> dict:
     t = (SRC / spec).read_text(encoding="utf-8")
     folder = SRC / Path(spec).parent
-    reqs = re.split(r"\n### Requirement: ", t)[1:]
+    reqs = [re.sub(r'<a id="r-[a-z]+-\d+"></a>[^\n]*\n', "", r) for r in re.split(r"\n### Requirement: ", t)[1:]]
     cap = Path(spec).parent.name
     purpose = re.search(r"## Purpose\n\n([^\n]+)", t)
     fmt = (4 if purpose and len(purpose.group(1)) >= 50 else 0)
@@ -304,25 +458,56 @@ def spec_readiness(spec: str) -> dict:
     cov = round(25 * sum(min(r.count("#### Scenario:"), 3) / 3 for r in reqs) / len(reqs)) if reqs else 0
     rtm = (folder / "traceability.md")
     rows = [l for l in rtm.read_text(encoding="utf-8").splitlines() if l.startswith("| ") and "---" not in l][1:] if rtm.exists() else []
-    trace = round(20 * sum(1 for l in rows if "нет задачи" not in l) / len(reqs)) if reqs and rows else 0
+    ts = task_side(); ok2 = 0
+    for rid, impl in re.findall(r'`(R-[A-Z]+-\d+)` · \*\*Реализует задача:\*\* ([^\n]*)', t):
+        tasks = set(re.findall(r"tasks/(\d\.\d)-", impl))
+        ok2 += 1 if ("BACKLOG" in impl and not tasks) or (tasks and tasks <= ts.get(rid, set())) else 0
+    trace = round(20 * ok2 / len(reqs)) if reqs else 0  # двусторонняя связь требование ↔ задача
     why = (5 if "Обоснование:" in t else 0) + (5 if rows and all("⚠️ нет |" not in l for l in rows) else 0)
     itf = folder / "interfaces.md"
     it = itf.read_text(encoding="utf-8") if itf.exists() else ""
     fail = sum(2 for h in ("## Параметры модуля", "## Хранилища данных", "## Интерфейсы обмена", "## Отказы (FMEA)") if h in it)
     fr = next((r for r in reqs if r.startswith("Поведение при отказах")), "")
-    fail += 4 if fr.count("#### Scenario:") >= 3 else 0
-    fail += 3 if any(r.startswith("Конфигурация модуля") for r in reqs) else 0
+    fail += 3 if fr.count("#### Scenario:") >= 3 else 0
+    fail += 2 if any(r.startswith("Нагрузка и производительность") for r in reqs) and any(r.startswith("Развёртывание") for r in reqs) else 0
     slug = next((c[0] for c in COMPONENTS for _, pth in c[6] if pth == spec), None)
     conn = 5 if (folder / "architecture.md").exists() else 0
     conn += 5 if f"specs/{cap}/spec.md" in (SRC / "architecture.md").read_text(encoding="utf-8") else 0
     conn += 5 if slug and (SRC / f"docs/flows/{slug}.md").exists() else 0
-    parts = {"Формат": (fmt, 15), "Сценарии": (cov, 25), "Трассировка": (trace, 20), "Обоснование": (why, 10), "Отказы и интерфейсы": (fail, 15), "Связность": (conn, 15)}
-    return {"pct": sum(v for v, _ in parts.values()), "parts": parts, "reqs": len(reqs), "single": sum(1 for r in reqs if r.count("#### Scenario:") == 1)}
+    for h in ("## Нагрузка и развёртывание",):
+        fail += 2 if h in it else 0
+    fail = min(fail, 15)
+    oqf = folder / "open-questions.md"
+    oq = [l for l in oqf.read_text(encoding="utf-8").splitlines() if l.startswith("| ОВ-")] if oqf.exists() else []
+    n_q = sum(1 for l in oq if "| ❓ |" in l); n_d = sum(1 for l in oq if "| 📌 |" in l)
+    pen = min(2 * n_q, 10) + min(4 * n_d, 16)
+    dup = duplicates(cap)
+    pen_dup = min(2 * len(dup), 10)
+    no_us = []
+    for l in rows:
+        c = [x.strip() for x in l.strip("|").split("|")]
+        nm = re.sub(r"^\[R-[A-Z]+-\d+\]\([^)]*\)\s*", "", c[0])
+        body = next((r for r in reqs if r.startswith(nm + "\n")), "")
+        if len(c) > 1 and c[1] == "техническое" and not nm.startswith(TECH_REQS) and USER_WORDS.search(body):
+            no_us.append(nm)
+    pen_us = min(2 * len(no_us), 10)
+    parts = {"Формат": (fmt, 15), "Сценарии": (cov, 25), "Трассировка": (trace, 20), "Обоснование": (why, 10), "Интерфейсы, отказы, нагрузка": (fail, 15), "Связность": (conn, 15)}
+    base = sum(v for v, _ in parts.values())
+    parts["Открытые вопросы"] = (-pen, 0)
+    parts["Шаблонный текст"] = (-pen_dup, 0)
+    parts["Без User Story"] = (-pen_us, 0)
+    rev = review_open(cap)
+    pct = max(base - pen - pen_dup - pen_us, 0)
+    cut = pct - 90 if rev and pct > 90 else 0  # потолок 90, пока в последнем ревью есть открытое
+    pct -= cut
+    parts["Потолок без ревью"] = (-cut, 0)
+    return {"pct": pct, "base": base, "oq": (n_q, n_d), "parts": parts, "reqs": len(reqs), "single": sum(1 for r in reqs if r.count("#### Scenario:") == 1),
+            "dup": dup, "no_us": no_us, "review_open": rev}
 
 
 def rd_bar(r: dict, wide: bool = False) -> str:
     c, name = rd_color(r["pct"])
-    tip = " · ".join(f"{k} {v}/{m}" for k, (v, m) in r["parts"].items())
+    tip = " · ".join(f"{k} {v}/{m}" if m else f"{k} {v}" for k, (v, m) in r["parts"].items())
     cls = "rd rd-wide" if wide else "rd"
     return (f'<span class="{cls}" title="{tip}"><span class="rd-track"><span class="rd-fill" style="width:{r["pct"]}%;background:{c}"></span></span>'
             f'<b class="rd-pct" style="color:{c}">{r["pct"]}%</b>' + (f'<span class="rd-name">{name}</span>' if wide else "") + "</span>")
@@ -456,11 +641,11 @@ def write_component_pages():
     rows = []
     for sp in specs:
         r = spec_readiness(sp)
-        rows.append(f"| [{Path(sp).parent.name}]({rel('specs-by-component', sp)}) | {Path(sp).parts[2]} | {r['reqs']} | {r['single']} | {rd_bar(r)} |")
+        rows.append(f"| [{Path(sp).parent.name}]({rel('specs-by-component', sp)}) | {Path(sp).parts[2]} | {r['reqs']} | ❓ {r['oq'][0]} · 📌 {r['oq'][1]} | {rd_bar(r)} |")
     avg = round(sum(spec_readiness(s)["pct"] for s in specs) / len(specs)) if specs else 0
     readiness_md = ["## Готовность спек", "", f"Средняя готовность: {rd_bar({'pct': avg, 'parts': {}}, True)}", "", rd_scale(), "",
-                    "Считается по [критериям полноты](" + rel("specs-by-component", "docs/rules/spec-criteria.md") + "): формат 15, сценарии 25, трассировка 20, обоснование 10, отказы и интерфейсы 15, связность 15. Наведите на шкалу — разбивка.", "",
-                    "| Спека | Change | Требований | С одним сценарием | Готовность |", "|---|---|---|---|---|"] + rows + [""]
+                    "Считается по [критериям полноты](" + rel("specs-by-component", "docs/rules/spec-criteria.md") + "): формат 15, сценарии 25, трассировка 20, обоснование 10, интерфейсы / отказы / нагрузка 15, связность 15; минус открытые вопросы (❓ −2, 📌 −4), шаблонный текст (−2 за требование), пользовательские требования без User Story (−2); потолок 90, пока в последнем ревью есть открытое по спеке. Наведите на шкалу — разбивка.", "",
+                    "| Спека | Change | Требований | Открытые вопросы | Готовность |", "|---|---|---|---|---|"] + rows + [""]
 
     for d, title, sub in (("rnd-by-component", "R&D по компонентам", "Исследования и выбор технологий по каждому компоненту."),
                           ("specs-by-component", "Спеки по компонентам", "Требования (OpenSpec) и схемы каждого компонента."),
@@ -479,7 +664,7 @@ def spec_family(path: str) -> list:
     out = [path]
     if path.endswith("/spec.md"):
         base = path[: -len("spec.md")]
-        out += [base + n for n in ("interfaces.md", "traceability.md") if (SRC / (base + n)).exists()]
+        out += [base + n for n in ("interfaces.md", "traceability.md", "open-questions.md") if (SRC / (base + n)).exists()]
     return out
 
 
@@ -491,7 +676,7 @@ def nav_yaml() -> str:
         used.add(path)
         return f"{' ' * indent}- {q(label)}: {path}"
 
-    LBL = {"interfaces.md": "Интерфейсы, данные, отказы", "traceability.md": "Трассировка (RTM)"}
+    LBL = {"interfaces.md": "Интерфейсы, данные, отказы", "traceability.md": "Трассировка (RTM)", "open-questions.md": "Открытые вопросы"}
     L = ["nav:", item(2, "Главная", "index.md")]
     for slug, name, st, g, desc, links, docs, tids in COMPONENTS:
         L.append(f"  - {q(name)}:")
@@ -516,7 +701,7 @@ def nav_yaml() -> str:
         rs = [p for _, p in REFS.get(slug, []) if p.startswith("docs/rnd/") and (SRC / p).exists() and p not in used]
         L += ["    - R&D:", item(6, "R&D " + name, f"rnd-by-component/{slug}/index.md")]
         L += [item(6, title_of(SRC / p, p).replace("R&D: ", ""), p) for p in rs]
-    L += ["  - Обзоры:", item(4, "Сквозной поток", "docs/flows/README.md"), item(4, "Все User Stories", "docs/stories/README.md"),
+    L += ["  - Обзоры:", item(4, "Сквозной поток", "docs/flows/README.md"), item(4, "Все User Stories", "docs/stories/README.md"), item(4, "Покрытие историй", "docs/stories/coverage.md"),
           item(4, "Спеки по компонентам", "specs-by-component/index.md"), item(4, "Задачи по компонентам", "tasks-by-component/index.md"),
           item(4, "Roadmap MVP", "docs/ROADMAP.md"), item(4, "Сводная таблица задач", "docs/TASKS.md"), item(4, "Бэклог", "docs/BACKLOG.md"),
           item(4, "R&D по компонентам", "rnd-by-component/index.md"), item(4, "Все R&D", "docs/rnd/README.md"), item(4, "Методология R&D", "docs/rnd/METHOD.md")]
@@ -539,7 +724,8 @@ def nav_yaml() -> str:
           "    - Правила документации:", item(6, "Правила документации", "docs/rules/README.md"),
           item(6, "Критерии полноты спеки", "docs/rules/spec-criteria.md"), item(6, "Роли", "docs/rules/roles.md"),
           item(6, "Типы документов", "docs/rules/doc-types.md"), item(6, "Граф связности документов", "docs/rules/doc-graph.md"),
-          item(6, "Процесс изменения", "docs/rules/change-process.md"), item(6, "Промпты", "docs/rules/prompts.md")]
+          item(6, "Процесс изменения", "docs/rules/change-process.md"), item(6, "Промпты", "docs/rules/prompts.md"),
+          item(6, "Методология SDD", "docs/rules/sdd-methodology.md"), item(6, "Методика User Stories", "docs/rules/us-methodology.md")]
     revs = sorted((SRC / "docs/reviews").glob("*.md")) if (SRC / "docs/reviews").exists() else []
     if revs:
         L.append("    - Ревью:")

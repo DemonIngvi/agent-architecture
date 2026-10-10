@@ -15,7 +15,8 @@ def _wrap(s: str, n: int = 16) -> list:
     return lines + ([cur] if cur else [])
 
 
-def bpmn_svg(proc: dict) -> str:
+def bpmn_svg(proc: dict, artifacts: dict = None) -> str:
+    artifacts = artifacts or {}
     lanes, steps = proc["lanes"], proc["steps"]
     col = {s[0]: i for i, s in enumerate(steps)}
     pos = {s[0]: (LABEL_W + col[s[0]] * COL_W + COL_W / 2, s[1] * LANE_H + LANE_H / 2) for s in steps}
@@ -64,9 +65,14 @@ def bpmn_svg(proc: dict) -> str:
             ty = y + 30
         for k, line in enumerate(lines):
             out.append(f'<text x="{x}" y="{ty + k * 13}" class="b-text">{html.escape(line)}</text>')
+        arts = artifacts.get(sid, [])
+        if arts:
+            ay = (y + 36) if typ == "task" else (ty + len(lines) * 13 + 2)
+            label = "📄 " + ", ".join(arts)
+            out.append(f'<text x="{x}" y="{ay}" class="b-art">{html.escape(label if len(label) < 34 else label[:32] + "…")}<title>{html.escape(", ".join(arts))}</title></text>')
     out.append("</svg>")
     legend = ('<div class="b-legend"><span><i class="lg lg-start"></i>начало</span><span><i class="lg lg-task"></i>задача</span>'
-              '<span><i class="lg lg-gw"></i>развилка</span><span><i class="lg lg-end"></i>конец</span><span><i class="lg lg-err"></i>ошибка</span></div>')
+              '<span><i class="lg lg-gw"></i>развилка</span><span><i class="lg lg-end"></i>конец</span><span><i class="lg lg-err"></i>ошибка</span><span>📄 артефакт шага</span></div>')
     return '<div class="bpmn-wrap">' + "".join(out) + legend + "</div>"
 
 

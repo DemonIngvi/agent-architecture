@@ -21,6 +21,7 @@
 | `g1.enabled … g4.enabled` | Включение точек | L0 | S9 | g1–g3 вкл, g4 выкл |
 | `on_engine_error` | Поведение при недоступности OPA | L0 | S9 | deny |
 | `tools_allow / approval` | Данные правил агента | L1 | S2 | из агента |
+| `autonomy_level` | Уровень автономии R0–R5 (политика подтверждений) | L1 | S2 | R2 |
 | `Rego-правила` | Логика проверок | L0 | S8 | allowlist + approval |
 | `loop.repeat_calls` | Повторов одинакового вызова до стопа | L0 | S9 | 3 |
 | `loop.no_progress_steps` | Шагов без прогресса до стопа | L0 | S9 | 8 |

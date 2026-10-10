@@ -242,3 +242,10 @@
 .lg-gw { transform: rotate(45deg) scale(0.75); border: 1.5px solid #f9a825; background: #fff8e1; }
 .t-us { background: #1565c0; }
 .md-typeset .tb-type.t-us.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #1565c0; }
+.b-art { fill: #6d4c41; font-size: 9.5px; text-anchor: middle; font-style: italic; }
+
+.md-typeset .rd-neg b { color: #c62828; }
+.oq-list { flex-basis: 100%; font-size: 0.66rem; margin-top: 0.3rem; }
+.md-typeset .oq-list ul { margin: 0.2rem 0 0.2rem 1rem; }
+.md-typeset .oq-list li { margin: 0.05rem 0; }
+.md-typeset .oq-list i { color: #c62828; font-style: normal; font-weight: 700; font-size: 0.58rem; }

@@ -15,10 +15,10 @@
 
 | Компонент | Историй | Процесс |
 |---|---|---|
-| [ICPlan](icplan.md) | 6 | BPMN |
+| [ICPlan](icplan.md) | 7 | BPMN |
 | [Platform module](platform-module.md) | 5 | BPMN |
 | [Agent Runner](agent-runner.md) | 5 | BPMN |
-| [Sandbox](sandbox.md) | 4 | BPMN |
+| [Sandbox](sandbox.md) | 7 | BPMN |
 | [Harness](harness.md) | 5 | BPMN |
 | [Memory](memory.md) | 4 | BPMN |
 | [MCP / Tools](mcp-tools.md) | 3 | BPMN |
