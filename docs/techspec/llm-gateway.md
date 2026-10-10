@@ -1,0 +1,42 @@
+# Техспека: LiteLLM gateway
+
+← [Все техспеки](README.md) · [компонент](../../components/llm-gateway/index.md) · [правило](../rules/tech-spec.md)
+
+**Что разворачивается:** LiteLLM Proxy: алиасы, бюджеты, учёт; mock-LLM для разработки.
+
+## Образы
+
+| Образ | База | Что внутри | Как собирается | Откуда берём | Тег | Пользователь | Порты | Проверка готовности |
+|---|---|---|---|---|---|---|---|---|
+| litellm | официальный `ghcr.io/berriai/litellm:v1.104.2-stable` | LiteLLM Proxy | официальный образ | GHCR BerriAI, закреплён digest | v1.104.2 | non-root | 4000 | `GET /health/liveliness`, `/health/readiness` |
+| mock-llm | `python:3.12-slim` | OpenAI-совместимый mock со сценариями | `mock-llm/Dockerfile` | `ghcr.io/demoningvi/mock-llm` | semver платформы | uid 10001 | 8000 | `GET /health` |
+
+## Запуск
+
+| | |
+|---|---|
+| **Реплики** | LiteLLM 2 |
+| **Конфиг** | `config.yaml` из ConfigMap (`model_list`, `fallbacks`, `drop_params: true`) |
+| **БД** | Postgres `litellm` через PgBouncer (`pgbouncer=true`), миграции — прямым подключением |
+
+## Переменные и секреты
+
+| Переменная | Зачем | Откуда |
+|---|---|---|
+| `LITELLM_MASTER_KEY` | админ-ключ | Secret |
+| ключи провайдеров | провайдеры | Secret `llm-providers` |
+| `DATABASE_URL`, `DIRECT_URL` | БД и миграции | Secret |
+
+## Сборка и поставка
+
+1. mock-LLM: сценарии в git, сборка как Python-сервис
+2. Сборка в GitHub Actions по тегу `vX.Y.Z` репозитория компонента; базовые образы закреплены по digest
+3. Многостадийный Dockerfile: стадия сборки → минимальный образ запуска без компиляторов и менеджеров пакетов
+4. SBOM (`syft`) и проверка уязвимостей (`trivy`, блокирует выпуск при critical)
+5. Публикация в `ghcr.io/demoningvi/<имя>:<версия>` и `:<версия>-<sha>`; тег `latest` не используется
+6. Кластер тянет образы с pull-секретом `ghcr-pull` (Secret в namespace)
+
+## Проверка после развёртывания
+
+- [ ] Вызов алиаса `team-default` → ответ mock
+- [ ] Затраты по `metadata.run_id` видны

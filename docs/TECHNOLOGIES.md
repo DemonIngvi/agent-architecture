@@ -15,6 +15,9 @@
 | Drizzle ORM | ORM ICPlan, Platform module | 0.45.x | Apache-2.0 | [drizzle-team/drizzle-orm](https://github.com/drizzle-team/drizzle-orm) | npm `drizzle-orm` | Adopt | — |
 | Go | Agent Runner | 1.2x | BSD-3-Clause | [golang/go](https://github.com/golang/go) | [go.dev/dl](https://go.dev/dl/), образ `golang` | Adopt | [Runner](rnd/runner-and-scheduling.md) |
 | Python | Harness, Memory API, mock-LLM | 3.12+ | PSF-2.0 | [python/cpython](https://github.com/python/cpython) | [python.org](https://www.python.org/downloads/), образ `python` | Adopt | — |
+| Node.js | ICPlan web (SSR) | 24 (образ `node:24-alpine`) | MIT | [nodejs/node](https://github.com/nodejs/node) | образ `node` | Adopt | [техспека ICPlan](techspec/icplan.md) |
+| FastAPI | Memory API, mock-LLM | 0.11x | MIT | [fastapi/fastapi](https://github.com/fastapi/fastapi) | PyPI `fastapi` | Adopt | [техспека Memory](techspec/memory.md) |
+| uv | Сборка Python-образов (`uv.lock`) | 0.x | Apache-2.0 / MIT | [astral-sh/uv](https://github.com/astral-sh/uv) | PyPI `uv` / образ `ghcr.io/astral-sh/uv` | Adopt | [техспека Harness](techspec/harness.md) |
 | LangGraph | Harness: агентский цикл |  1.2.14 (закреплена, D18) | MIT | [langchain-ai/langgraph](https://github.com/langchain-ai/langgraph) | PyPI `langgraph` | Adopt | [фреймворк](rnd/harness-framework.md) |
 | LangChain MCP (`langchain.mcp`) | Tool Executor: MCP-тулы в LangGraph |  langchain 1.4.4, extra `mcp` (fastmcp ≥ 4.0.11) | MIT | [langchain-ai/langchain](https://github.com/langchain-ai/langchain/tree/master/libs/langchain_v1/langchain/mcp) | PyPI `langchain[mcp]` | Trial | [MCP](rnd/mcp-vs-direct.md) |
 | MCP Python SDK | протокол MCP (зависимость `langchain[mcp]`) | v2.3.0 | MIT | [modelcontextprotocol/python-sdk](https://github.com/modelcontextprotocol/python-sdk) | PyPI `mcp` | Adopt (косвенно) | [MCP](rnd/mcp-vs-direct.md) |
@@ -56,6 +59,9 @@
 | Argo CD | GitOps | v3.5.4 | Apache-2.0 | [argoproj/argo-cd](https://github.com/argoproj/argo-cd) | Helm `argoproj.github.io/argo-helm` | Hold (бэклог) | [Kubernetes](rnd/kubernetes-runtime.md) |
 | Sealed Secrets | секреты для GitOps | v0.40.0 | Apache-2.0 | [bitnami-labs/sealed-secrets](https://github.com/bitnami-labs/sealed-secrets) | GitHub Releases | Hold (бэклог) | — |
 | Trivy | сканирование образов | v0.75.0 | Apache-2.0 | [aquasecurity/trivy](https://github.com/aquasecurity/trivy) | `aquasec/trivy` | Hold (бэклог) | — |
+| Syft | SBOM образов в CI | 1.x | Apache-2.0 | [anchore/syft](https://github.com/anchore/syft) | релизы GitHub / образ `anchore/syft` | Adopt | [правило техспеки](rules/tech-spec.md) |
+| distroless | База образа Runner | `static:nonroot` | Apache-2.0 | [GoogleContainerTools/distroless](https://github.com/GoogleContainerTools/distroless) | `gcr.io/distroless/static` | Adopt | [техспека Runner](techspec/agent-runner.md) |
+| GitHub Container Registry | Реестр образов платформы (`ghcr.io/demoningvi/*`) | — | сервис GitHub | [docs](https://docs.github.com/packages) | ghcr.io | Adopt | [правило техспеки](rules/tech-spec.md) |
 
 ## Документация
 

@@ -18,6 +18,7 @@ TYPES = [  # (ключ, подпись, раздел навигации, URL к�
     ("spec", "Спеки", "Спеки", "specs-by-component/{}/", "specs-by-component/"),
     ("task", "Задачи", "Задачи", "tasks-by-component/{}/", "tasks-by-component/"),
     ("rnd", "R&D", "R&D", "rnd-by-component/{}/", "rnd-by-component/"),
+    ("tech", "Техспека", "Техспека", "docs/techspec/{}/", "docs/techspec/"),
     ("ref", "Справка", "Справка", None, "overview/"),
 ]
 
@@ -70,6 +71,8 @@ def _doc_type(src: str) -> str:
         return "Спеки"
     if src.startswith(("tasks-by-component/", "docs/tasks/", "docs/ROADMAP", "docs/TASKS", "docs/BACKLOG")) or src.endswith("/tasks.md"):
         return "Задачи"
+    if src.startswith("docs/techspec/"):
+        return "Техспека"
     if src.startswith(("docs/rnd/", "rnd-by-component/")):
         return "R&D"
     return "Справка"

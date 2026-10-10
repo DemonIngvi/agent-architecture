@@ -1,0 +1,42 @@
+# Техспека: Инфраструктура
+
+← [Все техспеки](README.md) · [компонент](../../components/infrastructure/index.md) · [правило](../rules/tech-spec.md)
+
+**Что разворачивается:** k3s на одном узле, Helm-чарты, Traefik, CloudNativePG + PgBouncer, RustFS, бэкапы вне площадки.
+
+## Образы
+
+| Образ | База | Что внутри | Как собирается | Откуда берём | Тег | Пользователь | Порты | Проверка готовности |
+|---|---|---|---|---|---|---|---|---|
+| k3s | установщик `get.k3s.io`, версия `v1.37.1+k3s1` | Kubernetes, Traefik, local-path | скрипт установки с закреплённой версией | github.com/k3s-io/k3s releases | v1.37.1+k3s1 | — | 6443 | `kubectl get --raw /readyz` |
+| postgresql | `ghcr.io/cloudnative-pg/postgresql:17` (pgvector в комплекте) | Postgres 17 | оператор CloudNativePG | GHCR CloudNativePG, закреплён digest | 17.x | postgres | 5432 | проверки оператора |
+| pgbouncer | Pooler CloudNativePG | PgBouncer transaction | ресурс `Pooler` | образ оператора | версия оператора | — | 5432 | проверки оператора |
+| rustfs | `rustfs/rustfs:1.0.0` | S3-совместимое хранилище | официальный образ | Docker Hub, закреплён digest | 1.0.0 | non-root | 9000 | `/health` |
+
+## Запуск
+
+| | |
+|---|---|
+| **Порядок** | CNPG → Postgres → PgBouncer → RustFS → ICPlan → LiteLLM, OPA → Runner |
+| **Бэкап** | WAL-архив и копии CNPG в внешнее S3 на другой площадке |
+| **Секреты** | Secret кластера; ротация без простоя |
+
+## Переменные и секреты
+
+| Переменная | Зачем | Откуда |
+|---|---|---|
+| `values.yaml` | параметры L0 платформы | git платформы (без секретов) |
+
+## Сборка и поставка
+
+1. Чарты в git платформы, `helm lint` и `values.schema.json` в CI
+2. Сборка в GitHub Actions по тегу `vX.Y.Z` репозитория компонента; базовые образы закреплены по digest
+3. Многостадийный Dockerfile: стадия сборки → минимальный образ запуска без компиляторов и менеджеров пакетов
+4. SBOM (`syft`) и проверка уязвимостей (`trivy`, блокирует выпуск при critical)
+5. Публикация в `ghcr.io/demoningvi/<имя>:<версия>` и `:<версия>-<sha>`; тег `latest` не используется
+6. Кластер тянет образы с pull-секретом `ghcr-pull` (Secret в namespace)
+
+## Проверка после развёртывания
+
+- [ ] `helm install` на чистом сервере проходит
+- [ ] Восстановление БД из копии на тестовом узле
