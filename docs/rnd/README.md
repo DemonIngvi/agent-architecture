@@ -7,6 +7,7 @@
 | R&D | Компонент | Решение | Design |
 |---|---|---|---|
 | [Выбор таск-трекера](tracker-choice.md) | ICPlan | Форк It's a Plan | — |
+| [Автоподхват задач агентом](autopickup-rules.md) | ICPlan | Агент-делегат статуса и типа + эффект Действия | — |
 | [Runner и очередь запусков](runner-and-scheduling.md) | Agent Runner | Свой Runner как внешний раннер ICPlan; планировщик со слотами (вариант B) | D8, D14 |
 | [Изоляция запусков](sandbox-isolation.md) | Sandbox | Тёплый пул + одноразовые контейнеры | D1 |
 | [Фреймворк агентского цикла](harness-framework.md) | Harness | LangGraph | D2 |

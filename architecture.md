@@ -305,7 +305,7 @@ MVP: таблица событий запуска в БД ICPlan → пошаг�
 
 ### ICPlan → Task UI
 - **Есть:** доска, статусы с автоназначением исполнителя (без запуска агента), комментарии, чат агента, история запусков (итог).
-- **Доработать:** автоподхват задачи агентом по статусу/типу/действию — [change icplan-agent-autopickup](openspec/changes/icplan-agent-autopickup/tasks.md); approve действия агента; результат quality gate; пошаговый лог; затраты задачи.
+- **Доработать:** автоподхват задачи агентом по статусу/типу/действию — [change icplan-agent-autopickup](openspec/changes/icplan-agent-autopickup/tasks.md), спека: [icplan-agent-autopickup](openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md); approve действия агента; результат quality gate; пошаговый лог; затраты задачи.
 - **Спека:** [ici/icplan-integration](openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md)
 
 ### Platform module (модуль ICPlan)
