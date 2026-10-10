@@ -1,0 +1,33 @@
+# Секреты и учётные данные
+.env
+.env.*
+!.env.example
+*.local.*
+*.local
+SECRETS*
+ACCOUNTS*
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+credentials*
+*token*
+!**/*token*.md
+
+# Локальные настройки инструментов
+.claude/settings.local.json
+.idea/
+.vscode/
+*.code-workspace
+
+# Системные
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Временные
+tmp/
+*.tmp
+*.log

@@ -1,0 +1,38 @@
+schema: spec-driven
+
+context: |
+  Language: ru
+  All artifacts must be written in ru.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+# Дополнения из PDLC (см. docs/PLAN.md)
+rules:
+  specs:
+    - Если результат агента проверяется перед переходом дальше, описать quality gate отдельным Requirement со сценариями прохождения и непрохождения.
+    - Для действий агента, требующих подтверждения человека, указывать уровень автономии R0–R5.
+    - Детерминированные проверки (формат, наличие полей, лимиты) описывать как проверки кодом, а не LLM (правило «98/2»).
+  tasks:
+    - Каждая задача ссылается на Requirement спеки, который она реализует (трассировка требование → задача → запуск).
+    - Формат INVEST — у задачи есть «Зачем» и «Приёмка»; выполненное отмечается [x].
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always state what is out of scope
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing
