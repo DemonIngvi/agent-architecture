@@ -36,3 +36,4 @@ tmp/
 html-view/.build/
 html-view/site/
 html-view/.venv/
+__pycache__/
