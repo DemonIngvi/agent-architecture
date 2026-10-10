@@ -15,7 +15,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from components import AP, BLOCKS, BY_SLUG, COMPONENTS, STATUS  # noqa: E402
+from components import ABOUT, AP, BLOCKS, BY_SLUG, COMPONENTS, STATUS  # noqa: E402
 
 ROOT = HERE.parent
 BUILD = HERE / ".build"
@@ -168,18 +168,36 @@ def write_component_pages():
         docs_ok = [(l, p) for l, p in docs if (SRC / p).exists()]
         ts = [t for t in tids if t in tasks]
         gtxt = f' <span class="g">{g}</span>' if g else ""
-        head = (f'<div class="comp-head"><span class="pill">{STATUS[st]}</span>{gtxt}'
-                f'<span class="comp-desc">{esc(desc)}</span></div>')
-        panel = ['<div class="doclinks"><div class="doclinks-title">Другая документация по компоненту '
-                 '<span>— переход в другой раздел сайта</span></div><div class="doclinks-grid">',
-                 f'<a class="card dl" href="{href(page, spec_page)}"><span class="dtype dtype-spec">СПЕКИ</span>'
-                 f'<b>Требования и схемы</b><small>{len(docs_ok)} док. · что компонент обязан делать</small></a>',
-                 f'<a class="card dl" href="{href(page, task_page)}"><span class="dtype dtype-task">ЗАДАЧИ</span>'
-                 f'<b>Доработки</b><small>{len(ts)} задач · INVEST, оценки, открытые вопросы</small></a>',
-                 f'<a class="card dl" href="{href(page, "architecture.md")}"><span class="dtype dtype-ref">СПРАВКА</span>'
-                 f'<b>Общие схемы C1 / C2</b><small>текстовые схемы всей платформы</small></a>',
-                 "</div></div>"]
-        body = ["---", "hide:", "  - toc", "---", "", f"# {name}", "", head, "",
+        head = f'<div class="comp-head"><span class="pill">{STATUS[st]}</span>{gtxt}</div>'
+        chain, purpose, does = ABOUT.get(slug, ([], desc, []))
+        ch = []
+        for label, s in chain:
+            if s == slug:
+                ch.append(f'<span class="ch-item ch-cur">{esc(label)}</span>')
+            elif s:
+                ch.append(f'<a class="ch-item" href="{href(page, f"components/{s}/index.md")}">{esc(label)}</a>')
+            else:
+                ch.append(f'<span class="ch-item ch-plain">{esc(label)}</span>')
+        spec_links = "".join(f'<li><a href="{href(page, p)}">{esc(l)}</a></li>' for l, p in docs_ok)
+        task_links = "".join(
+            f'<li><a href="{href(page, tasks[t])}"><span class="tid">{t}</span> {esc(title_of(SRC / tasks[t], t).split(". ", 1)[-1])}</a></li>'
+            for t in ts)
+        about = (
+            '<div class="about"><div class="about-main">'
+            '<div class="about-label">Позиция в системе</div>'
+            f'<div class="chain">{"<span class=ch-arrow>→</span>".join(ch)}</div>'
+            '<div class="about-label">Для чего</div>'
+            f'<p class="purpose">{esc(purpose)}</p>'
+            '<div class="about-label">Что делает</div>'
+            f'<ul class="does">{"".join(f"<li>{esc(x)}</li>" for x in does)}</ul>'
+            '</div><aside class="about-side">'
+            f'<div class="side-card"><div class="side-head"><span class="dtype dtype-spec">СПЕКА</span>'
+            f'<a class="side-all" href="{href(page, spec_page)}">все →</a></div><ul>{spec_links}</ul></div>'
+            f'<div class="side-card"><div class="side-head"><span class="dtype dtype-task">ЗАДАЧИ</span>'
+            f'<a class="side-all" href="{href(page, task_page)}">все →</a></div><ul>{task_links}</ul></div>'
+            '</aside></div>')
+        body = [f"# {name}", "", head, "", about, "",
+                "## Устройство", "",
                 f'<div class="map">{render_rows(BLOCKS.get(slug, []), page)}</div>', ""]
         (SRC / page).parent.mkdir(parents=True, exist_ok=True)
         (SRC / page).write_text("\n".join(body), encoding="utf-8")

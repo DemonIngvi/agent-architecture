@@ -1,18 +1,6 @@
----
-hide:
-  - toc
----
-
 <div class="hero">
   <h1>Agent Platform</h1>
   <p>Платформа запуска LLM-агентов для задач таск-трекера ICPlan: изоляция каждого запуска, контроль моделей и затрат, guardrails, память.</p>
-  <div class="hero-actions">
-    <a class="md-button md-button--primary" href="docs/ROADMAP/">Roadmap MVP</a>
-    <a class="md-button" href="tasks-by-component/">Задачи</a>
-    <a class="md-button" href="specs-by-component/">Спеки</a>
-    <a class="md-button" href="architecture/">Схемы C1 / C2</a>
-    <a class="md-button" href="docs/HOW-TO-READ/">Как читать</a>
-  </div>
 </div>
 
 <div class="legend">
@@ -20,7 +8,7 @@ hide:
   <span><i class="st st-part"></i>частично</span>
   <span><i class="st st-todo"></i>не начато</span>
   <span><b class="g">G1–G4</b> точки guardrails</span>
-  <span>Клик по блоку — схема компонента · спеки и задачи — во вкладках сверху</span>
+  <span>Клик по блоку — описание и устройство компонента; спеки и задачи — рядом на его странице</span>
 </div>
 
 <div class="map">
@@ -34,19 +22,19 @@ hide:
   <div class="zone zone-icplan">
     <div class="zone-title"><a href="components/icplan/">ICPlan</a> <span>It's a Plan · таск-трекер · уже есть, дорабатываем</span></div>
     <div class="grid4">
-      <a class="card" href="openspec/changes/define-agent-platform/specs/control-plane/spec/">
+      <a class="card" href="components/icplan/">
         <i class="st st-done"></i><b>Control Plane UI</b>
         <small>Настройка агентов: модель, инструкция, тулы, навыки, MCP</small>
       </a>
-      <a class="card" href="openspec/changes/define-agent-platform/specs/agent-registry/spec/">
+      <a class="card" href="components/icplan/">
         <i class="st st-part"></i><b>Registry</b>
         <small>Агенты, тулы, навыки, ключи. Нужны версии и экспорт YAML</small>
       </a>
-      <a class="card" href="openspec/changes/add-icplan-integration/specs/icplan-integration/spec/">
+      <a class="card" href="components/icplan/">
         <i class="st st-part"></i><b>Run Queue</b>
         <small>Очередь запусков и протокол внешнего раннера</small>
       </a>
-      <a class="card" href="openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/architecture/">
+      <a class="card" href="components/icplan/">
         <i class="st st-part"></i><b>Task UI</b>
         <small>Доска, чат, approve, таймлайн. Нужен автоподхват задач агентом</small>
       </a>
@@ -116,13 +104,4 @@ hide:
     <span class="chip">mock-LLM (разработка)</span><span class="chip">Anthropic</span><span class="chip">OpenAI</span><span class="chip">локальные модели</span>
   </div>
 
-</div>
-
-<div class="links3">
-  <a class="card" href="docs/ROADMAP/"><b>🗺 Roadmap MVP</b><small>4 этапа, 23 задачи, оценки по времени и токенам</small></a>
-  <a class="card" href="docs/tasks/1.1-mock-llm-litellm/"><b>▶ Первая задача</b><small>1.1 Mock-LLM и LiteLLM</small></a>
-  <a class="card" href="overview/"><b>📋 Компоненты</b><small>Таблица компонентов, интеграции, готовность</small></a>
-  <a class="card" href="openspec/changes/define-agent-platform/design/"><b>⚖ Решения</b><small>Design D1–D13: почему так</small></a>
-  <a class="card" href="docs/BACKLOG/"><b>🗄 Бэклог</b><small>Что отложено и почему</small></a>
-  <a class="card" href="https://github.com/DemonIngvi/agent-architecture"><b>⌥ GitHub</b><small>Исходники документации</small></a>
 </div>
