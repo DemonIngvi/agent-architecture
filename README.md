@@ -5,6 +5,7 @@
 - HTML-версия — https://demoningvi.github.io/agent-architecture/ ([как собрать](html-view/README.md))
 - Впервые здесь — [как читать документацию](docs/HOW-TO-READ.md)
 - Схемы C1/C2 — [architecture.md](architecture.md)
+- Потоки данных и форматы — [docs/flows/](docs/flows/README.md)
 - План работ по документации — [docs/PLAN.md](docs/PLAN.md)
 - Roadmap MVP с оценками — [docs/ROADMAP.md](docs/ROADMAP.md)
 - Сводная таблица задач — [docs/TASKS.md](docs/TASKS.md)

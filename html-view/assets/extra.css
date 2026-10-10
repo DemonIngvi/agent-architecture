@@ -161,3 +161,12 @@
 .md-typeset .side-card li { margin: 0.25rem 0; font-size: 0.68rem; line-height: 1.3; }
 .md-typeset .tid { display: inline-block; min-width: 1.8rem; font-weight: 700; opacity: .7; }
 @media (max-width: 960px) { .about { grid-template-columns: 1fr; } }
+
+/* Потоки, входы/выходы, главная: текст под картой */
+.dtype-flow { background: #ef6c00; }
+.t-flow { background: #ef6c00; }
+.md-typeset .tb-type.t-flow.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #ef6c00; }
+.io { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.md-typeset .home-title { text-align: center; font-weight: 800; color: var(--md-default-fg-color); margin-bottom: 1rem; }
+.hero-below { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--md-default-fg-color--lightest); }
+@media (max-width: 960px) { .io { grid-template-columns: 1fr; } }

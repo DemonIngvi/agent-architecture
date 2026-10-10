@@ -294,3 +294,28 @@ ABOUT = {
                ["Пишет события каждого запуска", "Строит таймлайн в задаче ICPlan",
                 "Считает затраты по запуску, задаче, агенту, модели", "Хранит аудит guardrails", "Удаляет старые события по сроку"]),
 }
+
+
+# Что компонент получает и отдаёт (типы данных — см. docs/flows/)
+IO = {
+    "icplan": (["Действия пользователей: статусы, комментарии, approve", "`RunEvent`, `RunResult` от Agent Runner"],
+               ["`Run` в очередь запусков", "`AgentDefinition` (часть полей)", "`ApprovalDecision`"]),
+    "platform-module": (["Настройки из Control Plane UI", "YAML при импорте агента"],
+                        ["`AgentSettings` → Agent Runner", "Алиасы и ключи → LiteLLM", "Данные правил → OPA"]),
+    "agent-runner": (["`Run` из очереди ICPlan", "`AgentSettings`, `PolicyDecision` (G1)", "`RunEvent`, `RunResult` от Harness"],
+                     ["`RunBundle` → Harness", "`RepoGrant` → Sandbox", "События и итог → ICPlan"]),
+    "sandbox": (["`SandboxClaim` от Agent Runner", "`RepoGrant`"],
+                ["Изолированная среда для Harness", "Ветка и PR в git"]),
+    "harness": (["`RunBundle`", "Ответы модели и результаты тулов", "`ApprovalDecision`"],
+                ["`chat.completions` → LiteLLM", "`tools/call` → MCP", "`M3Record` → Memory", "`RunEvent`, `RunResult`"]),
+    "memory": (["M1, M2 — автоматически", "`M3Record` от агента"],
+               ["Контекст запуска: M2, M3, M5, M6"]),
+    "mcp-tools": (["`tools/call` от Harness"],
+                  ["Изменения в ICPlan и git", "Результат тула"]),
+    "guardrails": (["`PolicyInput` от Runner и Harness", "Rego (git) + данные правил"],
+                   ["`PolicyDecision`: allow / deny / confirm", "Аудит решений"]),
+    "llm-gateway": (["`chat.completions` с virtual key агента"],
+                    ["Ответ модели", "Spend log → Observability"]),
+    "observability": (["`RunEvent`", "Spend log LiteLLM", "Решения guardrails"],
+                      ["Таймлайн и затраты в задаче"]),
+}

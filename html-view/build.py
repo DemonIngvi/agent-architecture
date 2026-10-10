@@ -15,7 +15,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from components import ABOUT, AP, BLOCKS, BY_SLUG, COMPONENTS, STATUS  # noqa: E402
+from components import ABOUT, AP, IO, BLOCKS, BY_SLUG, COMPONENTS, STATUS  # noqa: E402
 
 ROOT = HERE.parent
 BUILD = HERE / ".build"
@@ -92,6 +92,8 @@ def write_pagebar_map():
             if t in tasks:
                 pages[tasks[t]] = slug
     pages.setdefault(f"{AP}/tasks.md", "icplan")
+    for slug, *_ in COMPONENTS:
+        pages[f"docs/flows/{slug}.md"] = slug
     data = {"pages": pages, "names": {c[0]: c[1] for c in COMPONENTS}}
     (BUILD / "pagebar.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
@@ -121,6 +123,11 @@ def task_meta(path: str) -> list:
     """Строка оценки из документа задачи: этап, компонент, зависит, человек, агент, токены."""
     rows = [l for l in (SRC / path).read_text(encoding="utf-8").splitlines() if l.startswith("| ") and "---" not in l]
     return [c.strip() for c in rows[1].strip("|").split("|")] if len(rows) > 1 else []
+
+
+def code(s: str) -> str:
+    """`x` → <code>x</code> для сырого HTML."""
+    return re.sub(r"`([^`]+)`", lambda m: f"<code>{m.group(1)}</code>", esc(s))
 
 
 def esc(s: str) -> str:
@@ -190,15 +197,22 @@ def write_component_pages():
             f'<p class="purpose">{esc(purpose)}</p>'
             '<div class="about-label">Что делает</div>'
             f'<ul class="does">{"".join(f"<li>{esc(x)}</li>" for x in does)}</ul>'
+            '<div class="io"><div><div class="about-label">Получает</div>'
+            f'<ul class="does">{"".join(f"<li>{code(x)}</li>" for x in IO.get(slug, ([], []))[0])}</ul></div>'
+            '<div><div class="about-label">Отдаёт</div>'
+            f'<ul class="does">{"".join(f"<li>{code(x)}</li>" for x in IO.get(slug, ([], []))[1])}</ul></div></div>'
             '</div><aside class="about-side">'
+            f'<div class="side-card"><div class="side-head"><span class="dtype dtype-flow">ПОТОКИ</span>'
+            f'<a class="side-all" href="{href(page, f"docs/flows/{slug}.md")}">открыть →</a></div>'
+            '<ul><li>Шаги, типы данных, примеры</li></ul></div>'
             f'<div class="side-card"><div class="side-head"><span class="dtype dtype-spec">СПЕКА</span>'
             f'<a class="side-all" href="{href(page, spec_page)}">все →</a></div><ul>{spec_links}</ul></div>'
             f'<div class="side-card"><div class="side-head"><span class="dtype dtype-task">ЗАДАЧИ</span>'
             f'<a class="side-all" href="{href(page, task_page)}">все →</a></div><ul>{task_links}</ul></div>'
             '</aside></div>')
-        body = [f"# {name}", "", head, "", about, "",
-                "## Устройство", "",
-                f'<div class="map">{render_rows(BLOCKS.get(slug, []), page)}</div>', ""]
+        body = [f"# {name}", "", head, "",
+                f'<div class="map">{render_rows(BLOCKS.get(slug, []), page)}</div>', "",
+                "## О компоненте", "", about, ""]
         (SRC / page).parent.mkdir(parents=True, exist_ok=True)
         (SRC / page).write_text("\n".join(body), encoding="utf-8")
 
@@ -248,6 +262,10 @@ def nav_yaml() -> str:
     for slug, name, *_ in COMPONENTS:
         L.append(item(4, name, f"components/{slug}/index.md"))
 
+    L += ["  - Потоки:", item(4, "Сквозной поток", "docs/flows/README.md")]
+    for slug, name, *_ in COMPONENTS:
+        if (SRC / f"docs/flows/{slug}.md").exists():
+            L.append(item(4, name, f"docs/flows/{slug}.md"))
     L += ["  - Спеки:", item(4, "Спеки по компонентам", "specs-by-component/index.md")]
     for slug, name, st, g, desc, links, docs, tids in COMPONENTS:
         L.append(f"    - {q(name)}:")

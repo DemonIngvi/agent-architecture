@@ -13,6 +13,7 @@ DATA = {"pages": {}, "names": {}}
 
 TYPES = [  # (ключ, подпись, раздел навигации, URL компонента, URL без компонента)
     ("arch", "Архитектура", "Архитектура", "components/{}/", ""),
+    ("flow", "Потоки", "Потоки", "docs/flows/{}/", "docs/flows/"),
     ("spec", "Спеки", "Спеки", "specs-by-component/{}/", "specs-by-component/"),
     ("task", "Задачи", "Задачи", "tasks-by-component/{}/", "tasks-by-component/"),
     ("ref", "Справка", "Справка", None, "overview/"),

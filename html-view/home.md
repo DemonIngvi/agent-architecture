@@ -1,15 +1,4 @@
-<div class="hero">
-  <h1>Agent Platform</h1>
-  <p>Платформа запуска LLM-агентов для задач таск-трекера ICPlan: изоляция каждого запуска, контроль моделей и затрат, guardrails, память.</p>
-</div>
-
-<div class="legend">
-  <span><i class="st st-done"></i>есть</span>
-  <span><i class="st st-part"></i>частично</span>
-  <span><i class="st st-todo"></i>не начато</span>
-  <span><b class="g">G1–G4</b> точки guardrails</span>
-  <span>Клик по блоку — описание и устройство компонента; спеки и задачи — рядом на его странице</span>
-</div>
+<h1 class="home-title">Agent Platform</h1>
 
 <div class="map">
 
@@ -104,4 +93,16 @@
     <span class="chip">mock-LLM (разработка)</span><span class="chip">Anthropic</span><span class="chip">OpenAI</span><span class="chip">локальные модели</span>
   </div>
 
+</div>
+
+<div class="hero hero-below">
+  <p>Платформа запуска LLM-агентов для задач таск-трекера ICPlan: изоляция каждого запуска, контроль моделей и затрат, guardrails, память.</p>
+</div>
+
+<div class="legend">
+  <span><i class="st st-done"></i>есть</span>
+  <span><i class="st st-part"></i>частично</span>
+  <span><i class="st st-todo"></i>не начато</span>
+  <span><b class="g">G1–G4</b> точки guardrails</span>
+  <span>Клик по блоку — описание и устройство компонента; спеки и задачи — рядом на его странице</span>
 </div>
