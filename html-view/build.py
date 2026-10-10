@@ -270,9 +270,25 @@ def approval_stats(folder: Path) -> tuple:
     return ok, len(rows), sum(1 for l in rows if "| ❌ |" in l)
 
 
+def check_docs() -> list:
+    """Проверки правил из журнала отклонений (docs/rules/deviations.md)."""
+    issues = []
+    for itf in ROOT.glob("openspec/changes/*/specs/*/interfaces.md"):
+        t = itf.read_text(encoding="utf-8")
+        fm = t.split("## Отказы (FMEA)")[-1] if "## Отказы (FMEA)" in t else ""
+        if re.search(r"^\| S\d+ \|", t, re.M) and not re.search(r"БД|Postgres|хранилищ|RustFS|S3|checkpoint|бандл", fm):  # О-10
+            issues.append(f"{itf.parent.name}: в FMEA нет отказа своего хранилища")
+        if "Почему так по умолчанию" not in t:  # таблица параметров
+            issues.append(f"{itf.parent.name}: таблица параметров без обоснований и границ")
+    for i in issues:
+        print("⚠️ правила:", i)
+    return issues
+
+
 def copy_sources():
     sync_stories()
     sync_approvals()
+    check_docs()
     check_req_tasks()
     shutil.rmtree(SRC, ignore_errors=True)
     files = []
