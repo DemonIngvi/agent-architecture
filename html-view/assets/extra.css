@@ -179,3 +179,12 @@
 
 .why-platform { margin-top: 2rem; }
 .why-platform h2 { margin-top: 0; }
+
+/* R&D, ключевые параметры */
+.dtype-rnd { background: #5d4037; }
+.t-rnd { background: #5d4037; }
+.md-typeset .tb-type.t-rnd.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #5d4037; }
+.keyparams { display: flex; flex-wrap: wrap; gap: 0.4rem 0.8rem; align-items: center; margin: -0.4rem 0 1rem;
+  padding: 0.5rem 0.8rem; border-radius: 0.7rem; background: var(--md-code-bg-color); }
+.keyparams .about-label { margin: 0 0.3rem 0 0; }
+.md-typeset .kp { font-size: 0.66rem; }

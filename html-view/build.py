@@ -16,6 +16,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from rationale import RATIONALE, REFS  # noqa: E402
+from subcomponents import SUB  # noqa: E402
 from components import ABOUT, AP, IO, BLOCKS, BY_SLUG, COMPONENTS, STATUS  # noqa: E402
 
 ROOT = HERE.parent
@@ -95,6 +96,10 @@ def write_pagebar_map():
     pages.setdefault(f"{AP}/tasks.md", "icplan")
     for slug, *_ in COMPONENTS:
         pages[f"docs/flows/{slug}.md"] = slug
+    for (slug, title) in SUB:
+        pages[sub_page(slug, title)] = slug
+    for slug, *_ in COMPONENTS:
+        pages[f"rnd-by-component/{slug}/index.md"] = slug
     for slug, refs in REFS.items():
         for _, p in refs:
             if p.startswith("docs/rnd/"):
@@ -130,6 +135,20 @@ def task_meta(path: str) -> list:
     return [c.strip() for c in rows[1].strip("|").split("|")] if len(rows) > 1 else []
 
 
+TR = dict(zip("абвгдеёжзийклмнопрстуфхцчшщъыьэюя",
+              ["a", "b", "v", "g", "d", "e", "e", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f",
+               "h", "c", "ch", "sh", "sch", "", "y", "", "e", "yu", "ya"]))
+
+
+def sub_slug(title: str) -> str:
+    s = "".join(TR.get(ch, ch) for ch in title.lower())
+    return re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+
+
+def sub_page(slug: str, title: str) -> str:
+    return f"components/{slug}/{sub_slug(title)}/index.md"
+
+
 def code(s: str) -> str:
     """`x` → <code>x</code> для сырого HTML."""
     return re.sub(r"`([^`]+)`", lambda m: f"<code>{m.group(1)}</code>", esc(s))
@@ -139,7 +158,7 @@ def esc(s: str) -> str:
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def render_block(b: dict, page: str) -> str:
+def render_block(b: dict, page: str, comp: str = "") -> str:
     cls = f"card blk {b['kind']}".strip()
     inner = []
     if b["st"]:
@@ -150,13 +169,16 @@ def render_block(b: dict, page: str) -> str:
         inner.append(f"<small>{esc(b['desc'])}</small>")
     if b["kind"] == "back":
         inner.append('<span class="tag-back">бэклог</span>')
+    if comp and (comp, b["title"]) in SUB and b["kind"] != "ext":
+        inner.append('<span class="go">подробнее →</span>')
+        return f'<a class="{cls}" href="{href(page, sub_page(comp, b["title"]))}">' + "".join(inner) + "</a>"
     if b["kind"] == "ext" and b["to"]:
         inner.append('<span class="go">схема компонента →</span>')
         return f'<a class="{cls}" href="{href(page, f"components/{b["to"]}/index.md")}">' + "".join(inner) + "</a>"
     return f'<div class="{cls}">' + "".join(inner) + "</div>"
 
 
-def render_rows(rows: list, page: str) -> str:
+def render_rows(rows: list, page: str, comp: str = "") -> str:
     out = []
     for r in rows:
         if isinstance(r, str):
@@ -164,10 +186,10 @@ def render_rows(rows: list, page: str) -> str:
         elif isinstance(r, dict):
             g = f' <span class="g">{r["g"]}</span>' if r.get("g") else ""
             out.append(f'<div class="zone zone-{r.get("cls") or "plain"}"><div class="zone-title">{esc(r["zone"])}{g}</div>'
-                       f'<div class="map">{render_rows(r["rows"], page)}</div></div>')
+                       f'<div class="map">{render_rows(r["rows"], page, comp)}</div></div>')
         else:
             out.append(f'<div class="crow" style="grid-template-columns:repeat({len(r)},1fr)">'
-                       + "".join(render_block(b, page) for b in r) + "</div>")
+                       + "".join(render_block(b, page, comp) for b in r) + "</div>")
     return "".join(out)
 
 
@@ -232,14 +254,24 @@ def write_component_pages():
             f'<div class="side-card"><div class="side-head"><span class="dtype dtype-flow">ПОТОКИ</span>'
             f'<a class="side-all" href="{href(page, f"docs/flows/{slug}.md")}">открыть →</a></div>'
             '<ul><li>Шаги, типы данных, примеры</li></ul></div>'
+            f'<div class="side-card"><div class="side-head"><span class="dtype dtype-rnd">R&amp;D</span>'
+            f'<a class="side-all" href="{href(page, f"rnd-by-component/{slug}/index.md")}">все →</a></div><ul>'
+            + "".join(f'<li><a href="{href(page, p)}">{esc(lab)}</a></li>' for lab, p in REFS.get(slug, []) if p.startswith("docs/rnd/"))
+            + '</ul></div>'
             f'<div class="side-card"><div class="side-head"><span class="dtype dtype-spec">СПЕКА</span>'
             f'<a class="side-all" href="{href(page, spec_page)}">все →</a></div><ul>{spec_links}</ul></div>'
             f'<div class="side-card"><div class="side-head"><span class="dtype dtype-task">ЗАДАЧИ</span>'
             f'<a class="side-all" href="{href(page, task_page)}">все →</a></div><ul>{task_links}</ul></div>'
             '</aside></div>')
-        body = [f"# {name}", "", head, "", about, "",
+        cfg = RATIONALE.get(slug, {}).get("config", [])[:6]
+        keyp = ""
+        if cfg:
+            keyp = ('<div class="keyparams"><span class="about-label">Ключевые параметры</span>'
+                    + "".join(f'<span class="kp"><code>{esc(n)}</code> {esc(d)}</span>' for n, _, _, d, _ in cfg)
+                    + '<a class="side-all" href="#_5">все параметры ↓</a></div>')
+        body = [f"# {name}", "", head, "", keyp, "", about, "",
                 "## Устройство", "",
-                f'<div class="map">{render_rows(BLOCKS.get(slug, []), page)}</div>', ""]
+                f'<div class="map">{render_rows(BLOCKS.get(slug, []), page, slug)}</div>', ""]
         body += rationale_md(slug)
         (SRC / page).parent.mkdir(parents=True, exist_ok=True)
         (SRC / page).write_text("\n".join(body), encoding="utf-8")
@@ -268,8 +300,36 @@ def write_component_pages():
         (SRC / d).mkdir(parents=True, exist_ok=True)
         (SRC / d / "index.md").write_text("\n".join(L) + "\n", encoding="utf-8")
 
+    # Подкомпоненты
+    for (slug, title), s in SUB.items():
+        page = sub_page(slug, title)
+        d = str(Path(page).parent).replace("\\", "/")
+        name = BY_SLUG[slug][1]
+        L = [f"# {title}", "",
+             f"Часть компонента [{name}]({rel(d, f'components/{slug}/index.md')}).", "",
+             "## Технология и ключевые параметры", "", f"**Технология:** {s['tech']}", "",
+             "| Параметр | Значение |", "|---|---|"] + [f"| `{cell(a)}` | {cell(b)} |" for a, b in s["params"]]
+        L += ["", "## Что делает", ""] + [f"- {x}" for x in s["does"]]
+        L += ["", "## Почему так", "", s["why"]]
+        if s["rnd"]:
+            L += ["", f"**Исследование:** [R&D]({rel(d, 'docs/rnd/' + s['rnd'])})"]
+        (SRC / d).mkdir(parents=True, exist_ok=True)
+        (SRC / page).write_text("\n".join(L) + "\n", encoding="utf-8")
+
+    for slug, name, *_ in COMPONENTS:
+        d = f"rnd-by-component/{slug}"
+        L = [f"# R&D: {name}", "", "Исследования, на которых основаны решения по компоненту. Методология — [METHOD](" + rel(d, "docs/rnd/METHOD.md") + ").", "",
+             "| Исследование | Решение |", "|---|---|"]
+        for lab, p in REFS.get(slug, []):
+            if p.startswith("docs/rnd/") and (SRC / p).exists():
+                dec = next((l.split("|")[2].strip() for l in (SRC / p).read_text(encoding="utf-8").splitlines() if l.startswith("| **Решение**")), "")
+                L.append(f"| [{lab.replace('R&D: ', '')}]({rel(d, p)}) | {dec} |")
+        (SRC / d).mkdir(parents=True, exist_ok=True)
+        (SRC / d / "index.md").write_text("\n".join(L) + "\n", encoding="utf-8")
+
     # Обзорные страницы вкладок «Спеки» и «Задачи»
-    for d, title, sub in (("specs-by-component", "Спеки по компонентам", "Требования (OpenSpec) и схемы каждого компонента."),
+    for d, title, sub in (("rnd-by-component", "R&D по компонентам", "Исследования и выбор технологий по каждому компоненту."),
+                          ("specs-by-component", "Спеки по компонентам", "Требования (OpenSpec) и схемы каждого компонента."),
                           ("tasks-by-component", "Задачи по компонентам", "Доработки каждого компонента. Порядок и оценки — в Roadmap.")):
         L = [f"# {title}", "", sub, "", '<div class="links3">']
         for slug, name, st, g, desc, *_ in COMPONENTS:
@@ -288,7 +348,13 @@ def nav_yaml() -> str:
 
     L = ["nav:", "  - Архитектура:", item(4, "Главная — карта", "index.md")]
     for slug, name, *_ in COMPONENTS:
-        L.append(item(4, name, f"components/{slug}/index.md"))
+        subs = [title for (s, title) in SUB if s == slug]
+        if subs:
+            L.append(f"    - {q(name)}:")
+            L.append(item(6, name, f"components/{slug}/index.md"))
+            L += [item(6, title, sub_page(slug, title)) for title in subs]
+        else:
+            L.append(item(4, name, f"components/{slug}/index.md"))
 
     L += ["  - Потоки:", item(4, "Сквозной поток", "docs/flows/README.md")]
     for slug, name, *_ in COMPONENTS:
@@ -321,10 +387,15 @@ def nav_yaml() -> str:
         L.append("    - Прочие задачи:")
         L += [item(6, title_of(SRC / t, t), t) for t in left]
 
-    L += ["  - R&D:", item(4, "Все R&D", "docs/rnd/README.md")]
-    for f in sorted((SRC / "docs/rnd").glob("*.md")):
-        if f.name != "README.md":
-            L.append(item(4, title_of(f, f.stem).replace("R&D: ", ""), f"docs/rnd/{f.name}"))
+    L += ["  - R&D:", item(4, "R&D по компонентам", "rnd-by-component/index.md"),
+          item(4, "Все R&D", "docs/rnd/README.md"), item(4, "Методология", "docs/rnd/METHOD.md")]
+    for slug, name, *_ in COMPONENTS:
+        rs = [p for _, p in REFS.get(slug, []) if p.startswith("docs/rnd/") and (SRC / p).exists() and p not in used]
+        L.append(f"    - {q(name)}:")
+        L.append(item(6, name, f"rnd-by-component/{slug}/index.md"))
+        L += [item(6, title_of(SRC / p, p).replace("R&D: ", ""), p) for p in rs]
+    left = [f"docs/rnd/{f.name}" for f in sorted((SRC / "docs/rnd").glob("*.md")) if f"docs/rnd/{f.name}" not in used]
+    L += [item(4, title_of(SRC / p, p).replace("R&D: ", ""), p) for p in left]
     L += ["  - Справка:", item(4, "Компоненты (таблица)", "overview.md"), item(4, "Как читать", "docs/HOW-TO-READ.md"),
           item(4, "Схемы C1 / C2 (текст)", "architecture.md"), item(4, "Бэклог", "docs/BACKLOG.md"),
           item(4, "План документации", "docs/PLAN.md"), item(4, "Формат схем", "FORMAT.md")]
