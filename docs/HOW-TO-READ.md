@@ -24,6 +24,7 @@
 | Что уже сделано, что нет | Колонка «Готовность» в README, статусы в `tasks.md` |
 | Почему выбрано именно так | [design.md](../openspec/changes/define-agent-platform/design.md) — решения D1–D13 |
 | Что отложено | [BACKLOG.md](BACKLOG.md) |
+| Какие были альтернативы и почему отвергнуты | [R&D](rnd/README.md) |
 
 ## Обозначения
 

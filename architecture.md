@@ -77,7 +77,7 @@ ICPlan назначает агента на задачу. Agent Runner толь�
 | Hooks | Точки расширения: плагины, guardrails |
 | Policy / Stop | Лимиты и критерий завершения |
 
-Основа: **LangGraph** (решено) за своим интерфейсом harness + свои хуки. Причины: `interrupt` для approve, checkpointer для возобновления, стрим шагов для таймлайна.
+Основа: **LangGraph** (решено) за своим интерфейсом harness + свои хуки. Обоснование: [R&D: фреймворк цикла](docs/rnd/harness-framework.md) · [design D2](openspec/changes/define-agent-platform/design.md). Причины: `interrupt` для approve, checkpointer для возобновления, стрим шагов для таймлайна.
 
 ## Guardrails
 
@@ -102,7 +102,7 @@ guardrails:
   g3: { enabled: true }       # сеть, ФС, ресурсы sandbox
   g4: { enabled: false }      # PII, injection, модерация в LiteLLM
 ```
-Выключенная точка не ломает платформу; при старте пишется «Gx disabled». Спека: [guardrails](openspec/changes/define-agent-platform/specs/guardrails/spec.md).
+Выключенная точка не ломает платформу; при старте пишется «Gx disabled». Обоснование: [R&D: движок guardrails](docs/rnd/guardrails-engine.md) · [design D6](openspec/changes/define-agent-platform/design.md). Спека: [guardrails](openspec/changes/define-agent-platform/specs/guardrails/spec.md).
 
 ### Защита от зацикливания и перерасхода
 
@@ -120,7 +120,26 @@ guardrails:
 | RPM / TPM на модель и агента | G4 | по провайдеру | ожидание или отказ |
 | Kill switch агента / платформы | G1 | — | очередь закрыта, активные — `cancelled` |
 
-Все проверки детерминированные (кодом, без LLM). Спека: [guardrails](openspec/changes/define-agent-platform/specs/guardrails/spec.md).
+Все проверки детерминированные (кодом, без LLM). Обоснование: [R&D: защита от перерасхода](docs/rnd/runaway-protection.md). Спека: [guardrails](openspec/changes/define-agent-platform/specs/guardrails/spec.md).
+
+## Очередь и планирование запусков
+
+Очередь — в ICPlan. Agent Runner стартует запуск, только когда свободны все его слоты (вариант B):
+
+```yaml
+scheduling:
+  mode: parallel            # sequential — вся платформа строго по одному
+  global_max: 4             # всего запусков одновременно
+  per_issue: 1              # один активный запуск на задачу
+  order: fifo               # или priority (приоритет задачи ICPlan)
+  agents:
+    analyst:   { parallel: true,  max: 2 }
+    developer: { parallel: false }
+  models:
+    team-default: { max: 3 }  # общий лимит для всех агентов на модели
+```
+
+Обоснование: [R&D: Runner и очередь](docs/rnd/runner-and-scheduling.md) · [design D14](openspec/changes/define-agent-platform/design.md) · спека: [agent-runner](openspec/changes/define-agent-platform/specs/agent-runner/spec.md).
 
 ## Исполнение: тёплый пул + одноразовое использование
 
@@ -131,6 +150,8 @@ guardrails:
 └──────▲───────┘        └──────────────┘      └──────────────┘         └──────┬───────┘
        └──────────────────────────────────────────────────────────────────────┘
 ```
+Обоснование: [R&D: изоляция](docs/rnd/sandbox-isolation.md) · [design D1](openspec/changes/define-agent-platform/design.md).
+
 Старт за доли секунды, изоляция как у «контейнер на запуск». Рабочие данные в контейнере не живут (см. «Рабочие данные и доступы»). Ориентиры: harness 150–300 МБ RAM, агент-разработчик 0.5–2 ГБ, CPU почти не нужен (ожидание LLM). Спека: [agent-sandbox](openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md).
 
 ## Память M0–M6
@@ -145,11 +166,11 @@ guardrails:
 | M5 процедурная | Инструкция, навыки | БД ICPlan | ✅ есть |
 | M6 организационная | Документы проекта, ADR | Документы ICPlan | ✅ есть (`get_document`) |
 
-Область видимости (агент / проект / команда) — атрибут записи, не уровень. Спека: [agent-memory](openspec/changes/define-agent-platform/specs/agent-memory/spec.md).
+Область видимости (агент / проект / команда) — атрибут записи, не уровень. Обоснование: [R&D: модель памяти](docs/rnd/memory-model.md) · [design D4](openspec/changes/define-agent-platform/design.md). Спека: [agent-memory](openspec/changes/define-agent-platform/specs/agent-memory/spec.md).
 
 ## RAG
 
-Не в MVP. В MVP: документы через `get_document` (M6), по коду — агентный поиск тулами (grep/read). RAG вводится, когда корпус документов перестаёт помещаться в навигацию. Хранилище — pgvector, эмбеддер — локальный контейнер. RAG — механизм чтения M4/M6, новых уровней не добавляет.
+Не в MVP. В MVP: документы через `get_document` (M6), по коду — агентный поиск тулами (grep/read). RAG вводится, когда корпус документов перестаёт помещаться в навигацию. Хранилище — pgvector, эмбеддер — локальный контейнер. RAG — механизм чтения M4/M6, новых уровней не добавляет. Обоснование: [R&D: RAG](docs/rnd/rag.md) · [design D13](openspec/changes/define-agent-platform/design.md).
 
 ## Хранение конфигурации
 
@@ -160,6 +181,8 @@ guardrails:
 | Ревью и перенос между окружениями | Экспорт / импорт YAML |
 | Наши настройки (алиасы, бюджеты, профили sandbox, данные guardrails) | **Platform module** — модуль ICPlan, отдельная схема в БД ICPlan |
 | Логика guardrails (Rego) | git (код, тесты `opa test`, ревью) |
+
+Обоснование: [R&D: хранение конфигурации](docs/rnd/config-storage.md) · [design D9](openspec/changes/define-agent-platform/design.md).
 
 ## MCP или прямой вызов
 
@@ -173,7 +196,7 @@ guardrails:
 | R6 | Админ-функции | Отдельные MCP-серверы по уровню доверия, рабочим агентам недоступны |
 | R7 | Внутренности платформы: Runner↔ICPlan, Harness↔LiteLLM, проверки G1–G4, автозапись M1/M2 | Только прямой вызов |
 
-Спека: [tool-integration](openspec/changes/define-agent-platform/specs/tool-integration/spec.md).
+Спека: [tool-integration](openspec/changes/define-agent-platform/specs/tool-integration/spec.md). Обоснование: [R&D: MCP или прямой вызов](docs/rnd/mcp-vs-direct.md) · [design D10](openspec/changes/define-agent-platform/design.md).
 
 ## Рабочие данные и доступы
 
@@ -207,6 +230,8 @@ guardrails:
 | `HTTPS_PROXY` | Egress-прокси с allowlist (G3) |
 
 ## Observability
+
+Обоснование: [R&D: наблюдаемость](docs/rnd/observability.md) · [design D12](openspec/changes/define-agent-platform/design.md).
 
 MVP: таблица событий запуска в БД ICPlan → пошаговый таймлайн в задаче. Langfuse — позже (evals, анализ промптов; тяжёлый self-host). Prometheus / Grafana / Loki — компоненты есть, остаются пустыми: [бэклог](docs/BACKLOG.md). Спека: [observability](openspec/changes/define-agent-platform/specs/observability/spec.md).
 

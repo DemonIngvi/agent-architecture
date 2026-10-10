@@ -15,7 +15,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from rationale import RATIONALE  # noqa: E402
+from rationale import RATIONALE, REFS  # noqa: E402
 from components import ABOUT, AP, IO, BLOCKS, BY_SLUG, COMPONENTS, STATUS  # noqa: E402
 
 ROOT = HERE.parent
@@ -95,6 +95,10 @@ def write_pagebar_map():
     pages.setdefault(f"{AP}/tasks.md", "icplan")
     for slug, *_ in COMPONENTS:
         pages[f"docs/flows/{slug}.md"] = slug
+    for slug, refs in REFS.items():
+        for _, p in refs:
+            if p.startswith("docs/rnd/"):
+                pages.setdefault(p, slug)
     data = {"pages": pages, "names": {c[0]: c[1] for c in COMPONENTS}}
     (BUILD / "pagebar.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
@@ -176,7 +180,9 @@ def rationale_md(slug: str) -> list:
     r = RATIONALE.get(slug)
     if not r:
         return []
-    L = ["## Почему так", "", "**Почему выбран**", ""] + [f"- {x}" for x in r["why"]]
+    d = f"components/{slug}"
+    refs = " · ".join(f"[{lab}]({rel(d, p)})" for lab, p in REFS.get(slug, []) if (SRC / p).exists())
+    L = ["## Почему так", ""] + ([f"**Обоснование:** {refs}", ""] if refs else []) + ["**Почему выбран**", ""] + [f"- {x}" for x in r["why"]]
     L += ["", "**Что даёт**", ""] + [f"- {x}" for x in r["gain"]]
     L += ["", "**Отвергнутые альтернативы**", "", "| Вариант | Почему нет |", "|---|---|"]
     L += [f"| {cell(a)} | {cell(b)} |" for a, b in r["alts"]]
@@ -315,6 +321,10 @@ def nav_yaml() -> str:
         L.append("    - Прочие задачи:")
         L += [item(6, title_of(SRC / t, t), t) for t in left]
 
+    L += ["  - R&D:", item(4, "Все R&D", "docs/rnd/README.md")]
+    for f in sorted((SRC / "docs/rnd").glob("*.md")):
+        if f.name != "README.md":
+            L.append(item(4, title_of(f, f.stem).replace("R&D: ", ""), f"docs/rnd/{f.name}"))
     L += ["  - Справка:", item(4, "Компоненты (таблица)", "overview.md"), item(4, "Как читать", "docs/HOW-TO-READ.md"),
           item(4, "Схемы C1 / C2 (текст)", "architecture.md"), item(4, "Бэклог", "docs/BACKLOG.md"),
           item(4, "План документации", "docs/PLAN.md"), item(4, "Формат схем", "FORMAT.md")]

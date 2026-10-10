@@ -7,7 +7,8 @@
 | # | Поток | От → к | Данные |
 |---|---|---|---|
 | 1 | Опрос очереди по ключу агента | Runner → ICPlan | `Run` |
-| 2 | Допуск, бюджет, параллельность (G1) | Runner → OPA | `PolicyInput` → `PolicyDecision` |
+| 2 | Планирование: свободны ли слоты (глобальный, агента, модели, задачи) | Runner → таблица слотов | `queued` → `admitted` |
+| 2a | Допуск, бюджет (G1) | Runner → OPA | `PolicyInput` → `PolicyDecision` |
 | 3 | Профиль и бюджет агента | Runner → Platform module | `AgentSettings` |
 | 4 | Контейнер из тёплого пула | Runner → Sandbox | `profile` → `sandbox_id` |
 | 5 | Токен репозиториев на запуск | Runner → git-провайдер | `RepoGrant` |
@@ -21,10 +22,10 @@
 ## Состояния запуска
 
 ```
-pending ─▶ admitted ─▶ running ─▶ succeeded
-   │           │          ├────▶ waiting_approval ─▶ running
-   │           │          ├────▶ failed | limit | cancelled
-   └─▶ rejected (G1)
+pending ─▶ queued ─────────▶ admitted ─▶ running ─▶ succeeded
+           (ждёт слот)          │           ├──────▶ waiting_approval ─▶ running
+                                │           └──────▶ failed │ limit │ loop_detected │ cancelled
+                                └─▶ rejected (G1: бюджет, kill switch)
 ```
 
 ## Данные

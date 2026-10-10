@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Единая настраиваемая политика безопасности и ограничений агентов, хранимая в Registry и применяемая в четырёх точках: G1 Admission, G2 Action, G3 Isolation, G4 LLM.
+Единая настраиваемая политика безопасности и ограничений агентов, хранимая в Registry и применяемая в четырёх точках: G1 Admission, G2 Action, G3 Isolation, G4 LLM. Обоснование: [R&D](../../../../../docs/rnd/guardrails-engine.md).
 
 ## ADDED Requirements
 

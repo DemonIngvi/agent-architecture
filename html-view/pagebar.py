@@ -16,6 +16,7 @@ TYPES = [  # (ключ, подпись, раздел навигации, URL к�
     ("flow", "Потоки", "Потоки", "docs/flows/{}/", "docs/flows/"),
     ("spec", "Спеки", "Спеки", "specs-by-component/{}/", "specs-by-component/"),
     ("task", "Задачи", "Задачи", "tasks-by-component/{}/", "tasks-by-component/"),
+    ("rnd", "R&D", "R&D", None, "docs/rnd/"),
     ("ref", "Справка", "Справка", None, "overview/"),
 ]
 

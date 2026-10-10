@@ -6,6 +6,7 @@
 - Впервые здесь — [как читать документацию](docs/HOW-TO-READ.md)
 - Схемы C1/C2 — [architecture.md](architecture.md)
 - Потоки данных и форматы — [docs/flows/](docs/flows/README.md)
+- R&D: обоснование решений — [docs/rnd/](docs/rnd/README.md)
 - План работ по документации — [docs/PLAN.md](docs/PLAN.md)
 - Roadmap MVP с оценками — [docs/ROADMAP.md](docs/ROADMAP.md)
 - Сводная таблица задач — [docs/TASKS.md](docs/TASKS.md)

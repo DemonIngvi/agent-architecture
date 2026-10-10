@@ -65,7 +65,13 @@ RATIONALE = {
                 ("timeout_s", "Таймаут запуска по умолчанию", "Зависшие запуски не тратят ресурсы", "1800", "Platform module"),
                 ("retry", "Повтор при сбое инфраструктуры", "Устойчивость против дублей действий", "0 (без повтора)", "Конфиг Runner"),
                 ("agents", "Ключи агентов, которые обслуживает Runner", "Какие агенты исполняются нашей платформой", "—", "Конфиг Runner"),
-                ("guardrails.g1.enabled", "Проверка допуска и бюджета", "Защита от перерасхода до старта", "true", "Конфиг деплоя")]),
+                ("guardrails.g1.enabled", "Проверка допуска и бюджета", "Защита от перерасхода до старта", "true", "Конфиг деплоя"),
+                ("scheduling.mode", "sequential или parallel", "Вся платформа по одному запуску или по лимитам слотов", "parallel", "Конфиг деплоя"),
+                ("scheduling.global_max", "Всего запусков одновременно", "Нагрузка на хост и модели", "4", "Конфиг деплоя"),
+                ("scheduling.per_issue", "Запусков на задачу", "Нет конфликтов двух агентов в одной задаче", "1", "Конфиг деплоя"),
+                ("scheduling.order", "fifo или priority", "Что стартует первым при нехватке слотов", "fifo", "Конфиг деплоя"),
+                ("scheduling.agents.<id>.parallel / max", "Может ли агент идти в несколько потоков", "Агенты с общим ресурсом идут строго по одному", "по агенту", "Platform module"),
+                ("scheduling.models.<alias>.max", "Запусков на модель", "Общий лимит модели для всех агентов, не упираемся в TPM", "3", "Конфиг деплоя")]),
     "sandbox": dict(
         why=["Агент выполняет код и ходит в сеть — нужна жёсткая граница",
              "Тёплый пул даёт быстрый старт без потери изоляции (подход Copilot agent, E2B)"],
@@ -166,4 +172,20 @@ RATIONALE = {
         config=[("events.level", "Детализация событий", "Подробность таймлайна против объёма", "тулы + итоги", "Конфиг"),
                 ("retention_days", "Срок хранения событий", "Глубина разбора против места", "90", "Конфиг"),
                 ("cost.source", "Откуда затраты", "Точность учёта", "LiteLLM spend log", "Конфиг")]),
+}
+
+
+# Подтверждающие документы для блока «Почему так»
+D = "openspec/changes/define-agent-platform/design.md"
+REFS = {
+    "icplan": [("R&D: выбор таск-трекера", "docs/rnd/tracker-choice.md")],
+    "platform-module": [("R&D: хранение конфигурации", "docs/rnd/config-storage.md"), ("Design D9", D)],
+    "agent-runner": [("R&D: Runner и очередь", "docs/rnd/runner-and-scheduling.md"), ("Design D8, D14", D)],
+    "sandbox": [("R&D: изоляция запусков", "docs/rnd/sandbox-isolation.md"), ("Design D1", D)],
+    "harness": [("R&D: фреймворк цикла", "docs/rnd/harness-framework.md"), ("Design D2", D)],
+    "memory": [("R&D: модель памяти", "docs/rnd/memory-model.md"), ("R&D: RAG", "docs/rnd/rag.md"), ("Design D4, D13", D)],
+    "mcp-tools": [("R&D: MCP или прямой вызов", "docs/rnd/mcp-vs-direct.md"), ("Design D10", D)],
+    "guardrails": [("R&D: движок guardrails", "docs/rnd/guardrails-engine.md"), ("R&D: защита от перерасхода", "docs/rnd/runaway-protection.md"), ("Design D6", D)],
+    "llm-gateway": [("R&D: шлюз к моделям", "docs/rnd/llm-gateway.md"), ("Design D5", D)],
+    "observability": [("R&D: наблюдаемость", "docs/rnd/observability.md"), ("Design D12", D)],
 }

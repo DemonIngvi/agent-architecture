@@ -53,6 +53,7 @@
 | ⬜ | Каркас Runner (Go), контракт Runner↔Harness | [задача 2.1](tasks/2.1-runner-external.md) |
 | ⬜ | Работа как внешний раннер ICPlan: опрос, стрим, итог | [задача 2.1](tasks/2.1-runner-external.md) |
 | ⬜ | Жизненный цикл: claim из пула → Harness → результат → destroy | [задача 2.2](tasks/2.2-sandbox-docker-oneshot.md) |
+| ⬜ | Планировщик: слоты, режим sequential / parallel, один запуск на задачу | [задача 2.7](tasks/2.7-runner-scheduler.md) |
 | ⬜ | Таймаут и отмена | [задача 2.1](tasks/2.1-runner-external.md) |
 | ⬜ | Короткоживущий токен репозиториев на запуск | [arch → Рабочие данные](../architecture.md) |
 

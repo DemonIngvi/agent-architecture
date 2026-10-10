@@ -2,7 +2,7 @@
 
 ## Purpose
 
-API управления платформой — CRUD над ресурсами Registry и просмотр запусков; CLI и UI — оболочки над тем же API.
+API управления платформой — CRUD над ресурсами Registry и просмотр запусков; CLI и UI — оболочки над тем же API. Обоснование: [R&D](../../../../../docs/rnd/config-storage.md).
 
 ## ADDED Requirements
 
