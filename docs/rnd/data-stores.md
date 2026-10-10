@@ -1,6 +1,6 @@
 # R&D: СУБД и хранилища
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **Инфраструктура** · решение: [design D4, D15](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **Инфраструктура** · решение: [design D4, D15](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -76,4 +76,4 @@
 - [RustFS](https://github.com/rustfs/rustfs)
 - [SeaweedFS](https://github.com/seaweedfs/seaweedfs)
 - [MinIO (архив)](https://github.com/minio/minio)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

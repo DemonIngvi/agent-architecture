@@ -1,6 +1,6 @@
 # R&D: Изоляция запусков
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **Sandbox** · решение: [design D1](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **Sandbox** · решение: [design D1](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -67,4 +67,4 @@
 - [Firecracker](https://github.com/firecracker-microvm/firecracker)
 - [E2B](https://github.com/e2b-dev/E2B)
 - [Daytona](https://github.com/daytonaio/daytona)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

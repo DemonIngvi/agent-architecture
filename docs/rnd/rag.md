@@ -1,6 +1,6 @@
 # R&D: RAG
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **Memory** · решение: [design D13](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **Memory** · решение: [design D13](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -60,4 +60,4 @@ RAG даёт агенту куски из больших корпусов без
 
 - [pgvector](https://github.com/pgvector/pgvector)
 - [Qdrant](https://github.com/qdrant/qdrant)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

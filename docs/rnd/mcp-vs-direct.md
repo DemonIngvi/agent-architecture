@@ -1,6 +1,6 @@
 # R&D: MCP или прямой вызов
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **MCP / Tools** · решение: [design D10](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **MCP / Tools** · решение: [design D10](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -61,4 +61,4 @@ MCP — стандарт для тулов, которые выбирает мо
 - [MCP vs API — PromptLayer](https://blog.promptlayer.com/mcp-vs-api-architecture-patterns-for-ai-agents-and-applications/)
 - [MCP vs API — Nylas](https://cli.nylas.com/guides/mcp-vs-api-ai-agents)
 - [MCP vs Function Calling 2026](https://www.kunalganglani.com/blog/mcp-vs-function-calling-agents.md)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

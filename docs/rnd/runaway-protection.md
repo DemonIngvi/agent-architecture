@@ -1,6 +1,6 @@
 # R&D: Защита от зацикливания и перерасхода
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **Guardrails** · решение: [design D6](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **Guardrails** · решение: [design D6](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -63,4 +63,4 @@
 - [LangGraph](https://github.com/langchain-ai/langgraph)
 - [OpenAI Agents SDK](https://github.com/openai/openai-agents-python)
 - [LiteLLM](https://github.com/BerriAI/litellm)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

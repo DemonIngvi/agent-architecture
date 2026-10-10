@@ -1,6 +1,6 @@
 # R&D: Хранение конфигурации
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **Platform module** · решение: [design D9](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **Platform module** · решение: [design D9](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -58,4 +58,4 @@
 ## Источники
 
 - [OPA](https://www.openpolicyagent.org)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

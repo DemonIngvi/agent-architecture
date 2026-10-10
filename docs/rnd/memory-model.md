@@ -1,6 +1,6 @@
 # R&D: Модель памяти
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **Memory** · решение: [design D4](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **Memory** · решение: [design D4](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -61,4 +61,4 @@
 
 - [CoALA, arXiv 2309.02427](https://arxiv.org/abs/2309.02427)
 - [Letta](https://github.com/letta-ai/letta)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

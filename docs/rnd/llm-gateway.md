@@ -1,6 +1,6 @@
 # R&D: Шлюз к моделям
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **LiteLLM gateway** · решение: [design D5](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **LiteLLM gateway** · решение: [design D5](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -65,4 +65,4 @@
 - [LiteLLM](https://github.com/BerriAI/litellm)
 - [Kong](https://github.com/Kong/kong)
 - [Portkey gateway](https://github.com/Portkey-AI/gateway)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

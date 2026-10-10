@@ -1,6 +1,6 @@
 # R&D: Наблюдаемость
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **Observability** · решение: [design D12](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **Observability** · решение: [design D12](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -59,4 +59,4 @@ Langfuse выигрывает функционально, но тяжёлый se
 
 - [Langfuse](https://github.com/langfuse/langfuse)
 - [Prometheus](https://github.com/prometheus/prometheus)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

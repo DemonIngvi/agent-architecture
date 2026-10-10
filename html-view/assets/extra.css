@@ -249,3 +249,11 @@
 .md-typeset .oq-list ul { margin: 0.2rem 0 0.2rem 1rem; }
 .md-typeset .oq-list li { margin: 0.05rem 0; }
 .md-typeset .oq-list i { color: #c62828; font-style: normal; font-weight: 700; font-size: 0.58rem; }
+
+/* каталог API */
+.md-typeset .m{display:inline-block;min-width:3.6em;text-align:center;font:600 .68rem/1.6 var(--md-code-font-family,monospace);border-radius:4px;padding:0 .35em;color:#fff}
+.m-get{background:#2e7d32}.m-post{background:#1565c0}.m-put{background:#6a1b9a}.m-patch{background:#ef6c00}.m-del{background:#c62828}.m-none{background:#9e9e9e}
+.md-typeset .st{white-space:nowrap;font-size:.72rem;padding:0 .4em;border-radius:10px;border:1px solid currentColor}
+.st-ok{color:#2e7d32}.st-fork{color:#ef6c00}.st-new{color:#1565c0}
+.api-legend{display:flex;gap:.6rem;flex-wrap:wrap;margin:.4rem 0}
+.api-head{display:flex;gap:1.5rem;flex-wrap:wrap;padding:.5rem .8rem;border-left:3px solid var(--md-accent-fg-color,#1565c0);background:var(--md-code-bg-color);margin-bottom:.8rem}

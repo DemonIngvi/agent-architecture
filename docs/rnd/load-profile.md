@@ -1,6 +1,6 @@
 # R&D: Профиль нагрузки и ёмкость
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **Инфраструктура** · решение: [design D16](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **Инфраструктура** · решение: [design D16](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -68,4 +68,4 @@
 - [Сайзинг проекта AI-агент](https://github.com/DemonIngvi/itsaplan-agent-platform-docs)
 - [k3s](https://github.com/k3s-io/k3s)
 - [k6](https://github.com/grafana/k6)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

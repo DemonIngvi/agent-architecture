@@ -1,6 +1,6 @@
 # R&D: Ingress и балансировка
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **Инфраструктура** · решение: [design D15](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **Инфраструктура** · решение: [design D15](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -72,4 +72,4 @@ NGINX как отдельный балансировщик не нужен: вн
 - [ingress-nginx (архив)](https://github.com/kubernetes/ingress-nginx)
 - [PgBouncer](https://github.com/pgbouncer/pgbouncer)
 - [Pgpool-II](https://github.com/pgpool/pgpool2)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

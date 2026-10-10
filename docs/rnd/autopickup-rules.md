@@ -1,6 +1,6 @@
 # R&D: Автоподхват задач агентом
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **ICPlan**
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **ICPlan**
 
 ## Итог
 
@@ -71,4 +71,4 @@
 
 - [It's a Plan (upstream)](https://github.com/croffasia/itsaplan)
 - [Temporal](https://github.com/temporalio/temporal)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

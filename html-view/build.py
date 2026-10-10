@@ -750,7 +750,7 @@ def write_component_pages():
 
     for slug, name, *_ in COMPONENTS:
         d = f"rnd-by-component/{slug}"
-        L = [f"# R&D: {name}", "", "Исследования, на которых основаны решения по компоненту. Методология — [METHOD](" + rel(d, "docs/rnd/METHOD.md") + ").", "",
+        L = [f"# R&D: {name}", "", "Исследования, на которых основаны решения по компоненту. Методология — [методология R&D](" + rel(d, "docs/rules/rnd-methodology.md") + ").", "",
              "| Исследование | Решение |", "|---|---|"]
         for lab, p in REFS.get(slug, []):
             if p.startswith("docs/rnd/") and (SRC / p).exists():
@@ -822,14 +822,16 @@ def nav_yaml() -> str:
         if slug == "icplan" and (SRC / f"{AP}/tasks.md").exists():
             L.append(item(6, "Автоподхват: задачи ICPlan", f"{AP}/tasks.md"))
         rs = [p for _, p in REFS.get(slug, []) if p.startswith("docs/rnd/") and (SRC / p).exists() and p not in used]
+        if (SRC / f"docs/api/{slug}.md").exists():
+            L += ["    - API:", item(6, "API " + name, f"docs/api/{slug}.md")]
         if (SRC / f"docs/techspec/{slug}.md").exists():
             L += ["    - Техспека:", item(6, "Техспека " + name, f"docs/techspec/{slug}.md")]
         L += ["    - R&D:", item(6, "R&D " + name, f"rnd-by-component/{slug}/index.md")]
         L += [item(6, title_of(SRC / p, p).replace("R&D: ", ""), p) for p in rs]
-    L += ["  - Обзоры:", item(4, "Сквозной поток", "docs/flows/README.md"), item(4, "Типы данных и потоки", "docs/flows/data-types.md"), item(4, "Техспеки компонентов", "docs/techspec/README.md"), item(4, "Все User Stories", "docs/stories/README.md"), item(4, "Покрытие историй", "docs/stories/coverage.md"),
+    L += ["  - Обзоры:", item(4, "Сквозной поток", "docs/flows/README.md"), item(4, "Типы данных и потоки", "docs/flows/data-types.md"), item(4, "Техспеки компонентов", "docs/techspec/README.md"), item(4, "Каталог API", "docs/api/README.md"), item(4, "Все User Stories", "docs/stories/README.md"), item(4, "Покрытие историй", "docs/stories/coverage.md"),
           item(4, "Спеки по компонентам", "specs-by-component/index.md"), item(4, "Задачи по компонентам", "tasks-by-component/index.md"),
           item(4, "Roadmap MVP", "docs/ROADMAP.md"), item(4, "Сводная таблица задач", "docs/TASKS.md"), item(4, "Бэклог", "docs/BACKLOG.md"),
-          item(4, "R&D по компонентам", "rnd-by-component/index.md"), item(4, "Все R&D", "docs/rnd/README.md"), item(4, "Методология R&D", "docs/rnd/METHOD.md")]
+          item(4, "R&D по компонентам", "rnd-by-component/index.md"), item(4, "Все R&D", "docs/rnd/README.md")]
     left = [t for t in tasks.values() if t not in used]
     if left:
         L.append("    - Прочие задачи:")
@@ -850,7 +852,9 @@ def nav_yaml() -> str:
           item(6, "Критерии полноты спеки", "docs/rules/spec-criteria.md"), item(6, "Роли", "docs/rules/roles.md"),
           item(6, "Типы документов", "docs/rules/doc-types.md"), item(6, "Граф связности документов", "docs/rules/doc-graph.md"),
           item(6, "Процесс изменения", "docs/rules/change-process.md"), item(6, "Промпты", "docs/rules/prompts.md"),
-          item(6, "Методология SDD", "docs/rules/sdd-methodology.md"), item(6, "Методика User Stories", "docs/rules/us-methodology.md")]
+          item(6, "Методология SDD", "docs/rules/sdd-methodology.md"), item(6, "Методика User Stories", "docs/rules/us-methodology.md"),
+          item(6, "Методология R&D", "docs/rules/rnd-methodology.md"), item(6, "Виды спек и подтверждение", "docs/rules/spec-kinds.md"),
+          item(6, "Техническая спецификация", "docs/rules/tech-spec.md"), item(6, "Журнал отклонений", "docs/rules/deviations.md")]
     revs = sorted((SRC / "docs/reviews").glob("*.md")) if (SRC / "docs/reviews").exists() else []
     if revs:
         L.append("    - Ревью:")

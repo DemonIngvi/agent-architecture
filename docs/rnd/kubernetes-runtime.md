@@ -1,6 +1,6 @@
 # R&D: Kubernetes и развёртывание
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **Инфраструктура** · решение: [design D15](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **Инфраструктура** · решение: [design D15](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -67,4 +67,4 @@
 - [Helm](https://github.com/helm/helm)
 - [k3d](https://github.com/k3d-io/k3d)
 - [Argo CD](https://github.com/argoproj/argo-cd)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

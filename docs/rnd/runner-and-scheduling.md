@@ -1,6 +1,6 @@
 # R&D: Runner и очередь запусков
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **Agent Runner** · решение: [design D8, D14](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **Agent Runner** · решение: [design D8, D14](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -65,4 +65,4 @@
 - [Celery](https://github.com/celery/celery)
 - [Kubernetes ResourceQuota](https://kubernetes.io/docs/concepts/policy/resource-quotas/)
 - [Протокол раннера ICPlan](https://github.com/croffasia/itsaplan/blob/main/docs/runner.md)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

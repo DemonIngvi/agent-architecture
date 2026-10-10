@@ -1,6 +1,6 @@
 # R&D: Выбор таск-трекера
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **ICPlan**
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **ICPlan**
 
 ## Итог
 
@@ -75,4 +75,4 @@ Targetprocess проверен поиском 10.10.2026: открытой ли�
 - [Plane](https://github.com/makeplane/plane)
 - [GNU AGPL-3.0](https://www.gnu.org/licenses/agpl-3.0.html)
 - [IBM Targetprocess](https://www.apptio.com/products/targetprocess/)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)

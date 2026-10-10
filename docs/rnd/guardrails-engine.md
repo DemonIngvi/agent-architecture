@@ -1,6 +1,6 @@
 # R&D: Движок guardrails
 
-← [Все R&D](README.md) · [методология](METHOD.md) · компонент: **Guardrails** · решение: [design D6](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **Guardrails** · решение: [design D6](../../openspec/changes/define-agent-platform/design.md)
 
 ## Итог
 
@@ -62,4 +62,4 @@
 - [OPA](https://github.com/open-policy-agent/opa)
 - [Cedar](https://github.com/cedar-policy/cedar)
 - [CNCF: OPA](https://www.cncf.io/projects/open-policy-agent-opa/)
-- Методология: [METHOD.md](METHOD.md)
+- Методология: [методология R&D](../rules/rnd-methodology.md)
