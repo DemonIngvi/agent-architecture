@@ -137,8 +137,8 @@ Registry MUST отклонять сохранение определения а�
 - **THEN** определения не читаются — запуски не стартуют
 
 #### Scenario: Доступ вне своих хранилищ
-- **WHEN** код agent-registry обращается к таблицам вне S1, S2
-- **THEN** доступа нет: роль БД agent-registry ограничена S1, S2
+- **WHEN** код agent-registry обращается к таблицам вне S1
+- **THEN** доступа нет: роль БД agent-registry ограничена S1
 
 <a id="r-reg-08"></a>**ID:** `R-REG-08` · **Реализует задача:** [2.3](../../../../../docs/tasks/2.3-config-from-icplan.md), [4.4](../../../../../docs/tasks/4.4-platform-module.md)
 
