@@ -50,7 +50,7 @@
 | I5 | Agent Runner → OPA (G1) | HTTP REST `POST /v1/data/agent/g1` | JSON `PolicyInput` / `PolicyDecision` | внутренняя сеть (mTLS — позже) | синхронно | 200 мс | нет → `on_engine_error` | чтение |
 | I10 | Harness → OPA (G2) | HTTP REST `POST /v1/data/agent/g2` | JSON `PolicyInput` / `PolicyDecision` | внутренняя сеть | синхронно | 200 мс | нет → `on_engine_error` | чтение |
 | I16 | Platform module + git (Rego) → OPA | OPA bundles API, HTTP pull | tar.gz bundle | токен bundle-сервера | опрос 30 с | 10 с | встроенный в OPA | да |
-| I8 | Harness → LiteLLM | HTTP, OpenAI Chat Completions, SSE-стрим | JSON + `metadata.run_id` | Bearer virtual key (подставляет egress-прокси) | синхронно / стрим | 120 с | 2 раза с backoff | нет — повтор = новые затраты |
+| I8 | Harness → LiteLLM | HTTP, OpenAI Chat Completions, SSE-стрим | JSON + `metadata.run_id` | Bearer virtual key (подставляет egress-прокси) | синхронно / стрим | 120 с | 2 раза с backoff | да по результату: побочных действий нет; повтор стоит токенов и учитывается в бюджете |
 
 ## Нагрузка и развёртывание
 

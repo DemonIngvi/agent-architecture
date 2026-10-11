@@ -37,8 +37,8 @@
 
 | ID | От → к | Протокол | Формат | Аутентификация | Режим | Таймаут | Повтор | Идемпотентность |
 |---|---|---|---|---|---|---|---|---|
-| I8 | Harness → LiteLLM | HTTP, OpenAI Chat Completions, SSE-стрим | JSON + `metadata.run_id` | Bearer virtual key (подставляет egress-прокси) | синхронно / стрим | 120 с | 2 раза с backoff | нет — повтор = новые затраты |
-| I13 | LiteLLM → провайдеры / mock | HTTPS API провайдера; HTTP для mock | провайдерский JSON | ключ провайдера в LiteLLM (Secret) | синхронно / стрим | 120 с | + fallback-модель | нет |
+| I8 | Harness → LiteLLM | HTTP, OpenAI Chat Completions, SSE-стрим | JSON + `metadata.run_id` | Bearer virtual key (подставляет egress-прокси) | синхронно / стрим | 120 с | 2 раза с backoff | да по результату: побочных действий нет; повтор стоит токенов и учитывается в бюджете |
+| I13 | LiteLLM → провайдеры / mock | HTTPS API провайдера; HTTP для mock | провайдерский JSON | ключ провайдера в LiteLLM (Secret) | синхронно / стрим | 120 с | + fallback-модель | да по результату: побочных действий нет; повтор стоит токенов |
 | I14 | LiteLLM → БД `litellm` | протокол PostgreSQL | таблицы LiteLLM | пароль из Secret | синхронно | 5 с | встроенный | — |
 | I15 | Platform module → LiteLLM admin API | HTTP REST `/key/generate`, `/key/update` | JSON | master key (Secret) | синхронно | 5 с | 3 раза | да, по алиасу ключа |
 | I22 | Сервисы → PgBouncer → Postgres | протокол PostgreSQL | SQL | логин / пароль из Secret, роль на схему | синхронно | 5 с на запрос | 1 раз (только чтение) | — |
