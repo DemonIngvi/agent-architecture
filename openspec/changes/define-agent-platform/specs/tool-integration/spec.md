@@ -146,7 +146,7 @@
 Модуль SHALL хранить свои данные только в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`) (`interfaces.md`). Секреты MUST NOT храниться в БД и git.
 
 #### Scenario: Запись в своё хранилище
-- **WHEN** модуль сохраняет mCP-серверы проекта, тулы и навыки, ссылки на секреты
+- **WHEN** модуль сохраняет MCP-серверы проекта, тулы и навыки, ссылки на секреты
 - **THEN** запись попадает в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`)
 
 #### Scenario: S1 недоступно
