@@ -19,28 +19,6 @@
 
 ## Матрица интерфейсов
 
-| I-код | От → к | Типы данных |
-|---|---|---|
-| I1 | ICPlan → Agent Runner: выдача запуска | Т6, Т1 (задание) |
-| I2 | Agent Runner → ICPlan: шаги и итог | Т7, Т8 (итог), Т3 (ссылки на артефакты) |
-| I3 | ICPlan → Agent Runner: подтверждения, отмена, указания | Т6, Т1 (указания) |
-| I4 | Agent Runner → Platform module: настройки агента | Т4 |
-| I5 | Agent Runner → OPA (G1) | Т6, Т4 |
-| I6 | Agent Runner → Docker API | Т4 (профиль среды), Т6 |
-| I7 | Agent Runner ↔ Harness | Т6 (`RunBundle`), Т1, Т2, Т4, Т7, Т8 |
-| I8 | Harness → LiteLLM | Т1, Т2, Т8, Т7 (`metadata`), Т5 (virtual key) |
-| I9 | Harness → MCP-прокси Runner → MCP-серверы (D19) | Т6 (вызов), Т8 (вывод), Т3 |
-| I10 | Harness → OPA (G2); для MCP — Runner (D19) | Т6, Т4 |
-| I11 | Harness → Memory API | Т2 |
-| I12 | Harness → Agent Runner: checkpoint | Т2 (состояние цикла) |
-| I13 | LiteLLM → провайдеры / mock | Т1, Т2, Т8, Т5 (ключ провайдера) |
-| I14 | LiteLLM → БД `litellm` | Т7 (затраты), Т4 (ключи, бюджеты) |
-| I15 | Platform module → LiteLLM admin API | Т4, Т5 (virtual keys) |
-| I16 | Platform module + git → OPA: бандл | Т4 (правила, данные) |
-| I17 | Sandbox → egress-прокси → внешние хосты | Т3, Т5 (подстановка токена) |
-| I18 | Agent Runner → git-провайдер: токены | Т5 |
-| I19 | Agent Runner / ICPlan → объектное хранилище | Т3 |
-| I20 | ICPlan UI ↔ ICPlan API | Т1, Т3, Т4, Т7 |
-| I21 | Пользователи → Traefik → web / api / mcp | Т1, Т3, Т4 |
-| I22 | Сервисы → PgBouncer → Postgres | Т1–Т7 (хранение) |
-| I23 | Agent Runner → Kubernetes API | Т4 (манифесты), Т6 |
+Какие типы данных идут по каждому интерфейсу. Стороны, назначение и модели — из `html-view/datamodel.py` (INTEG), типы — INTEG_TYPES; таблица генерируется.
+
+<!-- iface-matrix -->

@@ -86,6 +86,7 @@
 | Новая задача | docs/tasks → ROADMAP (строка и итоги) → TASKS → tasks.md change (`python html-view/tasksmd.py`) → components.py (tids) |
 | Новый параметр конфигурации | rationale.py (config) → subcomponents.py (params) → спека (сценарий S9) → architecture.md при необходимости |
 | Новый блок на схеме компонента | components.py (BLOCKS) → subcomponents.py (SUB) |
+| Новая или изменённая модель, интеграция, имя | [проверка двумя читателями](dual-read.md): протокол в `docs/reviews/`; расхождения — исправить в источнике и повторить |
 | Новый тип данных или поле | `html-view/datamodel.py` (MODELS) → пример в `docs/api/README.md` (сборка сверяет поля) → flows (ссылкой, без копии полей) → спека (сценарии) |
 | Новый интерфейс, хранилище или таблица | `interfaces.md` спек-участников (I / S) → `html-view/datamodel.py` (INTEG, ALSO, PLATFORM_TABLES / STORES; таблицы ICPlan — из схемы форка) → API в `docs/api/` → сборка: карточки «Интеграции», «Модели данных», ER-диаграммы и [Модель данных](../../data-model.md) строятся сами, проверка `IG.check` |
 | Новый компонент | README → architecture.md → components.py (COMPONENTS, BLOCKS, ABOUT) → datamodel.py (INTEG, STORES) → rationale.py → flows → спека → R&D |

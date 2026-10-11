@@ -40,3 +40,24 @@
 
 - [ ] `helm install` на чистом сервере проходит
 - [ ] Восстановление БД из копии на тестовом узле
+
+## Пример конфигурации
+
+Как настройки лежат в развёртывании. Значения и границы параметров — в `interfaces.md` спеки (здесь новых не вводится); поля контрактов — в [Модели данных](../../data-model.md).
+
+Фрагмент `values-server.yaml`:
+
+```yaml
+ingress:
+  host: plan.example.com
+  tls: { acme: true }
+api:      { replicas: 2, resources: { requests: { cpu: 300m, memory: 512Mi }, limits: { cpu: "1", memory: 1Gi } } }
+litellm:  { replicas: 2, resources: { requests: { cpu: 300m, memory: 800Mi } } }
+opa:      { replicas: 2, resources: { requests: { cpu: 50m, memory: 128Mi } } }
+pgbouncer: { poolMode: transaction, defaultPoolSize: 30 }
+postgres:
+  backup: { target: s3://backup-offsite/itsaplan, schedule: "0 3 * * *" }
+objectStorage: { endpoint: http://rustfs.itsaplan-data:9000, bucket: planner-attachments }
+existingSecret: itsaplan-secrets
+networkPolicy: { enabled: true }
+```

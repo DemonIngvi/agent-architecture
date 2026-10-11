@@ -28,8 +28,8 @@
 | ③ | Runner забирает запуск | Runner → ICPlan | `Run` | HTTP, ключ агента |
 | ④ | Допуск и бюджет | Runner → OPA | `PolicyInput` G1 → `PolicyDecision` | HTTP |
 | ⑤ | Выдача sandbox и задания | Runner → Harness | `RunBundle` | HTTP / stdin |
-| ⑥ | Вызов модели | Harness → LiteLLM | `chat.completions` + `metadata.run_id` | OpenAI API |
-| ⑦ | Действия и память | Harness → MCP / Memory | `tools/call`, `M3Record` | MCP, HTTP |
+| ⑥ | Вызов модели | Harness → LiteLLM | `ChatCompletionRequest` (`metadata.run_id`) | OpenAI API |
+| ⑦ | Действия и память | Harness → MCP-прокси Runner → MCP / Memory | `McpToolCall`, `M3Record` | MCP, HTTP |
 | ⑧ | Шаги работы | Harness → Runner → ICPlan | `RunEvent` | поток событий |
 | ⑨ | Подтверждение | ICPlan → Runner → Harness | `ApprovalDecision` | HTTP |
 | ⑩ | Итог | Harness → Runner → ICPlan | `RunResult` | HTTP |

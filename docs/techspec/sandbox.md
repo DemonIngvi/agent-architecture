@@ -46,3 +46,18 @@ Squid: две подсети источника — `sbx-agent` (только с
 
 - [ ] Запрос к домену вне allowlist отклонён
 - [ ] Контейнер удалён после запуска
+
+## Пример конфигурации
+
+Как настройки лежат в развёртывании. Значения и границы параметров — в `interfaces.md` спеки (здесь новых не вводится); поля контрактов — в [Модели данных](../../data-model.md).
+
+Профиль sandbox:
+
+```yaml
+profile: light
+image: harness:0.3.1
+resources: { cpu: 1, memory_mb: 1024, disk_gb: 2 }
+network:
+  egress_allow: [litellm, api, memory, opa, github.com]
+pool: { size: 2 }
+```

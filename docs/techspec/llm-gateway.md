@@ -40,3 +40,28 @@
 
 - [ ] Вызов алиаса `team-default` → ответ mock
 - [ ] Затраты по `metadata.run_id` видны
+
+## Пример конфигурации
+
+Как настройки лежат в развёртывании. Значения и границы параметров — в `interfaces.md` спеки (здесь новых не вводится); поля контрактов — в [Модели данных](../../data-model.md).
+
+Конфиг алиасов (mock для разработки):
+
+```yaml
+model_list:
+  - model_name: team-default
+    litellm_params: { model: openai/mock, api_base: http://mock-llm:8000/v1 }
+  - model_name: team-default-fallback
+    litellm_params: { model: anthropic/claude-sonnet-5 }
+router_settings:
+  fallbacks: [{ team-default: [team-default-fallback] }]
+```
+
+Сценарий mock-LLM (задача [1.1](../tasks/1.1-mock-llm-litellm.md)):
+
+```yaml
+- match: "MKT-42"
+  steps:
+    - tool_call: { name: add_comment, arguments: { issue: MKT-42, body: "Готово" } }
+    - text: "Комментарий оставлен."
+```

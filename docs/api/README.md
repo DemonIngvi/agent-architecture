@@ -142,6 +142,27 @@ _OPA G1 / G2_
 { "result": { "allow": false, "approval": true, "reason": "push требует подтверждения" } }
 ```
 
+### AgentDefinition
+
+_определение агента для экспорта и импорта (`GET /platform/agents/:agentId/export`, `POST /platform/agents/import`)_
+
+```yaml
+apiVersion: agent/v1
+id: analyst
+version: 3
+model: team-default
+instructions: |
+  Ты аналитик. По задаче пишешь требования в формате SDD.
+skills: [sdd-writer]
+mcp:
+  - server: itsaplan-core
+    tools: [get_issue, add_comment, update_issue]
+limits: { max_steps: 30, timeout_s: 1800, max_tokens: 200000 }
+approval: { tools: [update_issue] }
+memory: { profile: default, read: [M2, M3, M6], write: [M3] }
+sandbox: { profile: light }
+```
+
 ### Heartbeat
 
 _ответ на продление аренды (доработка: сейчас форк отвечает 204 без тела) — отмена, подтверждения и указания (I3)_

@@ -37,6 +37,33 @@ INTEG = {
     "I23": ("agent-runner", "sandbox", "infrastructure", "среды запусков через Kubernetes API (этап 4)", ["SandboxClaim"]),
 }
 # Кто пользуется общими стыками I22 (БД) и I20 (API ICPlan), кроме владельцев
+# Типы данных (Т1–Т8, docs/flows/data-types.md) по интерфейсам
+INTEG_TYPES = {
+    "I1": "Т6, Т1 (задание)",
+    "I2": "Т7, Т8 (итог), Т3 (ссылки на артефакты)",
+    "I3": "Т6, Т1 (указания)",
+    "I4": "Т4",
+    "I5": "Т6, Т4",
+    "I6": "Т4 (профиль среды), Т6",
+    "I7": "Т6 (`RunBundle`), Т1, Т2, Т4, Т7, Т8",
+    "I8": "Т1, Т2, Т8, Т7 (`metadata`), Т5 (virtual key)",
+    "I9": "Т6 (вызов), Т8 (вывод), Т3",
+    "I10": "Т6, Т4",
+    "I11": "Т2",
+    "I12": "Т2 (состояние цикла)",
+    "I13": "Т1, Т2, Т8, Т5 (ключ провайдера)",
+    "I14": "Т7 (затраты), Т4 (ключи, бюджеты)",
+    "I15": "Т4, Т5 (virtual keys)",
+    "I16": "Т4 (правила, данные)",
+    "I17": "Т3, Т5 (подстановка токена)",
+    "I18": "Т5",
+    "I19": "Т3",
+    "I20": "Т1, Т3, Т4, Т7",
+    "I21": "Т1, Т3, Т4",
+    "I22": "Т1–Т7 (хранение)",
+    "I23": "Т4 (манифесты), Т6",
+}
+
 ALSO = {"I22": ["icplan", "platform-module", "agent-runner", "memory", "observability", "llm-gateway"],
         "I20": ["platform-module", "observability"], "I2": ["observability", "memory"], "I14": ["observability"],
         "I19": ["sandbox", "icplan"], "I17": ["sandbox", "mcp-tools"],
@@ -52,6 +79,13 @@ MODELS = {
         ("attempts", "int", True, "сколько раз запуск уже выдавался (аренда истекала)"),
         ("issueId", "int | null", True, "задача; `null` — запуск без задачи (расписание)"), ("issueIdentifier", "string | null", True, "читаемый ключ задачи, `MKT-42`"),
         ("rule", "{type, process, step}", False, "шаг процесса, создавший запуск (D17)")]),
+    "AgentDefinition": ("определение агента в YAML `agent/v1` — экспорт и импорт (R-REG-04, R-CP-05)", [
+        ("apiVersion", "const: agent/v1", True, "версия формата"), ("id", "string", True, "имя агента (`username` в ICPlan)"),
+        ("version", "int", True, "версия определения"), ("model", "string", True, "алиас LiteLLM"),
+        ("instructions", "string", True, "инструкция агента"), ("skills", "string[]", False, "навыки"),
+        ("mcp", "{server, tools[]}[]", False, "MCP-серверы и разрешённые тулы"),
+        ("limits", "{max_steps, timeout_s, max_tokens}", False, "параметры `limits.*`"), ("approval", "{tools[]}", False, "тулы с подтверждением"),
+        ("memory", "{profile, read[], write[]}", False, "профиль памяти"), ("sandbox", "{profile}", False, "профиль среды")]),
     "RunSummary": ("итог прошлого запуска для памяти M2 — строка `agent_run` форка", [
         ("runId", "int", True, "`agent_run.id`"), ("agentId", "int", True, ""), ("status", "string", True, "как в `agent_run.status`"),
         ("output", "string | null", False, "итог, обрезанный для контекста"), ("lastError", "string | null", False, ""),
@@ -159,6 +193,8 @@ NAMING = ("Имена полей: JSON наших контрактов — camel
 MODEL_META = {
     "Run": ("fork", "POST /agent-runs/claim", "response.run",
             "Это ответ форка любому внешнему раннеру: так ICPlan уже выдаёт запуски. `prompt` и `systemPrompt` разделены, потому что раннер передаёт первое как задание, второе — как системные правила. Мы добавляем только `rule` — какой шаг процесса создал запуск (D17): по нему Runner берёт критерии шага, а лента задачи — разделитель шага."),
+    "AgentDefinition": ("ours", "R-REG-04, R-CP-05, задача 1.2",
+                        "Файл для ревью и переноса агента между окружениями. Это конфигурация, поэтому имена — как у параметров конфигурации (`limits.max_steps`, `memory_profile.read`): YAML snake_case. Источник правды — БД ICPlan (`ai_agent`) и Platform module; файл — их снимок."),
     "RunSummary": ("ours", "R-MEM-03, R-MEM-05",
                    "M2 не хранится отдельно: это строки `agent_run` форка (статус, итог, ошибка, токены), которые платформа пишет сама. Поля и имена — как в API ICPlan (`GET /projects/:projectKey/analytics/agent-runs`: `agentId`, `lastError`)."),
     "Heartbeat": ("ours", "D17, R-ICP-16",

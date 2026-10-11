@@ -325,9 +325,9 @@ def check_docs() -> list:
                 issues.append(f"{itf.parent.name}: в FMEA нет отказа своего хранилища ({kind})")
         if "Почему так по умолчанию" not in t:  # таблица параметров
             issues.append(f"{itf.parent.name}: таблица параметров без обоснований и границ")
-    dt = (ROOT / "docs/flows/data-types.md").read_text(encoding="utf-8") if (ROOT / "docs/flows/data-types.md").exists() else ""
+    import datamodel as DM  # О-16, О-46: типы данных интерфейсов — datamodel.INTEG_TYPES
     codes = {c for itf in ROOT.glob("openspec/changes/*/specs/*/interfaces.md") for c in re.findall(r"^\| (I\d+) \|", itf.read_text(encoding="utf-8"), re.M)}
-    issues += [f"интерфейс {c} не отнесён к типам данных (docs/flows/data-types.md)" for c in sorted(codes) if f"| {c} |" not in dt]  # О-16
+    issues += [f"интерфейс {c} не отнесён к типам данных (datamodel.INTEG_TYPES)" for c in sorted(codes) if c not in DM.INTEG_TYPES]  # О-16
     ids = {s[0] for l in STORIES.values() for s in l}  # О-20: сквозная трассировка историй ICPlan
     issues += [f"история {s[0]} без цепочки сквозной трассировки" for s in STORIES.get("icplan", []) if s[0] not in CHAINS]
     issues += [f"цепочка {k}: нет истории {x}" for k, (ch, _) in CHAINS.items() for x in ch if x not in ids]
@@ -480,6 +480,8 @@ def copy_sources():
         txt = txt.replace("<!-- docgraph -->", graph_svg(docgraph.LAYERS, docgraph.EDGES))
         if rel.as_posix().startswith("docs/rnd/") or rel.as_posix() == "docs/rules/rnd-methodology.md":
             txt = rnd_highlight(txt)
+        if rel.as_posix().startswith("docs/flows/"):
+            txt = IG.flow_page(txt, rel.stem, IG.names(COMPONENTS))  # О-46: потоки — ссылками, без копий
         if rel.as_posix().startswith("docs/api/") and rel.name != "README.md":
             txt = IG.api_page_structure(txt)  # О-45: структура запросов и ответов из OpenAPI форка и datamodel
         dst.write_text(txt, encoding="utf-8")
@@ -1049,16 +1051,10 @@ def nav_yaml() -> str:
             L += ["    - Техспека:", item(6, "Техспека " + name, f"docs/techspec/{slug}.md")]
         L += ["    - R&D:", item(6, "R&D " + name, f"rnd-by-component/{slug}/index.md")]
         L += [item(6, title_of(SRC / p, p).replace("R&D: ", ""), p) for p in rs]
-    L += ["  - Обзоры:", item(4, "Сквозной поток", "docs/flows/README.md"), item(4, "Типы данных и потоки", "docs/flows/data-types.md"), item(4, "Техспеки компонентов", "docs/techspec/README.md"), item(4, "Каталог API", "docs/api/README.md"), item(4, "Все User Stories", "docs/stories/README.md"), item(4, "Покрытие историй", "docs/stories/coverage.md"),
-          item(4, "Спеки по компонентам", "specs-by-component/index.md"), item(4, "Задачи по компонентам", "tasks-by-component/index.md"),
-          item(4, "Roadmap MVP", "docs/ROADMAP.md"), item(4, "Сводная таблица задач", "docs/TASKS.md"), item(4, "Бэклог", "docs/BACKLOG.md"),
-          item(4, "R&D по компонентам", "rnd-by-component/index.md"), item(4, "Все R&D", "docs/rnd/README.md"), item(4, "Последствия R&D", "rnd-consequences.md")]
-    left = [t for t in tasks.values() if t not in used]
-    if left:
-        L.append("    - Прочие задачи:")
-        L += [item(6, title_of(SRC / x, x), x) for x in left]
-    rleft = [f"docs/rnd/{f.name}" for f in sorted((SRC / "docs/rnd").glob("*.md")) if f"docs/rnd/{f.name}" not in used]
-    L += [item(4, title_of(SRC / x, x).replace("R&D: ", ""), x) for x in rleft]
+    # Разделы сайта (doc-types.md#tabs): архитектура → требования → R&D → план → справка
+    L += ["  - Архитектура:", item(4, "Компоненты (таблица)", "overview.md"), item(4, "Схемы C1 / C2", "architecture.md"),
+          item(4, "Сквозной поток", "docs/flows/README.md"), item(4, "Типы данных и интерфейсы", "docs/flows/data-types.md"),
+          item(4, "Модель данных", "data-model.md"), item(4, "Каталог API", "docs/api/README.md"), item(4, "Техспеки компонентов", "docs/techspec/README.md")]
     L.append("    - Решения (OpenSpec):")
     for ch in sorted(p for p in (SRC / "openspec/changes").iterdir() if p.is_dir() and p.name != "archive"):
         rest = [f"openspec/changes/{ch.name}/{n}" for n in ("proposal.md", "design.md", "tasks.md")]
@@ -1067,15 +1063,29 @@ def nav_yaml() -> str:
         if rest:
             L.append(f"      - {q(ch.name)}:")
             L += [item(8, title_of(SRC / x, Path(x).parent.name), x) for x in rest]
-    L += ["  - Справка:", item(4, "Компоненты (таблица)", "overview.md"), item(4, "Как читать", "docs/HOW-TO-READ.md"),
-          item(4, "Схемы C1 / C2 (текст)", "architecture.md"), item(4, "Модель данных", "data-model.md"), item(4, "План документации", "docs/PLAN.md"), item(4, "Формат схем", "FORMAT.md"),
+    L += ["  - Требования:", item(4, "Все User Stories", "docs/stories/README.md"), item(4, "Покрытие историй", "docs/stories/coverage.md"),
+          item(4, "Спеки по компонентам", "specs-by-component/index.md")]
+    if (SRC / "docs/stories/personas.md").exists() and "docs/stories/personas.md" not in used:
+        L.append(item(4, "Персоны", "docs/stories/personas.md"))
+    L += ["  - R&D:", item(4, "Все R&D", "docs/rnd/README.md"), item(4, "R&D по компонентам", "rnd-by-component/index.md"), item(4, "Последствия R&D", "rnd-consequences.md")]
+    rleft = [f"docs/rnd/{f.name}" for f in sorted((SRC / "docs/rnd").glob("*.md")) if f"docs/rnd/{f.name}" not in used]
+    if rleft:
+        L.append("    - Сквозные исследования:")
+        L += [item(6, title_of(SRC / x, x).replace("R&D: ", ""), x) for x in rleft]
+    L += ["  - План и задачи:", item(4, "Roadmap MVP", "docs/ROADMAP.md"), item(4, "Сводная таблица задач", "docs/TASKS.md"),
+          item(4, "Задачи по компонентам", "tasks-by-component/index.md"), item(4, "Бэклог", "docs/BACKLOG.md"), item(4, "План документации", "docs/PLAN.md")]
+    left = [x for x in tasks.values() if x not in used]
+    if left:
+        L.append("    - Сквозные задачи:")
+        L += [item(6, title_of(SRC / x, x), x) for x in left]
+    L += ["  - Справка:", item(4, "Как читать", "docs/HOW-TO-READ.md"), item(4, "Формат схем", "FORMAT.md"),
           "    - Правила документации:", item(6, "Правила документации", "docs/rules/README.md"),
-          item(6, "Критерии полноты спеки", "docs/rules/spec-criteria.md"), item(6, "Роли", "docs/rules/roles.md"),
-          item(6, "Типы документов", "docs/rules/doc-types.md"), item(6, "Граф связности документов", "docs/rules/doc-graph.md"),
-          item(6, "Процесс изменения", "docs/rules/change-process.md"), item(6, "Промпты", "docs/rules/prompts.md"),
+          item(6, "Типы документов и вкладки", "docs/rules/doc-types.md"), item(6, "Процесс изменения", "docs/rules/change-process.md"),
+          item(6, "Граф связности документов", "docs/rules/doc-graph.md"), item(6, "Роли", "docs/rules/roles.md"), item(6, "Промпты", "docs/rules/prompts.md"),
+          item(6, "Критерии полноты спеки", "docs/rules/spec-criteria.md"), item(6, "Виды спек и подтверждение", "docs/rules/spec-kinds.md"),
           item(6, "Методология SDD", "docs/rules/sdd-methodology.md"), item(6, "Методика User Stories", "docs/rules/us-methodology.md"),
-          item(6, "Методология R&D", "docs/rules/rnd-methodology.md"), item(6, "Виды спек и подтверждение", "docs/rules/spec-kinds.md"),
-          item(6, "Техническая спецификация", "docs/rules/tech-spec.md"), item(6, "Журнал отклонений", "docs/rules/deviations.md")]
+          item(6, "Методология R&D", "docs/rules/rnd-methodology.md"), item(6, "Техническая спецификация", "docs/rules/tech-spec.md"),
+          item(6, "Проверка двумя читателями", "docs/rules/dual-read.md"), item(6, "Журнал отклонений", "docs/rules/deviations.md")]
     revs = sorted((SRC / "docs/reviews").glob("*.md")) if (SRC / "docs/reviews").exists() else []
     if revs:
         L.append("    - Ревью:")

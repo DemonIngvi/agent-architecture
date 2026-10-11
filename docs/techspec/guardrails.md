@@ -38,3 +38,27 @@
 
 - [ ] Запрещённый тул → deny
 - [ ] Без бандла → deny (`on_engine_error`)
+
+## Пример конфигурации
+
+Как настройки лежат в развёртывании. Значения и границы параметров — в `interfaces.md` спеки (здесь новых не вводится); поля контрактов — в [Модели данных](../../data-model.md).
+
+Правило (Rego, в git):
+
+```rego
+package agent.g2
+default allow := false
+allow if input.tool in data.agents[input.agent].tools_allow
+confirm if input.tool in data.agents[input.agent].approval
+```
+
+Конфиг деплоя:
+
+```yaml
+guardrails:
+  engine: opa
+  g1: { enabled: true,  on_engine_error: deny }
+  g2: { enabled: true,  on_engine_error: deny, approval: true }
+  g3: { enabled: true }
+  g4: { enabled: false }
+```

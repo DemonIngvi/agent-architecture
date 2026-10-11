@@ -43,10 +43,4 @@ queued ─▶ starting ─▶ running ─▶ succeeded
 
 ## Данные
 
-`RunBundle` — всё, что нужно Harness для запуска:
-
-Поля — [`RunBundle`](../../data-model.md#model-runbundle); пример — [каталог API](../api/README.md#runbundle). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
-
-`PolicyInput` для G1:
-
-Поля — [`PolicyInput`](../../data-model.md#model-policyinput) · [`PolicyDecision`](../../data-model.md#model-policydecision); пример — [каталог API](../api/README.md#policyinput-policydecision). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
+<!-- flow-data -->

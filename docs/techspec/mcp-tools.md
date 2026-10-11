@@ -36,3 +36,18 @@
 ## Проверка после развёртывания
 
 - [ ] `tools/list` возвращает разрешённые тулы
+
+## Пример конфигурации
+
+Как настройки лежат в развёртывании. Значения и границы параметров — в `interfaces.md` спеки (здесь новых не вводится); поля контрактов — в [Модели данных](../../data-model.md).
+
+Подключение MCP-сервера к агенту:
+
+```yaml
+mcp:
+  - server: itsaplan-core
+    url: http://api:3000/mcp      # агент ходит через http://agent-runner:8080/runs/<id>/mcp/itsaplan-core (D19)
+    auth: { secret_ref: agent-key/analyst }   # ключ не попадает в контекст агента
+    tools: [get_issue, add_comment, update_issue]
+    timeout_s: 30
+```

@@ -110,18 +110,8 @@
 
 Что **не** показывается в ленте: промпты, полный вывод тулов без раскрытия, события `CUSTOM` `llm_call` — они у администратора в Observability.
 
-## Данные
-
-`Run` — запуск в очереди (протокол `@itsaplan/runner`, реализация — задача [2.1](../tasks/2.1-runner-external.md)):
-
-Поля — [`Run`](../../data-model.md#model-run); пример — [каталог API](../api/README.md#run). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
-
-Процесс типа задачи (доработки [3.1](../tasks/3.1-icplan-autodelegate-status.md), [3.6](../tasks/3.6-icplan-process-engine.md)):
-
-Поля — [`Process`](../../data-model.md#model-process) · [`ProcessStep`](../../data-model.md#model-processstep); пример — [каталог API](../api/README.md#process). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
-
 У «Исследования» последний шаг — `"onSuccess": { "process": "Фича" }`: тип задачи меняется, задача встаёт на первый шаг «Фичи».
 
-`ApprovalDecision` — ответ пользователя на паузу агента:
+## Данные
 
-Поля — [`ApprovalDecision`](../../data-model.md#model-approvaldecision); пример — [каталог API](../api/README.md#approvaldecision). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
+<!-- flow-data -->

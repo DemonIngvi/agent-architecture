@@ -84,7 +84,7 @@ def io_lists(slug, nm):
 
 def integrations_md(slug, page, nm, href) -> list:
     rows, api = iface_rows(), api_rows()
-    L = ["## Интеграции", "", "Все стыки компонента: с кем, через что и по какому контракту. Протокол, аутентификация и таймауты — из `interfaces.md` спек, эндпоинты — из [каталога API](../../docs/api/README.md).", "",
+    L = ["## Интеграции {#integrations}", "", "Все стыки компонента: с кем, через что и по какому контракту. Протокол, аутентификация и таймауты — из `interfaces.md` спек, эндпоинты — из [каталога API](../../docs/api/README.md).", "",
          '<div class="integ">']
     for i, a, b, via, what, models in sorted(involved(slug), key=lambda x: int(x[0][1:])):
         r = rows.get(i, {})
@@ -131,7 +131,7 @@ def models_md(slug) -> list:
     ms = models_of(slug)
     if not ms:
         return []
-    L = ["## Контракты данных", "", "Структуры, которыми компонент обменивается с соседями: поля, откуда взяты, почему такие, пример. "
+    L = ["## Контракты данных {#contracts}", "", "Структуры, которыми компонент обменивается с соседями: поля, откуда взяты, почему такие, пример. "
          "Правило имён — [на странице «Модель данных»](../../data-model.md#naming).", ""]
     for m in ms:
         L += model_block(m)
@@ -446,7 +446,7 @@ def _pk_of(table):
 def stores_md(slug, page, href) -> list:
     tables = er_tables(slug)
     stores = DM.STORES.get(slug, [])
-    L = ["## Хранилища и модель данных", "",
+    L = ["## Хранилища и модель данных {#stores}", "",
          f"Хранилища компонента: {', '.join(stores) or '—'} ([все хранилища и общая модель](../../data-model.md)). На диаграмме — ключи и основные поля; все поля — в таблицах ниже.", ""]
     if tables:
         L += mermaid_er(tables) + [""]
@@ -582,12 +582,60 @@ def api_examples_check() -> list:
     return issues
 
 
+FLOW_NON_MODELS = {"AgentChatPanel"}  # имена в потоках, которые не модели (компоненты UI)
+
+
+def _link_models(text, base):
+    """`Модель` вне блоков кода → ссылка на её поля."""
+    parts = re.split(r"(```.*?```)", text, flags=re.S)
+    for k in range(0, len(parts), 2):
+        parts[k] = re.sub(r"(?<!\[)`([A-Z][A-Za-z0-9]+)`(?!\])",
+                          lambda m: f"[`{m.group(1)}`]({base}data-model.md#model-{m.group(1).lower()})" if m.group(1) in DM.MODELS else m.group(0), parts[k])
+    return "".join(parts)
+
+
+def flow_page(text, slug, nm) -> str:
+    """Страница потоков: модели — ссылками; раздел «Данные» — ссылки на контракты, хранилища и API, без копий (О-46)."""
+    used = [m for m in DM.MODELS if re.search(rf"`{m}`", text)]
+    data = ["Поля, источник и пример каждой структуры — по ссылке; здесь они не повторяются ([правило](../rules/doc-types.md#tabs)).", ""]
+    if used:
+        data += ["**Структуры в этих потоках:** " + " · ".join(f"[`{m}`](../../data-model.md#model-{m.lower()})" for m in used), ""]
+    if slug in nm:
+        data += [f"**Компонент {nm[slug]}:** [контракты данных](../../components/{slug}/index.md#contracts) · [хранилища](../../components/{slug}/index.md#stores) · "
+                 f"[интеграции](../../components/{slug}/index.md#integrations)" + (f" · [API](../api/{slug}.md)" if (ROOT / f"docs/api/{slug}.md").exists() else "")
+                 + (f" · [техспека и пример конфигурации](../techspec/{slug}.md)" if (ROOT / f"docs/techspec/{slug}.md").exists() else ""), ""]
+    text = text.replace("<!-- flow-data -->", "\n".join(data))
+    if "<!-- iface-matrix -->" in text:
+        rows = ["| I-код | От → к | Что | Модели | Типы данных |", "|---|---|---|---|---|"]
+        for i in sorted(DM.INTEG, key=lambda x: int(x[1:])):
+            a, b, via, what, models = DM.INTEG[i]
+            path = _who(a, nm) + (f" → {_who(via, nm)}" if via else "") + f" → {_who(b, nm)}"
+            rows.append(f"| {i} | {path} | {what} | {', '.join(f'`{m}`' for m in models) or '—'} | {DM.INTEG_TYPES.get(i, '—')} |")
+        text = text.replace("<!-- iface-matrix -->", "\n".join(rows))
+    return _link_models(text, "../../")
+
+
+def flows_check() -> list:
+    """Потоки: нет рукописных копий полей и конфигов; имена моделей существуют (О-46)."""
+    issues = []
+    for f in sorted((ROOT / "docs/flows").glob("*.md")):
+        t = f.read_text(encoding="utf-8")
+        if re.search(r"^```(yaml|json|rego)", t, re.M) and f.name != "harness.md":
+            issues.append(f"docs/flows/{f.name}: блок конфигурации или JSON — место в техспеке или каталоге API")
+        body = re.sub(r"```.*?```", "", t, flags=re.S)
+        for n in sorted(set(re.findall(r"`([A-Z][a-z]+[A-Z][A-Za-z]*)`", body)) - set(DM.MODELS) - FLOW_NON_MODELS):
+            issues.append(f"docs/flows/{f.name}: `{n}` — нет такой модели в datamodel.MODELS")
+        if f.name not in ("README.md", "data-types.md") and "<!-- flow-data -->" not in t:
+            issues.append(f"docs/flows/{f.name}: раздел «Данные» должен быть меткой <!-- flow-data --> (генерируется)")
+    return issues
+
+
 def check(components) -> list:
     """Сверка: каждый I-код матрицы описан в INTEG; модели из INTEG описаны; I-коды есть в interfaces.md."""
     issues = []
-    dt = (ROOT / "docs/flows/data-types.md").read_text(encoding="utf-8")
-    codes = set(re.findall(r"^\| (I\d+) \|", dt, re.M))
-    issues += [f"интеграция {c} есть в матрице, но не в datamodel.INTEG" for c in sorted(codes - set(DM.INTEG))]
+    issues += [f"{i}: нет типов данных в datamodel.INTEG_TYPES" for i in DM.INTEG if i not in DM.INTEG_TYPES]
+    issues += [f"{i}: типы данных для неизвестного интерфейса" for i in DM.INTEG_TYPES if i not in DM.INTEG]
+    issues += flows_check()
     issues += [f"{i}: модель {m} не описана в datamodel.MODELS" for i, v in DM.INTEG.items() for m in v[4] if m not in DM.MODELS]
     rows = iface_rows()
     issues += [f"{i}: нет строки в «Интерфейсы обмена» спек" for i in DM.INTEG if i not in rows]

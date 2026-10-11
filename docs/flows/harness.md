@@ -64,17 +64,19 @@ RunBundle ─▶ Bootstrap ─▶ Context Manager ─▶ LLM client ──▶ о
 
 ### Параметры запроса
 
-| Поле запроса (OpenAI-совместимое) | Параметр платформы | Уровень | Хранилище |
-|---|---|---|---|
-| `model` | `agent.model` (алиас) | L2 | S1 |
-| `temperature`, `top_p` | `model.temperature`, `model.top_p` | L2 | S1 |
-| `max_tokens` | `model.max_output_tokens` (не больше остатка `limits.max_tokens`) | L2 | S1 |
-| `reasoning_effort` / `thinking.budget_tokens` | `model.reasoning_effort`, `model.reasoning_budget_tokens` | L2 | S1 |
-| `tools`, `tool_choice`, `parallel_tool_calls` | набор тулов агента, `model.tool_choice`, `model.parallel_tool_calls` | L2 | S1 |
-| `response_format` | `model.response_format` | L2 | S1 |
-| `stream`, `timeout` | всегда `true`; `request.timeout_s` | L0 | S9 |
-| `metadata` | `run_id`, `issue`, `agent`, `project` — для учёта затрат | L3 | `Run` |
-| ключ (`Authorization`) | virtual key агента | L1 | S6 (LiteLLM), выдаёт Platform module |
+Откуда Harness берёт каждое поле запроса. Уровни, значения и границы параметров — в [interfaces.md спеки Harness](../../openspec/changes/define-agent-platform/specs/agent-harness/interfaces.md), поля запроса — в модели [`ChatCompletionRequest`](../../data-model.md#model-chatcompletionrequest).
+
+| Поле запроса (OpenAI-совместимое) | Откуда берётся |
+|---|---|
+| `model` | `agent.model` (алиас) |
+| `temperature`, `top_p` | `model.temperature`, `model.top_p` |
+| `max_tokens` | `model.max_output_tokens` (не больше остатка `limits.max_tokens`) |
+| `reasoning_effort` / `thinking.budget_tokens` | `model.reasoning_effort`, `model.reasoning_budget_tokens` |
+| `tools`, `tool_choice`, `parallel_tool_calls` | набор тулов агента, `model.tool_choice`, `model.parallel_tool_calls` |
+| `response_format` | `model.response_format` |
+| `stream`, `timeout` | всегда `true`; `request.timeout_s` |
+| `metadata` | `run_id`, `issue_key`, `agent` — атрибуция затрат (R-LLM-03) |
+| ключ (`Authorization`) | virtual key агента |
 
 Неподдерживаемые моделью параметры LiteLLM отбрасывает (`drop_params: true`); токены размышлений входят в бюджет запуска; текст размышлений не пишется в события, кроме `events.level: всё`.
 
@@ -97,14 +99,4 @@ RunBundle ─▶ Bootstrap ─▶ Context Manager ─▶ LLM client ──▶ о
 
 ## Данные
 
-`RunEvent` — один шаг:
-
-Поля — [`RunEvent`](../../data-model.md#model-runevent); пример — [каталог API](../api/README.md#runevent). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
-
-Типы событий — протокол AG-UI (D21): `RUN_*`, `STEP_*`, `TEXT_MESSAGE_*` (реплика агента перед действием), `REASONING_*` (рассуждения модели из `reasoning_content`, если есть), `TOOL_CALL_*`, `ACTIVITY_SNAPSHOT` (план); события платформы — `CUSTOM`: `question`, `approval_request`, `guardrail_decision`, `memory_write`, `llm_call`. Поля — [`RunEvent`](../../data-model.md#model-runevent), [`AgUiEvent`](../../data-model.md#model-aguievent); что видит пользователь — [чат запуска](icplan.md#agent-feed).
-
-`RunResult`:
-
-Поля — [`RunResult`](../../data-model.md#model-runresult); пример — [каталог API](../api/README.md#runresult). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
-
-Статусы: `succeeded`, `failed`, `limit`, `canceled`.
+<!-- flow-data -->

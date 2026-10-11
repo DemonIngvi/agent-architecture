@@ -17,26 +17,4 @@
 
 ## Данные
 
-`PolicyInput` для G2 и ответ OPA:
-
-Поля — [`PolicyInput`](../../data-model.md#model-policyinput) · [`PolicyDecision`](../../data-model.md#model-policydecision); пример — [каталог API](../api/README.md#policyinput-policydecision). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
-
-Правило (Rego, в git):
-
-```rego
-package agent.g2
-default allow := false
-allow if input.tool in data.agents[input.agent].tools_allow
-confirm if input.tool in data.agents[input.agent].approval
-```
-
-Конфиг деплоя:
-
-```yaml
-guardrails:
-  engine: opa
-  g1: { enabled: true,  on_engine_error: deny }
-  g2: { enabled: true,  on_engine_error: deny, approval: true }
-  g3: { enabled: true }
-  g4: { enabled: false }
-```
+<!-- flow-data -->

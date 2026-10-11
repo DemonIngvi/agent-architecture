@@ -19,21 +19,4 @@
 
 ## Данные
 
-`SandboxClaim`:
-
-Поля — [`SandboxClaim`](../../data-model.md#model-sandboxclaim); пример — [каталог API](../api/README.md#sandboxclaim). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
-
-`RepoGrant` — доступ к репозиторию на один запуск:
-
-Поля — [`RepoGrant`](../../data-model.md#model-repogrant); пример — [каталог API](../api/README.md#repogrant). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
-
-Профиль sandbox:
-
-```yaml
-profile: light
-image: harness:0.3.1
-resources: { cpu: 1, memory_mb: 1024, disk_mb: 2048 }
-network:
-  egress_allow: [litellm, api, memory, opa, github.com]
-pool: { size: 2 }
-```
+<!-- flow-data -->

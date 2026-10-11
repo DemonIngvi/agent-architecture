@@ -16,17 +16,4 @@
 
 ## Данные
 
-`tools/call` (MCP):
-
-Поля — [`McpToolCall`](../../data-model.md#model-mcptoolcall); пример — [каталог API](../api/README.md#mcptoolcall). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
-
-Подключение MCP-сервера к агенту:
-
-```yaml
-mcp:
-  - server: itsaplan-core
-    url: http://api:3000/mcp      # агент ходит через http://agent-runner:8080/runs/<id>/mcp/itsaplan-core (D19)
-    auth: { secret_ref: agent-key/analyst }   # ключ не попадает в контекст агента
-    tools: [get_issue, add_comment, update_issue]
-    timeout_s: 30
-```
+<!-- flow-data -->
