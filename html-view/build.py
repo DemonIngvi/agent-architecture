@@ -1139,7 +1139,7 @@ def nav_yaml() -> str:
     if revs0:
         L.append("    - Ревью:")
         L += [item(6, title_of(f, f.stem), f"docs/reviews/{f.name}") for f in revs0]
-    L += ["  - Справка:", item(4, "Правила документации", "docs/rules/README.md"), item(4, "Формат схем", "FORMAT.md"),
+    L += ["  - Справка:", item(4, "Правила документации", "docs/rules/README.md"), item(4, "Путь изменения документа", "docs/rules/agent-workflow.md"), item(4, "Формат схем", "FORMAT.md"),
           item(4, "Персоны", "docs/stories/personas.md"),
           "    - Методологии:",
           item(6, "Методология архитектуры", "docs/rules/architecture-methodology.md"), item(6, "Методология данных и интеграций", "docs/rules/data-methodology.md"),
