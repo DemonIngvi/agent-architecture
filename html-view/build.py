@@ -1080,7 +1080,7 @@ def nav_yaml() -> str:
         L += [item(6, title_of(SRC / x, x), x) for x in left]
     L += ["  - Справка:", item(4, "Как читать", "docs/HOW-TO-READ.md"), item(4, "Формат схем", "FORMAT.md"),
           "    - Правила документации:", item(6, "Правила документации", "docs/rules/README.md"),
-          item(6, "Типы документов и вкладки", "docs/rules/doc-types.md"), item(6, "Процесс изменения", "docs/rules/change-process.md"),
+          item(6, "Типы документов и вкладки", "docs/rules/doc-types.md"), item(6, "Работа с документами", "docs/rules/doc-work.md"), item(6, "Процесс изменения", "docs/rules/change-process.md"),
           item(6, "Граф связности документов", "docs/rules/doc-graph.md"), item(6, "Роли", "docs/rules/roles.md"), item(6, "Промпты", "docs/rules/prompts.md"),
           item(6, "Критерии полноты спеки", "docs/rules/spec-criteria.md"), item(6, "Виды спек и подтверждение", "docs/rules/spec-kinds.md"),
           item(6, "Методология SDD", "docs/rules/sdd-methodology.md"), item(6, "Методика User Stories", "docs/rules/us-methodology.md"),

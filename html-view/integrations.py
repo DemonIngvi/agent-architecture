@@ -684,6 +684,13 @@ def check(components) -> list:
     issues += policy_check()
     issues += fork_models_check()
     issues += api_structure_check()
+    # architecture.md — карта и решения, без значений параметров и конфигов (О-49, doc-work.md#architecture)
+    arch = (ROOT / "architecture.md").read_text(encoding="utf-8")
+    if re.search(r"^```(yaml|json)", arch, re.M):
+        issues.append("architecture.md: блок конфигурации — место в техспеке или interfaces.md")
+    for h in re.findall(r"^\| ([^|\n]+) \|.*$", arch, re.M):
+        if re.search(r"Порог|По умолчанию|Значение|Переменная", h):
+            issues.append(f"architecture.md: таблица значений «{h.strip()}» — значения живут в interfaces.md спек")
     issues += param_mirror_check()
     # схема ICPlan не отстала от форка (О-44): коммит app.ts в форке = коммит импорта
     meta = json.loads((HERE / "icplan_schema.meta.json").read_text(encoding="utf-8"))
