@@ -18,7 +18,7 @@
 | Node.js | ICPlan web (SSR) | 24 (образ `node:24-alpine`) | MIT | [nodejs/node](https://github.com/nodejs/node) | образ `node` | Adopt | [техспека ICPlan](techspec/icplan.md) |
 | FastAPI | Memory API, mock-LLM | 0.11x | MIT | [fastapi/fastapi](https://github.com/fastapi/fastapi) | PyPI `fastapi` | Adopt | [техспека Memory](techspec/memory.md) |
 | uv | Сборка Python-образов (`uv.lock`) | 0.x | Apache-2.0 / MIT | [astral-sh/uv](https://github.com/astral-sh/uv) | PyPI `uv` / образ `ghcr.io/astral-sh/uv` | Adopt | [техспека Harness](techspec/harness.md) |
-| LangGraph | Harness: агентский цикл |  1.2.14 (закреплена, D18) | MIT | [langchain-ai/langgraph](https://github.com/langchain-ai/langgraph) | PyPI `langgraph` | Adopt | [фреймворк](rnd/harness-framework.md) |
+| LangGraph | Harness: агентский цикл |  1.2.14 (закреплена, D18) | MIT | [langchain-ai/langgraph](https://github.com/langchain-ai/langgraph) | PyPI `langgraph` | Trial → Adopt после прототипа AG1–AG5 (задача 1.3.9) | [фреймворк](rnd/harness-framework.md) |
 | LangChain MCP (`langchain.mcp`) | Tool Executor: MCP-тулы в LangGraph |  langchain 1.4.4, extra `mcp` (fastmcp ≥ 4.0.11) | MIT | [langchain-ai/langchain](https://github.com/langchain-ai/langchain/tree/master/libs/langchain_v1/langchain/mcp) | PyPI `langchain[mcp]` | Trial | [MCP](rnd/mcp-vs-direct.md) |
 | MCP Python SDK | протокол MCP (зависимость `langchain[mcp]`) | v2.3.0 | MIT | [modelcontextprotocol/python-sdk](https://github.com/modelcontextprotocol/python-sdk) | PyPI `mcp` | Adopt (косвенно) | [MCP](rnd/mcp-vs-direct.md) |
 | langchain-mcp-adapters | адаптер MCP → LangChain | 0.3.2 | MIT | [langchain-ai/langchain-mcp-adapters](https://github.com/langchain-ai/langchain-mcp-adapters) | — | **Hold — архивирован**: перенесён в `langchain[mcp]` ([гайд миграции](https://docs.langchain.com/oss/python/migrate/langchain-mcp-adapters)) | — |
@@ -31,7 +31,12 @@
 
 | Технология | Назначение / компонент | Версия | Лицензия | Репозиторий | Откуда качать | Статус | R&D |
 |---|---|---|---|---|---|---|---|
+| Bifrost | запасной LLM gateway на Go (ключи, бюджеты с периодом) | — | Apache-2.0 | [maximhq/bifrost](https://github.com/maximhq/bifrost) | GitHub Releases | Assess (пилот, если LiteLLM не пройдёт порог 4.8.4) | [шлюз](rnd/llm-gateway.md) |
+| TensorZero | LLM gateway с A/B-вариантами | 2026.6.0 | Apache-2.0 | [tensorzero/tensorzero](https://github.com/tensorzero/tensorzero) | — | **Hold — репозиторий архивирован 11.06.2026** | [шлюз](rnd/llm-gateway.md) |
 | PostgreSQL | СУБД: ICPlan, платформа, LiteLLM, checkpoint | 17 | PostgreSQL License | [postgres/postgres](https://github.com/postgres/postgres) (зеркало) | `pgvector/pgvector:pg17` (сейчас); `ghcr.io/cloudnative-pg/postgresql:17` (CNPG) | Adopt | [СУБД](rnd/data-stores.md) |
+| Mem0 | кандидат движка M4: извлечение фактов, разрешение противоречий | ts-v3.3.1 | Apache-2.0 | [mem0ai/mem0](https://github.com/mem0ai/mem0) | PyPI `mem0ai` | Assess (M4 после MVP) | [память](rnd/memory-model.md) |
+| LangMem | кандидат движка M4: память для LangGraph поверх Postgres store | — | MIT | [langchain-ai/langmem](https://github.com/langchain-ai/langmem) | PyPI `langmem` | Assess (M4 после MVP) | [память](rnd/memory-model.md) |
+| Graphiti (Zep) | временной граф знаний: срок действия факта | v0.30.2 | Apache-2.0 | [getzep/graphiti](https://github.com/getzep/graphiti) | PyPI `graphiti-core` | Assess (нужна графовая БД — берём только идею срока действия) | [память](rnd/memory-model.md) |
 | pgvector | векторы для M4 | — | PostgreSQL License | [pgvector/pgvector](https://github.com/pgvector/pgvector) | в образе `pgvector/pgvector:pg17` | Assess | [RAG](rnd/rag.md) |
 | CloudNativePG | оператор Postgres: бэкап, пулер | v1.30.1 | Apache-2.0 | [cloudnative-pg/cloudnative-pg](https://github.com/cloudnative-pg/cloudnative-pg) | Helm `cloudnative-pg.github.io/charts` | Trial (4.7) | [СУБД](rnd/data-stores.md) |
 | PgBouncer | пул соединений Postgres | 1.26.0 | ISC | [pgbouncer/pgbouncer](https://github.com/pgbouncer/pgbouncer) | в составе Pooler CloudNativePG | Adopt | [балансировка](rnd/ingress-and-balancing.md) |
@@ -49,7 +54,10 @@
 | Traefik | ingress, TLS | v3.7 (в составе k3s) | MIT | [traefik/traefik](https://github.com/traefik/traefik) | в составе k3s | Adopt | [ingress](rnd/ingress-and-balancing.md) |
 | ingress-nginx | ingress | controller-v1.15.1 | Apache-2.0 | [kubernetes/ingress-nginx](https://github.com/kubernetes/ingress-nginx) | — | **Hold — архивирован** | [ingress](rnd/ingress-and-balancing.md) |
 | Docker Engine (Moby) | контейнеры, sandbox (этапы 1–3) | 29.x | Apache-2.0 | [moby/moby](https://github.com/moby/moby) | [docs.docker.com/engine/install](https://docs.docker.com/engine/install/) | Adopt | [изоляция](rnd/sandbox-isolation.md) |
-| Squid | egress-прокси с allowlist доменов (G3) | 7.7 | GPL-2.0 (отдельный процесс) | [squid-cache/squid](https://github.com/squid-cache/squid) | пакеты ОС / образ | Trial (D18: Squid; mitmproxy отклонён — расшифровка TLS не нужна и добавляет риск) | [изоляция](rnd/sandbox-isolation.md) |
+| Squid | egress-прокси с allowlist доменов (G3) | образ `ubuntu/squid` 6.x (upstream 7.7) | GPL-2.0 (отдельный процесс) | [squid-cache/squid](https://github.com/squid-cache/squid) | пакеты ОС / образ | Trial (D18: Squid; mitmproxy отклонён — расшифровка TLS не нужна и добавляет риск) | [изоляция](rnd/sandbox-isolation.md) |
+| gVisor (runsc) | усиленная изоляция ядра контейнера sandbox без KVM | release-20261005.0 | Apache-2.0 | [google/gvisor](https://github.com/google/gvisor) | [gvisor.dev](https://gvisor.dev/docs/user_guide/install/) | Assess (проверка в задаче 2.2.8) | [изоляция](rnd/sandbox-isolation.md) |
+| kubernetes-sigs/agent-sandbox | тёплый пул sandbox как объект K8s (этап 4) | v1.0.6 | Apache-2.0 | [kubernetes-sigs/agent-sandbox](https://github.com/kubernetes-sigs/agent-sandbox) | GitHub Releases | Assess | [изоляция](rnd/sandbox-isolation.md), [Kubernetes](rnd/kubernetes-runtime.md) |
+| Daytona | песочницы для агентов | v0.190.0 | не определена | [daytonaio/daytona](https://github.com/daytonaio/daytona) | — | **Hold — репозиторий архивирован 24.07.2026** | [изоляция](rnd/sandbox-isolation.md) |
 | Firecracker | microVM — будущий провайдер sandbox | v1.17.0 | Apache-2.0 | [firecracker-microvm/firecracker](https://github.com/firecracker-microvm/firecracker) | GitHub Releases | Assess | [изоляция](rnd/sandbox-isolation.md) |
 | k6 | нагрузочный тест | v2.3.0 | AGPL-3.0 | [grafana/k6](https://github.com/grafana/k6) | `grafana/k6` | Trial (4.8) | [нагрузка](rnd/load-profile.md) |
 | Prometheus | метрики | v3.15.0 | Apache-2.0 | [prometheus/prometheus](https://github.com/prometheus/prometheus) | `prom/prometheus` | Hold (бэклог) | — |

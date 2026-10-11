@@ -30,7 +30,7 @@ Runner работает с интерфейсом `create / claim / exec / destr
 
 ### D2. Harness: LangGraph (Python) внутри sandbox — подтверждено
 Агентский цикл — граф LangGraph: `context → llm → tools → context`. Hooks (G2) реализуются как узлы/обёртки графа до и после `llm` и `tools`. LLM-клиент настроен на endpoint LiteLLM (OpenAI-совместимый API).
-- Альтернативы: Claude Agent SDK (готовые hooks/skills, но завязка на формат Anthropic), свой минимальный цикл (решение проекта AI-агент; без `interrupt`, checkpointer и стрима — всё писать самим).
+- Альтернативы ([R&D v3.1](../../../docs/rnd/harness-framework.md), 11.10.2026): OpenAI Agents SDK (запасной: пауза через `RunState`, сравнение прототипом в 1.3.9), PydanticAI, Google ADK, Microsoft Agent Framework, Claude Agent SDK (формат Anthropic, CLI в образе), Hermes Agent (готовый агент: заменил бы Runner, Sandbox, Memory, Guardrails), свой минимальный цикл (всё писать самим).
 - Почему LangGraph: `interrupt` для approve (G2), checkpointer в Postgres для возобновления, стрим шагов для таймлайна. Версию фиксируем, LangGraph держим за своим интерфейсом harness.
 - Следствие: скиллы и MCP подключаем сами — MCP через `langchain[mcp]` (`langchain.mcp`; архивный `langchain-mcp-adapters` перенесён туда), скилл = промпт-фрагмент + набор тулов.
 
@@ -77,6 +77,7 @@ Workspace эфемерный; код — ветка `agent/<KEY>` + PR; доку
 MVP — таблица событий запуска в БД ICPlan → таймлайн в задаче. Langfuse — после MVP (тяжёлый self-host: Postgres + ClickHouse + Redis + S3). Prometheus / Grafana / Loki — в бэклоге.
 
 ### D14. Очередь и планирование запусков
+Альтернативы ([R&D v3.1](../../../docs/rnd/runner-and-scheduling.md), 11.10.2026): Hatchet (ключи параллельности CEL — вторая очередь и новый сервис), River Pro (лимиты по аргументам — платно), Temporal (кластер), Kueue (квоты ресурсов — на этапе 4, лимит модели остаётся у нас).
 Очередь запусков — в ICPlan; Agent Runner забирает запуски и решает, когда стартовать, планировщиком со слотами (вариант B): запуск стартует, только когда свободны все его слоты — глобальный (`global_max`), агента (`parallel`, `max`), модели (`models.<alias>.max`), задачи (`per_issue: 1`). Режим `scheduling.mode: sequential | parallel` переключает всю платформу. Порядок `fifo | priority`. Несколько экземпляров Runner делят слоты через блокировку в Postgres. Сравнение вариантов A/B/C — [R&D](../../../docs/rnd/runner-and-scheduling.md).
 
 ### D15. Развёртывание и инфраструктура
