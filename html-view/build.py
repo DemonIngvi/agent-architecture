@@ -23,6 +23,7 @@ from diagrams import bpmn_svg, graph_svg  # noqa: E402
 import docgraph  # noqa: E402
 from components import ABOUT, AP, BLOCKS, BY_SLUG, COMPONENTS, STATUS  # noqa: E402
 import integrations as IG  # noqa: E402
+import sitemap as SM  # noqa: E402
 
 ROOT = HERE.parent
 BUILD = HERE / ".build"
@@ -55,6 +56,11 @@ def task_files() -> dict:
     for f in sorted((SRC / "docs/tasks").glob("*.md"), key=natural):
         out[f.name.split("-", 1)[0]] = f"docs/tasks/{f.name}"
     return out
+
+
+def DM_NAMING() -> str:
+    import datamodel as DM
+    return DM.NAMING
 
 
 def relink_readme(text: str, src: Path) -> str:
@@ -475,26 +481,35 @@ def copy_sources():
         files += [src] if src.is_file() else list(src.rglob("*.md"))
     for f in files:
         rel = f.relative_to(ROOT)
+        if rel.as_posix() in SM.NOT_PAGES:
+            continue  # не отдельная страница сайта (О-54): содержание на главной или на страницах компонентов
         # Корневой README на сайте — страница «Компоненты» (overview.md); главная — карта из home.md
         dst = SRC / ("overview.md" if rel.as_posix() == "README.md" else rel)
         dst.parent.mkdir(parents=True, exist_ok=True)
-        txt = relink_readme(f.read_text(encoding="utf-8"), f)
+        txt = f.read_text(encoding="utf-8")
         txt = re.sub(r"<!-- bpmn:([a-z-]+):(\d+) -->", lambda m: bpmn_svg(BPMN[m.group(1)][int(m.group(2))]) if m.group(1) in BPMN else "", txt)
         txt = txt.replace("<!-- docgraph -->", graph_svg(docgraph.LAYERS, docgraph.EDGES))
         if rel.as_posix().startswith("docs/rnd/") or rel.as_posix() == "docs/rules/rnd-methodology.md":
             txt = rnd_highlight(txt)
-        if rel.as_posix().startswith("docs/techspec/") or rel.as_posix() in ("docs/data-types.md", "architecture.md"):
+        if rel.as_posix() == "docs/rules/data-methodology.md":
+            txt = txt.replace("<!-- naming -->", DM_NAMING())
+        if rel.as_posix().startswith("docs/techspec/"):
             base = "../" * (len(rel.parts) - 1)
             txt = IG.flow_page(txt, rel.stem, IG.names(COMPONENTS), base)  # О-46, О-52: модели — ссылками, матрица интерфейсов — из datamodel
         if rel.as_posix().startswith("docs/api/") and rel.name != "README.md":
             txt = IG.api_page_structure(txt)  # О-45: структура запросов и ответов из OpenAPI форка и datamodel
         dst.write_text(txt, encoding="utf-8")
-    shutil.copy2(HERE / "home.md", SRC / "index.md")
+    (SRC / "index.md").write_text(SM.home_page((HERE / "home.md").read_text(encoding="utf-8"), IG.flow_page), encoding="utf-8")
     (SRC / "assets").mkdir(parents=True, exist_ok=True)
     shutil.copy2(HERE / "assets" / "extra.css", SRC / "assets" / "extra.css")
     write_component_pages()
     write_rnd_consequences()
-    (SRC / "data-model.md").write_text(IG.data_model_page(COMPONENTS), encoding="utf-8")
+    for p in SRC.rglob("*.md"):  # ссылки на ушедшие страницы → новые места (О-54)
+        r = p.relative_to(SRC).as_posix()
+        t = p.read_text(encoding="utf-8")
+        nt = SM.relink(t, r)
+        if nt != t:
+            p.write_text(nt, encoding="utf-8")
     write_pagebar_map()
     check_links()
 
@@ -843,7 +858,7 @@ def _spec_readiness(spec: str) -> dict:
     fail += 2 if any(r.startswith("Нагрузка и производительность") for r in reqs) and any(r.startswith("Развёртывание") for r in reqs) else 0
     slug = next((c[0] for c in COMPONENTS for _, pth in c[6] if pth == spec), None)
     conn = 5 if (folder / "architecture.md").exists() else 0
-    conn += 5 if f"specs/{cap}/spec.md" in (SRC / "architecture.md").read_text(encoding="utf-8") else 0
+    conn += 5 if f"specs/{cap}/spec.md" in (ROOT / "architecture.md").read_text(encoding="utf-8") else 0
     conn += 5 if slug and "## Как работает" in ((SRC / f"docs/techspec/{slug}.md").read_text(encoding="utf-8") if (SRC / f"docs/techspec/{slug}.md").exists() else "") else 0
     for h in ("## Нагрузка и развёртывание",):
         fail += 2 if h in it else 0
@@ -1018,22 +1033,21 @@ def write_component_pages():
     rows = []
     for sp in specs:
         r = spec_readiness(sp)
-        rows.append(f"| [{Path(sp).parent.name}]({rel('specs-by-component', sp)}) | {Path(sp).parts[2]} | {r['reqs']} | ❓ {r['oq'][0]} · 📌 {r['oq'][1]} | {rd_bar(r)} |")
+        rows.append(f"| [{Path(sp).parent.name}]({rel('docs', sp)}) | {Path(sp).parts[2]} | {r['reqs']} | ❓ {r['oq'][0]} · 📌 {r['oq'][1]} | {rd_bar(r)} |")
     avg = round(sum(spec_readiness(s)["pct"] for s in specs) / len(specs)) if specs else 0
     readiness_md = ["## Готовность спек", "", f"Средняя готовность: {rd_bar({'pct': avg, 'parts': {}}, True)}", "", rd_scale(), "",
-                    "Считается по [критериям полноты](" + rel("specs-by-component", "docs/rules/spec-criteria.md") + "): формат 15, сценарии 25, трассировка 20, обоснование 10, интерфейсы / отказы / нагрузка 15, связность 15; минус открытые вопросы (❓ −2, 📌 −4), шаблонный текст (−2 за требование), пользовательские требования без User Story (−2); потолок 90, пока в последнем ревью есть открытое по спеке. Наведите на шкалу — разбивка.", "",
+                    "Считается по [критериям полноты](" + rel("docs", "docs/rules/spec-criteria.md") + "): формат 15, сценарии 25, трассировка 20, обоснование 10, интерфейсы / отказы / нагрузка 15, связность 15; минус открытые вопросы (❓ −2, 📌 −4), шаблонный текст (−2 за требование), пользовательские требования без User Story (−2); потолок 90, пока в последнем ревью есть открытое по спеке. Наведите на шкалу — разбивка.", "",
                     "| Спека | Change | Требований | Открытые вопросы | Готовность |", "|---|---|---|---|---|"] + rows + [""]
 
     for d, title, sub in (("rnd-by-component", "R&D по компонентам", "Исследования и выбор технологий по каждому компоненту."),
-                          ("specs-by-component", "Спеки по компонентам", "Требования (OpenSpec) и схемы каждого компонента."),
                           ("tasks-by-component", "Задачи по компонентам", "Доработки каждого компонента. Порядок и оценки — в Roadmap.")):
         L = [f"# {title}", "", sub, "", '<div class="links3">']
         for slug, name, st, g, desc, *_ in COMPONENTS:
             L.append(f'<a class="card" href="{slug}/"><i class="st st-{st}"></i><b>{esc(name)}</b><small>{esc(desc)}</small></a>')
         L.append("</div>")
-        if d == "specs-by-component":
-            L += [""] + readiness_md
         (SRC / d / "index.md").write_text("\n".join(L) + "\n", encoding="utf-8")
+    plan = SRC / "docs/PLAN.md"  # готовность спек — в плане документации (О-54: общего раздела «Требования» нет)
+    plan.write_text(plan.read_text(encoding="utf-8").rstrip("\n") + "\n\n" + "\n".join(readiness_md) + "\n", encoding="utf-8")
 
 
 def spec_family(path: str) -> list:
@@ -1080,46 +1094,51 @@ def nav_yaml() -> str:
             L += ["    - Техспека:", item(6, "Техспека " + name, f"docs/techspec/{slug}.md")]
         L += ["    - R&D:", item(6, "R&D " + name, f"rnd-by-component/{slug}/index.md")]
         L += [item(6, title_of(SRC / p, p).replace("R&D: ", ""), p) for p in rs]
-    # Разделы сайта (doc-types.md#tabs): архитектура → требования → R&D → план → справка
-    L += ["  - Архитектура:", item(4, "Компоненты (таблица)", "overview.md"), item(4, "Схемы C1 / C2", "architecture.md"),
-          item(4, "Типы данных и интерфейсы", "docs/data-types.md"),
-          item(4, "Модель данных", "data-model.md"), item(4, "Каталог API", "docs/api/README.md"), item(4, "Техспеки компонентов", "docs/techspec/README.md")]
-    L.append("    - Решения (OpenSpec):")
-    for ch in sorted(p for p in (SRC / "openspec/changes").iterdir() if p.is_dir() and p.name != "archive"):
-        rest = [f"openspec/changes/{ch.name}/{n}" for n in ("proposal.md", "design.md", "tasks.md")]
-        rest += [x.relative_to(SRC).as_posix() for x in sorted(ch.rglob("*.md")) if "specs" in x.parts]
-        rest = [x for x in rest if (SRC / x).exists() and x not in used]
-        if rest:
-            L.append(f"      - {q(ch.name)}:")
-            L += [item(8, title_of(SRC / x, Path(x).parent.name), x) for x in rest]
-    L += ["  - Требования:", item(4, "Все User Stories", "docs/stories/README.md"), item(4, "Покрытие историй", "docs/stories/coverage.md"),
-          item(4, "Спеки по компонентам", "specs-by-component/index.md")]
-    if (SRC / "docs/stories/personas.md").exists() and "docs/stories/personas.md" not in used:
-        L.append(item(4, "Персоны", "docs/stories/personas.md"))
+    # Разделы сайта (doc-types.md#tabs): общих «Архитектуры» и «Требований» нет — обзор на главной, остальное во вкладках компонентов (О-54)
     L += ["  - R&D:", item(4, "Все R&D", "docs/rnd/README.md"), item(4, "R&D по компонентам", "rnd-by-component/index.md"), item(4, "Последствия R&D", "rnd-consequences.md")]
     rleft = [f"docs/rnd/{f.name}" for f in sorted((SRC / "docs/rnd").glob("*.md")) if f"docs/rnd/{f.name}" not in used]
     if rleft:
         L.append("    - Сквозные исследования:")
         L += [item(6, title_of(SRC / x, x).replace("R&D: ", ""), x) for x in rleft]
+    L.append("    - Решения (OpenSpec):")
+    for ch in sorted(p for p in (SRC / "openspec/changes").iterdir() if p.is_dir() and p.name != "archive"):
+        rest = [f"openspec/changes/{ch.name}/{n}" for n in ("proposal.md", "design.md")]
+        rest += [x.relative_to(SRC).as_posix() for x in sorted(ch.rglob("*.md")) if "specs" in x.parts]
+        rest = [x for x in rest if (SRC / x).exists() and x not in used]
+        if rest:
+            L.append(f"      - {q(ch.name)}:")
+            L += [item(8, title_of(SRC / x, Path(x).parent.name), x) for x in rest]
     L += ["  - План и задачи:", item(4, "Roadmap MVP", "docs/ROADMAP.md"), item(4, "Сводная таблица задач", "docs/TASKS.md"),
-          item(4, "Задачи по компонентам", "tasks-by-component/index.md"), item(4, "Бэклог", "docs/BACKLOG.md"), item(4, "План документации", "docs/PLAN.md")]
+          item(4, "Задачи по компонентам", "tasks-by-component/index.md"), item(4, "Бэклог", "docs/BACKLOG.md"), item(4, "Технологии", "docs/TECHNOLOGIES.md"), item(4, "План документации", "docs/PLAN.md")]
+    chtasks = [f"openspec/changes/{ch.name}/tasks.md" for ch in sorted((SRC / "openspec/changes").iterdir()) if ch.is_dir() and (SRC / f"openspec/changes/{ch.name}/tasks.md").exists() and f"openspec/changes/{ch.name}/tasks.md" not in used]
+    if chtasks:
+        L.append("    - Задачи изменений (OpenSpec):")
+        L += [item(6, Path(x).parent.name, x) for x in chtasks]
     left = [x for x in tasks.values() if x not in used]
     if left:
         L.append("    - Сквозные задачи:")
         L += [item(6, title_of(SRC / x, x), x) for x in left]
-    L += ["  - Справка:", item(4, "Как читать", "docs/HOW-TO-READ.md"), item(4, "Формат схем", "FORMAT.md"),
-          "    - Правила документации:", item(6, "Правила документации", "docs/rules/README.md"),
-          item(6, "Типы документов и вкладки", "docs/rules/doc-types.md"), item(6, "Работа с документами", "docs/rules/doc-work.md"), item(6, "Процесс изменения", "docs/rules/change-process.md"),
-          item(6, "Граф связности документов", "docs/rules/doc-graph.md"), item(6, "Роли", "docs/rules/roles.md"), item(6, "Промпты", "docs/rules/prompts.md"),
-          item(6, "Критерии полноты спеки", "docs/rules/spec-criteria.md"), item(6, "Виды спек и подтверждение", "docs/rules/spec-kinds.md"),
-          item(6, "Методология архитектуры", "docs/rules/architecture-methodology.md"), item(6, "Методология данных и интеграций", "docs/rules/data-methodology.md"), item(6, "Методология API", "docs/rules/api-methodology.md"), item(6, "Методология решений", "docs/rules/decision-methodology.md"), item(6, "Методология задач и плана", "docs/rules/task-methodology.md"), item(6, "Методология ревью и отклонений", "docs/rules/review-methodology.md"), item(6, "Методология сопровождающих документов", "docs/rules/support-docs-methodology.md"), item(6, "Методология SDD", "docs/rules/sdd-methodology.md"), item(6, "Методика User Stories", "docs/rules/us-methodology.md"),
-          item(6, "Методология R&D", "docs/rules/rnd-methodology.md"), item(6, "Техническая спецификация", "docs/rules/tech-spec.md"),
-          item(6, "Проверка двумя читателями", "docs/rules/dual-read.md"), item(6, "Журнал отклонений", "docs/rules/deviations.md")]
-    revs = sorted((SRC / "docs/reviews").glob("*.md")) if (SRC / "docs/reviews").exists() else []
-    if revs:
+    revs0 = sorted((SRC / "docs/reviews").glob("*.md")) if (SRC / "docs/reviews").exists() else []
+    if revs0:
         L.append("    - Ревью:")
-        L += [item(6, title_of(f, f.stem), f"docs/reviews/{f.name}") for f in revs]
+        L += [item(6, title_of(f, f.stem), f"docs/reviews/{f.name}") for f in revs0]
+    L += ["  - Справка:", item(4, "Правила документации", "docs/rules/README.md"), item(4, "Формат схем", "FORMAT.md"),
+          item(4, "Персоны", "docs/stories/personas.md"),
+          "    - Методологии:",
+          item(6, "Методология архитектуры", "docs/rules/architecture-methodology.md"), item(6, "Методология данных и интеграций", "docs/rules/data-methodology.md"),
+          item(6, "Методология API", "docs/rules/api-methodology.md"), item(6, "Методология решений", "docs/rules/decision-methodology.md"),
+          item(6, "Методология задач и плана", "docs/rules/task-methodology.md"), item(6, "Методология ревью и отклонений", "docs/rules/review-methodology.md"),
+          item(6, "Методология сопровождающих документов", "docs/rules/support-docs-methodology.md"), item(6, "Методология SDD", "docs/rules/sdd-methodology.md"),
+          item(6, "Методика User Stories", "docs/rules/us-methodology.md"), item(6, "Методология R&D", "docs/rules/rnd-methodology.md"),
+          item(6, "Техническая спецификация", "docs/rules/tech-spec.md"), item(6, "Критерии полноты спеки", "docs/rules/spec-criteria.md"),
+          item(6, "Виды спек и подтверждение", "docs/rules/spec-kinds.md"),
+          "    - Как работать с документами:",
+          item(6, "Типы документов и вкладки", "docs/rules/doc-types.md"), item(6, "Работа с документами", "docs/rules/doc-work.md"),
+          item(6, "Процесс изменения", "docs/rules/change-process.md"), item(6, "Граф связности документов", "docs/rules/doc-graph.md"),
+          item(6, "Роли", "docs/rules/roles.md"), item(6, "Промпты", "docs/rules/prompts.md"),
+          item(6, "Проверка двумя читателями", "docs/rules/dual-read.md"), item(6, "Журнал отклонений", "docs/rules/deviations.md")]
     return "\n".join(L) + "\n"
+
 
 
 def write_config(serve: bool = False):

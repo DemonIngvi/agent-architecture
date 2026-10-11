@@ -1,7 +1,7 @@
 """Hook MkDocs: верхняя панель на каждой странице.
 
 Слева — «Назад» (история браузера) и «На уровень выше» (родитель в дереве навигации).
-Справа — переход между типами документации: Архитектура / Спеки / Задачи / Справка.
+Справа — вкладки компонента: Архитектура, User Stories, Спеки, Задачи, API, Техспека, R&D; Справка — общие правила.
 Если страница относится к компоненту, ссылки ведут на документацию этого компонента.
 """
 import json
@@ -11,16 +11,15 @@ from pathlib import Path
 MAP_FILE = Path(__file__).resolve().parent / ".build" / "pagebar.json"
 DATA = {"pages": {}, "names": {}}
 
-TYPES = [  # (ключ, подпись, раздел навигации, URL компонента, URL без компонента)
+TYPES = [  # (ключ, подпись, раздел навигации, URL компонента, URL без компонента; None — вкладки нет вне компонента)
     ("arch", "Архитектура", "Архитектура", "components/{}/", ""),
-    ("flow", "Потоки", "Потоки", "docs/flows/{}/", "docs/flows/"),
-    ("us", "User Stories", "User Stories", "docs/stories/{}/", "docs/stories/"),
-    ("spec", "Спеки", "Спеки", "specs-by-component/{}/", "specs-by-component/"),
+    ("us", "User Stories", "User Stories", "docs/stories/{}/", None),
+    ("spec", "Спеки", "Спеки", "specs-by-component/{}/", None),
     ("task", "Задачи", "Задачи", "tasks-by-component/{}/", "tasks-by-component/"),
+    ("api", "API", "API", "docs/api/{}/", None),
+    ("tech", "Техспека", "Техспека", "docs/techspec/{}/", None),
     ("rnd", "R&D", "R&D", "rnd-by-component/{}/", "rnd-by-component/"),
-    ("tech", "Техспека", "Техспека", "docs/techspec/{}/", "docs/techspec/"),
-    ("api", "API", "API", "docs/api/{}/", "docs/api/"),
-    ("ref", "Справка", "Справка", None, "overview/"),
+    ("ref", "Справка", "Справка", None, "docs/rules/"),
 ]
 
 
@@ -64,8 +63,6 @@ def _top_section(page):
 def _doc_type(src: str) -> str:
     if src == "index.md" or src.startswith("components/"):
         return "Архитектура"
-    if src.startswith("docs/flows/"):
-        return "Потоки"
     if src.startswith("docs/stories/"):
         return "User Stories"
     if src.startswith("specs-by-component/") or "/specs/" in src:
@@ -96,6 +93,8 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     types = []
     for key, label, section, comp_url, plain_url in TYPES:
         target = comp_url.format(slug) if (slug and comp_url) else plain_url
+        if target is None:
+            continue  # у вкладки нет общей страницы (О-54)
         active = " active" if section == current else ""
         types.append(f'<a class="tb-type t-{key}{active}" href="{_rel(page.url, target)}">{label}</a>')
 

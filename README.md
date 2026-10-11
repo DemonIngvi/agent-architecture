@@ -3,10 +3,10 @@
 Платформа запуска LLM-агентов для задач из таск-трекера ICPlan (It's a Plan): изоляция каждого запуска, контроль моделей и затрат, guardrails, память.
 
 - HTML-версия — https://demoningvi.github.io/agent-architecture/ ([как собрать](https://github.com/DemonIngvi/agent-architecture/blob/main/html-view/README.md))
-- Впервые здесь — [как читать документацию](docs/HOW-TO-READ.md)
+- Впервые здесь — [как читать документацию](docs/rules/README.md)
 - Схемы C1/C2 — [architecture.md](architecture.md)
 - User Stories и процессы BPMN — [docs/stories/](docs/stories/README.md)
-- Потоки данных и форматы — [docs/flows/](architecture.md#interaction)
+- Взаимодействие компонентов — [architecture.md](architecture.md#interaction); модели данных и интеграции — на страницах компонентов
 - R&D: обоснование решений — [docs/rnd/](docs/rnd/README.md)
 - План работ по документации — [docs/PLAN.md](docs/PLAN.md)
 - Roadmap MVP с оценками — [docs/ROADMAP.md](docs/ROADMAP.md)

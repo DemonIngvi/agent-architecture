@@ -28,7 +28,11 @@
 | Тип данных Т1–Т8 | `docs/data-types.md` (типы), `INTEG_TYPES` (по интерфейсам) | матрица интерфейсов |
 | Имена | `NAMING` в `datamodel.py` | раздел «Правило имён» |
 
-**Правило имён (кратко):** JSON наших контрактов — camelCase, как в API ICPlan; задача — `issueId` + `issueIdentifier`; агент — `agentId`, автор — `username`; единица — суффиксом (`readyMs`, `ttlSec`); внешние протоколы (OpenAI, LiteLLM, MCP, AG-UI, OPA) — в их стиле; колонки БД и параметры конфигурации — snake_case. Полностью — [Модель данных, «Правило имён»](../../data-model.md#naming).
+**Правило имён (кратко):** JSON наших контрактов — camelCase, как в API ICPlan; задача — `issueId` + `issueIdentifier`; агент — `agentId`, автор — `username`; единица — суффиксом (`readyMs`, `ttlSec`); внешние протоколы (OpenAI, LiteLLM, MCP, AG-UI, OPA) — в их стиле; колонки БД и параметры конфигурации — snake_case. Полностью — [ниже](#naming).
+
+## Правило имён {#naming}
+
+<!-- naming -->
 
 ## Как вести
 

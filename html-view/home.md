@@ -25,7 +25,7 @@
       </a>
       <a class="card" href="components/icplan/">
         <i class="st st-part"></i><b>Task UI</b>
-        <small>Доска, чат, approve, таймлайн. Нужен автоподхват задач агентом</small>
+        <small>Доска, процесс задачи (D17), чат запуска с вопросами и подтверждениями (D21)</small>
       </a>
     </div>
   </div>
@@ -35,7 +35,7 @@
   <div class="row3">
     <a class="card card-side" href="components/platform-module/">
       <i class="st st-todo"></i><b>Platform module</b>
-      <small>Модуль ICPlan: алиасы LLM, бюджеты, профили sandbox и памяти, данные guardrails</small>
+      <small>Модуль ICPlan: автономия, бюджеты, профили среды и памяти, доступы, данные guardrails</small>
     </a>
     <a class="card card-main" href="components/agent-runner/">
       <i class="st st-todo"></i><b>Agent Runner</b> <span class="g">G1</span>
@@ -84,7 +84,7 @@
     </a>
     <a class="card" href="components/observability/">
       <i class="st st-part"></i><b>Observability</b>
-      <small>События запуска → таймлайн в задаче, затраты</small>
+      <small>События запуска (AG-UI) → чат запуска в задаче, затраты</small>
     </a>
   </div>
 
@@ -110,7 +110,7 @@
       <tr><td>Нет правил, что агенту можно</td><td>Политики в 4 точках, approve опасных действий, аудит</td><td><a href="components/guardrails/">Guardrails</a></td></tr>
       <tr><td>Следующий агент не знает, что сделал предыдущий</td><td>Память задачи и истории запусков</td><td><a href="components/memory/">Memory</a></td></tr>
       <tr><td>Задачу нужно вручную отдавать агенту</td><td>Автоподхват по статусу и типу задачи</td><td><a href="components/icplan/">ICPlan</a></td></tr>
-      <tr><td>Видно только итог работы агента</td><td>Пошаговый таймлайн и затраты в задаче</td><td><a href="components/observability/">Observability</a></td></tr>
+      <tr><td>Видно только итог работы агента</td><td>Чат запуска и затраты в задаче</td><td><a href="components/observability/">Observability</a></td></tr>
       <tr><td>Настройки агента ограничены моделью и инструкцией</td><td>Бюджеты, профили среды и памяти, правила, версии</td><td><a href="components/platform-module/">Platform module</a></td></tr>
     </tbody>
   </table>
