@@ -21,12 +21,25 @@
 
 ## Состояния запуска
 
+Единый список статусов запуска — требование R-RUN-07; остальные документы ссылаются на него.
+
 ```
-pending ─▶ queued ─────────▶ admitted ─▶ running ─▶ succeeded
-           (ждёт слот)          │           ├──────▶ waiting_approval ─▶ running
-                                │           └──────▶ failed │ limit │ loop_detected │ canceled
-                                └─▶ rejected (G1: бюджет, kill switch)
+queued ─▶ starting ─▶ running ─▶ succeeded
+  │  (ждёт слот)          ├──────▶ waiting_approval ─▶ running
+  │                       ├──────▶ gate_failed
+  │                       ├──────▶ limit_exceeded   (шаги, время, простой, бюджет, зацикливание)
+  │                       ├──────▶ failed
+  │                       └──────▶ canceled
+  └─▶ limit_exceeded / failed   (G1 до старта: бюджет / kill switch, агент недоступен)
 ```
+
+| Причина завершения Harness (R-HRN-09) | Статус запуска (R-RUN-07) | Статус в ICPlan (`agent_run`) |
+|---|---|---|
+| `done` | `succeeded` | `success` |
+| `gate_failed` | `gate_failed` | `failed` с пометкой «не прошёл проверку» |
+| `limit` (шаги, время, простой, `loop_detected`) | `limit_exceeded` | `failed` с причиной |
+| `error` | `failed` | `failed` |
+| остановка пользователем | `canceled` | `canceled` |
 
 ## Данные
 
