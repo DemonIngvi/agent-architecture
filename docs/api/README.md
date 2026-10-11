@@ -32,7 +32,7 @@ _выдача запуска (`/agent-runs/claim`)_
 { "run": { "id": 1042, "trigger": "process_step", "attempts": 0,
           "prompt": "Work item MKT-42 has been delegated to you…", "systemPrompt": "You are running as agent analyst…",
           "issueId": 318, "issueIdentifier": "MKT-42",
-          "rule": { "process": "Фича", "step": "sdd" } } }
+          "rule": { "process": "Фича", "stepId": "sdd" } } }
 ```
 
 ### RunBundle
@@ -46,7 +46,7 @@ _Runner → Harness (`POST /run`)_
   "workspace": [ { "name": "repo", "type": "git", "url": "…", "branch": "agent/MKT-42", "right": "write" },
                  { "name": "task", "type": "folder", "prefix": "projects/MKT/tasks/42/", "right": "read" } ],
   "memory": { "m3": { … }, "m2": [ … ] },
-  "task": { "issueId": 318, "issueIdentifier": "MKT-42",
+  "task": { "issueId": 318, "issueIdentifier": "MKT-42", "stepId": "sdd",
             "criteria": [ { "text": "…", "origin": "process", "status": "active" }, { "text": "…", "origin": "user:anna", "status": "active" } ],
             "returnNote": null } }
 ```
@@ -82,7 +82,7 @@ _итог (`/agent-runs/:id/result`)_
 
 ```json
 { "status": "success", "output": "## Требования…", "error": null,
-  "usage": { "inputTokens": 18450, "outputTokens": 2210, "reasoningTokens": 900, "costUsd": 0.12, "steps": 9 },
+  "usage": { "inputTokens": 18450, "outputTokens": 2210, "reasoningTokens": 900, "costUsd": 0.12, "iterations": 9 },
   "reason": "done", "artifacts": [ { "name": "requirements.md", "url": "s3://…" } ], "gate": { "passed": true, "failed": [] } }
 ```
 
@@ -107,7 +107,7 @@ _указание во время работы (ответ heartbeat)_
 _вердикт по результату_
 
 ```json
-{ "runId": 1042, "verdict": "rejected", "note": "нет тестов", "by": "lead",
+{ "issueId": 318, "stepId": "code", "runId": 1042, "verdict": "rejected", "note": "нет тестов", "by": "lead",
   "criteria": [ { "text": "есть тест на пустой список", "origin": "reviewer:lead", "status": "active" } ] }
 ```
 
@@ -141,10 +141,15 @@ _состояние задачи_
 
 ### PolicyInput / PolicyDecision
 
-_OPA G1 / G2_
+_OPA G1 / G2: запрос `{input}` и ответ `{result}`_
 
 ```json
-{ "input": { "point": "g2", "agentId": 9, "run": { "id": 1042, "issueId": 318, "step": "code" }, "tool": "git_push", "argsHash": "…", "autonomy": "R2" } }
+{ "input": { "point": "g2", "agentId": 9, "run": { "id": 1042, "issueId": 318, "stepId": "code" }, "tool": "git_push", "argsHash": "…" } }
+```
+
+Ответ:
+
+```json
 { "result": { "allow": false, "approval": true, "reason": "push требует подтверждения" } }
 ```
 
@@ -210,7 +215,7 @@ _доступ к репозиторию на один запуск (I6, I18)_
 _состояние цикла Harness (I12, `PUT /runs/{id}/checkpoint`)_
 
 ```json
-{ "runId": 1042, "step": 7, "parentStep": 6, "state": "<base64>" }
+{ "runId": 1042, "iteration": 7, "parentIteration": 6, "state": "<base64>" }
 ```
 
 ### ChatCompletionRequest
@@ -238,7 +243,7 @@ _вызов тула через MCP-прокси Runner (I9, JSON-RPC 2.0)_
 _ключ LiteLLM на агента (I15, `/key/generate`)_
 
 ```json
-{ "key_alias": "agent:7", "models": ["team-default"], "max_budget": 5, "budget_duration": "1d", "rpm_limit": 30, "tpm_limit": 200000, "metadata": { "agentId": 7 } }
+{ "key_alias": "agent:7", "models": ["team-default"], "max_budget": 5, "budget_duration": "1d", "rpm_limit": 30, "tpm_limit": 200000, "metadata": { "agent_id": 7 } }
 ```
 
 ### OpaBundleData
@@ -247,6 +252,7 @@ _данные бандла OPA (I16, `data.json`)_
 
 ```json
 { "agents": { "7": { "tools_allow": ["itsaplan_get_issue", "git_push"], "approval": ["git_push"], "autonomy": "R2", "budget": { "run_usd": 1, "day_usd": 5 } } },
+  "projects": { "12": { "budget": { "month_usd": 100 } } },
   "platform": { "kill_switch": false } }
 ```
 

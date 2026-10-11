@@ -46,9 +46,9 @@
 
 | ID | От → к | Протокол | Формат | Аутентификация | Режим | Таймаут | Повтор | Идемпотентность |
 |---|---|---|---|---|---|---|---|---|
-| I1 | ICPlan Run Queue → Agent Runner | HTTP REST (протокол `@itsaplan/runner`) | JSON `Run` | Bearer API-ключ агента | pull, опрос 3 с | 10 с | backoff до 60 с | аренда запуска: выдаётся одному Runner |
+| I1 | Agent Runner → ICPlan Run Queue (claim, pull) | HTTP REST (протокол `@itsaplan/runner`) | JSON `Run` | Bearer API-ключ агента | pull, опрос 3 с | 10 с | backoff до 60 с | аренда запуска: выдаётся одному Runner |
 | I2 | Agent Runner → ICPlan (шаги, итог) | HTTP REST | JSON-пакеты `RunEvent` с `seq`, `RunResult` | Bearer API-ключ агента | асинхронно | 10 с | повтор с дедупликацией по (run_id, seq) | да, по (run_id, seq) |
-| I3 | ICPlan → Agent Runner (approve, отмена) | HTTP REST, опрос состояния запуска | JSON `ApprovalDecision`, статус | Bearer API-ключ агента | pull | 10 с | backoff | да, по (run_id, seq) |
+| I3 | Agent Runner → ICPlan: heartbeat, в ответе (approve, отмена) | HTTP REST, опрос состояния запуска | JSON `ApprovalDecision`, статус | Bearer API-ключ агента | pull | 10 с | backoff | да, по (run_id, seq) |
 | I4 | Agent Runner → Platform module API | HTTP REST | JSON `AgentSettings` | сервисный токен | синхронно | 2 с | 3 раза | чтение |
 | I5 | Agent Runner → OPA (G1) | HTTP REST `POST /v1/data/agent/g1` | JSON `PolicyInput` / `PolicyDecision` | внутренняя сеть (mTLS — позже) | синхронно | 200 мс | нет → `on_engine_error` | чтение |
 | I6 | Agent Runner → Docker Engine API | HTTP поверх unix-сокета (позже K8s API) | JSON Docker API | доступ к сокету | синхронно | 30 с | 1 раз | create — нет; destroy — да |

@@ -12,12 +12,12 @@
 # ---------- интеграции ----------
 # I-код → (от, к, через, что передаётся, модели). Слаги компонентов или внешние участники в «…».
 INTEG = {
-    "I1": ("icplan", "agent-runner", "", "выдача запуска из очереди агента (pull, аренда)", ["Run"]),
+    "I1": ("agent-runner", "icplan", "", "Runner забирает запуск из очереди (`POST /agent-runs/claim`, pull, аренда 300 с); в ответе — `Run`", ["Run"]),
     "I2": ("agent-runner", "icplan", "", "шаги запуска и итог", ["RunEvent", "RunResult"]),
-    "I3": ("icplan", "agent-runner", "", "подтверждения, отмена, указания — в ответе heartbeat", ["Heartbeat", "ApprovalDecision", "UserMessage"]),
+    "I3": ("agent-runner", "icplan", "", "Runner продлевает аренду (`POST /agent-runs/:runId/heartbeat`); в ответе — отмена, решения и указания пользователя", ["Heartbeat", "ApprovalDecision", "UserMessage"]),
     "I4": ("agent-runner", "platform-module", "", "настройки агента и манифест рабочего пространства", ["AgentSettings", "WorkspaceSource"]),
     "I5": ("agent-runner", "guardrails", "", "допуск запуска G1", ["PolicyInput", "PolicyDecision"]),
-    "I6": ("agent-runner", "sandbox", "", "создание и уничтожение среды (Docker API)", ["SandboxClaim", "RepoGrant"]),
+    "I6": ("agent-runner", "sandbox", "", "Runner создаёт и уничтожает среду (Docker API) по `SandboxClaim`; `RepoGrant` задаёт правила git-прокси этой среды (какие репозитории и ветки), сам токен в среду не попадает", ["SandboxClaim", "RepoGrant"]),
     "I7": ("agent-runner", "harness", "", "Runner вызывает Harness: задание, подтверждения, указания и отмена → Harness; события и итог ← Harness", ["RunBundle", "UserMessage", "RunEvent", "ApprovalDecision", "RunResult"]),
     "I8": ("harness", "llm-gateway", "", "вызов модели", ["ChatCompletionRequest"]),
     "I9": ("harness", "mcp-tools", "agent-runner", "вызов тулов MCP через MCP-прокси Runner (D19)", ["McpToolCall"]),
@@ -64,6 +64,9 @@ INTEG_TYPES = {
     "I23": "Т4 (манифесты), Т6",
 }
 
+# Интерфейсы, где стрелка (кто вызывает) обратна потоку данных: данные приходят в ответе вызываемого
+DATA_IN_RESPONSE = {"I1", "I3", "I4"}
+
 ALSO = {"I22": ["icplan", "platform-module", "agent-runner", "memory", "observability", "llm-gateway"],
         "I20": ["platform-module", "observability"], "I2": ["observability", "memory"], "I14": ["observability"],
         "I19": ["sandbox", "icplan"], "I17": ["sandbox", "mcp-tools"],
@@ -78,7 +81,7 @@ MODELS = {
         ("prompt", "string", True, "задание, собранное ICPlan"), ("systemPrompt", "string", True, "правила самого запуска от ICPlan"),
         ("attempts", "int", True, "сколько раз запуск уже выдавался: аренда `AGENT_RUN_LEASE_SECONDS` = 300 с, Runner продлевает её heartbeat-ом (I3); не продлил — запуск выдаётся снова"),
         ("issueId", "int | null", True, "задача; `null` — запуск без задачи (расписание)"), ("issueIdentifier", "string | null", True, "читаемый ключ задачи, `MKT-42`"),
-        ("rule", "{process, step}", False, "шаг процесса, создавший запуск, при `trigger = process_step` (D17): `process` — тип задачи процесса, `step` — `ProcessStep.id`")]),
+        ("rule", "{process, stepId}", False, "шаг процесса, создавший запуск, при `trigger = process_step` (D17): `process` — название типа задачи (= процесса), `stepId` — `ProcessStep.id`; иначе поля нет")]),
     "AgentDefinition": ("определение агента в YAML `agent/v1` — экспорт и импорт (R-REG-04, R-CP-05)", [
         ("apiVersion", "const: agent/v1", True, "версия формата"), ("id", "string", True, "имя агента (`username` в ICPlan)"),
         ("version", "int", True, "версия определения"), ("model", "string", True, "алиас LiteLLM"),
@@ -92,95 +95,95 @@ MODELS = {
         ("inputTokens / outputTokens", "int | null", False, "токены запуска"), ("finishedAt", "timestamp | null", False, "время завершения")]),
     "Heartbeat": ("ответ на продление аренды (`POST /agent-runs/:runId/heartbeat`) — обратный канал к раннеру", [
         ("canceled", "bool", True, "запуск остановлен пользователем — Runner останавливает Harness"),
-        ("approvals", "ApprovalDecision[]", False, "решения, ещё не доставленные; повторяются в каждом ответе, пока в событиях запуска не появится их `seq` (Runner отбрасывает повтор по `runId` + `seq`)"), ("messages", "UserMessage[]", False, "указания пользователя, ещё не доставленные; повтор отбрасывается по `id`")]),
+        ("approvals", "ApprovalDecision[]", False, "решения, ещё не доставленные; ICPlan повторяет их в каждом ответе, пока в событиях запуска не придёт `CUSTOM` `decision_applied` с этим `seq`; Runner отбрасывает повтор по `runId` + `seq`"), ("messages", "UserMessage[]", False, "указания, ещё не доставленные; повторяются, пока не придёт `CUSTOM` `message_received` с этим `id` (в ленте — «получено агентом»); повтор отбрасывается по `id`")]),
     "RunBundle": ("задание Harness от Runner (`POST /run`)", [
         ("runId", "int", True, "= `Run.id`"), ("agent", "{agentId, model, version, instructions, skills[]}", True, "определение агента той версии, что была при выдаче (`instructions` — как поле `ai_agent.instructions` ICPlan)"),
         ("prompt / systemPrompt", "string", True, "задание и системные правила из `Run` без изменений"), ("guidance", "string", False, "руководство проекта для агентов (`project_platform.guidance`, Platform module)"), ("params", "map<string, any>", True, "итоговые параметры после слияния уровней L0 (развёртывание) → L1 (проект) → L2 (агент) → L3 (запуск); ключи — имена параметров конфигурации (`model.temperature`, `limits.max_steps`)"),
         ("workspace", "WorkspaceSource[]", False, "манифест рабочего пространства (R-RUN-17)"),
-        ("memory", "{m3: M3Record, m2: RunSummary[]}", False, "память для продолжения: M3 области `issue` этой задачи; M2 — последние `m2_last_runs` (3) запусков"),
-        ("task", "{issueId, issueIdentifier, criteria: Criterion[], returnNote}", False, "задача, критерии с происхождением (D20); `returnNote` — `Verdict.note` последнего возврата шага"),
+        ("memory", "{m3: M3Record, m2: RunSummary[]}", False, "память на старте: M3 этой задачи; M2 — итоги последних запусков (параметр `m2_last_runs`, по умолчанию 3); во время работы Harness пишет M3 в Memory API (I11)"),
+        ("task", "{issueId, issueIdentifier, stepId, criteria: Criterion[], returnNote}", False, "задача и шаг процесса; `criteria` — только `active`: готовность шага, критерии человека, принятые критерии предыдущего шага и ревьюера (D20); `returnNote` — `Verdict.note` последнего возврата"),
         ("mcp", "{server, url, tools[]}[]", False, "MCP через прокси Runner (D19)")]),
     "WorkspaceSource": ("источник рабочего пространства", [
         ("name", "string", True, "имя в `/workspace/<имя>`"), ("type", "enum: git · folder", True, "вид"),
         ("url / prefix", "string", True, "при `type = git` — `url` репозитория; при `folder` — `prefix` папки в объектном хранилище RustFS (S3)"), ("branch", "string", False, "ветка агента `agent/<задача>`"),
         ("right", "enum: read · write", True, "право по политике (D18): `read` — вся папка и ветка задачи; `write` — только своя подпапка шага и ветка агента")]),
     "Criterion": ("критерий приёмки (D20)", [
-        ("text", "string", True, "проверяемая формулировка"), ("origin", "enum: process · user:<username> · agent:<username> · reviewer:<username>", True, "кто задал: процесс, человек, агент предыдущего шага, ревьюер при возврате; `<username>` — `username` пользователя или агента ICPlan; порядок при конфликте: user и reviewer > process > agent"),
+        ("text", "string", True, "проверяемая формулировка"), ("origin", "enum: process · user:<username> · agent:<username> · reviewer:<username>", True, "кто задал: процесс, человек, агент предыдущего шага, ревьюер при возврате; `<username>` — `username` пользователя или агента ICPlan; порядок при конфликте: user и reviewer > process > agent; противоречие двух людей — агент задаёт вопрос исполнителю задачи (D20)"),
         ("status", "enum: active · pending_approval", True, "`pending_approval` — критерий агента ждёт подтверждения человеком (по `criteriaApproval` шага); проверка gate берёт только `active`")]),
-    "RunEvent": ("событие запуска: конверт платформы вокруг события AG-UI (D21; NDJSON `/run/events`, `POST /agent-runs/:runId/events`)", [
-        ("runId", "int", True, "= `agent_run.id`"), ("seq", "int", True, "порядковый номер от Harness; ключ идемпотентности и порядка"),
-        ("at", "timestamp", True, "время события в Harness"),
+    "RunEvent": ("событие запуска: конверт платформы вокруг события AG-UI (D21). Runner читает поток у Harness (`GET /run/events`, NDJSON) и пересылает в ICPlan (`POST /agent-runs/:runId/events`)", [
+        ("runId", "int", True, "= `agent_run.id`"), ("seq", "int", True, "порядковый номер от Harness; ключ идемпотентности и порядка; Runner своих событий не нумерует, кроме `RUN_ERROR` при сбое среды (`seq` = последний + 1)"),
+        ("at", "timestamp", True, "время события в Harness, ISO 8601 UTC"),
         ("event", "AgUiEvent", True, "событие AG-UI как есть: `type` и поля протокола")]),
     "AgUiEvent": ("событие протокола AG-UI", [
         ("type", "enum: RUN_STARTED · RUN_FINISHED · RUN_ERROR · STEP_STARTED · STEP_FINISHED · TEXT_MESSAGE_START · TEXT_MESSAGE_CONTENT · TEXT_MESSAGE_END · REASONING_START · REASONING_MESSAGE_START · REASONING_MESSAGE_CONTENT · REASONING_MESSAGE_END · REASONING_END · TOOL_CALL_START · TOOL_CALL_ARGS · TOOL_CALL_END · TOOL_CALL_RESULT · ACTIVITY_SNAPSHOT · CUSTOM", True, "тип события по протоколу"),
-        ("runId / threadId", "string", False, "у `RUN_*`: запуск (строкой, как требует AG-UI) и тред = `issueIdentifier`; без задачи — `run-<id>`"), ("stepName", "string", False, "у `STEP_*`: шаг цикла"),
+        ("runId / threadId", "string", False, "у `RUN_*`: `runId` — запуск строкой (так требует AG-UI); `threadId` — `issueIdentifier`, у запуска без задачи — `run-<runId>`"), ("stepName", "string", False, "у `STEP_*`: шаг цикла"),
         ("messageId / role / delta", "string", False, "у `TEXT_MESSAGE_*`, `REASONING_MESSAGE_*`: сообщение, роль, фрагмент текста; в хранилище платформы `*_END` несёт собранный текст сообщения в `delta` (D21)"),
         ("toolCallId / toolCallName / parentMessageId / content", "string", False, "у `TOOL_CALL_*`: вызов тула, имя, сообщение-родитель, результат"),
         ("activityType / content", "string / object", False, "у `ACTIVITY_SNAPSHOT`: `plan` и план `{done[], next[]}` из M3"),
-        ("name", "string", False, "у `CUSTOM`: `question`, `approval_request`, `guardrail_decision`, `memory_write`, `llm_call`"), ("value", "object", False, "у `CUSTOM`: `question` → `{text}`; `approval_request` → `{tool, argsHash, reason}`; `guardrail_decision` → `{point, allow, approval, reason}`; `memory_write` → `{level, scope}`; `llm_call` → `{model, inputTokens, outputTokens, costUsd}`"),
+        ("name", "string", False, "у `CUSTOM` — наш подтип: `question`, `approval_request`, `decision_applied`, `message_received`, `guardrail_decision`, `memory_write`, `llm_call`"), ("value", "object", False, "у `CUSTOM` — наши данные: `question` → `{text}`; `approval_request` → `{tool, argsHash, reason}`; `decision_applied` → `{seq}`; `message_received` → `{id}`; `guardrail_decision` → `{point: g1 · g2 · g4, allow, approval, reason}`; `memory_write` → `{level, scope}`; `llm_call` → `{model, inputTokens, outputTokens, costUsd}`"),
         ("message / code", "string", False, "у `RUN_ERROR`: причина")]),
     "RunResult": ("итог запуска (`POST /agent-runs/:runId/result`)", [
         ("status", "enum: success · failed", True, "отмену фиксирует ICPlan сам, раннер её не сообщает"),
-        ("output", "string | null", False, "итог для истории (ICPlan хранит до 10 000 символов)"), ("error", "string | null", False, "причина при `failed` (до 500 символов)"),
-        ("usage", "{inputTokens, outputTokens, reasoningTokens, costUsd, steps}", False, "расход; `reasoningTokens`, `costUsd`, `steps` — добавляем (D18)"),
+        ("output", "string | null", False, "итог для истории; ICPlan обрезает до 10 000 символов"), ("error", "string | null", False, "причина при `failed`; ICPlan обрезает до 500 символов"),
+        ("usage", "{inputTokens, outputTokens, reasoningTokens, costUsd, iterations}", False, "расход; `reasoningTokens`, `costUsd`, `iterations` (итерации цикла) — добавляем (D18)"),
         ("reason", "enum: done · limit · gate_failed · error", False, "причина Harness (R-RUN-07): `done` → `status = success`; `limit`, `gate_failed`, `error` → `failed`"),
-        ("artifacts", "{name, url}[]", False, "опубликованные файлы, ветка, PR (D20)"),
+        ("artifacts", "{name, url}[]", False, "опубликованное для человека: файл в RustFS (`s3://…`), ветка или PR (D20); в M3 — рабочие ссылки `{path, ref}`"),
         ("gate", "{passed: bool, failed: Criterion[]}", False, "проверка по критериям (R-HRN-08, D20): не выполненные критерии")]),
     "ApprovalDecision": ("решение пользователя по вопросу или подтверждению", [
-        ("runId", "int", True, ""), ("seq", "int", True, "`seq` события `CUSTOM` `approval_request` или `question`"), ("decision", "enum: approve · reject · answer", True, ""),
-        ("scope", "enum: once · run", False, "только для `approve`: этот вызов или такие же вызовы до конца запуска (R-GRD-03)"), ("by", "string", True, "`username` того, кто решил"), ("comment", "string", False, "при `answer` — ответ на вопрос; иначе пояснение")]),
+        ("runId", "int", True, ""), ("seq", "int", True, "`seq` события `CUSTOM` `approval_request` или `question`"), ("decision", "enum: approve · reject · answer", True, "на `approval_request` — `approve` или `reject`; на `question` — `answer`"),
+        ("scope", "enum: once · run", False, "только для `approve`: этот вызов или такие же вызовы до конца запуска (R-GRD-03)"), ("by", "string", True, "`username` того, кто решил"), ("comment", "string | null", False, "при `answer` — ответ на вопрос; иначе пояснение")]),
     "UserMessage": ("указание пользователя во время работы", [
         ("id", "string", True, "идентификатор сообщения ICPlan, ключ от повторной доставки"), ("text", "string", True, "текст указания"), ("by", "string", True, "`username` автора"), ("at", "timestamp", True, "когда написано")]),
     "Verdict": ("вердикт по результату шага (R-AP-19)", [
-        ("runId", "int", True, "запуск, чей итог оценивается"), ("verdict", "enum: accepted · rejected", True, "`accepted` → переход `onSuccess` шага, `rejected` → `onFailure`"), ("note", "string", False, "заметка возврата; следующий запуск шага получает её в `RunBundle.task.returnNote`"), ("by", "string", True, "`username` того, кто вынес вердикт"),
+        ("issueId / stepId", "int / string", True, "задача и шаг, по которому вердикт"), ("runId", "int | null", False, "запуск, чей итог оценивается; нет — ручной шаг"), ("verdict", "enum: accepted · rejected", True, "`accepted` → переход `onSuccess` шага, `rejected` → `onFailure`"), ("note", "string", False, "заметка возврата; следующий запуск шага, на который вернули задачу, получает её в `RunBundle.task.returnNote`"), ("by", "string", True, "`username` того, кто вынес вердикт"),
         ("criteria", "Criterion[]", False, "критерии ревьюера при возврате (D20)")]),
     "Process": ("процесс типа задачи (D17)", [
         ("issueType", "string", True, "тип задачи"), ("owner", "string", True, "`username` владельца процесса"), ("firstStep", "string", True, "`id` первого шага"),
-        ("steps", "ProcessStep[]", True, "шаги"), ("version", "int", True, "версия; растёт при каждом изменении; идущие задачи доходят текущий шаг по старой версии")]),
+        ("steps", "ProcessStep[]", True, "шаги"), ("version", "int", True, "версия; растёт при каждом изменении; задача на шаге дорабатывает его по старой версии, следующий шаг берёт из новой")]),
     "ProcessStep": ("шаг процесса (D17, D20)", [
         ("id", "string", True, "идентификатор шага в процессе (`sdd`)"), ("column", "string", True, "название колонки проекта (`SDD`)"), ("agentId", "int", False, "агент шага; нет — ручной шаг"),
-        ("onSuccess / onFailure", "{step} · {process} · {done: true}", True, "куда переходит задача: на шаг этого процесса по `id`, на первый шаг другого процесса (тип задачи меняется) или завершается"), ("maxRuns", "int", False, "лимит запусков шага, по умолчанию 3; превышен — `onFailure`"),
+        ("onSuccess / onFailure", "{step} · {process} · {done: true}", True, "куда переходит задача: на шаг этого процесса по `id`, на первый шаг другого процесса (тип задачи меняется) или завершается"), ("maxRuns", "int", False, "сколько раз шаг может запускаться по одной задаче, 1–10, по умолчанию 3 (R-AP-16); превышен — `onFailure`"),
         ("requireReview", "bool", True, "итог шага проверяет человек (вердикт), прежде чем задача перейдёт дальше"), ("deliverable", "string", False, "что шаг сдаёт: артефакты и формат (D20)"),
-        ("doneCriteria", "Criterion[]", False, "готовность шага (D20)"), ("criteriaApproval", "enum: auto · review · always", True, "как подтверждаются критерии, предложенные агентом (D20): `auto` — действуют сразу, человек подтверждает только при `requireReview` или автономии R0–R1; `review` — подтверждает человек на этом шаге; `always` — всегда человек")]),
+        ("doneCriteria", "Criterion[]", False, "готовность шага (D20)"), ("criteriaApproval", "enum: auto · review · always", True, "как подтверждаются критерии, предложенные агентом (D20): `auto` — без подтверждения, но если у шага `requireReview` или у агента-автора автономия R0–R1, работает как `review`; `review` — подтверждает человек при проверке шага; `always` — подтверждает человек всегда, до запуска шага")]),
     "M3Record": ("состояние задачи и передача следующему шагу (R-MEM-04, D20)", [
-        ("issueId", "int | null", False, "задача, = `issue.id`; есть при `scope = issue`"), ("scope", "enum: issue · agent · project · team", True, "область: задача, агент, проект или команда"), ("agentId", "int", True, "автор записи"),
-        ("done", "string[]", True, "сделано"), ("next", "string[]", True, "дальше"), ("blockers", "string[]", False, ""),
+        ("issueId", "int", True, "задача, = `issue.id`; ключ записи — (задача, область)"), ("scope", "enum: issue · agent · project · team", True, "кто видит запись (R-MEM-02): агенты этой задачи, этот агент в других задачах, проект, команда"), ("agentId", "int", True, "автор записи"),
+        ("done", "string[]", True, "сделано"), ("next", "string[]", True, "дальше"), ("blockers", "string[]", False, "что мешает продолжить"),
         ("artifacts", "{path, ref}[]", False, "артефакты: путь и ветка@коммит"), ("questions", "string[]", False, "открытые вопросы"),
         ("criteriaNext", "Criterion[]", False, "критерии, предложенные следующему шагу"), ("version", "int", True, "версия записи для конкурентной записи")]),
     "PolicyInput": ("вход OPA (G1, G2)", [
-        ("point", "enum: g1 · g2", True, "G1 — допуск запуска, G2 — проверка действия агента"), ("agentId", "int", True, "агент; по нему правило находит `data.agents[<agentId>]`"), ("run", "{id, issueId, step}", True, "запуск, задача, `ProcessStep.id`"),
-        ("tool / argsHash", "string", False, "для G2: тул и хеш его аргументов"), ("autonomy", "enum: R0–R5", True, "уровень автономии агента: R0 — всё с подтверждением … R5 — без подтверждений"), ("spent", "{runUsd, dayUsd, monthUsd}", False, "для G1: уже потрачено запуском, агентом за день, проектом за месяц; лимиты правило берёт из `data`")]),
+        ("point", "enum: g1 · g2", True, "G1 — допуск запуска, G2 — проверка действия агента"), ("agentId", "int", True, "агент; по нему правило находит `data.agents[<agentId>]`"), ("run", "{id, issueId, stepId}", True, "запуск, задача (или `null`), шаг процесса (или `null`, если запуск не по процессу)"),
+        ("tool / argsHash", "string", False, "для G2: тул и SHA-256 его аргументов"), ("spent", "{dayUsd, monthUsd}", False, "для G1: потрачено агентом за день и проектом за месяц (считает Runner по журналу LiteLLM); лимиты, автономию и тулы правило берёт из данных бандла")]),
     "PolicyDecision": ("решение OPA", [
-        ("allow", "bool", True, "можно ли выполнить сразу"), ("approval", "bool", True, "при `allow = false`: `true` — можно после подтверждения человеком (пауза), `false` — запрещено"), ("reason", "string", True, "причина для аудита и ленты")]),
+        ("allow", "bool", True, "можно ли выполнить сразу; при `true` поле `approval` = `false`"), ("approval", "bool", True, "при `allow = false`: `true` — можно после подтверждения человеком (пауза), `false` — запрещено"), ("reason", "string", True, "причина для аудита и ленты")]),
     "AgentSettings": ("настройки агента из Platform module (I4)", [
-        ("agentId", "int", True, ""), ("version", "int", True, "версия настроек (R-CP-04)"), ("autonomy", "enum: R0–R5", True, ""),
+        ("agentId", "int", True, "агент"), ("version", "int", True, "единая версия агента: растёт при любой правке определения или настроек (R-CP-04); та же в `AgentDefinition.version` и `RunBundle.agent.version`"), ("autonomy", "enum: R0–R5", True, "уровень автономии: R0 — каждое действие с подтверждением … R5 — без подтверждений"),
         ("budget", "{runUsd, dayUsd}", True, "лимиты агента в $: на запуск и на день"), ("sandboxProfile", "string", True, "имя профиля среды (`sandbox_profile.name`)"), ("memoryProfile", "string", True, "имя профиля памяти"),
-        ("toolsAllow / approvalTools", "string[]", True, "разрешённые тулы и тулы с подтверждением; в бандл OPA уходят как `tools_allow` и `approval`"), ("scheduling", "{parallel, max}", False, "одновременных запусков агента и предел очереди"), ("enabled", "bool", True, "выключение агента")]),
+        ("toolsAllow / approvalTools", "string[]", True, "разрешённые тулы и тулы с подтверждением; в бандл OPA уходят как `tools_allow` и `approval`"), ("scheduling", "{parallel, max}", False, "`parallel` — сколько запусков агента идёт одновременно; `max` — сколько запусков агента может ждать в очереди"), ("enabled", "bool", True, "выключение агента")]),
     "SandboxClaim": ("заявка Runner на среду запуска", [
-        ("profile", "string", True, "имя профиля среды"), ("sandboxId", "string", False, "в ответе: идентификатор среды, назначает провайдер"), ("image", "string", True, "образ Harness"),
+        ("profile", "string", True, "имя профиля среды"), ("sandboxId", "string", False, "в ответе: идентификатор среды, назначает провайдер"), ("image", "string", True, "образ Harness из профиля"),
         ("runtime", "enum: runc · runsc", True, "runc — обычный контейнер; runsc — gVisor, изоляция ядра для недоверенного кода (R-SBX-05)"), ("cpu / memoryMb / diskGb", "number", True, "ядра, МБ памяти, ГБ диска из профиля"), ("readyMs", "int", False, "в ответе: время до готовности среды")]),
     "RepoGrant": ("доступ к репозиторию на один запуск", [
         ("repo", "string", True, "репозиторий `org/name`"), ("access", "enum: read · write", True, "право на репозиторий"), ("branchPrefix", "string", True, "в какие ветки можно писать: `agent/`"),
         ("protected", "string[]", True, "ветки без записи"), ("ttlSec", "int", True, "срок токена; сам токен в модель не входит — его подставляет прокси (R-SBX-04)")]),
     "Checkpoint": ("состояние цикла (I12)", [
-        ("runId", "int", True, "запуск"), ("step", "int", True, "номер итерации цикла Harness (не шаг процесса); ключ идемпотентности"), ("parentStep", "int", False, "предыдущая итерация"),
-        ("state", "bytes", True, "сериализованное состояние графа LangGraph")]),
+        ("runId", "int", True, "запуск"), ("iteration", "int", True, "номер итерации цикла Harness; ключ идемпотентности — `runId` + `iteration`"), ("parentIteration", "int", False, "предыдущая итерация"),
+        ("state", "string (base64)", True, "сериализованное состояние графа LangGraph")]),
     "ChatCompletionRequest": ("запрос к модели (OpenAI Chat Completions через LiteLLM)", [
         ("model", "string", True, "алиас из `model_list`"), ("messages", "{role, content}[]", True, "слои промпта (R-HRN-18)"), ("tools", "{type, function: {name, parameters}}[]", False, ""),
         ("tool_choice / parallel_tool_calls", "enum / bool", False, "Harness: `auto`, без параллельных вызовов"), ("temperature / max_tokens / reasoning_effort", "number / enum", False, "`model.*`; неподдерживаемое отбрасывает `drop_params`"),
         ("metadata", "{run_id, issue_key, agent}", True, "наши ключи для атрибуции затрат (R-LLM-03): `run_id` = `Run.id`, `issue_key` = `issueIdentifier`, `agent` = `username`"), ("stream", "bool", False, "")]),
     "McpToolCall": ("вызов тула MCP (JSON-RPC 2.0)", [
-        ("jsonrpc / id", "string / int", True, "конверт JSON-RPC 2.0"), ("method", "enum: tools/list · tools/call", True, ""), ("params.name", "string", False, "имя тула"), ("params.arguments", "object", False, "аргументы"),
-        ("result.content", "{type, text}[]", False, "результат, обрезка `max_result_kb`")]),
+        ("jsonrpc / id", "string / int", True, "конверт JSON-RPC 2.0"), ("method", "enum: tools/list · tools/call", True, ""), ("params.name", "string", False, "в запросе: имя тула"), ("params.arguments", "object", False, "в запросе: аргументы"),
+        ("result.content", "{type, text}[]", False, "в ответе: результат; MCP-прокси Runner обрезает до `max_result_kb`"), ("error", "{code, message}", False, "в ответе при ошибке (JSON-RPC 2.0)")]),
     "VirtualKey": ("ключ LiteLLM на агента (`/key/generate`)", [
         ("key_alias", "string", True, "`agent:<agentId>`"), ("models", "string[]", True, "разрешённые алиасы"), ("max_budget", "float", True, "бюджет $ за период = `AgentSettings.budget.dayUsd`"),
-        ("budget_duration", "string", True, "период"), ("rpm_limit / tpm_limit", "int", False, ""), ("metadata", "object", False, "")]),
+        ("budget_duration", "string", True, "всегда `1d`: бюджет ключа = дневной лимит агента; лимит на запуск проверяет G1"), ("rpm_limit / tpm_limit", "int", False, ""), ("metadata", "object", False, "наши ключи в стиле LiteLLM: `agent_id`")]),
     "CostAggregate": ("сводка затрат по задаче и агенту (экран «Затраты», R-OBS-05)", [
-        ("issueId", "int", True, "задача: `run_id` из журнала LiteLLM → `agent_run.issue_id`"), ("agentId", "int", True, "агент: `agent_run.agent_id`"), ("runs", "int", True, "число запусков за всё время задачи"),
+        ("issueId", "int", True, "задача: `run_id` из журнала LiteLLM → `agent_run.issue_id`"), ("agentId", "int", True, "агент: `agent_run.agent_id`"), ("runs", "int", True, "число запусков за всё время задачи; запуски без задачи — в сводке агента (задача 3.9)"),
         ("inputTokens / outputTokens", "int", True, "токены из журнала LiteLLM"), ("costUsd", "float", True, "затраты")]),
     "OpaBundleData": ("данные бандла OPA (`data.json`)", [
         ("agents.<id>.tools_allow", "string[]", True, "`<id>` — `agentId`"), ("agents.<id>.approval", "string[]", True, "тулы с паузой"),
-        ("agents.<id>.autonomy", "enum: R0–R5", True, ""), ("agents.<id>.budget", "{run_usd, day_usd}", True, "лимиты $ = `AgentSettings.budget`"), ("platform.kill_switch", "bool", True, "")]),
+        ("agents.<id>.autonomy", "enum: R0–R5", True, ""), ("agents.<id>.budget", "{run_usd, day_usd}", True, "лимиты $ = `AgentSettings.budget`"), ("projects.<id>.budget.month_usd", "number", False, "лимит проекта на месяц = `project_platform.budget_month_usd`"), ("platform.kill_switch", "bool", True, "аварийная остановка всех агентов")]),
 }
 
 # Откуда модель и почему она такая (О-45): вид источника, ссылка, сноска «почему так, почему такие имена».
@@ -195,16 +198,16 @@ MODEL_META = {
     "Run": ("fork", "POST /agent-runs/claim", "response.run",
             "Это ответ форка любому внешнему раннеру: так ICPlan уже выдаёт запуски. `prompt` и `systemPrompt` разделены, потому что раннер передаёт первое как задание, второе — как системные правила. Мы добавляем только `rule` — какой шаг процесса создал запуск (D17): по нему Runner берёт критерии шага, а лента задачи — разделитель шага."),
     "AgentDefinition": ("ours", "R-REG-04, R-CP-05, задача 1.2",
-                        "Файл для ревью и переноса агента между окружениями. Это конфигурация, поэтому имена — как у параметров конфигурации: YAML snake_case (`limits.max_steps`, `memory.read`), единицы — суффиксом `_s`. Исключение — `apiVersion`: заголовок версии формата, как в манифестах Kubernetes. Источник правды — БД ICPlan (`ai_agent`) и Platform module; файл — их снимок."),
+                        "Файл для ревью и переноса агента между окружениями: снимок `ai_agent` (ICPlan) и `AgentSettings` (Platform module), источник правды — они, файл только читается и импортируется. Агент в файле — `id` = `username`, потому что числовой `agentId` в другом окружении другой. Имена — как у параметров конфигурации: YAML snake_case (`limits.max_steps`, `memory.read` — уровни памяти M0–M6), единицы — суффиксом `_s`. Исключение — `apiVersion`: заголовок формата, как в манифестах Kubernetes."),
     "RunSummary": ("ours", "R-MEM-03, R-MEM-05",
-                   "M2 (эпизодическая память: итоги прошлых запусков) не хранится отдельно: это строки `agent_run` форка, которые платформа пишет сама. Модель наша, данные и имена — форка (`GET /projects/:projectKey/analytics/agent-runs`: `id`, `agentId`, `lastError`)."),
+                   "M2 (эпизодическая память: итоги прошлых запусков) не хранится отдельно: это строки `agent_run` форка: ICPlan пишет их сам при выдаче и завершении запуска (`POST …/result`). Модель наша, данные и имена — форка (`GET /projects/:projectKey/analytics/agent-runs`: `id`, `agentId`, `lastError`)."),
     "Heartbeat": ("ours", "D17, R-ICP-16",
                   "Сейчас heartbeat в форке отвечает 204 без тела. Ответ с телом — доработка: так раннер узнаёт об отмене, ответах и указаниях без отдельного канала (раннер ходит наружу сам, входящих соединений нет). Имя `canceled` — как в ответе форка на события чата (`POST /agent-chats/:id/events` → `{canceled}`)."),
     "RunBundle": ("ours", "D18, D19, D20",
                   "Всё, что нужно Harness на один запуск, одним документом: Harness не ходит в ICPlan сам (нет учётных данных в sandbox). Группы `agent`, `task`, `memory`, `workspace`, `mcp` — по источнику данных, чтобы было видно, кто за что отвечает."),
     "WorkspaceSource": ("ours", "D18", "Рабочее пространство собирается из источников проекта; `right` — право агента на источник по политике, его проверяет Runner при монтировании."),
     "Criterion": ("ours", "D20", "Критерий хранится пунктом чек-листа задачи ICPlan (`issue_checklist_item`) с полями `origin` и `status`. Происхождение нужно, чтобы применить порядок «человек > процесс > агент» и показать, кто что задал."),
-    "RunEvent": ("ours", "D21", "Конверт добавляет к событию AG-UI то, чего в протоколе нет: номер запуска, сквозной `seq` для порядка и идемпотентности и время в Harness. Само событие не меняем — его понимает чат форка."),
+    "RunEvent": ("ours", "D21", "Конверт добавляет к событию AG-UI то, чего в протоколе нет: номер запуска, сквозной `seq` для порядка и идемпотентности и время в Harness. Поля события не меняем — их понимает чат форка; единственное отличие в хранилище: дельты сообщения собираются, и `*_END` несёт полный текст в `delta`."),
     "AgUiEvent": ("ext", "https://docs.ag-ui.com/concepts/events",
                   "Протокол AG-UI без изменений; тот же формат форк уже принимает в чате агента (`POST /agent-chats/:messageId/events`, OpenAPI 1.3.0). Имена и регистр типов — по протоколу."),
     "RunResult": ("fork", "POST /agent-runs/{runId}/result", "request",
@@ -217,16 +220,26 @@ MODEL_META = {
     "M3Record": ("ours", "R-MEM-04, D20", "M3 — память состояния задачи и передача между шагами: «сделано / дальше / блокеры» и ссылки на артефакты вместо содержимого. Harness пишет её в Memory API (отдельный сервис платформы) по токену запуска, а не в БД; Memory API хранит её в `memory_m3` по ключу (задача, область), `version` защищает от одновременной записи."),
     "PolicyInput": ("ours", "D6, R-GRD-01", "Содержимое наше: точка G1 или G2, агент, запуск, тул и потраченный бюджет; конверт `{input: …}` задаёт REST API OPA. Вместо аргументов тула — их хеш, чтобы в аудите не было данных. Лимиты сюда не передаются: правило берёт их из данных бандла по `agentId`."),
     "PolicyDecision": ("ours", "D6, R-GRD-03", "Ответ нашего правила Rego, OPA кладёт его в `{result: …}`. Три исхода: выполнить сразу (`allow`), после подтверждения (`approval`), запрещено."),
-    "AgentSettings": ("ours", "D9, R-CP-04", "Наши настройки агента, которых нет в ICPlan; версия нужна для отката и для того, чтобы запуск видел настройки на момент выдачи."),
+    "AgentSettings": ("ours", "D9, R-CP-04", "Наши настройки агента, которых нет в ICPlan; источник правды для автономии, бюджета, тулов и профилей. Из них собираются бандл OPA (`OpaBundleData`, имена конфигурации) и файл экспорта (`AgentDefinition`). Версия нужна для отката и для того, чтобы запуск видел настройки на момент выдачи."),
     "SandboxClaim": ("ours", "D1, R-SBX-05", "Заявка Runner провайдеру среды (Docker, позже Kubernetes): профиль, образ и ресурсы."),
     "RepoGrant": ("ours", "D18, R-SBX-04", "Короткоживущий доступ к репозиторию на запуск: только ветки с префиксом агента, защищённые ветки без записи."),
     "Checkpoint": ("ours", "D2, D18, R-HRN-05", "Состояние графа LangGraph между шагами; Harness пишет его через Runner, потому что в sandbox нет учётных данных БД."),
     "ChatCompletionRequest": ("ext", "https://platform.openai.com/docs/api-reference/chat/create",
                               "Стандартный запрос OpenAI Chat Completions, который LiteLLM принимает для любого провайдера. `metadata` — наши ключи для атрибуции затрат; их имена в стиле LiteLLM, потому что они попадают в его журнал затрат."),
     "McpToolCall": ("ext", "https://modelcontextprotocol.io/specification", "Вызов тула по протоколу MCP поверх JSON-RPC 2.0; имена — по спецификации."),
-    "VirtualKey": ("ext", "https://docs.litellm.ai/docs/proxy/virtual_keys", "Ключ LiteLLM на агента: бюджет и модели ограничиваются шлюзом, а не кодом агента. Имена — API LiteLLM."),
-    "CostAggregate": ("ours", "R-OBS-05, R-LLM-03", "Сводка для экрана затрат собирается из журнала LiteLLM по `metadata.run_id`; токены названы как в ICPlan (`inputTokens`, `outputTokens`)."),
+    "VirtualKey": ("ext", "https://docs.litellm.ai/docs/proxy/virtual_keys", "Ключ LiteLLM на агента: бюджет и модели ограничиваются шлюзом, а не кодом агента. Ключ хранится в Secret и подставляется egress-прокси, в среду запуска не попадает (Т5). Имена — API LiteLLM, включая наши ключи `metadata`."),
+    "CostAggregate": ("ours", "R-OBS-05, R-LLM-03", "Сводка для экрана затрат: Observability читает журнал LiteLLM (I14) и группирует по `metadata.run_id` → `agent_run`; токены названы как в ICPlan (`inputTokens`, `outputTokens`). `RunResult.usage` — расход одного запуска, сводка — сумма по журналу."),
     "OpaBundleData": ("ours", "D6, R-GRD-01", "Данные, которые Platform module кладёт в бандл OPA рядом с правилами Rego: что разрешено агенту, где нужна пауза, бюджет и аварийный выключатель. Это выгрузка параметров конфигурации как есть, поэтому имена — как у параметров (`guardrails.tools_allow`, `kill_switch`): их и читают правила Rego."),
+}
+
+# Значок источника поля, если он отличается от значка модели (О-48): модель → {поле: значок и пояснение}
+FIELD_SRC = {
+    "RunSummary": {n: "✅ форк (`agent_run`)" for n in ("id", "agentId", "status", "output", "lastError", "inputTokens / outputTokens", "finishedAt")},
+    "Criterion": {"text": "✅ форк (`issue_checklist_item.content`)", "origin": "🛠 D20", "status": "🛠 D20"},
+    "AgUiEvent": {"name": "🧩 наше (подтип)", "value": "🧩 наше"},
+    "ChatCompletionRequest": {"metadata": "🧩 наши ключи"},
+    "VirtualKey": {"metadata": "🧩 наши ключи"},
+    "RunEvent": {"event": "📘 AG-UI; `*_END` в хранилище — с собранным `delta` (D21)"},
 }
 
 # Поля моделей «fork», которых в форке ещё нет: поле → решение
@@ -288,7 +301,7 @@ PLATFORM_TABLES = {
                                    ("version", "int", "", ""), ("updated_at", "timestamptz", "", "")]),
     "m4_fact": ("S4", "memory", [("id", "bigserial", "PK", "после MVP"), ("scope", "text", "", ""), ("text", "text", "", "маскированный"), ("embedding", "vector", "", "pgvector"),
                                  ("source", "text", "", ""), ("valid_from", "timestamptz", "", ""), ("valid_to", "timestamptz", "", ""), ("superseded_by", "bigint", "FK m4_fact", "")]),
-    "run_checkpoint": ("S5", "agent-runner", [("run_id", "int", "PK, FK agent_run", ""), ("step", "int", "PK", ""), ("parent_step", "int", "", ""), ("state", "bytea", "", "состояние LangGraph"),
+    "run_checkpoint": ("S5", "agent-runner", [("run_id", "int", "PK, FK agent_run", ""), ("iteration", "int", "PK", "итерация цикла"), ("parent_iteration", "int", "", ""), ("state", "bytea", "", "состояние LangGraph"),
                                               ("created_at", "timestamptz", "", ""), ("expires_at", "timestamptz", "", "`checkpoint.ttl`")]),
 }
 LITELLM_REF = "schema.prisma LiteLLM v1.104.2 (тег, fc3920bf)"
@@ -384,7 +397,7 @@ ENDPOINT_IO = {
     "GET /ready": ("—", "200 · {ready, version}", "Runner ждёт готовности перед `POST /run`"),
     # Agent Runner
     "PUT /runs/:runId/checkpoint": ("Checkpoint", "204", "одноразовый токен запуска"),
-    "GET /runs/:runId/checkpoint": ("query: step", "200 · Checkpoint", ""),
+    "GET /runs/:runId/checkpoint": ("query: iteration (нет — последняя)", "200 · Checkpoint", "при повторной выдаче запуска Harness продолжает с последней итерации"),
     "POST /runs/:runId/mcp/:server": ("McpToolCall", "200 · McpToolCall (result)", "allowlist запуска и G2 проверяются до вызова сервера"),
     "POST /runs/:runId/deps": ("{lockFiles?: string[]}", "200 · {status: ok · failed, log}", "повтор шага подготовки (D19)"),
     "GET /healthz": ("—", "200 · {status}", ""),

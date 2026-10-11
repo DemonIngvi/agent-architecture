@@ -39,9 +39,9 @@
 
 | ID | От → к | Протокол | Формат | Аутентификация | Режим | Таймаут | Повтор | Идемпотентность |
 |---|---|---|---|---|---|---|---|---|
-| I1 | ICPlan Run Queue → Agent Runner | HTTP REST `POST /agent-runs/claim` (протокол `@itsaplan/runner`) | JSON `Run` | Bearer API-ключ агента | pull, опрос 3 с | 10 с | backoff до 60 с | аренда запуска: выдаётся одному Runner |
+| I1 | Agent Runner → ICPlan Run Queue (claim, pull) | HTTP REST `POST /agent-runs/claim` (протокол `@itsaplan/runner`) | JSON `Run` | Bearer API-ключ агента | pull, опрос 3 с | 10 с | backoff до 60 с | аренда запуска: выдаётся одному Runner |
 | I2 | Agent Runner → ICPlan (шаги, итог) | HTTP REST: `POST /agent-runs/{id}/result` (есть); `POST /agent-runs/{id}/events` — доработка форка по образцу `/agent-chats/{id}/events` | JSON-пакеты `RunEvent` с `seq`, `RunResult` | Bearer API-ключ агента | асинхронно | 10 с | повтор с дедупликацией по (run_id, seq) | да, по (run_id, seq) |
-| I3 | ICPlan → Agent Runner (approve, отмена, указания пользователя) | HTTP REST: ответ heartbeat запуска (`/agent-runs/:id/heartbeat` — запуск ещё активен; сообщения пользователя) | JSON `ApprovalDecision`, статус, `UserMessage[]` | Bearer API-ключ агента | pull | 10 с | backoff | да, по (run_id, seq) |
+| I3 | Agent Runner → ICPlan: heartbeat, в ответе (approve, отмена, указания пользователя) | HTTP REST: ответ heartbeat запуска (`/agent-runs/:id/heartbeat` — запуск ещё активен; сообщения пользователя) | JSON `ApprovalDecision`, статус, `UserMessage[]` | Bearer API-ключ агента | pull | 10 с | backoff | да, по (run_id, seq) |
 | I19 | Agent Runner / ICPlan → объектное хранилище (RustFS) | S3 API | файлы | ключи сервиса (Secret) | синхронно | 30 с | 3 раза | да, по ключу объекта |
 | I20 | ICPlan UI ↔ ICPlan API | HTTP REST (существующий) | JSON | сессия пользователя | синхронно | — | — | — |
 | I21 | Пользователи → Traefik → web / api / mcp | HTTPS (TLS 1.2+), HTTP/2 | HTML / JSON | сессия ICPlan; ACME-сертификат | синхронно | 60 с (ingress) | нет | — |

@@ -41,7 +41,7 @@
 | ID | От → к | Протокол | Формат | Аутентификация | Режим | Таймаут | Повтор | Идемпотентность |
 |---|---|---|---|---|---|---|---|---|
 | I20 | ICPlan UI ↔ ICPlan API | HTTP REST (существующий) | JSON | сессия пользователя | синхронно | — | — | — |
-| I1 | ICPlan Run Queue → Agent Runner | HTTP REST (протокол `@itsaplan/runner`) | JSON `Run` | Bearer API-ключ агента | pull, опрос 3 с | 10 с | backoff до 60 с | аренда запуска: выдаётся одному Runner |
+| I1 | Agent Runner → ICPlan Run Queue (claim, pull) | HTTP REST (протокол `@itsaplan/runner`) | JSON `Run` | Bearer API-ключ агента | pull, опрос 3 с | 10 с | backoff до 60 с | аренда запуска: выдаётся одному Runner |
 
 ## Нагрузка и развёртывание
 

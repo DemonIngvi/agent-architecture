@@ -71,7 +71,7 @@ GLOSSARY = [
     "| **RustFS** | объектное хранилище (S3) для файлов задач и артефактов |",
     "| **Запуск** | одна работа агента по задаче: от выдачи из очереди до итога (`agent_run`) |",
     "| **Шаг процесса** | этап задачи: колонка + агент + переходы (`ProcessStep`, строковый `id`) |",
-    "| **Итерация цикла** | один круг Harness «модель → тулы» (`Checkpoint.step`, `STEP_*` AG-UI, `usage.steps`) |",
+    "| **Итерация цикла** | один круг Harness «модель → тулы» (`Checkpoint.iteration`, `STEP_*` AG-UI, `usage.iterations`) |",
     "| **Лента задачи**, карточка итога | панель «Агент» в задаче: события запуска и итог с критериями и кнопками вердикта (D21) |",
     "| **M0–M6** | уровни памяти: M0 рабочая, M1 переписка, M2 итоги прошлых запусков, M3 состояние задачи, M4 факты, M5 агент, M6 документы проекта |",
     "| **L0–L3** | уровни конфигурации: L0 развёртывание, L1 проект, L2 агент, L3 запуск; нижний уровень переопределяет верхний |",
@@ -97,6 +97,8 @@ def io_lists(slug, nm):
     for i, a, b, via, what, models in involved(slug):
         if a == b == slug:
             continue
+        if i in DM.DATA_IN_RESPONSE:  # стрелка — кто вызывает; данные идут в ответе
+            a, b = b, a
         lab = ", ".join(f"`{m}`" for m in models) or what
         if b == slug or (via == slug and a != slug):
             got.append(f"{lab} ← {_who(a, nm)} ({i})")
@@ -111,6 +113,9 @@ def integrations_md(slug, page, nm, href) -> list:
          '<div class="integ">']
     for i, a, b, via, what, models in sorted(involved(slug), key=lambda x: int(x[0][1:])):
         r = rows.get(i, {})
+        caller = _who(a, nm)
+        if i in DM.DATA_IN_RESPONSE:  # стрелка — кто вызывает; данные идут в ответе
+            a, b = b, a
         if a == slug and b != slug:
             dirc, cls = "отдаёт", "out"
         elif b == slug or (via == slug and a != slug and b != slug):
@@ -118,6 +123,8 @@ def integrations_md(slug, page, nm, href) -> list:
         else:
             dirc, cls = "участвует", "mid"
         path = _who(a, nm) + (f" → {_who(via, nm)}" if via else "") + f" → {_who(b, nm)}"
+        if i in DM.DATA_IN_RESPONSE:
+            path += f" (вызывает {caller}, данные — в ответе)"
         eps = api.get(i, [])
         ep_html = "".join(f'<li><span class="m {BADGE.get(m.split()[0], "m-none")}">{_esc(m.split()[0])}</span> <code>{_esc(p.strip("`"))}</code> <small>{_esc(d.replace(chr(96), ""))}</small></li>'
                           for m, p, d, _ in eps[:8])
@@ -198,6 +205,8 @@ def _names(field):
 
 
 def field_origin(m, field):
+    if field in DM.FIELD_SRC.get(m, {}):
+        return DM.FIELD_SRC[m][field]
     kind = DM.MODEL_META[m][0]
     if kind == "fork":
         plan = DM.PLANNED.get(m, {})
@@ -517,6 +526,7 @@ def data_model_page(components) -> str:
           "Модели JSON, которыми обмениваются компоненты. Это единственное описание полей: потоки ссылаются сюда, "
           "примеры — в [каталоге API](docs/api/README.md) (сборка сверяет ключи примеров с полями). "
           "У каждой модели — источник, у поля — откуда оно: ✅ поле есть в OpenAPI форка ICPlan; 🛠 поля в форке ещё нет — доработка по решению D… или требованию R-…; 📘 поле задаёт внешняя спецификация (OpenAI, MCP, AG-UI, LiteLLM); 🧩 наш контракт.", "",
+          "Строка `a / b` — несколько полей одного назначения, обязательность и тип — у каждого; «в запросе» / «в ответе» — в какой части вызова поле есть; `…` в примерах — сокращение, не часть JSON.", "",
           "### Термины и коды {#terms}", "", *GLOSSARY, "",
           "### Правило имён {#naming}", "", DM.NAMING, ""]
     for m in DM.MODELS:
