@@ -115,7 +115,7 @@ SUB = {
         why="Зависшие запуски не держат слоты.", rnd="runaway-protection.md"),
     ("agent-runner", "Event relay"): dict(
         tech="Go, поток `RunEvent`",
-        params=[("events.level", "тулы + итоги"), ("Approve", "пробрасывает `ApprovalDecision`")],
+        params=[("events.level", "всё"), ("Approve", "пробрасывает `ApprovalDecision`")],
         does=["Передаёт шаги Harness в ICPlan и таблицу событий", "Передаёт решение человека обратно"],
         why="Один канал для таймлайна, approve и аудита.", rnd="observability.md"),
     ("agent-runner", "Finalizer"): dict(
@@ -277,7 +277,7 @@ SUB = {
     # ---------- Observability ----------
     ("observability", "События запуска"): dict(
         tech="Таблица `run_event` в БД ICPlan",
-        params=[("events.level", "тулы + итоги"), ("retention_days", "90")],
+        params=[("events.level", "всё"), ("retention_days", "90")],
         does=["Хранит шаги запуска", "Источник таймлайна и аудита"],
         why="Самый дешёвый способ дать таймлайн в MVP.", rnd="observability.md"),
     ("observability", "Агрегаты затрат"): dict(
