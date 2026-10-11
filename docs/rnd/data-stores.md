@@ -302,7 +302,7 @@ MinIO архивирован (последний релиз — 15.10.2025). Rus
 | Стыки I14, I19, I22 | спека platform-infrastructure | — не требуется |
 | Бэкапы и восстановление | [R-INF-08](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-08) | — не требуется: PITR уже в требовании |
 | Техспека инфраструктуры | [техспека](../techspec/infrastructure.md) | — не требуется |
-| Поток инфраструктуры | [поток](../techspec/infrastructure.md#how) | — не требуется |
+| Поток инфраструктуры | [поток](../how/infrastructure.md) | — не требуется |
 
 <span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.
 

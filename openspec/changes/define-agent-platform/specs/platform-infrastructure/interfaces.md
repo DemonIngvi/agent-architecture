@@ -54,7 +54,7 @@
 | **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | ~20 RPS к API ICPlan и до 6 запусков агентов в пике; потребление ~13 ГБ RAM и ~5 vCPU не более ёмкости узла 8 vCPU / 32 ГБ / 400 ГБ; запас под 10 обычных или 4–5 «coder» запусков |
 | **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | k3s один узел; namespaces `itsaplan-core`, `itsaplan-data`, `itsaplan-agents`, `itsaplan-platform`; Traefik ingress; CloudNativePG + PgBouncer; RustFS |
 
-Детали форматов — [потоки](../../../../../docs/techspec/infrastructure.md#how).
+Детали форматов — [потоки](../../../../../docs/how/infrastructure.md).
 
 ## Отказы (FMEA)
 

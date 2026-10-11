@@ -1,6 +1,6 @@
 # User Stories: ICPlan
 
-← [Все истории](README.md) · [как работает](../techspec/icplan.md#how)
+← [Все истории](README.md) · [как работает](../how/icplan.md)
 
 > Сгенерировано из `html-view/stories.py` — правьте там.
 

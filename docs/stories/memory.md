@@ -1,6 +1,6 @@
 # User Stories: Memory
 
-← [Все истории](README.md) · [как работает](../techspec/memory.md#how)
+← [Все истории](README.md) · [как работает](../how/memory.md)
 
 > Сгенерировано из `html-view/stories.py` — правьте там.
 

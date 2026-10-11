@@ -1,6 +1,6 @@
 # User Stories: MCP / Tools
 
-← [Все истории](README.md) · [как работает](../techspec/mcp-tools.md#how)
+← [Все истории](README.md) · [как работает](../how/mcp-tools.md)
 
 > Сгенерировано из `html-view/stories.py` — правьте там.
 

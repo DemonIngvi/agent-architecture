@@ -68,7 +68,7 @@
 | **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | опрос очереди ~0.3 RPS на агента; до 6 запусков в очереди, 4 активны; старт запуска после взятия < 5 с (с пулом < 1 с); MCP-прокси ~1 RPS (D19); шаг подготовки — до `setup.timeout_s` при промахе кэша |
 | **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | Deployment `agent-runner` в `itsaplan-agents`, 1 реплика (MVP), 2 — с общими слотами; requests 0.1 CPU / 128 МиБ, limits 0.5 / 512 МиБ; без ingress |
 
-Детали форматов — [потоки](../../../../../docs/techspec/agent-runner.md#how).
+Детали форматов — [потоки](../../../../../docs/how/agent-runner.md).
 
 ## Отказы (FMEA)
 

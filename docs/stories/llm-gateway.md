@@ -1,6 +1,6 @@
 # User Stories: LiteLLM gateway
 
-← [Все истории](README.md) · [как работает](../techspec/llm-gateway.md#how)
+← [Все истории](README.md) · [как работает](../how/llm-gateway.md)
 
 > Сгенерировано из `html-view/stories.py` — правьте там.
 

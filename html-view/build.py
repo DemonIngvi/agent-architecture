@@ -102,7 +102,7 @@ def sync_stories():
             continue
         procs = BPMN.get(slug, [])
         idx.append(f"| [{name}]({slug}.md) | {len(lst)} | {len(procs) or '—'} |")
-        L = [f"# User Stories: {name}", "", "← [Все истории](README.md) · [как работает](../techspec/" + slug + ".md#how)", "",
+        L = [f"# User Stories: {name}", "", "← [Все истории](README.md) · [как работает](../how/" + slug + ".md)", "",
              "> Сгенерировано из `html-view/stories.py` — правьте там.", ""]
         typ = {"start": "начало", "task": "задача", "gateway": "развилка", "end": "конец", "error": "ошибка"}
         for i, pr in enumerate(procs):
@@ -481,7 +481,7 @@ def copy_sources():
         files += [src] if src.is_file() else list(src.rglob("*.md"))
     for f in files:
         rel = f.relative_to(ROOT)
-        if rel.as_posix() in SM.NOT_PAGES:
+        if rel.as_posix() in SM.NOT_PAGES or rel.as_posix().startswith(SM.NOT_PAGE_DIRS):
             continue  # не отдельная страница сайта (О-54): содержание на главной или на страницах компонентов
         # Корневой README на сайте — страница «Компоненты» (overview.md); главная — карта из home.md
         dst = SRC / ("overview.md" if rel.as_posix() == "README.md" else rel)
@@ -497,6 +497,9 @@ def copy_sources():
             base = "../" * (len(rel.parts) - 1)
             txt = IG.flow_page(txt, rel.stem, IG.names(COMPONENTS), base)  # О-46, О-52: модели — ссылками, матрица интерфейсов — из datamodel
         if rel.as_posix().startswith("docs/api/") and rel.name != "README.md":
+            head, _, rest = txt.partition("\n## ")
+            head = re.sub(r"^# API: ", "# Интеграции: ", head)
+            txt = head.rstrip("\n") + "\n\n" + "\n".join(IG.integrations_page_head(rel.stem, IG.names(COMPONENTS))) + "\n\n## " + rest if rest else head
             txt = IG.api_page_structure(txt)  # О-45: структура запросов и ответов из OpenAPI форка и datamodel
         dst.write_text(txt, encoding="utf-8")
     (SRC / "index.md").write_text(SM.home_page((HERE / "home.md").read_text(encoding="utf-8"), IG.flow_page), encoding="utf-8")
@@ -577,6 +580,8 @@ def write_pagebar_map():
     pages.setdefault(f"{AP}/tasks.md", "icplan")
     for slug, *_ in COMPONENTS:
         pages[f"docs/stories/{slug}.md"] = slug
+        pages[f"docs/api/{slug}.md"] = slug
+        pages[f"docs/techspec/{slug}.md"] = slug
     for slug, name, st, g, desc, links, docs, tids in COMPONENTS:
         for _, p in docs:
             for fp in spec_family(p):
@@ -950,9 +955,9 @@ def write_component_pages():
             '<div><div class="about-label">Отдаёт</div>'
             f'<ul class="does">{"".join(f"<li>{code(x)}</li>" for x in gave)}</ul></div></div>'
             '</div><aside class="about-side">'
-            f'<div class="side-card"><div class="side-head"><span class="dtype dtype-flow">КАК РАБОТАЕТ</span>'
-            f'<a class="side-all" href="{href(page, f"docs/techspec/{slug}.md")}#how">открыть →</a></div>'
-            '<ul><li>Порядок работы, запуск, конфигурация</li></ul></div>'
+            f'<div class="side-card"><div class="side-head"><span class="dtype dtype-flow">ИНТЕГРАЦИИ</span>'
+            f'<a class="side-all" href="{href(page, f"docs/api/{slug}.md")}">открыть →</a></div>'
+            '<ul><li>Схема C1, стыки с соседями, API</li></ul></div>'
             f'<div class="side-card"><div class="side-head"><span class="dtype dtype-rnd">R&amp;D</span>'
             f'<a class="side-all" href="{href(page, f"rnd-by-component/{slug}/index.md")}">все →</a></div><ul>'
             + "".join(f'<li><a href="{href(page, p)}">{esc(lab)}</a></li>' for lab, p in REFS.get(slug, []) if p.startswith("docs/rnd/"))
@@ -972,7 +977,11 @@ def write_component_pages():
                 "## Устройство", "",
                 f'<div class="map">{render_rows(BLOCKS.get(slug, []), page, slug)}</div>', ""]
         body += rationale_md(slug)
-        body += [""] + IG.integrations_md(slug, page, IG.names(COMPONENTS), href) + IG.models_md(slug) + IG.stores_md(slug, page, href)
+        how = ROOT / f"docs/how/{slug}.md"  # порядок работы компонента (О-55); интеграции — на вкладке «Интеграции»
+        if how.exists():
+            ht = SM.relink(how.read_text(encoding="utf-8"), f"docs/how/{slug}.md", page)
+            body += ["", "## Как работает {#how}", "", IG.flow_page(ht, slug, IG.names(COMPONENTS), "../../")]
+        body += [""] + IG.models_md(slug) + IG.stores_md(slug, page, href)
         (SRC / page).parent.mkdir(parents=True, exist_ok=True)
         (SRC / page).write_text("\n".join(body), encoding="utf-8")
 
@@ -1089,9 +1098,9 @@ def nav_yaml() -> str:
             L.append(item(6, "Автоподхват: задачи ICPlan", f"{AP}/tasks.md"))
         rs = [p for _, p in REFS.get(slug, []) if p.startswith("docs/rnd/") and (SRC / p).exists() and p not in used]
         if (SRC / f"docs/api/{slug}.md").exists():
-            L += ["    - API:", item(6, "API " + name, f"docs/api/{slug}.md")]
+            L += ["    - Интеграции:", item(6, "Интеграции " + name, f"docs/api/{slug}.md")]
         if (SRC / f"docs/techspec/{slug}.md").exists():
-            L += ["    - Техспека:", item(6, "Техспека " + name, f"docs/techspec/{slug}.md")]
+            L += ["    - Deploy:", item(6, "Deploy " + name, f"docs/techspec/{slug}.md")]
         L += ["    - R&D:", item(6, "R&D " + name, f"rnd-by-component/{slug}/index.md")]
         L += [item(6, title_of(SRC / p, p).replace("R&D: ", ""), p) for p in rs]
     # Разделы сайта (doc-types.md#tabs): общих «Архитектуры» и «Требований» нет — обзор на главной, остальное во вкладках компонентов (О-54)

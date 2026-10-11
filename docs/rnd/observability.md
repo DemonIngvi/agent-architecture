@@ -156,7 +156,7 @@ Langfuse и Phoenix сильнее в разборе промптов и evals. 
 
 **Вывод этапа.** Таблица закрывает всё, что видит пользователь и администратор. Разбор промптов (П8) — частично: только по `events.level`.
 
-<span class="gate">G3</span> ✅ функции из спеки и [потока observability](../techspec/observability.md#how) (А).
+<span class="gate">G3</span> ✅ функции из спеки и [потока observability](../how/observability.md) (А).
 
 ## Э4. Альтернативы и их ключевые функции {#e4}
 
@@ -316,7 +316,7 @@ Langfuse и Phoenix сильнее в разборе промптов и evals. 
 | Решение D12 | design | ✅ подтверждено, без изменений |
 | `events.level` по умолчанию «всё» — решение владельца продукта вместо рекомендованного «тулы + итоги» | [interfaces observability](../../openspec/changes/define-agent-platform/specs/observability/interfaces.md), D18, [типы данных](../data-types.md), [профиль нагрузки](load-profile.md) | ✅ внесено: умолчание, объём ~250 МБ/день, сценарий маскирования промптов в R-OBS-04 |
 | Стыки I2, I14, I20 | спека observability | — не требуется |
-| Поток observability | [поток](../techspec/observability.md#how) | — не требуется |
+| Поток observability | [поток](../how/observability.md) | — не требуется |
 
 <span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.
 
@@ -341,4 +341,4 @@ GitHub API на 11.10.2026.
 
 - [Langfuse](https://github.com/langfuse/langfuse) (Б) · [Phoenix](https://github.com/Arize-ai/phoenix) (Б) · [Opik](https://github.com/comet-ml/opik) (Б) · [OpenLLMetry](https://github.com/traceloop/openllmetry) (Б) · [OpenLIT](https://github.com/openlit/openlit) (Б)
 - OTel GenAI: [semantic-conventions](https://github.com/open-telemetry/semantic-conventions) (Б), [Dash0 — разбор соглашений](https://www.dash0.com/knowledge/opentelemetry-genai-semantic-conventions-explained) (В), [Greptime, 05.2026](https://greptime.com/blogs/2026-05-09-opentelemetry-genai-semantic-conventions) (В), [трассировка агентов 2026](https://www.morphllm.com/agent-tracing) (В)
-- Наши: [D12](../../openspec/changes/define-agent-platform/design.md), [поток observability](../techspec/observability.md#how), [типы событий Harness](../techspec/harness.md#how) (А)
+- Наши: [D12](../../openspec/changes/define-agent-platform/design.md), [поток observability](../how/observability.md), [типы событий Harness](../how/harness.md) (А)

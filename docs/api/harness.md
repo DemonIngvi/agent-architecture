@@ -1,6 +1,6 @@
-# API: Harness
+# Интеграции: Harness
 
-← [Каталог API](README.md) · [компонент](../../components/harness/index.md) · [техспека](../techspec/harness.md)
+← [компонент](../../components/harness/index.md) · [Deploy](../techspec/harness.md) · [методология](../rules/api-methodology.md)
 
 <div class="api-head">
 <div><span class="about-label">Базовый адрес</span> см. Agent Runner ↔ Harness</div>

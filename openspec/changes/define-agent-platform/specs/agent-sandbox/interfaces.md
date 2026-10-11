@@ -56,7 +56,7 @@
 | **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | до 6 контейнеров одновременно + пул 2 на профиль; обычный 0.3 ГБ / 0.2 CPU, «coder» 1–2 ГБ / 1–2 CPU |
 | **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | этапы 1–3 — Docker на узле; этап 4 — Pod на запуск в `itsaplan-agents`, NetworkPolicy только к egress-прокси; egress-прокси — Deployment 1 реплика |
 
-Детали форматов — [потоки](../../../../../docs/techspec/sandbox.md#how).
+Детали форматов — [потоки](../../../../../docs/how/sandbox.md).
 
 ## Отказы (FMEA)
 

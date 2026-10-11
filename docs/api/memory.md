@@ -1,6 +1,6 @@
-# API: Memory API
+# Интеграции: Memory API
 
-← [Каталог API](README.md) · [компонент](../../components/memory/index.md) · [техспека](../techspec/memory.md)
+← [компонент](../../components/memory/index.md) · [Deploy](../techspec/memory.md) · [методология](../rules/api-methodology.md)
 
 <div class="api-head">
 <div><span class="about-label">Базовый адрес</span> `http://memory-api:8085`</div>

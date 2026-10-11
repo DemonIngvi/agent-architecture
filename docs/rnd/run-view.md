@@ -317,7 +317,7 @@ Linear выделяет вопрос к человеку (elicitation) и отв
 | `POST /agent-runs/:runId/events`, `GET /agent-runs/:runId/stream`, `GET /issues/:issueId/agent-feed` | [каталог API ICPlan](../api/icplan.md) | ✅ внесено |
 | Поток «Как пользователь видит работу агента» | [потоки ICPlan](../stories/icplan.md#agent-feed) | ✅ внесено |
 | Задача 3.3: чат запуска вместо таймлайна | [3.3](../tasks/3.3-run-events-timeline.md) | ✅ внесено |
-| Хранение: сообщение целиком на `*_END` | [потоки Observability](../techspec/observability.md#how) | ✅ внесено |
+| Хранение: сообщение целиком на `*_END` | [потоки Observability](../how/observability.md) | ✅ внесено |
 
 <span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.
 

@@ -1,6 +1,6 @@
 # User Stories: Инфраструктура
 
-← [Все истории](README.md) · [как работает](../techspec/infrastructure.md#how)
+← [Все истории](README.md) · [как работает](../how/infrastructure.md)
 
 > Сгенерировано из `html-view/stories.py` — правьте там.
 

@@ -59,7 +59,7 @@
 | **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | OPA 1–2 RPS, p95 ≤ 20 мс (D18), таймаут 200 мс; хуки G4 в LiteLLM на каждый вызов |
 | **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | OPA — Deployment `opa` в `itsaplan-agents`, 2 реплики, Service ClusterIP; Rego — bundle; без ingress |
 
-Детали форматов — [потоки](../../../../../docs/techspec/guardrails.md#how).
+Детали форматов — [потоки](../../../../../docs/how/guardrails.md).
 
 ## Отказы (FMEA)
 

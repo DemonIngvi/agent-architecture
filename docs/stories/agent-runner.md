@@ -1,6 +1,6 @@
 # User Stories: Agent Runner
 
-← [Все истории](README.md) · [как работает](../techspec/agent-runner.md#how)
+← [Все истории](README.md) · [как работает](../how/agent-runner.md)
 
 > Сгенерировано из `html-view/stories.py` — правьте там.
 

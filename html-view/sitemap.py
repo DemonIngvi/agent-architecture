@@ -14,6 +14,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 
 # не отдельные страницы сайта
+NOT_PAGE_DIRS = ("docs/how/",)  # «Как работает» встраивается в страницу компонента
 NOT_PAGES = {"README.md", "architecture.md", "docs/data-types.md", "docs/api/README.md", "docs/techspec/README.md",
              "docs/stories/README.md", "docs/stories/coverage.md"}
 
@@ -40,6 +41,9 @@ def _model_target(anchor: str):
 
 def moved(target: str, anchor: str):
     """(путь от корня, якорь) ушедшей страницы → новое место или None."""
+    m = re.match(r"docs/how/([a-z-]+)\.md$", target)
+    if m:
+        return f"components/{m.group(1)}/index.md", anchor or "how"
     if target == "README.md":
         return "index.md", ""
     if target == "architecture.md":

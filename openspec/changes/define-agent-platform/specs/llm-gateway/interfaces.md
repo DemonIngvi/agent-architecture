@@ -50,7 +50,7 @@
 | **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | 0.4–1 RPS, ~55 тыс. токенов/мин в пике; ответ модели 5–20 с, стрим |
 | **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | LiteLLM — Deployment `litellm` в `itsaplan-agents`, 2 реплики за Service ClusterIP; БД `litellm` через PgBouncer; админка без ingress |
 
-Детали форматов — [потоки](../../../../../docs/techspec/llm-gateway.md#how).
+Детали форматов — [потоки](../../../../../docs/how/llm-gateway.md).
 
 ## Отказы (FMEA)
 

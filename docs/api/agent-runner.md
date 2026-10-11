@@ -1,6 +1,6 @@
-# API: Agent Runner ↔ Harness
+# Интеграции: Agent Runner ↔ Harness
 
-← [Каталог API](README.md) · [компонент](../../components/agent-runner/index.md) · [техспека](../techspec/agent-runner.md)
+← [компонент](../../components/agent-runner/index.md) · [Deploy](../techspec/agent-runner.md) · [методология](../rules/api-methodology.md)
 
 <div class="api-head">
 <div><span class="about-label">Базовый адрес</span> Harness: `http://<sandbox>:8090`; Runner: `http://agent-runner:8080`</div>

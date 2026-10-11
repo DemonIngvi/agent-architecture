@@ -1,6 +1,6 @@
 # User Stories: Observability
 
-← [Все истории](README.md) · [как работает](../techspec/observability.md#how)
+← [Все истории](README.md) · [как работает](../how/observability.md)
 
 > Сгенерировано из `html-view/stories.py` — правьте там.
 

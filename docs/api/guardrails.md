@@ -1,6 +1,6 @@
-# API: Guardrails (OPA)
+# Интеграции: Guardrails (OPA)
 
-← [Каталог API](README.md) · [компонент](../../components/guardrails/index.md) · [техспека](../techspec/guardrails.md)
+← [компонент](../../components/guardrails/index.md) · [Deploy](../techspec/guardrails.md) · [методология](../rules/api-methodology.md)
 
 <div class="api-head">
 <div><span class="about-label">Базовый адрес</span> `http://opa:8181`</div>

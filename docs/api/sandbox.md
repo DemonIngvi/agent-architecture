@@ -1,6 +1,6 @@
-# API: Sandbox
+# Интеграции: Sandbox
 
-← [Каталог API](README.md) · [компонент](../../components/sandbox/index.md) · [техспека](../techspec/sandbox.md)
+← [компонент](../../components/sandbox/index.md) · [Deploy](../techspec/sandbox.md) · [методология](../rules/api-methodology.md)
 
 <div class="api-head">
 <div><span class="about-label">Базовый адрес</span> своего API нет: среду создаёт Runner</div>

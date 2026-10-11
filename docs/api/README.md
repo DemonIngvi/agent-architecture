@@ -1,6 +1,6 @@
 # Каталог API
 
-← [Справка](../rules/README.md) · [типы данных](../data-types.md) · [сборка запроса к модели](../techspec/harness.md#llm-request)
+← [Справка](../rules/README.md) · [типы данных](../data-types.md) · [сборка запроса к модели](../how/harness.md#llm-request)
 
 Все API, которые нужны историям: что уже есть в ICPlan, что дорабатываем в форке и что делаем в сервисах платформы. У каждого вызова — кто вызывает, аутентификация, истории, требования и интерфейс (I-код).
 
@@ -220,7 +220,7 @@ _состояние цикла Harness (I12, `PUT /runs/{id}/checkpoint`)_
 
 ### ChatCompletionRequest
 
-_вызов модели через LiteLLM (I8); полный пример со слоями промпта — [сборка запроса](../techspec/harness.md#llm-request)_
+_вызов модели через LiteLLM (I8); полный пример со слоями промпта — [сборка запроса](../how/harness.md#llm-request)_
 
 ```json
 { "model": "team-default", "messages": [ { "role": "system", "content": "…" }, { "role": "user", "content": "MKT-42: …" } ],

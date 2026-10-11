@@ -1,6 +1,6 @@
-# API: Инфраструктура
+# Интеграции: Инфраструктура
 
-← [Каталог API](README.md) · [компонент](../../components/infrastructure/index.md) · [техспека](../techspec/infrastructure.md)
+← [компонент](../../components/infrastructure/index.md) · [Deploy](../techspec/infrastructure.md) · [методология](../rules/api-methodology.md)
 
 <div class="api-head">
 <div><span class="about-label">Базовый адрес</span> ingress Traefik</div>

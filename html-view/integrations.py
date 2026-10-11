@@ -107,9 +107,55 @@ def io_lists(slug, nm):
     return got, gave
 
 
-def integrations_md(slug, page, nm, href) -> list:
+def c1_mermaid(slug, nm) -> list:
+    """Схема C1 компонента (О-55): компонент в центре, соседи; стрелка — кто вызывает кого, подпись — I-код и данные."""
+    def nid(x):
+        return "n_" + re.sub(r"[^a-z0-9]", "_", x.lower()) if not x.startswith("«") else "x_" + __import__("hashlib").md5(x.encode("utf-8")).hexdigest()[:6]
+
+    def lab(s):
+        return s.replace('"', "'")
+
+    nodes, pairs, dotted = {slug: ("self", nm.get(slug, slug))}, {}, {}
+    for i, a, b, via, what, models in sorted(involved(slug), key=lambda x: int(x[0][1:])):
+        tag = i + ("↩" if i in DM.DATA_IN_RESPONSE else "")
+        chain = [x for x in (a, via, b) if x]
+        if slug not in chain:  # участвует через общую инфраструктуру (ALSO)
+            other = b if b != slug else a
+            nodes.setdefault(other, ("ext" if other.startswith("«") else "comp", _who(other, nm)))
+            dotted.setdefault(other, []).append(i)
+            continue
+        for x in chain:
+            nodes.setdefault(x, ("ext" if x.startswith("«") else "comp", _who(x, nm)))
+        for x, y in zip(chain, chain[1:]):
+            if x != y:
+                pairs.setdefault((x, y), []).append(tag)
+    edges = [f'  {nid(x)} -->|"{", ".join(tags)}"| {nid(y)}' for (x, y), tags in pairs.items()]
+    edges += [f'  {nid(slug)} -.-|"{", ".join(tags)}"| {nid(o)}' for o, tags in dotted.items()]
+    L = ["```mermaid", "flowchart LR",
+         "  classDef self fill:#c5cae9,color:#1a237e,stroke:#1a237e,stroke-width:3px,font-weight:bold",
+         "  classDef comp fill:#e8eaf6,stroke:#5c6bc0,color:#1a237e",
+         "  classDef ext fill:#fff3e0,stroke:#ef6c00,color:#e65100,stroke-dasharray:4 3"]
+    for k, (cls, name) in nodes.items():
+        shape = f'(["{lab(name)}"])' if cls == "ext" else f'["{lab(name)}"]'
+        L.append(f"  {nid(k)}{shape}:::{cls}")
+    L += list(dict.fromkeys(edges)) + ["```"]
+    return L
+
+
+def integrations_page_head(slug, nm) -> list:
+    """Вкладка «Интеграции» (О-55): схема C1, карточки интеграций; ниже — API компонента."""
+    comp = f"../../components/{slug}/index.md"
+    return (["## Схема C1 {#c1}", "",
+             f"{nm.get(slug, slug)} и его соседи. Стрелка — кто вызывает кого, подпись — I-коды (↩ — данные приходят в ответе); "
+             "пунктир — общая инфраструктура (БД, вход, хранилище); оранжевым — внешние системы. Что идёт по каждому I-коду — в карточках ниже.", ""]
+            + c1_mermaid(slug, nm) + [""]
+            + integrations_md(slug, None, nm, None, model_href=comp)
+            + ["## API {#api}", ""])
+
+
+def integrations_md(slug, page, nm, href, model_href="") -> list:
     rows, api = iface_rows(), api_rows()
-    L = ["## Интеграции {#integrations}", "", "Все стыки компонента: с кем, через что и по какому контракту. Протокол, аутентификация и таймауты — из `interfaces.md` спек, эндпоинты — из [каталога API](../../docs/api/README.md).", "",
+    L = ["## Интеграции {#integrations}", "", "Все стыки компонента: с кем, через что и по какому контракту. Протокол, аутентификация и таймауты — из `interfaces.md` спек; эндпоинты и структура запросов — в разделе [API](#api) ниже; поля данных — в [контрактах](" + (model_href or "") + "#contracts).", "",
          '<div class="integ">']
     for i, a, b, via, what, models in sorted(involved(slug), key=lambda x: int(x[0][1:])):
         r = rows.get(i, {})
@@ -129,7 +175,7 @@ def integrations_md(slug, page, nm, href) -> list:
         ep_html = "".join(f'<li><span class="m {BADGE.get(m.split()[0], "m-none")}">{_esc(m.split()[0])}</span> <code>{_esc(p.strip("`"))}</code> <small>{_esc(d.replace(chr(96), ""))}</small></li>'
                           for m, p, d, _ in eps[:8])
         more = f'<li><small>ещё {len(eps) - 8} — в каталоге API</small></li>' if len(eps) > 8 else ""
-        mods = " ".join(f'<a class="mdl" href="#model-{m.lower()}">{m}</a>' for m in models)
+        mods = " ".join(f'<a class="mdl" href="{model_href}#model-{m.lower()}">{m}</a>' for m in models)
         L.append(
             f'<div class="integ-card {cls}"><div class="integ-h"><span class="integ-i">{i}</span><span class="integ-dir">{dirc}</span><b>{_esc(path)}</b></div>'
             f'<p>{_esc(what)}</p>'
@@ -603,7 +649,7 @@ def api_examples_check() -> list:
         names = [x.strip() for x in m.group(1).split("/")]
         js = "".join(re.findall(r"```json\n(.*?)```", m.group(2), re.S))
         issues += example_issues(f"API: пример {m.group(1)}", names, js)
-    for f in sorted((ROOT / "docs/techspec").glob("*.md")):  # JSON — только с подписью-моделью (О-46, О-52)
+    for f in sorted((ROOT / "docs/how").glob("*.md")):  # JSON — только с подписью-моделью (О-46, О-52, О-55)
         L = f.read_text(encoding="utf-8").split("\n")
         for i, line in enumerate(L):
             if line.strip() != "```json":
@@ -611,7 +657,7 @@ def api_examples_check() -> list:
             cap = next((L[k] for k in range(i - 1, max(-1, i - 4), -1) if L[k].strip()), "")
             j = next(k for k in range(i + 1, len(L)) if L[k].strip() == "```")
             names = [n for n in re.findall(r"`(\w+)`", cap) if n in DM.MODELS]
-            where = f"docs/techspec/{f.name}:{i + 1}"
+            where = f"docs/how/{f.name}:{i + 1}"
             if not names:
                 issues.append(f"{where}: пример JSON без модели в подписи — модель в datamodel.py, пример в docs/api/README.md")
             else:
@@ -655,18 +701,20 @@ def flow_page(text, slug, nm, base="../../") -> str:
 
 
 def flows_check() -> list:
-    """Вкладки «Потоки» нет (О-52); «Как работает» в техспеке — порядок работы без конфигов и с существующими моделями."""
+    """Вкладки «Потоки» нет (О-52); «Как работает» — docs/how/<компонент>.md, встраивается в «Архитектуру» (О-55)."""
     issues = []
     if (ROOT / "docs/flows").exists():
-        issues.append("docs/flows: вкладка «Потоки» упразднена — порядок работы в техспеке («Как работает»), процесс пользователя в историях, взаимодействие — в architecture.md")
+        issues.append("docs/flows: вкладка «Потоки» упразднена — порядок работы в docs/how, процесс пользователя в историях, взаимодействие — в architecture.md")
     for f in sorted((ROOT / "docs/techspec").glob("*.md")):
-        t = f.read_text(encoding="utf-8")
-        how = t.split("## Как работает", 1)[1].split("\n## ", 1)[0] if "## Как работает" in t else ""
+        if "## Как работает" in f.read_text(encoding="utf-8"):
+            issues.append(f"docs/techspec/{f.name}: «Как работает» — не про развёртывание: место в docs/how/{f.name}")
+    for f in sorted((ROOT / "docs/how").glob("*.md")):
+        how = f.read_text(encoding="utf-8")
         if re.search(r"^```(yaml|rego)", how, re.M):
-            issues.append(f"docs/techspec/{f.name}: конфиг в «Как работает» — место в «Пример конфигурации»")
+            issues.append(f"docs/how/{f.name}: конфиг — место в Deploy («Пример конфигурации»)")
         body = re.sub(r"```.*?```", "", how, flags=re.S)
         for n in sorted(set(re.findall(r"`([A-Z][a-z]+[A-Z][A-Za-z]*)`", body)) - set(DM.MODELS) - FLOW_NON_MODELS):
-            issues.append(f"docs/techspec/{f.name}: `{n}` — нет такой модели в datamodel.MODELS")
+            issues.append(f"docs/how/{f.name}: `{n}` — нет такой модели в datamodel.MODELS")
     return issues
 
 

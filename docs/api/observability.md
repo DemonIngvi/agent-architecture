@@ -1,6 +1,6 @@
-# API: Observability
+# Интеграции: Observability
 
-← [Каталог API](README.md) · [компонент](../../components/observability/index.md) · [техспека](../techspec/observability.md)
+← [компонент](../../components/observability/index.md) · [Deploy](../techspec/observability.md) · [методология](../rules/api-methodology.md)
 
 <div class="api-head">
 <div><span class="about-label">Базовый адрес</span> в api ICPlan</div>

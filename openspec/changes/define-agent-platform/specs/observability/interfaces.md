@@ -62,7 +62,7 @@
 | **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | запись событий ~4 RPS в пике, ~250 МБ/день при `events.level: всё`; чат запуска обновляется < 3 с |
 | **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | таблица событий в Postgres; чтение — через api ICPlan; Langfuse / Prometheus — бэклог |
 
-Детали форматов — [потоки](../../../../../docs/techspec/observability.md#how).
+Детали форматов — [потоки](../../../../../docs/how/observability.md).
 
 ## Отказы (FMEA)
 

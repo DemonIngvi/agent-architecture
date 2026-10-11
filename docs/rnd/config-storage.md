@@ -293,7 +293,7 @@ Claude Code и Copilot хранят агентов файлами Markdown с YA
 | «Тулы по умолчанию — нет», а не «все» | `agent.tools` в [interfaces agent-registry](../../openspec/changes/define-agent-platform/specs/agent-registry/interfaces.md) | ✅ подтверждено, без изменений |
 | Решения D9, D18 | design | ✅ подтверждено, без изменений |
 | Стыки I4, I16, I20 | спеки agent-registry, control-plane | — не требуется |
-| Поток Platform module | [поток](../techspec/platform-module.md#how) | — не требуется |
+| Поток Platform module | [поток](../how/platform-module.md) | — не требуется |
 | Техспека Platform module | [техспека](../techspec/platform-module.md) | — не требуется |
 | Формат YAML `agent/v1` | [задача 1.2](../tasks/1.2-agent-definition-yaml.md) | — не требуется |
 

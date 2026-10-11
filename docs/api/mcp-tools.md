@@ -1,6 +1,6 @@
-# API: MCP / Tools
+# Интеграции: MCP / Tools
 
-← [Каталог API](README.md) · [компонент](../../components/mcp-tools/index.md) · [техспека](../techspec/mcp-tools.md)
+← [компонент](../../components/mcp-tools/index.md) · [Deploy](../techspec/mcp-tools.md) · [методология](../rules/api-methodology.md)
 
 <div class="api-head">
 <div><span class="about-label">Базовый адрес</span> MCP-серверы по протоколу MCP (streamable HTTP)</div>

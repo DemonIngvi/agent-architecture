@@ -357,7 +357,7 @@ MetaGPT закрепляет за каждой ролью стандартный
 | Формат критериев приёмки (строка D18) и решение D20 | [design D18, D20](../../openspec/changes/define-agent-platform/design.md) | ✅ внесено |
 | Ревьюер добавляет критерий при возврате | [R-AP-19](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-19), задача 3.7 | ✅ внесено |
 | `RunBundle.task.criteria` с `origin`, `M3Record` | [каталог API](../api/README.md) | ✅ внесено |
-| Что не передаётся следующему шагу | [потоки памяти](../techspec/memory.md#how) | ✅ внесено |
+| Что не передаётся следующему шагу | [потоки памяти](../how/memory.md) | ✅ внесено |
 | Порядок критериев и подтверждение | [поток ICPlan](../stories/icplan.md#process) | ✅ внесено |
 
 <span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.
@@ -373,4 +373,4 @@ MetaGPT закрепляет за каждой ролью стандартный
 - A2A: [обзор Instaclustr](https://www.instaclustr.com/blog/scaling-agent-systems-with-kafka-and-a2a-part-3-agent2agent-protocol-explained/) (В)
 - [Kiro — requirements-first](https://kiro.dev/docs/specs/feature-specs/requirements-first/) (Б) · [Spec Kit — обзор](https://developertoolkit.ai/en/ecosystem/frameworks/spec-kit/) (В)
 - [Hermes Kanban](https://hermes-agent.nousresearch.com/docs/user-guide/features/kanban) (Б)
-- Наши: [D17, D18](../../openspec/changes/define-agent-platform/design.md), [R-AP-06, R-AP-15, R-AP-18](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md), [R-HRN-08](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md), [потоки памяти](../techspec/memory.md#how) (А)
+- Наши: [D17, D18](../../openspec/changes/define-agent-platform/design.md), [R-AP-06, R-AP-15, R-AP-18](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md), [R-HRN-08](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md), [потоки памяти](../how/memory.md) (А)

@@ -1,6 +1,6 @@
 # R&D: Модель памяти агентов
 
-← [Все R&D](README.md) · [методология R&D v3.1](../rules/rnd-methodology.md) · компонент: **Memory** · решение: [design D4](../../openspec/changes/define-agent-platform/design.md) · спека: [agent-memory](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · потоки: [память](../techspec/memory.md#how)
+← [Все R&D](README.md) · [методология R&D v3.1](../rules/rnd-methodology.md) · компонент: **Memory** · решение: [design D4](../../openspec/changes/define-agent-platform/design.md) · спека: [agent-memory](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · потоки: [память](../how/memory.md)
 
 <div class="rnd-hero" markdown>
 <div class="rnd-q">Вопрос</div>
@@ -159,7 +159,7 @@ Mem0 разрешает противоречия: новый факт обнов
 
 **Вывод этапа.** M0–M6 закрывает П1–П7; M4 отложена.
 
-<span class="gate">G3</span> ✅ уровни связаны с потребностями; [потоки памяти](../techspec/memory.md#how) описывают запись и чтение каждого (А).
+<span class="gate">G3</span> ✅ уровни связаны с потребностями; [потоки памяти](../how/memory.md) описывают запись и чтение каждого (А).
 
 ## Э4. Альтернативы и их ключевые функции {#e4}
 
@@ -322,7 +322,7 @@ Mem0 разрешает противоречия: новый факт обнов
 | M4 вызывает модель из Memory — новый поток данных промпта | [типы данных](../data-types.md) | — не требуется сейчас: интерфейс Memory → LiteLLM войдёт в матрицу при переносе M4 в работу |
 | Модель M0–M6, D4 | design | ✅ подтверждено, без изменений |
 | Стыки I11, I22, S4 | спека agent-memory | — не требуется |
-| Потоки памяти | [потоки](../techspec/memory.md#how) | — не требуется |
+| Потоки памяти | [потоки](../how/memory.md) | — не требуется |
 | Техспека Memory | [техспека](../techspec/memory.md) | — не требуется |
 
 <span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.
@@ -349,4 +349,4 @@ CoALA (Sumers и др., 2023) — деление на рабочую, эпизо
 
 - [CoALA — Cognitive Architectures for Language Agents](https://arxiv.org/abs/2309.02427) (Б)
 - [Mem0](https://github.com/mem0ai/mem0) (Б) · [Letta](https://github.com/letta-ai/letta) (Б) · [Graphiti](https://github.com/getzep/graphiti) (Б) · [LangMem](https://github.com/langchain-ai/langmem) (Б) · [Cognee](https://github.com/topoteretes/cognee) (Б)
-- Наши: [D4](../../openspec/changes/define-agent-platform/design.md), [потоки памяти](../techspec/memory.md#how), [спека agent-memory](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) (А)
+- Наши: [D4](../../openspec/changes/define-agent-platform/design.md), [потоки памяти](../how/memory.md), [спека agent-memory](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) (А)

@@ -1,6 +1,6 @@
 # User Stories: Sandbox
 
-← [Все истории](README.md) · [как работает](../techspec/sandbox.md#how)
+← [Все истории](README.md) · [как работает](../how/sandbox.md)
 
 > Сгенерировано из `html-view/stories.py` — правьте там.
 

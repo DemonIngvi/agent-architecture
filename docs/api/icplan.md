@@ -1,6 +1,6 @@
-# API: ICPlan (форк)
+# Интеграции: ICPlan (форк)
 
-← [Каталог API](README.md) · [компонент](../../components/icplan/index.md) · [техспека](../techspec/icplan.md)
+← [компонент](../../components/icplan/index.md) · [Deploy](../techspec/icplan.md) · [методология](../rules/api-methodology.md)
 
 <div class="api-head">
 <div><span class="about-label">Базовый адрес</span> `https://<домен>/api` (api ICPlan, порт 3000)</div>

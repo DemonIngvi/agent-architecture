@@ -375,3 +375,17 @@
 .md-typeset .integ-ep li { margin: .1rem 0; }
 .md-typeset .integ-ep small { opacity: .75; }
 
+/* ===== Схема C1 на вкладке «Интеграции» ===== */
+.md-typeset .mermaid .node.self rect { fill: #3f51b5 !important; stroke: #1a237e !important; }
+.md-typeset .mermaid .node.self .nodeLabel, .md-typeset .mermaid .node.self span { color: #fff !important; font-weight: 700; }
+.md-typeset .mermaid .node.comp rect { fill: #e8eaf6 !important; stroke: #5c6bc0 !important; }
+.md-typeset .mermaid .node.ext rect, .md-typeset .mermaid .node.ext path { fill: #fff3e0 !important; stroke: #ef6c00 !important; }
+.md-typeset .mermaid .node.ext .nodeLabel { color: #e65100 !important; }
+.md-typeset .mermaid .edgeLabel { font-size: .62rem; }
+
+
+/* вкладки «Интеграции» и «Deploy» в верхней панели (О-55) */
+.t-api { background: #ef6c00; }
+.md-typeset .tb-type.t-api.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #ef6c00; }
+.t-tech { background: #455a64; }
+.md-typeset .tb-type.t-tech.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #455a64; }

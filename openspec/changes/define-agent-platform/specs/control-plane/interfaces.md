@@ -67,7 +67,7 @@
 | **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | единицы изменений в день; раздача в LiteLLM / OPA — секунды |
 | **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | модуль ICPlan api (`itsaplan-core`); OPA забирает bundle по HTTP раз в 30 с |
 
-Детали форматов — [потоки](../../../../../docs/techspec/platform-module.md#how).
+Детали форматов — [потоки](../../../../../docs/how/platform-module.md).
 
 ## Отказы (FMEA)
 

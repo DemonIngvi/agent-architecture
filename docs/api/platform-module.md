@@ -1,6 +1,6 @@
-# API: Platform module
+# Интеграции: Platform module
 
-← [Каталог API](README.md) · [компонент](../../components/platform-module/index.md) · [техспека](../techspec/platform-module.md)
+← [компонент](../../components/platform-module/index.md) · [Deploy](../techspec/platform-module.md) · [методология](../rules/api-methodology.md)
 
 <div class="api-head">
 <div><span class="about-label">Базовый адрес</span> `/api/platform` (в api форка ICPlan)</div>

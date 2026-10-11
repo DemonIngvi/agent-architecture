@@ -51,7 +51,7 @@
 | **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | чтение определения на каждый запуск (~30 в час в пике); изменения — единицы в день |
 | **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | часть ICPlan api (Deployment `api` в `itsaplan-core`) |
 
-Детали форматов — [потоки](../../../../../docs/techspec/icplan.md#how).
+Детали форматов — [потоки](../../../../../docs/how/icplan.md).
 
 ## Отказы (FMEA)
 

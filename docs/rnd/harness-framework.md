@@ -350,7 +350,7 @@ Hermes Agent силён: подтверждения, 7 видов термина
 | «Умное» подтверждение (Hermes) | [BACKLOG](../BACKLOG.md) | ✅ внесено в бэклог |
 | «Одобрить только этот вызов / до конца запуска» в `ApprovalDecision` | [R-GRD-03](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-03), I7 | ✅ внесено: сценарий в R-GRD-03, поле `scope`, подзадача 1.5.6 |
 | Решение D2 и версия 1.2.14 | design D2, D18 | ✅ подтверждено, без изменений |
-| Стыки I7–I12 | спека agent-harness, [поток Harness](../techspec/harness.md#how) | — не требуется: протоколы не меняются |
+| Стыки I7–I12 | спека agent-harness, [поток Harness](../how/harness.md) | — не требуется: протоколы не меняются |
 | Техспека Harness | [техспека](../techspec/harness.md) | — не требуется |
 
 <span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.
