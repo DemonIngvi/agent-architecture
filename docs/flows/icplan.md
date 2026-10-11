@@ -66,7 +66,6 @@
 - Не ветвится параллельно: у шага один переход при успехе. Параллельные работы — дочерние задачи.
 - Агент не выбирает следующий шаг: он возвращает итог, маршрут задан процессом.
 
-
 ### Критерии приёмки шага (D20)
 
 | Источник | Кто | Пометка | Подтверждение |
@@ -77,37 +76,19 @@
 | Возврат ревьюером | агент или человек | `reviewer:<кто>` | не нужно |
 
 Порядок при конфликте: человек > процесс > агент. Исполнитель не меняет критерии своего шага.
+
 ## Данные
 
-`Run` — запуск в очереди (черновик, уточняется по протоколу `@itsaplan/runner` в задаче [2.1](../tasks/2.1-runner-external.md)):
+`Run` — запуск в очереди (протокол `@itsaplan/runner`, реализация — задача [2.1](../tasks/2.1-runner-external.md)):
 
-```json
-{
-  "run_id": "run_01J9Z4K",
-  "agent_id": "ag_42",
-  "source": "delegation",
-  "issue": { "key": "MKT-42", "title": "Описать требования к экспорту", "url": "http://localhost:3001/team/MKT/issue/42" },
-  "prompt": "Work item MKT-42 has been delegated to you. Review it and take the appropriate next step.",
-  "rule": { "type": "process_step", "process": "Фича", "step": "Анализ" },
-  "created_at": "2026-10-10T12:00:00Z"
-}
-```
+Поля — [`Run`](../../data-model.md#model-run); пример — [каталог API](../api/README.md#run). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
 
 Процесс типа задачи (доработки [3.1](../tasks/3.1-icplan-autodelegate-status.md), [3.6](../tasks/3.6-icplan-process-engine.md)):
 
-```json
-{ "process": "Фича", "issue_type": "Фича", "owner": "user:lead", "first_step": "sdd",
-  "steps": [
-    { "id": "sdd",    "column": "SDD",    "agent": "agent:analyst", "max_runs": 3, "on_success": { "step": "code" },   "on_failure": { "step": "help" } },
-    { "id": "code",   "column": "Код",    "agent": "agent:dev",     "max_runs": 3, "on_success": { "step": "review" }, "on_failure": { "step": "help" } },
-    { "id": "review", "column": "Ревью",  "agent": null,            "on_success": { "done": true } },
-    { "id": "help",   "column": "Нужна помощь", "agent": null,      "on_success": { "step": "code" } } ] }
-```
+Поля — [`Process`](../../data-model.md#model-process) · [`ProcessStep`](../../data-model.md#model-processstep); пример — [каталог API](../api/README.md#process). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
 
-У «Исследования» последний шаг — `"on_success": { "process": "Фича" }`: тип задачи меняется, задача встаёт на первый шаг «Фичи».
+У «Исследования» последний шаг — `"onSuccess": { "process": "Фича" }`: тип задачи меняется, задача встаёт на первый шаг «Фичи».
 
 `ApprovalDecision` — ответ пользователя на паузу агента:
 
-```json
-{ "run_id": "run_01J9Z4K", "seq": 12, "decision": "approve", "by": "user_7", "comment": "Можно" }
-```
+Поля — [`ApprovalDecision`](../../data-model.md#model-approvaldecision); пример — [каталог API](../api/README.md#approvaldecision). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).

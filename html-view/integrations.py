@@ -133,11 +133,17 @@ def models_md(slug) -> list:
         return []
     L = ["## Контракты данных", "", "Структуры, которыми компонент обменивается с соседями. Примеры JSON — в [каталоге API](../../docs/api/README.md).", ""]
     for m in ms:
-        purpose, fields = DM.MODELS[m]
-        L += [f'### {m} {{#model-{m.lower()}}}', "", f"_{purpose}_", "", "| Поле | Тип | Обязательное | Описание |", "|---|---|---|---|"]
-        L += [f"| `{f}` | {t} | {'да' if req else '—'} | {d or '—'} |" for f, t, req, d in fields]
-        L.append("")
+        L += model_block(m)
     return L
+
+
+def model_block(m) -> list:
+    purpose, fields = DM.MODELS[m]
+    users = [i for i, v in DM.INTEG.items() if m in v[4]]
+    L = [f'### {m} {{#model-{m.lower()}}}', "", f"_{purpose}_" + (f" · интерфейсы: {', '.join(users)}" if users else ""), "",
+         "| Поле | Тип | Обязательное | Описание |", "|---|---|---|---|"]
+    L += [f"| `{f}` | {t} | {'да' if req else '—'} | {d or '—'} |" for f, t, req, d in fields]
+    return L + [""]
 
 
 def _mtype(t):
@@ -159,30 +165,105 @@ def er_tables(slug):
         if owner == slug or (slug == "observability" and t == "run_event") or (slug == "agent-runner" and t == "run_event"):
             out.append((t, cols, f"проект схемы, {store}"))
     if slug == "llm-gateway":
-        out += [(t, cols, "schema.prisma LiteLLM") for t, cols in DM.LITELLM_TABLES.items()]
+        out += [(t, cols, DM.LITELLM_REF) for t, cols in DM.LITELLM_TABLES.items()]
     if slug == "observability":
-        out += [("LiteLLM_SpendLogs", DM.LITELLM_TABLES["LiteLLM_SpendLogs"], "schema.prisma LiteLLM, чтение")]
+        out += [("LiteLLM_SpendLogs", DM.LITELLM_TABLES["LiteLLM_SpendLogs"], DM.LITELLM_REF + ", чтение")]
     if slug == "memory":
         pass
     return out
+
+
+def policy_md(t, ind="") -> list:
+    """Индексы, срок хранения, очистка и миграции таблицы проекта схемы."""
+    if t not in DM.TABLE_POLICY:
+        return []
+    idx, keep, clean, mig = DM.TABLE_POLICY[t]
+    L = ["", f"{ind}**Индексы:** " + ("; ".join(f"{k} ({c}) — {w}" for k, c, w in idx) if idx else "только первичный ключ"),
+         "", f"{ind}**Срок:** {keep} · **очистка:** {clean} · **миграции:** {DM.MIGRATE[mig]}"]
+    return L
+
+
+PARAM_MIRRORS = {  # параметр в control-plane → (спека-владелец, параметр там)
+    "limits.max_steps": ("agent-harness", "limits.max_steps"), "limits.timeout_s": ("agent-runner", "timeout_s"),
+    "sandbox.egress_allow": ("agent-sandbox", "network.egress_allow"), "sandbox.pool.size": ("agent-sandbox", "pool.size"),
+    "memory_profile.read": ("agent-memory", "read"), "memory_profile.write": ("agent-memory", "write"),
+    "memory.m2_last_runs": ("agent-memory", "m2_last_runs"), "memory.retention": ("agent-memory", "retention"),
+}
+
+
+def param_mirror_check() -> list:
+    """Значение и границы параметра в спеке-настройщике = в спеке-владельце (О-44)."""
+    specs = ROOT / "openspec/changes/define-agent-platform/specs"
+
+    def rows(spec):
+        out = {}
+        for line in (specs / spec / "interfaces.md").read_text(encoding="utf-8").splitlines():
+            m = re.match(r"^\| `([\w.]+)` \|(.*)", line)
+            if m:
+                c = [x.strip() for x in m.group(2).split("|")]
+                out[m.group(1)] = c
+        return out
+
+    norm = lambda s: re.sub(r"\s*\(.*?\)\s*$|`|scheduling\.", "", s).strip()
+    cp, issues = rows("control-plane"), []
+    for k, (spec, name) in PARAM_MIRRORS.items():
+        a, b = cp.get(k), rows(spec).get(name)
+        if not a or not b:
+            issues.append(f"параметр {k}: нет строки в control-plane или в {spec} ({name})")
+            continue
+        for i, what in ((3, "значение"), (5, "минимум"), (6, "максимум")):
+            if norm(a[i]) != norm(b[i]):
+                issues.append(f"параметр {k}: {what} в control-plane «{a[i]}», в {spec} «{b[i]}»")
+    return issues
+
+
+def policy_check() -> list:
+    """У каждой таблицы проекта схемы — политика; каждый FK покрыт индексом (О-44)."""
+    issues = [f"{t}: нет политики хранения в datamodel.TABLE_POLICY" for t in DM.PLATFORM_TABLES if t not in DM.TABLE_POLICY]
+    for t, (_, _, cols) in DM.PLATFORM_TABLES.items():
+        if t not in DM.TABLE_POLICY:
+            continue
+        pk = [n for n, _, k, _ in cols if "PK" in k]
+        firsts = {c.split(",")[0].strip() for _, c, _ in DM.TABLE_POLICY[t][0]} | ({pk[0]} if pk else set())
+        issues += [f"{t}.{n}: FK без индекса (Postgres не индексирует FK сам)" for n, _, k, _ in cols if "FK" in k and n not in firsts]
+    return issues
 
 
 def mermaid_er(tables, key_only=True) -> list:
     names_ = {t for t, _, _ in tables}
     L = ["```mermaid", "erDiagram"]
     rels = []
+    stubs = {}
     for t, cols, _ in tables:
         L.append(f"  {t} {{")
         shown = [c for c in cols if c[2]] + [c for c in cols if not c[2]]
         for n, typ, key, d in (shown[:9] if key_only else shown):
-            k = " PK" if key.startswith("PK") else (" FK" if "FK" in key else "")
-            L.append(f'    {_mtype(typ)} {_ccol(n)}{k}')
+            k = ", ".join(x for x in ("PK" if "PK" in key else "", "FK" if "FK" in key else "") if x)
+            L.append(f'    {_mtype(typ)} {_ccol(n)}{" " + k if k else ""}')
             m = re.search(r"FK (\w+)", key)
-            if m and m.group(1) in names_ and m.group(1) != t:
-                rels.append(f'  {m.group(1)} ||--o{{ {t} : "{_ccol(n)}"')
+            if m:
+                rels.append(f'  {m.group(1)} ||--o{{ {t} : "{_ccol(n)}"')  # в том числе ссылка на себя
+                if m.group(1) not in names_:
+                    stubs[m.group(1)] = _pk_of(m.group(1))
         L.append("  }")
+    # таблицы, на которые ссылаются, но которые вне диаграммы: только ключ
+    for t, (typ, n) in sorted(stubs.items()):
+        L += [f"  {t} {{", f"    {_mtype(typ)} {_ccol(n)} PK", "  }"]
     L += sorted(set(rels)) + ["```"]
     return L
+
+
+def _pk_of(table):
+    """Тип и имя первичного ключа таблицы (форк ICPlan или проект схемы)."""
+    for v in SCHEMA.values():
+        if v["table"] == table:
+            pk = next((c for c in v["cols"] if c["pk"]), None)
+            return (pk["type"], pk["name"]) if pk else ("text", "id")
+    for t, (_, _, cols) in DM.PLATFORM_TABLES.items():
+        if t == table:
+            pk = next((c for c in cols if "PK" in c[2]), None)
+            return (pk[1], pk[0]) if pk else ("text", "id")
+    return ("text", "id")
 
 
 def stores_md(slug, page, href) -> list:
@@ -195,7 +276,7 @@ def stores_md(slug, page, href) -> list:
         for t, cols, src in tables:
             L += [f'??? note "{t} — {src}"', "", "    | Колонка | Тип | Ключ | Описание |", "    |---|---|---|---|"]
             L += [f"    | `{n}` | {typ} | {key or '—'} | {d or '—'} |" for n, typ, key, d in cols]
-            L.append("")
+            L += policy_md(t, "    ") + [""]
     for s in stores:
         if s in DM.TREES:
             title, lines = DM.TREES[s]
@@ -214,7 +295,12 @@ def data_model_page(components) -> str:
          "| S7 | RustFS `planner-attachments` | ICPlan, Инфраструктура |", "| S8 | git | git-провайдер |", "| S9 | конфиг деплоя | эксплуатация |", "| S10 | `/workspace` среды | Sandbox |", "| S11 | OPA в памяти | Guardrails |", ""]
     # S1: процесс и агенты — ICPlan + новые таблицы D17/D20
     s1 = er_tables("icplan")
-    L += ["## S1 · ICPlan: задачи, процессы, агенты, запуски {#s1}", "", "Таблицы форка (код) и новые таблицы процесса (D17, D20).", ""] + mermaid_er(s1) + [""]
+    L += ["## S1 · ICPlan: задачи, процессы, агенты, запуски {#s1}", "",
+          "Таблицы форка (код) и новые таблицы процесса (D17, D20). Диаграмма разбита по доменам; таблицы другого домена показаны только ключом.", ""]
+    for title, names_ in DM.S1_DOMAINS:
+        L += [f"### {title}", ""] + mermaid_er([x for x in s1 if x[0] in names_]) + [""]
+    rest = sorted({x[0] for x in s1} - {n for _, ns in DM.S1_DOMAINS for n in ns})
+    assert not rest, f"таблицы S1 без домена: {rest} — добавить в datamodel.S1_DOMAINS"
     L += ["## S1 · ICPlan: тулы, навыки, MCP, интеграции {#s1-tools}", ""] + mermaid_er(er_tables("mcp-tools")) + [""]
     s2 = [(t, c, f"проект схемы, {st}") for t, (st, o, c) in DM.PLATFORM_TABLES.items() if st == "S2"]
     L += ["## S2 · Platform module: настройки, профили, доступы {#s2}", ""] + mermaid_er(s2 + [("ai_agent", [("id", "serial", "PK", "")], "код форка"), ("project", [("id", "serial", "PK", "")], "код форка")], key_only=False) + [""]
@@ -224,12 +310,18 @@ def data_model_page(components) -> str:
     L += ["## Нереляционные хранилища", ""]
     for s, (title, lines) in DM.TREES.items():
         L += [f"**{s} · {title}**", "", "```"] + lines + ["```", ""]
+    L += ["## Контракты обмена {#models}", "",
+          "Модели JSON, которыми обмениваются компоненты. Это единственное описание полей: потоки ссылаются сюда, "
+          "примеры — в [каталоге API](docs/api/README.md) (сборка сверяет ключи примеров с полями). "
+          "Имена полей — как у владельца API: ICPlan и Runner — camelCase, сервисы на Python и внешние API (OpenAI, LiteLLM, OPA, MCP) — snake_case; колонки БД — snake_case.", ""]
+    for m in DM.MODELS:
+        L += model_block(m)
     L += ["## Все поля", ""]
-    allt = s1 + [x for x in er_tables("mcp-tools") if x[0] not in {t for t, _, _ in s1}] + s2 + s345 + [(t, c, "schema.prisma LiteLLM") for t, c in DM.LITELLM_TABLES.items()]
+    allt = s1 + [x for x in er_tables("mcp-tools") if x[0] not in {t for t, _, _ in s1}] + s2 + s345 + [(t, c, DM.LITELLM_REF) for t, c in DM.LITELLM_TABLES.items()]
     for t, cols, src in allt:
         L += [f'??? note "{t} — {src}"', "", "    | Колонка | Тип | Ключ | Описание |", "    |---|---|---|---|"]
         L += [f"    | `{n}` | {typ} | {key or '—'} | {d or '—'} |" for n, typ, key, d in cols]
-        L.append("")
+        L += policy_md(t, "    ") + [""]
     return "\n".join(L) + "\n"
 
 
@@ -249,18 +341,66 @@ def _vocab(name, seen):
     return v
 
 
+def _free_fields(names):
+    """Поля свободного вида (object, map): их содержимое не сверяется."""
+    out, todo, seen = set(), list(names), set()
+    while todo:
+        n = todo.pop()
+        if n in seen or n not in DM.MODELS:
+            continue
+        seen.add(n)
+        for f, typ, *_ in DM.MODELS[n][1]:
+            if typ.startswith(("object", "map")):
+                out |= {x.strip().split(".")[-1] for x in f.split("/")}
+            todo += [o for o in DM.MODELS if o in typ]
+    return out
+
+
+def _strip_free(js, free):
+    """Убрать значения-объекты полей свободного вида."""
+    for k in free:
+        while (m := re.search(rf'"{k}"\s*:\s*\{{', js)):
+            depth, i = 0, m.end() - 1
+            for i in range(m.end() - 1, len(js)):
+                depth += {"{": 1, "}": -1}.get(js[i], 0)
+                if depth == 0:
+                    break
+            js = js[:m.start()] + js[i + 1:]
+    return js
+
+
+def example_issues(where, names, js) -> list:
+    """Ключи примера JSON ⊆ поля моделей (и вложенных); числовые ключи — идентификаторы."""
+    miss = [n for n in names if n not in DM.MODELS]
+    issues = [f"{where}: модели {n} нет в datamodel.MODELS" for n in miss]
+    v = set().union(*[_vocab(n, {n}) for n in names if n in DM.MODELS] or [set()])
+    js = _strip_free(js, _free_fields(names))
+    keys = {k.replace("_", "").lower() for k in re.findall(r'"(\w+)"\s*:', js) if not k.isdigit()} - ENVELOPE
+    return issues + [f"{where}: поле {k} не описано в модели {' / '.join(names)}" for k in sorted(keys - v)]
+
+
 def api_examples_check() -> list:
-    """Примеры JSON в docs/api/README.md используют только поля моделей datamodel (О-43)."""
+    """Примеры JSON в docs/api/README.md используют только поля моделей datamodel (О-43);
+    в потоках пример допускается только с подписью-моделью и сверяется так же (О-44)."""
     t = (ROOT / "docs/api/README.md").read_text(encoding="utf-8")
     issues = []
     for m in re.finditer(r"^### (.+?)\n(.*?)(?=^### |\Z)", t, re.M | re.S):
         names = [x.strip() for x in m.group(1).split("/")]
-        miss = [n for n in names if n not in DM.MODELS]
-        issues += [f"API: пример {n} — нет модели в datamodel.MODELS" for n in miss]
-        v = set().union(*[_vocab(n, {n}) for n in names if n in DM.MODELS] or [set()])
         js = "".join(re.findall(r"```json\n(.*?)```", m.group(2), re.S))
-        keys = {k.replace("_", "").lower() for k in re.findall(r'"(\w+)"\s*:', js)} - ENVELOPE
-        issues += [f"API: пример {m.group(1)} — поле {k} не описано в модели" for k in sorted(keys - v)]
+        issues += example_issues(f"API: пример {m.group(1)}", names, js)
+    for f in sorted((ROOT / "docs/flows").glob("*.md")):
+        L = f.read_text(encoding="utf-8").split("\n")
+        for i, line in enumerate(L):
+            if line.strip() != "```json":
+                continue
+            cap = next((L[k] for k in range(i - 1, max(-1, i - 4), -1) if L[k].strip()), "")
+            j = next(k for k in range(i + 1, len(L)) if L[k].strip() == "```")
+            names = [n for n in re.findall(r"`(\w+)`", cap) if n in DM.MODELS]
+            where = f"docs/flows/{f.name}:{i + 1}"
+            if not names:
+                issues.append(f"{where}: пример JSON без модели в подписи — модель в datamodel.py, пример в docs/api/README.md")
+            else:
+                issues += example_issues(where, names, "\n".join(L[i + 1:j]))
     return issues
 
 
@@ -276,6 +416,23 @@ def check(components) -> list:
     slugs = {c[0] for c in components}
     issues += [f"{i}: неизвестный компонент {x}" for i, v in DM.INTEG.items() for x in v[:3] if x and not x.startswith("«") and x not in slugs]
     issues += api_examples_check()
+    issues += policy_check()
+    issues += param_mirror_check()
+    # схема ICPlan не отстала от форка (О-44): коммит app.ts в форке = коммит импорта
+    meta = json.loads((HERE / "icplan_schema.meta.json").read_text(encoding="utf-8"))
+    import schema_import as SI
+    if SI.DEFAULT.exists():
+        cur = SI.fork_commit(SI.DEFAULT)
+        if cur and cur != meta["commit"]:
+            issues.append(f"схема ICPlan изменилась в форке ({meta['commit'][:8]} → {cur[:8]}): python html-view/schema_import.py")
+    ver = re.search(r"v\d+\.\d+\.\d+", DM.LITELLM_REF).group(0)
+    tech = (ROOT / "docs/TECHNOLOGIES.md").read_text(encoding="utf-8")
+    if not re.search(rf"LiteLLM[^\n]*{re.escape(ver)}", tech):
+        issues.append(f"таблицы LiteLLM сняты со схемы {ver}, а в TECHNOLOGIES.md закреплена другая версия — пересверить schema.prisma")
+    for v in SCHEMA.values():
+        for c in v["cols"]:
+            if c["ref"] and c["ref"] not in SCHEMA:
+                issues.append(f"{v['table']}.{c['name']}: FK на неизвестную таблицу {c['ref']}")
     # таблицы описываются только в datamodel.py; SQL-черновики в документах расходятся (О-43)
     for f in [*ROOT.glob("docs/**/*.md"), *ROOT.glob("openspec/**/*.md")]:
         if re.search(r"(?i)^\s*create table", f.read_text(encoding="utf-8"), re.M):

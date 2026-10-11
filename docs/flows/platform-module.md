@@ -17,17 +17,7 @@
 
 `AgentSettings` — наши настройки агента, которых нет в ICPlan:
 
-```json
-{
-  "agent_id": "ag_42",
-  "model_alias": "team-default",
-  "budget": { "daily_usd": 5, "per_run_tokens": 200000 },
-  "sandbox_profile": "light",
-  "memory_profile": "default",
-  "guardrails": { "tools_allow": ["get_issue", "add_comment", "update_issue"], "approval": ["update_issue"] },
-  "repos": [{ "repo": "org/app", "access": "write", "branch_prefix": "agent/" }]
-}
-```
+Поля — [`AgentSettings`](../../data-model.md#model-agentsettings); пример — [каталог API](../api/README.md#agentsettings). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
 
 `AgentDefinition` — формат экспорта/импорта (задача [1.2](../tasks/1.2-agent-definition-yaml.md)):
 

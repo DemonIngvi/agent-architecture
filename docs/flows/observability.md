@@ -19,6 +19,4 @@
 
 Агрегат затрат:
 
-```json
-{ "issue_key": "MKT-42", "agent": "analyst", "runs": 3, "prompt_tokens": 51200, "completion_tokens": 6400, "cost_usd": 0.34 }
-```
+Поля — [`CostAggregate`](../../data-model.md#model-costaggregate); пример — [каталог API](../api/README.md#costaggregate). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).

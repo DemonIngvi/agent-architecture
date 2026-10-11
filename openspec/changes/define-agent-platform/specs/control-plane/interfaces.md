@@ -35,7 +35,7 @@
 | `memory_profile.read` | Какие уровни памяти читать | L1 | S2 | M2, M3, M5, M6 | см. agent-memory | M3 | M0–M6 | см. agent-memory |
 | `memory_profile.write` | Какие уровни агент пишет | L1 | S2 | M3 | см. agent-memory | нет | M3, M4 | см. agent-memory |
 | `memory.m2_last_runs` | Сколько прошлых запусков в контекст | L1 | S2 | 3 | см. agent-memory | 0 | 10 | см. agent-memory |
-| `memory.retention` | Сроки хранения уровней | L1 | S2 | M1 30 д, M2 180 д | см. agent-memory | M1 7 д, M2 30 д | M1 90 д, M2 365 д | см. agent-memory |
+| `memory.retention` | Сроки хранения уровней | L1 | S2 | M1 30 д, M2 180 д, M3 до закрытия задачи, M4 до замены факта (`valid_to`) | см. agent-memory | M1 7 д, M2 30 д | M1 90 д, M2 365 д | см. agent-memory |
 | `guardrails.tools_allow` | Разрешённые тулы | L1 | S2 | из определения | см. `agent.tools` (agent-registry) | нет | тулы агента | см. agent-registry |
 | `guardrails.approval` | Тулы с подтверждением человека | L1 | S2 | запись в задачу, push | необратимые и видимые людям действия | пусто | все тулы агента | уровень автономии (guardrails) |
 | `guardrails.approval_timeout` | Сколько ждать подтверждения | L1 | S2 | 24 ч | рабочий день + ночь | 15 мин | 72 ч | доступность людей; не больше `checkpoint.ttl` |

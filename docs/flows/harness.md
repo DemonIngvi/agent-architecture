@@ -80,6 +80,8 @@ RunBundle ─▶ Bootstrap ─▶ Context Manager ─▶ LLM client ──▶ о
 
 ### Пример
 
+Запрос `ChatCompletionRequest` со слоями промпта (поля сверяются с моделью при сборке):
+
 ```json
 { "model": "team-default",
   "messages": [
@@ -90,27 +92,19 @@ RunBundle ─▶ Bootstrap ─▶ Context Manager ─▶ LLM client ──▶ о
   "tool_choice": "auto", "parallel_tool_calls": false,
   "temperature": 0.2, "max_tokens": 8192, "reasoning_effort": "medium",
   "stream": true,
-  "metadata": { "run_id": "run_01J9Z4K", "issue": "MKT-42", "agent": "analyst", "project": "MKT" } }
+  "metadata": { "run_id": 1042, "issue_key": "MKT-42", "agent": "analyst" } }
 ```
 
 ## Данные
 
 `RunEvent` — один шаг:
 
-```json
-{ "run_id": "run_01J9Z4K", "seq": 7, "ts": "2026-10-10T12:01:13Z", "type": "tool_call",
-  "data": { "tool": "add_comment", "args": { "issue": "MKT-42", "body": "Черновик требований готов" } } }
-```
+Поля — [`RunEvent`](../../data-model.md#model-runevent); пример — [каталог API](../api/README.md#runevent). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
 
 Типы событий: `run_started`, `llm_call`, `tool_call`, `tool_result`, `needs_approval`, `question`, `memory_write`, `guardrail_decision`, `run_finished`.
 
 `RunResult`:
 
-```json
-{ "run_id": "run_01J9Z4K", "status": "succeeded",
-  "output": "## Требования\n…",
-  "artifacts": [{ "name": "requirements.md", "url": "s3://attachments/MKT-42/requirements.md" }],
-  "usage": { "prompt_tokens": 18450, "completion_tokens": 2210, "cost_usd": 0.12, "steps": 9 } }
-```
+Поля — [`RunResult`](../../data-model.md#model-runresult); пример — [каталог API](../api/README.md#runresult). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
 
 Статусы: `succeeded`, `failed`, `limit`, `canceled`.

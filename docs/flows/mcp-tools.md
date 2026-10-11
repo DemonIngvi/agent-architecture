@@ -18,10 +18,7 @@
 
 `tools/call` (MCP):
 
-```json
-{ "jsonrpc": "2.0", "id": 12, "method": "tools/call",
-  "params": { "name": "update_issue", "arguments": { "issue": "MKT-42", "state": "Ревью" } } }
-```
+Поля — [`McpToolCall`](../../data-model.md#model-mcptoolcall); пример — [каталог API](../api/README.md#mcptoolcall). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
 
 Подключение MCP-сервера к агенту:
 

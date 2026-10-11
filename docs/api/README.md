@@ -131,3 +131,91 @@ _OPA G1 / G2_
 { "result": { "allow": false, "approval": true, "reason": "push требует подтверждения" } }
 ```
 
+### Heartbeat
+
+_продление аренды; в ответе — подтверждения и указания (I3)_
+
+```json
+{ "active": true, "approvals": [ { "runId": 1042, "seq": 8, "decision": "approve", "scope": "once", "by": "user:anna" } ],
+  "messages": [ { "id": "m-91", "text": "используй pytest", "by": "user:anna", "at": "2026-10-10T12:03:00Z" } ] }
+```
+
+### AgentSettings
+
+_настройки агента в Platform module (I4)_
+
+```json
+{ "agentId": 7, "version": 5, "autonomy": "R2", "budget": { "run_usd": 1, "day_usd": 5 },
+  "sandboxProfile": "light", "memoryProfile": "default",
+  "toolsAllow": ["itsaplan_get_issue", "itsaplan_add_comment", "git_push"], "approvalTools": ["git_push"],
+  "scheduling": { "parallel": 1, "max": 3 }, "enabled": true }
+```
+
+### SandboxClaim
+
+_заявка на среду запуска (I6, I23)_
+
+```json
+{ "profile": "light", "sandbox_id": "sbx-7f3a", "image": "harness:0.3.1", "runtime": "runc", "cpu": 1, "memory_mb": 1024, "disk_gb": 5, "ready_ms": 140 }
+```
+
+### RepoGrant
+
+_доступ к репозиторию на один запуск (I6, I18)_
+
+```json
+{ "repo": "org/app", "access": "write", "branch_prefix": "agent/MKT-42", "protected": ["main"], "ttl_s": 3600 }
+```
+
+### Checkpoint
+
+_состояние цикла Harness (I12, `PUT /runs/{id}/checkpoint`)_
+
+```json
+{ "runId": 1042, "step": 7, "parent_step": 6, "state": "<base64>" }
+```
+
+### ChatCompletionRequest
+
+_вызов модели через LiteLLM (I8); полный пример со слоями промпта — [сборка запроса](../flows/harness.md#llm-request)_
+
+```json
+{ "model": "team-default", "messages": [ { "role": "system", "content": "…" }, { "role": "user", "content": "MKT-42: …" } ],
+  "tools": [ { "type": "function", "function": { "name": "itsaplan_add_comment", "parameters": { "type": "object" } } } ],
+  "temperature": 0.2, "max_tokens": 8192, "stream": true,
+  "metadata": { "run_id": 1042, "issue_key": "MKT-42", "agent": "analyst" } }
+```
+
+### McpToolCall
+
+_вызов тула через MCP-прокси Runner (I9, JSON-RPC 2.0)_
+
+```json
+{ "jsonrpc": "2.0", "id": 12, "method": "tools/call", "params": { "name": "itsaplan_update_issue", "arguments": { "issue": "MKT-42", "state": "Ревью" } } }
+{ "jsonrpc": "2.0", "id": 12, "result": { "content": [ { "type": "text", "text": "ok" } ] } }
+```
+
+### VirtualKey
+
+_ключ LiteLLM на агента (I15, `/key/generate`)_
+
+```json
+{ "key_alias": "agent-7", "models": ["team-default"], "max_budget": 5, "budget_duration": "1d", "rpm_limit": 30, "tpm_limit": 200000, "metadata": { "agent": 7 } }
+```
+
+### OpaBundleData
+
+_данные бандла OPA (I16, `data.json`)_
+
+```json
+{ "agents": { "7": { "tools_allow": ["itsaplan_get_issue", "git_push"], "approval": ["git_push"], "autonomy": "R2", "budget": { "run": 1, "day": 5 } } },
+  "platform": { "kill_switch": false } }
+```
+
+### CostAggregate
+
+_сводка затрат по задаче (экран «Затраты»)_
+
+```json
+{ "issue_key": "MKT-42", "agent": "analyst", "runs": 3, "prompt_tokens": 51200, "completion_tokens": 6400, "cost_usd": 0.34 }
+```

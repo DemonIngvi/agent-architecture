@@ -21,15 +21,11 @@
 
 `SandboxClaim`:
 
-```json
-{ "profile": "light", "sandbox_id": "sbx-7f3a", "image": "harness:0.3.1", "cpu": 1, "memory_mb": 1024, "ready_ms": 140 }
-```
+Поля — [`SandboxClaim`](../../data-model.md#model-sandboxclaim); пример — [каталог API](../api/README.md#sandboxclaim). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
 
 `RepoGrant` — доступ к репозиторию на один запуск:
 
-```json
-{ "repo": "org/app", "access": "write", "branch_prefix": "agent/MKT-42", "protected": ["main"], "ttl_s": 3600 }
-```
+Поля — [`RepoGrant`](../../data-model.md#model-repogrant); пример — [каталог API](../api/README.md#repogrant). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
 
 Профиль sandbox:
 

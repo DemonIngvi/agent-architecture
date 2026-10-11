@@ -22,12 +22,7 @@ POST /v1/chat/completions
 Authorization: Bearer sk-agent-analyst
 ```
 
-```json
-{ "model": "team-default",
-  "messages": [{ "role": "system", "content": "Ты аналитик…" }, { "role": "user", "content": "MKT-42: …" }],
-  "tools": [{ "type": "function", "function": { "name": "add_comment", "parameters": { "type": "object" } } }],
-  "metadata": { "run_id": "run_01J9Z4K", "issue_key": "MKT-42", "agent": "analyst" } }
-```
+Поля — [`ChatCompletionRequest`](../../data-model.md#model-chatcompletionrequest); пример — [каталог API](../api/README.md#chatcompletionrequest). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
 
 Конфиг алиасов (mock для разработки):
 

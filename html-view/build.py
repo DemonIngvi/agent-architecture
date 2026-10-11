@@ -164,12 +164,18 @@ def check_req_tasks() -> list:
     """Правило трассировки: требование ↔ задача в обе стороны, все требования покрыты задачами."""
     req_side, task_side, issues = {}, {}, []
     for spec in ROOT.glob("openspec/changes/*/specs/*/spec.md"):
-        for rid, impl in re.findall(r'<a id="r-[a-z]+-\d+"></a>\*\*ID:\*\* `(R-[A-Z]+-\d+)` · \*\*Реализует задача:\*\* ([^\n]*)', spec.read_text(encoding="utf-8")):
+        for rid, impl in re.findall(r'\*\*ID:\*\* `(R-[A-Z]+-\d+)` · \*\*Реализует задача:\*\* ([^\n]*)', spec.read_text(encoding="utf-8")):
             req_side[rid] = set(re.findall(r"tasks/(\d\.\d)-", impl))
             if not req_side[rid] and "BACKLOG" not in impl and "есть в ICPlan" not in impl:
                 issues.append(f"{rid}: нет задачи")
         if spec.read_text(encoding="utf-8").count("### Requirement:") != len(re.findall(r'<a id="r-', spec.read_text(encoding="utf-8"))):
             issues.append(f"{spec.parent.name}: не у всех требований есть ID")
+        # якорь — у заголовка своего требования, ID в подписи того же блока (ссылка открывает начало требования)
+        for blk in re.split(r"\n(?=<a id=\"r-)", spec.read_text(encoding="utf-8"))[1:]:
+            a = re.match(r'<a id="(r-[a-z]+-\d+)"></a>\n### Requirement:', blk)
+            idm = re.search(r"\*\*ID:\*\* `(R-[A-Z]+-\d+)`", blk)
+            if not a or not idm or a.group(1) != idm.group(1).lower():
+                issues.append(f"{spec.parent.name}: якорь {a.group(1) if a else '?'} не у заголовка своего требования")
     for tf in ROOT.glob("docs/tasks/*.md"):
         t, txt = tf.name.split("-")[0], tf.read_text(encoding="utf-8")
         if "**Статус:** ❌ закрыта" in txt:  # закрытая как дубль: должна ссылаться на существующие требования
@@ -234,10 +240,15 @@ PERSONA_ROLE = {"П": "Пользователь", "А": "Администрат�
 APPR_HEAD = "| Требование | Роль | Кто | Тип | Дата | Решение | Версия текста | Комментарий |\n|---|---|---|---|---|---|---|---|\n"
 
 
+def strip_id(s: str) -> str:
+    """Убрать якорь требования (стоит перед заголовком) и строку ID (подпись после требования)."""
+    return re.sub(r'<a id="r-[a-z]+-\d+"></a>\n?|\*\*ID:\*\* `R-[A-Z]+-\d+`[^\n]*\n?', "", s)
+
+
 def req_version(block: str) -> str:
     """Короткий хэш текста требования (без строки ID): изменился текст — подтверждение устарело."""
     import hashlib
-    body = re.sub(r'<a id="r-[a-z]+-\d+"></a>[^\n]*', "", block)
+    body = strip_id(block)
     return hashlib.sha1(re.sub(r"\s+", " ", body).strip().encode("utf-8")).hexdigest()[:8]
 
 
@@ -703,7 +714,7 @@ def _req_bodies() -> dict:
         for sp in (SRC / "openspec/changes").glob("*/specs/*/spec.md"):
             for r in re.split(r"\n### Requirement: ", sp.read_text(encoding="utf-8"))[1:]:
                 name, body = r.split("\n", 1)
-                body = re.sub(r'<a id="r-[a-z]+-\d+"></a>[^\n]*', "", body)
+                body = strip_id(body)
                 out[(sp.parent.name, name.strip())] = re.sub(r"\s+", " ", body.lower()).strip()
         _CACHE["bodies"] = out
     return _CACHE["bodies"]
@@ -773,7 +784,7 @@ def spec_readiness(spec: str) -> dict:
 def _spec_readiness(spec: str) -> dict:
     t = (SRC / spec).read_text(encoding="utf-8")
     folder = SRC / Path(spec).parent
-    reqs = [re.sub(r'<a id="r-[a-z]+-\d+"></a>[^\n]*\n', "", r) for r in re.split(r"\n### Requirement: ", t)[1:]]
+    reqs = [strip_id(r) for r in re.split(r"\n### Requirement: ", t)[1:]]
     cap = Path(spec).parent.name
     purpose = re.search(r"## Purpose\n\n([^\n]+)", t)
     fmt = (4 if purpose and len(purpose.group(1)) >= 50 else 0)
@@ -1093,7 +1104,33 @@ def main():
         subprocess.run(cmd + ["serve", "-f", str(BUILD / "mkdocs.yml"), "-a", "127.0.0.1:8000"], check=True)
     else:
         subprocess.run(cmd + ["build", "-f", str(BUILD / "mkdocs.yml"), "-d", str(SITE), "--clean"], check=True)
+        check_anchors()
         print(f"Готово: {SITE / 'index.html'}")
+
+
+def check_anchors() -> list:
+    """Ссылки «файл.md#якорь» ведут на существующий id в собранной странице (О-44)."""
+    def page(md):
+        rel_ = md.relative_to(SRC).with_suffix("")
+        if rel_.name in ("index", "README"):
+            rel_ = rel_.parent
+        return SITE / rel_ / "index.html"
+    ids, bad = {}, []
+    for f in SRC.rglob("*.md"):
+        t = re.sub(r"```.*?```|`[^`\n]*`", "", f.read_text(encoding="utf-8"), flags=re.S)
+        for m in re.finditer(r"\]\(([^)\s#]*\.md)#([^)\s]+)\)", t):
+            tgt = (f.parent / m.group(1)).resolve()
+            if not tgt.exists():
+                continue  # битый файл ловит check_links
+            h = page(tgt)
+            if h not in ids:
+                ids[h] = set(re.findall(r'id="([^"]+)"', h.read_text(encoding="utf-8"))) if h.exists() else None
+            if ids[h] is not None and m.group(2) not in ids[h]:
+                bad.append(f"{f.relative_to(SRC).as_posix()} → {m.group(1)}#{m.group(2)}")
+    for b in bad:
+        print("⚠️ якорь:", b)
+    print(f"якоря: битых {len(bad)}")
+    return bad
 
 
 if __name__ == "__main__":

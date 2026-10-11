@@ -45,19 +45,8 @@ queued ─▶ starting ─▶ running ─▶ succeeded
 
 `RunBundle` — всё, что нужно Harness для запуска:
 
-```json
-{
-  "run_id": "run_01J9Z4K",
-  "agent": { "$ref": "AgentDefinition analyst v3" },
-  "task": { "issue_key": "MKT-42", "prompt": "…", "acceptance": "Требования в формате SDD, разделы: проблема, ограничения, критерии" },
-  "context": { "m3": "Сделано: черновик раздела «Проблема». Дальше: ограничения.", "m2": ["run_01J9Y: собраны вводные"] },
-  "limits": { "max_steps": 30, "timeout_s": 1800, "max_tokens": 200000 },
-  "endpoints": { "llm": "http://litellm:4000/v1", "itsaplan_mcp": "http://api:3000/mcp", "memory": "http://memory:8080" }
-}
-```
+Поля — [`RunBundle`](../../data-model.md#model-runbundle); пример — [каталог API](../api/README.md#runbundle). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
 
 `PolicyInput` для G1:
 
-```json
-{ "input": { "point": "G1", "agent": "analyst", "issue": "MKT-42", "spent_today_usd": 3.2, "running_runs": 1 } }
-```
+Поля — [`PolicyInput`](../../data-model.md#model-policyinput) · [`PolicyDecision`](../../data-model.md#model-policydecision); пример — [каталог API](../api/README.md#policyinput-policydecision). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).

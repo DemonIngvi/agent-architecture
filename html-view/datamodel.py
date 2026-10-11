@@ -3,9 +3,9 @@
 Источники:
 - интерфейсы I1–I23 — матрица docs/flows/data-types.md и таблицы «Интерфейсы обмена» в interfaces.md спек;
 - эндпоинты — страницы каталога docs/api/*.md (сборка читает их сама);
-- таблицы ICPlan — код форка, packages/db/src/schema/app.ts (icplan_schema.json, обновлять: python html-view/schema_import.py <путь к форку>);
+- таблицы ICPlan — код форка, packages/db/src/schema/app.ts (icplan_schema.json + .meta.json с коммитом; обновлять: python html-view/schema_import.py [путь к форку], сборка сверяет коммит);
 - таблицы платформы — проект схемы по спекам и решениям D4, D17–D20 (до реализации);
-- таблицы LiteLLM — schema.prisma LiteLLM (сверить с закреплённой v1.104.2 в задаче 1.1).
+- таблицы LiteLLM — schema.prisma тега v1.104.2 (LITELLM_REF; колонки и типы сверены 2026-10-11).
 Правило: docs/rules/change-process.md (новый интерфейс, хранилище или модель → этот файл).
 """
 
@@ -31,7 +31,7 @@ INTEG = {
     "I17": ("sandbox", "«внешние хосты»", "", "исходящий трафик через egress-прокси (allowlist)", []),
     "I18": ("agent-runner", "«git-провайдер»", "", "короткоживущие токены репозиториев", ["RepoGrant"]),
     "I19": ("agent-runner", "infrastructure", "", "файлы задачи и артефакты в RustFS (S3 API)", []),
-    "I20": ("icplan", "icplan", "", "интерфейс ICPlan ↔ API (в том числе экраны Platform module, таймлайн, сводка)", ["Process", "Verdict"]),
+    "I20": ("icplan", "icplan", "", "интерфейс ICPlan ↔ API (в том числе экраны Platform module, таймлайн, сводка)", ["Process", "Verdict", "CostAggregate"]),
     "I21": ("«пользователи»", "icplan", "infrastructure", "вход по HTTPS через Traefik: web, api, mcp", []),
     "I22": ("«сервисы»", "infrastructure", "", "Postgres через PgBouncer", []),
     "I23": ("agent-runner", "sandbox", "infrastructure", "среды запусков через Kubernetes API (этап 4)", ["SandboxClaim"]),
@@ -116,15 +116,18 @@ MODELS = {
         ("runId", "int", True, ""), ("step", "int", True, "ключ идемпотентности"), ("parent_step", "int", False, ""),
         ("state", "bytes", True, "сериализованное состояние графа LangGraph")]),
     "ChatCompletionRequest": ("запрос к модели (OpenAI Chat Completions)", [
-        ("model", "string", True, "алиас из `model_list`"), ("messages", "Message[]", True, "слои промпта (R-HRN-18)"), ("tools", "Tool[]", False, ""),
-        ("temperature / max_tokens / reasoning_effort", "number / enum", False, "`model.*`; неподдерживаемое отбрасывает `drop_params`"),
+        ("model", "string", True, "алиас из `model_list`"), ("messages", "{role, content}[]", True, "слои промпта (R-HRN-18)"), ("tools", "{type, function: {name, parameters}}[]", False, ""),
+        ("tool_choice / parallel_tool_calls", "enum / bool", False, "Harness: `auto`, без параллельных вызовов"), ("temperature / max_tokens / reasoning_effort", "number / enum", False, "`model.*`; неподдерживаемое отбрасывает `drop_params`"),
         ("metadata", "{run_id, issue_key, agent}", True, "атрибуция затрат (R-LLM-03)"), ("stream", "bool", False, "")]),
     "McpToolCall": ("вызов тула MCP (JSON-RPC 2.0)", [
-        ("method", "enum: tools/list · tools/call", True, ""), ("params.name", "string", False, "имя тула"), ("params.arguments", "object", False, "аргументы"),
-        ("result.content", "Content[]", False, "результат, обрезка `max_result_kb`")]),
+        ("jsonrpc / id", "string / int", True, "конверт JSON-RPC 2.0"), ("method", "enum: tools/list · tools/call", True, ""), ("params.name", "string", False, "имя тула"), ("params.arguments", "object", False, "аргументы"),
+        ("result.content", "{type, text}[]", False, "результат, обрезка `max_result_kb`")]),
     "VirtualKey": ("ключ LiteLLM на агента (`/key/generate`)", [
         ("key_alias", "string", True, "`agent:<id>`"), ("models", "string[]", True, "разрешённые алиасы"), ("max_budget", "float", True, "бюджет $"),
         ("budget_duration", "string", True, "период"), ("rpm_limit / tpm_limit", "int", False, ""), ("metadata", "object", False, "")]),
+    "CostAggregate": ("сводка затрат по задаче и агенту (экран «Затраты», R-OBS-03)", [
+        ("issue_key", "string", True, "ключ задачи"), ("agent", "string", True, "агент"), ("runs", "int", True, "число запусков"),
+        ("prompt_tokens / completion_tokens", "int", True, "токены из журнала LiteLLM"), ("cost_usd", "float", True, "затраты")]),
     "OpaBundleData": ("данные бандла OPA (`data.json`)", [
         ("agents.<id>.tools_allow", "string[]", True, ""), ("agents.<id>.approval", "string[]", True, "тулы с паузой"),
         ("agents.<id>.autonomy", "enum: R0–R5", True, ""), ("agents.<id>.budget", "{run, day}", True, ""), ("platform.kill_switch", "bool", True, "")]),
@@ -136,7 +139,8 @@ ICPLAN_TABLES = {
     "icplan": [("project", ""), ("projectColumn", ""), ("issueType", ""), ("issue", "+ `review_with_me` (D17)"), ("issueChecklist", ""),
                ("issueChecklistItem", "+ `origin`, `status` (D20)"), ("issueActivity", ""), ("aiAgent", "+ `enabled` (D17)"), ("agentRun", ""),
                ("agentSchedule", ""), ("agentChatThread", ""), ("agentChatMessage", ""), ("projectAction", "+ эффект `delegate_agent`"),
-               ("projectDocument", ""), ("issueAttachment", "")],
+               ("projectDocument", ""), ("issueAttachment", ""),
+               ("user", "Better Auth; у агента — бот-пользователь"), ("apikey", "ключ агента: Bearer для I1–I3; `reference_id` → `user.id`")],
     "mcp-tools": [("aiAgent", ""), ("agentTool", ""), ("agentToolLink", ""), ("agentSkill", ""), ("agentSkillLink", ""),
                   ("integrationCredential", ""), ("project", "`mcp_enabled`"), ("gitProviderConnection", ""), ("gitManagedRepository", "")],
     "memory": [("agentChatMessage", "M1"), ("agentRun", "M2"), ("issueActivity", "M1, M2"), ("projectDocument", "M6"), ("aiAgent", "M5")],
@@ -185,6 +189,7 @@ PLATFORM_TABLES = {
     "run_checkpoint": ("S5", "agent-runner", [("run_id", "int", "PK, FK agent_run", ""), ("step", "int", "PK", ""), ("parent_step", "int", "", ""), ("state", "bytea", "", "состояние LangGraph"),
                                               ("created_at", "timestamptz", "", ""), ("expires_at", "timestamptz", "", "`checkpoint.ttl`")]),
 }
+LITELLM_REF = "schema.prisma LiteLLM v1.104.2 (тег, fc3920bf)"
 LITELLM_TABLES = {
     "LiteLLM_VerificationToken": [("token", "String", "PK", "virtual key (хеш)"), ("key_alias", "String", "", "`agent:<id>`"), ("models", "String[]", "", ""), ("spend", "Float", "", ""),
                                   ("max_budget", "Float", "", ""), ("budget_duration", "String", "", ""), ("rpm_limit", "BigInt", "", ""), ("tpm_limit", "BigInt", "", ""),
@@ -197,6 +202,53 @@ LITELLM_TABLES = {
     "LiteLLM_ProxyModelTable": [("model_id", "String", "PK", ""), ("model_name", "String", "", "алиас"), ("litellm_params", "Json", "", "провайдер, модель")],
 }
 # Хранилища компонента для страницы: слаг → [(хранилище, подпись)]
+# Домены S1 на странице «Модель данных» — чтобы диаграмма читалась (О-44)
+S1_DOMAINS = [
+    ("Задачи и процесс", ["project", "project_column", "issue_type", "issue", "issue_checklist", "issue_checklist_item",
+                          "project_action", "process", "process_step", "issue_process_state"]),
+    ("Агенты, запуски, доступ", ["ai_agent", "agent_run", "agent_schedule", "agent_chat_thread", "agent_chat_message", "user", "apikey"]),
+    ("Активность, документы, вложения", ["issue_activity", "project_document", "issue_attachment"]),
+]
+
+# Политика хранения таблиц проекта схемы (О-44): индексы, уникальность, срок, очистка, кто мигрирует.
+# Индекс: (вид, колонки, зачем); вид — unique / index / hnsw. Сборка проверяет: у каждой таблицы есть политика,
+# каждый FK покрыт индексом (первая колонка индекса или PK), срок ссылается на параметр спеки.
+MIGRATE = {
+    "fork": "Drizzle в форке (`packages/db`), применяются до старта `api`",
+    "cp": "миграции Platform module в `api` форка, своя таблица версий, только схема `platform`",
+    "obs": "миграции Observability в `api` форка, своя таблица версий",
+    "runner": "миграции Agent Runner при старте, своя таблица версий",
+    "memory": "миграции Memory API при старте (Alembic), своя таблица версий",
+}
+TABLE_POLICY = {
+    "process": ([("unique", "project_id, issue_type_id", "один процесс на тип задачи"), ("index", "issue_type_id", "FK; процесс по типу задачи"), ("index", "first_step_id", "FK")],
+                "пока жив проект", "каскадно с проектом; версия процесса растёт при правке", "fork"),
+    "process_step": ([("unique", "process_id, column_id", "одна колонка — один шаг"), ("index", "column_id", "FK; переход по колонке"), ("index", "agent_id", "FK; шаги агента")],
+                     "пока жив процесс", "каскадно с процессом", "fork"),
+    "issue_process_state": ([("index", "process_id", "FK"), ("index", "step_id, state", "задачи на шаге — доска и подхват")],
+                            "пока жива задача", "каскадно с задачей", "fork"),
+    "agent_settings": ([("index", "sandbox_profile_id", "FK"), ("index", "memory_profile_id", "FK")],
+                       "пока жив агент", "каскадно с агентом", "cp"),
+    "agent_settings_version": ([], "все версии (откат и аудит)", "каскадно с агентом", "cp"),
+    "sandbox_profile": ([("unique", "name", "профиль по имени")], "бессрочно (справочник)", "удаление запрещено, пока профиль используется", "cp"),
+    "memory_profile": ([("unique", "name", "профиль по имени")], "бессрочно (справочник)", "удаление запрещено, пока профиль используется", "cp"),
+    "project_resource": ([("unique", "project_id, kind, ref", "ресурс один раз в проекте")], "пока жив проект", "каскадно с проектом", "cp"),
+    "access_policy": ([("unique", "agent_id, resource_id", "одно право агента на ресурс"), ("index", "project_id", "FK"), ("index", "resource_id", "FK")],
+                      "пока живы агент и ресурс", "каскадно", "cp"),
+    "project_platform": ([], "пока жив проект", "каскадно с проектом", "cp"),
+    "kill_switch": ([], "бессрочно (текущее состояние)", "история переключений — в аудите guardrails", "cp"),
+    "scheduler_slot": ([("index", "run_id", "FK; освобождение по запуску"), ("index", "lease_until", "забор просроченных аренд")],
+                       "на время аренды", "строка удаляется при освобождении; просроченная аренда (`lease_until`) забирается", "runner"),
+    "run_event": ([("index", "ts", "очистка по сроку"), ("index", "issue_key, ts", "таймлайн задачи")],
+                  "`retention_days` = 90 (observability)", "ночная пакетная очистка по `ts`; при медленной очистке (этап 4) — секции по дням", "obs"),
+    "setup_cache": ([("index", "project_id", "FK"), ("index", "expires_at", "очистка")],
+                    "`setup.cache_ttl_h` = 168 (agent-sandbox)", "очистка по `expires_at` вместе с томом кэша", "runner"),
+    "memory_m3": ([], "`memory.retention`: M3 до закрытия задачи (agent-memory)", "удаляется по профилю после закрытия задачи; M2 остаётся", "memory"),
+    "m4_fact": ([("index", "superseded_by", "FK"), ("index", "scope, valid_to", "действующие факты области"), ("hnsw", "embedding", "поиск похожих (pgvector)")],
+                "`memory.retention`: M4 до замены факта (agent-memory)", "заменённый факт получает `valid_to`, удаляется по профилю", "memory"),
+    "run_checkpoint": ([("index", "expires_at", "очистка")], "`checkpoint.ttl` = 7 дней (agent-harness)", "очистка по `expires_at`", "runner"),
+}
+
 STORES = {
     "icplan": ["S1"], "platform-module": ["S2"], "agent-runner": ["S3", "S5"], "memory": ["S4", "S1"], "observability": ["S3", "S6", "S1"],
     "llm-gateway": ["S6"], "mcp-tools": ["S1"], "guardrails": ["S11", "S8", "S2"], "sandbox": ["S10", "S7"], "harness": ["S10", "S5"],
