@@ -581,6 +581,7 @@ def write_pagebar_map():
     for slug, *_ in COMPONENTS:
         pages[f"docs/stories/{slug}.md"] = slug
         pages[f"docs/api/{slug}.md"] = slug
+        pages[f"data-by-component/{slug}/index.md"] = slug
         pages[f"docs/techspec/{slug}.md"] = slug
     for slug, name, st, g, desc, links, docs, tids in COMPONENTS:
         for _, p in docs:
@@ -981,9 +982,15 @@ def write_component_pages():
         if how.exists():
             ht = SM.relink(how.read_text(encoding="utf-8"), f"docs/how/{slug}.md", page)
             body += ["", "## Как работает {#how}", "", IG.flow_page(ht, slug, IG.names(COMPONENTS), "../../")]
-        body += [""] + IG.models_md(slug) + IG.stores_md(slug, page, href)
         (SRC / page).parent.mkdir(parents=True, exist_ok=True)
         (SRC / page).write_text("\n".join(body), encoding="utf-8")
+
+        # Вкладка «Данные»: хранилища и модель данных компонента (О-57)
+        dpage = f"data-by-component/{slug}/index.md"
+        dbody = [f"# Данные: {name}", "", f"← [{name}]({rel(f'data-by-component/{slug}', page)}) · [интеграции и контракты]({rel(f'data-by-component/{slug}', f'docs/api/{slug}.md')}) · [методология данных]({rel(f'data-by-component/{slug}', 'docs/rules/data-methodology.md')})", ""]
+        dbody += IG.stores_md(slug, dpage, href)
+        (SRC / dpage).parent.mkdir(parents=True, exist_ok=True)
+        (SRC / dpage).write_text("\n".join(dbody) + "\n", encoding="utf-8")
 
         # Вкладка «Спеки»: страница компонента
         d = f"specs-by-component/{slug}"
@@ -1099,6 +1106,7 @@ def nav_yaml() -> str:
         rs = [p for _, p in REFS.get(slug, []) if p.startswith("docs/rnd/") and (SRC / p).exists() and p not in used]
         if (SRC / f"docs/api/{slug}.md").exists():
             L += ["    - Интеграции:", item(6, "Интеграции " + name, f"docs/api/{slug}.md")]
+        L += ["    - Данные:", item(6, "Данные " + name, f"data-by-component/{slug}/index.md")]
         if (SRC / f"docs/techspec/{slug}.md").exists():
             L += ["    - Deploy:", item(6, "Deploy " + name, f"docs/techspec/{slug}.md")]
         L += ["    - R&D:", item(6, "R&D " + name, f"rnd-by-component/{slug}/index.md")]

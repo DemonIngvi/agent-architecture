@@ -1,7 +1,7 @@
 """Hook MkDocs: верхняя панель на каждой странице.
 
 Слева — «Назад» (история браузера) и «На уровень выше» (родитель в дереве навигации).
-Справа — вкладки компонента: Архитектура, User Stories, Спеки, Задачи, Интеграции, Deploy, R&D; Справка — общие правила.
+Справа — вкладки компонента: Архитектура, User Stories, Спеки, Задачи, Интеграции, Данные, Deploy, R&D; Справка — общие правила.
 Если страница относится к компоненту, ссылки ведут на документацию этого компонента.
 """
 import json
@@ -17,6 +17,7 @@ TYPES = [  # (ключ, подпись, раздел навигации, URL к�
     ("spec", "Спеки", "Спеки", "specs-by-component/{}/", None),
     ("task", "Задачи", "Задачи", "tasks-by-component/{}/", "tasks-by-component/"),
     ("api", "Интеграции", "Интеграции", "docs/api/{}/", None),
+    ("data", "Данные", "Данные", "data-by-component/{}/", None),
     ("tech", "Deploy", "Deploy", "docs/techspec/{}/", None),
     ("rnd", "R&D", "R&D", "rnd-by-component/{}/", "rnd-by-component/"),
     ("ref", "Справка", "Справка", None, "docs/rules/"),
@@ -69,6 +70,8 @@ def _doc_type(src: str) -> str:
         return "Спеки"
     if src.startswith(("tasks-by-component/", "docs/tasks/", "docs/ROADMAP", "docs/TASKS", "docs/BACKLOG")) or src.endswith("/tasks.md"):
         return "Задачи"
+    if src.startswith("data-by-component/"):
+        return "Данные"
     if src.startswith("docs/api/"):
         return "Интеграции"
     if src.startswith("docs/techspec/"):

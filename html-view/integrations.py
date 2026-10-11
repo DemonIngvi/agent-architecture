@@ -149,7 +149,8 @@ def integrations_page_head(slug, nm) -> list:
              f"{nm.get(slug, slug)} и его соседи. Стрелка — кто вызывает кого, подпись — I-коды (↩ — данные приходят в ответе); "
              "пунктир — общая инфраструктура (БД, вход, хранилище); оранжевым — внешние системы. Что идёт по каждому I-коду — в карточках ниже.", ""]
             + c1_mermaid(slug, nm) + [""]
-            + integrations_md(slug, None, nm, None, model_href=comp)
+            + integrations_md(slug, None, nm, None)
+            + [x.replace("../../data-model.md#naming", "../rules/data-methodology.md#naming") for x in models_md(slug)]
             + ["## API {#api}", ""])
 
 
@@ -528,7 +529,7 @@ def stores_md(slug, page, href) -> list:
     tables = er_tables(slug)
     stores = DM.STORES.get(slug, [])
     L = ["## Хранилища и модель данных {#stores}", "",
-         f"Хранилища компонента: {', '.join(stores) or '—'} ([все хранилища и общая модель](../../data-model.md)). На диаграмме — ключи и основные поля; все поля — в таблицах ниже.", ""]
+         f"Хранилища компонента: {', '.join(stores) or '—'}. На диаграмме — ключи и основные поля; все поля, индексы, срок хранения и миграции — в таблицах ниже; правила — [методология данных](../../docs/rules/data-methodology.md).", ""]
     if tables:
         L += mermaid_er(tables) + [""]
         for t, cols, src in tables:

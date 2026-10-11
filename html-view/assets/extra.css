@@ -389,3 +389,5 @@
 .md-typeset .tb-type.t-api.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #ef6c00; }
 .t-tech { background: #455a64; }
 .md-typeset .tb-type.t-tech.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #455a64; }
+.t-data { background: #2e7d32; }
+.md-typeset .tb-type.t-data.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #2e7d32; }

@@ -36,7 +36,7 @@ def _model_target(anchor: str):
         return None
     name = next((k for k in DM.MODELS if k.lower() == m.group(1)), None)
     owner = name and model_owner(name)
-    return (f"components/{owner}/index.md", f"model-{m.group(1)}") if owner else None
+    return (f"docs/api/{owner}.md", f"model-{m.group(1)}") if owner else None  # контракты — на вкладке «Интеграции» (О-57)
 
 
 def moved(target: str, anchor: str):
@@ -56,7 +56,7 @@ def moved(target: str, anchor: str):
         if anchor == "terms":
             return "index.md", "terms"
         if anchor in STORE_PAGE:
-            return f"components/{STORE_PAGE[anchor]}/index.md", "stores"
+            return f"data-by-component/{STORE_PAGE[anchor]}/index.md", "stores"
         return _model_target(anchor) or ("docs/rules/data-methodology.md", "")
     if target == "docs/api/README.md":
         a = "model-" + anchor.split("-")[0] if anchor else ""
