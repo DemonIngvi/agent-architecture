@@ -31,7 +31,6 @@ theme:
         icon: material/weather-sunny
         name: Светлая тема
   features:
-    - navigation.sections
     - navigation.path
     - navigation.footer
     - navigation.top
