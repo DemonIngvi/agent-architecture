@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# Проверки документации перед коммитом — для любого агента и человека (включается: ./tools/setup.sh).
+# Пропустить один раз: git commit --no-verify (только осознанно).
+ROOT="$(git rev-parse --show-toplevel)"
+"$ROOT/tools/doc" staged || {
+  echo "Коммит остановлен: исправьте замечания (подробно: ./tools/doc check; правила файла: ./tools/doc route <файл>)." >&2
+  exit 1
+}

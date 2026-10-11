@@ -4,7 +4,10 @@
     python html-view/doctool.py generated <файл>  если файл генерируется — откуда и чем; иначе пусто
     python html-view/doctool.py check             все проверки сборки без сборки сайта (секунды)
     python html-view/doctool.py rnd <slug> <тема> заготовка R&D v3.1, проходящая проверку структуры
-    python html-view/doctool.py hook-pre|hook-post  для хуков Claude Code (JSON на stdin)
+    python html-view/doctool.py pre <файл>         до правки: код 2 и источник, если файл генерируется (любой агент)
+    python html-view/doctool.py post <файл>        после правки: выжимка правил и замечания проверок (любой агент)
+    python html-view/doctool.py staged             проверки для git pre-commit (код 1 при замечаниях)
+    python html-view/doctool.py hook-pre|hook-post  то же для хуков Claude Code (JSON на stdin)
 
 Выжимка строится из таблиц правил при каждом вызове — копий правил здесь нет.
 """
@@ -217,6 +220,25 @@ def main():
         sys.exit(1 if issues else 0)
     elif cmd == "rnd":
         print(rnd(args[0], " ".join(args[1:]) or args[0]))
+    elif cmd == "pre":
+        g = generated(args[0])
+        if g:
+            print(f"{rel(args[0])} генерируется ({g[0]}). Правь источник: {g[1]}.", file=sys.stderr)
+            sys.exit(2)
+    elif cmd == "post":
+        out = route(args[0])
+        issues = check()
+        print(out + ("\n\nЗамечания проверок:\n" + "\n".join(f"- {i}" for i in issues) if issues else ""))
+    elif cmd == "staged":
+        import subprocess
+        files = subprocess.run(["git", "diff", "--cached", "--name-only"], capture_output=True, text=True, encoding="utf-8").stdout.split()
+        bad = [f for f in files if generated(ROOT / f) and not f.startswith("html-view/") and not f.startswith("docs/stories/") and not f.endswith("tasks.md") and not f.endswith("architecture.md")]
+        issues = check()
+        for f in bad:
+            print(f"⚠️ {f}: генерируемый файл изменён — правь источник ({generated(ROOT / f)[1]})")
+        for i in issues:
+            print(f"⚠️ {i}")
+        sys.exit(1 if issues or bad else 0)
     elif cmd == "hook-pre":
         f = _hook_input()
         g = generated(f) if f else None
