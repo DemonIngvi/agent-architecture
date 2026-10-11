@@ -281,8 +281,9 @@
 .md-typeset .rnd-grid > div.drop { border-top-color: #9aa0a6; }
 .md-typeset .rnd-grid > div.risk { border-top-color: #e3a008; }
 .md-typeset .rnd-grid > div.no { border-top-color: #c62828; }
-.md-typeset .rnd-chain { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.3rem; margin: 0.6rem 0 1rem; }
-.md-typeset .rnd-chain > div { flex: 1 1 0; min-width: 6rem; border-radius: 0.5rem; padding: 0.45rem 0.6rem; font-size: 0.66rem;
+.md-typeset .rnd-chain { display: grid; grid-template-columns: repeat(5, 1fr); align-items: stretch; gap: 0.35rem 0.6rem; margin: 0.6rem 0 1rem; }
+@media (max-width: 45em) { .md-typeset .rnd-chain { grid-template-columns: repeat(2, 1fr); } }
+.md-typeset .rnd-chain > div { min-width: 0; border-radius: 0.5rem; padding: 0.45rem 0.6rem; font-size: 0.66rem;
   background: rgba(63,81,181,.07); border: 1px solid var(--md-default-fg-color--lightest); position: relative; }
 .md-typeset .rnd-chain > div p { margin: 0; }
 .md-typeset .rnd-chain > div strong { display: block; font-size: 0.7rem; }

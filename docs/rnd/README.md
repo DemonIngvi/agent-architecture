@@ -14,14 +14,14 @@
 | [Изоляция запусков](sandbox-isolation.md) | Sandbox | Одноразовый контейнер + тёплый пул на rootless Docker; gVisor — проверка в 2.2; microVM — при внешнем коде; Daytona архивирован | D18 | v3.1 |
 | [Фреймворк агентского цикла](harness-framework.md) | Harness | LangGraph за своим интерфейсом; Trial до прототипа AG1–AG5 (OpenAI Agents SDK — запасной); Hermes заменил бы 4 компонента | D2 | v3.1 |
 | [Модель памяти](memory-model.md) | Memory | M0–M6 по видам знания, область — атрибут, своя Memory API; M4 после MVP на Mem0 или LangMem (противоречия, срок действия) | D4 | v3.1 |
-| [RAG](rag.md) | Memory | Не в MVP; pgvector позже | D13 | v1 + альтернативы |
+| [RAG](rag.md) | Memory | На MVP без RAG: get_document и поиск по файлам; после MVP — pgvector, гибридный поиск и контекстные фрагменты | D13 | v3.1 |
 | [MCP или прямой вызов](mcp-vs-direct.md) | MCP / Tools | Гибрид по R-MCP-04 подтверждён; проверка allowlist и G2 внутри sandbox обходится — MCP-шлюз вне sandbox, вопрос Q-MCP-01 владельцу | D2, D7 | v3.1 |
 | [Движок guardrails](guardrails-engine.md) | Guardrails | OPA (Rego) для G1 и G2: один движок для Go и Python, правила в git с тестами; детекторы содержания (LlamaFirewall) — кандидаты G4 | D6, D18 | v3.1 |
-| [Защита от зацикливания и перерасхода](runaway-protection.md) | Guardrails | Детерминированные лимиты и бюджеты | D6 | v1 + альтернативы |
+| [Защита от зацикливания и перерасхода](runaway-protection.md) | Guardrails | Детерминированные проверки в Harness и Runner + бюджеты LiteLLM; правило цикла уточняется: аргументы и результат (опрос — не цикл) | D6, D18 | v3.1 |
 | [Хранение конфигурации](config-storage.md) | Platform module | БД ICPlan — источник правды, версии, YAML; Rego в git; агент-файл в репозитории — импорт (бэклог) | D9, D18 | v3.1 |
 | [Шлюз к моделям](llm-gateway.md) | LiteLLM gateway | LiteLLM Proxy v1.104.2: ключи, бюджеты и учёт в открытом ядре; Bifrost — запасной при пороге 4.8.4; TensorZero архивирован | D5, D18 | v3.1 |
-| [Профиль нагрузки и ёмкость](load-profile.md) | Инфраструктура | Один узел k3s для MVP, гипотезы нагрузки | D16 | v1 + альтернативы |
-| [Ingress и балансировка](ingress-and-balancing.md) | Инфраструктура | Traefik, Service, PgBouncer | D15 | v1 + альтернативы |
+| [Профиль нагрузки и ёмкость](load-profile.md) | Инфраструктура | Один узел k3s 8 vCPU / 32 ГБ держит профиль команды; узкие места — TPM и RAM под запуски; шаг роста — узел для сред агентов | D15, D18 | v3.1 |
+| [Ingress и балансировка](ingress-and-balancing.md) | Инфраструктура | Traefik из k3s, TLS по ACME, маршруты на Gateway API; Service и PgBouncer; ingress-nginx архивирован | D15, D18 | v3.1 |
 | [Kubernetes и развёртывание](kubernetes-runtime.md) | Инфраструктура | k3s + Helm на одном узле, k3d локально; CIS-проверка узла; провайдер сред в K8s добавлен (4.6.8), кандидат — agent-sandbox | D15, D16, D18 | v3.1 |
 | [СУБД и хранилища](data-stores.md) | Инфраструктура | PostgreSQL 17 под CloudNativePG (WAL в S3 вне узла, Pooler, pgvector) + RustFS как в ICPlan; MinIO архивирован; Trial до проверки PITR | D4, D15, D18 | v3.1 |
 | [Рабочее пространство агентов и доступы](agent-workspace.md) | Sandbox, MCP, Platform module | Вариант B: каталог проекта + workspace задачи + политика, права токенами Runner (D18); зависимости проекта — вопрос Q-SBX-01 | D11, D18 | v3.1 |

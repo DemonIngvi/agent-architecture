@@ -1,95 +1,301 @@
-# R&D: Ingress и балансировка
+# R&D: Вход и балансировка
 
-← [Все R&D](README.md) · [методология](../rules/rnd-methodology.md) · компонент: **Инфраструктура** · решение: [design D15](../../openspec/changes/define-agent-platform/design.md)
+← [Все R&D](README.md) · [методология R&D v3.1](../rules/rnd-methodology.md) · компонент: **Инфраструктура** · решение: [design D15, D18](../../openspec/changes/define-agent-platform/design.md) · спека: [platform-infrastructure](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md)
 
-## Итог
+<div class="rnd-hero" markdown>
+<div class="rnd-q">Вопрос</div>
+Как пользователи и MCP-клиенты попадают в платформу по HTTPS, как запросы распределяются между репликами, а админки остаются закрытыми?
 
-| | |
-|---|---|
-| **Решение** | Traefik (встроен в k3s) — ingress и TLS; балансировка между репликами — Service (ClusterIP); PgBouncer — пул соединений Postgres |
-| **Версия** | Traefik v3.7 (в составе k3s v1.37); PgBouncer 1.26 (через пулер CloudNativePG) |
-| **Лицензия** | Traefik MIT; PgBouncer ISC |
-| **Стоимость** | 0 $ |
-| **Ключевые параметры** | публично только web и api/mcp по HTTPS · админки (LiteLLM, OPA) — без ingress · PgBouncer `transaction` pool, ≤ 30 серверных соединений |
-| **Статус** | Adopt |
-| **Оценка** | Traefik (k3s): **93** · ~~ingress-nginx: 83~~ ✗ · HAProxy Ingress: **81** |
+<div class="rnd-a">Ответ: Traefik из k3s — вход и TLS (ACME); маршруты описываем через Gateway API (HTTPRoute), а не Ingress, чтобы не зависеть от контроллера. Балансировку между репликами делает Service; пул соединений с Postgres — PgBouncer.</div>
 
-## Контекст
+<span class="rnd-badge adopt">Adopt</span> Traefik v3.7 (в k3s) · Gateway API v1.6 · PgBouncer 1.26 · данные 11.10.2026
+</div>
 
-Нужно: вход пользователей по HTTPS, распределение запросов между репликами сервисов, защита Postgres от лавины соединений, закрытые админки. Решение проекта AI-агент 7.12: Traefik через k3s.
+```deck
+# Покрытие потребностей П1–П6
+> Traefik закрывает всё и уже стоит в k3s; Gateway API делает маршруты переносимыми
+stack Traefik + Gateway API: 6 ok, 0 part, 0 no
+stack Envoy Gateway: 5 ok, 1 part, 0 no
+stack NGINX Gateway Fabric: 4 ok, 2 part, 0 no
+stack HAProxy Ingress: 4 ok, 2 part, 0 no
+# Что ставить сверх k3s
+> Traefik и ACME уже в k3s; остальным нужен контроллер и cert-manager
+bar Traefik: 0/2 ничего ok
+bar Envoy Gateway: 2/2 контроллер + cert-manager part
+bar HAProxy Ingress: 2/2 контроллер + cert-manager part
+# Позиции ролей
+side Traefik | Envoy Gateway
+pos DevOps: -2 | уже в k3s, ACME встроен
+pos Архитектор: -1 | Gateway API — переносимые маршруты
+pos Безопасность: 0 | админки без маршрутов у обоих
+pos Разработчик: 1 | Envoy сильнее в политиках трафика
+# Что меняется
+> D15 подтверждён; маршруты — Gateway API
+stack Документы: 3 ok, 0 part, 3 mute
+- ✅ задача 4.6: маршруты через HTTPRoute · ✅ TECHNOLOGIES: Gateway API, ingress-nginx архивирован 23.03.2026
+```
 
-## Обязательные требования (knock-out)
+**Почему Traefik и Gateway API.** Три вывода:
 
-- Проект активно поддерживается
+<div class="rnd-grid" markdown>
+<div markdown>
+**1. Вход уже есть в k3s**
 
-- ✗ **ingress-nginx** — репозиторий архивирован (проект закрыт)
+Traefik ставится вместе с k3s и получает сертификаты по ACME сам. Envoy Gateway, NGINX Gateway Fabric и HAProxy Ingress требуют отдельного контроллера и cert-manager. Для одного узла и трёх маршрутов (web, api, mcp) этого хватает ([Э9](#e9)).
+</div>
+<div markdown>
+**2. Маршруты — на стандарте, а не на контроллере**
 
-## Альтернативы
+ingress-nginx архивирован (23.03.2026) — вот цена привязки к контроллеру. Gateway API — стандарт Kubernetes; Traefik поддерживает его в рабочем режиме с v3.1. Маршруты в HTTPRoute переносятся на другой контроллер без переписывания ([Э6](#e6)).
+</div>
+<div markdown>
+**3. Админки — без маршрутов вообще**
 
-| Вариант | Что это и как решает вопрос | Подходит, если |
-|---|---|---|
-| **Traefik (встроен в k3s)** | ingress-контроллер k3s с ACME | k3s и один вход |
-| **HAProxy Ingress** | ingress на HAProxy | нужна тонкая настройка балансировки |
-| **ingress-nginx** | ingress на nginx | — (архивирован) |
+LiteLLM UI, OPA и админ-API не получают маршрутов: доступ к ним — через `kubectl port-forward` по SSH. Это проще и надёжнее, чем закрывать их правилами на входе ([Э7](#e7)).
+</div>
+</div>
 
-## Сравнение по существу вопроса
+<div class="rnd-grid" markdown>
+<div class="take" markdown>
+**Берём**
 
-Критерии выведены из вопроса; в клетках — факты. Баллы матрицы ниже следуют из этих фактов.
+- Traefik из k3s, TLS по ACME;
+- Service (ClusterIP) для балансировки между репликами;
+- PgBouncer в режиме transaction;
+- админки без маршрутов.
+</div>
+<div class="adapt" markdown>
+**Адаптируем**
 
-| Критерий (почему важен) | Traefik (встроен в k3s) | HAProxy Ingress | ingress-nginx |
+- маршруты Ingress → Gateway API HTTPRoute (Traefik через HelmChartConfig k3s);
+- политики трафика Envoy Gateway (лимиты, повторы) → лимиты на входе Traefik middleware при необходимости.
+</div>
+<div class="drop" markdown>
+**Не берём**
+
+- ingress-nginx: архивирован;
+- сервисную сеть (mesh) и mTLS до этапа 4 (D18);
+- внешний балансировщик: один узел.
+</div>
+</div>
+
+<div class="rnd-grid" markdown>
+<div class="no" markdown>
+**Отсеяны до сравнения**
+
+- **ingress-nginx** — репозиторий архивирован 23.03.2026.
+</div>
+<div class="risk" markdown>
+**Риски и пересмотр**
+
+- Gateway API в k3s требует CRD и настройки Traefik — проверка в 4.6.3.
+- Пересмотр: нужны сложные политики трафика между сервисами → Envoy Gateway.
+</div>
+</div>
+
+<div class="rnd-chain" markdown>
+<div markdown>**Э1 Вопрос**<span class="gate">G1</span></div>
+<div markdown>**Э2 Потребности**6 <span class="gate">G2</span></div>
+<div markdown>**Э3 Traefik**5 функций <span class="gate">G3</span></div>
+<div markdown>**Э4 Альтернативы**6 <span class="gate">G4</span></div>
+<div markdown>**Э5 Ценность**<span class="gate">G5</span></div>
+<div markdown>**Э6 Перенос**3 MUST <span class="gate">G6</span></div>
+<div markdown>**Э7 Встраивание**I21, I22 <span class="gate">G7</span></div>
+<div markdown>**Э8 Спор**4 роли <span class="gate">G8</span></div>
+<div markdown>**Э9 Выбор**<span class="gate">G9</span></div>
+<div markdown>**Э10 Последствия**6 <span class="gate">G10</span></div>
+</div>
+
+---
+
+Дальше — как получен ответ, этап за этапом.
+
+## Э1. Вопрос {#e1}
+
+**Ситуация.** Платформа на k3s (D15). Наружу смотрят web и api ICPlan и MCP ICPlan; у api и LiteLLM по две реплики.
+
+**Осложнение.** ingress-nginx, самый распространённый контроллер, архивирован. Стандарт Gateway API вытесняет Ingress.
+
+**Вопрос.** Чем принимать вход и как описывать маршруты?
+
+**Решает:** владелец продукта с DevOps. **Не решаем:** кластер ([Kubernetes](kubernetes-runtime.md)), Postgres ([хранилища](data-stores.md)).
+
+<span class="gate">G1</span> ✅ вопрос — выбор; есть владелец; связан с D15, D18.
+
+## Э2. Потребности {#e2}
+
+| # | Потребность | Откуда | Что ломается без неё |
 |---|---|---|---|
-| Уже есть в кластере | да, в k3s | ставить отдельно | — |
-| TLS по ACME | встроен | через cert-manager | — |
-| Поддержка | активная | активная | архив |
+| П1 | HTTPS с автоматическими сертификатами | R-INF-04 | ручное продление, просроченный сертификат |
+| П2 | маршруты web, api, mcp | R-INF-04 | пользователи и MCP-клиенты не попадают |
+| П3 | распределение по репликам | R-INF-05 | одна реплика держит всю нагрузку |
+| П4 | админки закрыты | R-INF-04, D18 | LiteLLM и OPA доступны снаружи |
+| П5 | живой проект контроллера | — | вход без обновлений безопасности |
+| П6 | без лишних компонентов на одном узле | D15 | ещё контроллеры |
 
-**Почему выбрано:** встроен в k3s и сам выпускает сертификаты — ни одного лишнего компонента.
+<span class="gate">G2</span> ✅ у потребностей есть требования.
 
-## Критерии и веса
+## Э3. Опорное решение: Traefik из k3s {#e3}
 
-| Ф Функц. | П Произв. | Н Надёжн. | Б Безоп. | И Интегр. | Л Лиц./цена | З Зрелость | Р Распростр. | Э Эксплуат. |
-|---|---|---|---|---|---|---|---|---|
-| 20 | 10 | 10 | 10 | 10 | 10 | 10 | 5 | 5 |
+| # | Функция | Что делает | Потребность |
+|---|---|---|---|
+| F1 | Контроллер в составе k3s | вход без установки | П6 |
+| F2 | ACME | сертификаты автоматически | П1 |
+| F3 | Ingress и Gateway API | маршруты | П2 |
+| F4 | Middleware | лимиты, заголовки | — |
+| F5 | Service (ClusterIP) в Kubernetes | балансировка между репликами | П3 |
 
-## Матрица оценки
+**Вывод этапа.** Traefik закрывает П1–П6; вопрос — в каком формате описывать маршруты.
 
-Оценка 1–5; итог = Σ(вес × оценка) / 5, максимум 100.
+<span class="gate">G3</span> ✅ функции из документации Traefik и k3s (Б).
 
-| Вариант | Ф | П | Н | Б | И | Л | З | Р | Э | **Итог** |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Traefik (k3s) | 5 | 4 | 4 | 4 | 5 | 5 | 5 | 5 | 5 | **93** |
-| ingress-nginx ✗ | 5 | 5 | 4 | 4 | 4 | 5 | 1 | 5 | 4 | **83** |
-| HAProxy Ingress | 4 | 5 | 5 | 4 | 3 | 4 | 4 | 4 | 3 | **81** |
+## Э4. Альтернативы и их ключевые функции {#e4}
 
-## Профиль технологий
+Поиск 11.10.2026: GitHub, документация Traefik, Gateway API.
 
-Данные GitHub API на 10.10.2026.
+| Кандидат | Ключевые функции | Чего нет у опорного | Уровень |
+|---|---|---|---|
+| **Envoy Gateway** (Apache-2.0, 3 073★, v1.9.2) | Gateway API на Envoy; политики трафика (лимиты, повторы, авторизация) | богатые политики | Б |
+| **NGINX Gateway Fabric** (Apache-2.0, 1 175★, v2.7.2) | Gateway API на nginx | — | Б |
+| **HAProxy Ingress** (Apache-2.0, 869★, v3.2.16) | ingress на HAProxy | тонкая балансировка | Б |
+| **ingress-nginx** (19 454★) | ingress на nginx; **архивирован 23.03.2026** | — | Б |
+| **Gateway API** (стандарт, v1.6.3) | HTTPRoute, GRPCRoute; переносимость между контроллерами | стандарт маршрутов | Б |
+| **cert-manager** (Apache-2.0, 14 107★) | сертификаты для любых контроллеров | — | Б |
 
-| Технология | Лицензия | ★ | Последний релиз | Активность | Распространённость, поток, токены, сеть |
-|---|---|---|---|---|---|
-| Traefik | MIT | 65 143 | v3.7.14 | 08.10.2026 | встроен в k3s; ACME (Let's Encrypt), middleware, mTLS по клиентскому сертификату (проверено в AI-агент 7.12) |
-| ingress-nginx | Apache-2.0 | 19 454 | controller-v1.15.1 | 23.03.2026 | **архивирован** — новых исправлений безопасности не будет |
-| HAProxy | GPL-2.0 / LGPL | 6 917 | — | 09.10.2026 | быстрый L4/L7, отдельный ingress-контроллер |
-| PgBouncer | ISC | 4 399 | 1.26.0 | 10.10.2026 | пул соединений Postgres; transaction pooling |
-| Pgpool-II | BSD-подобная | 445 | — | 09.10.2026 | пул + балансировка чтения; тяжелее, нам не нужна репликация чтения |
+**Вывод этапа.** Контроллеры на Gateway API различаются политиками трафика; стандарт маршрутов у них общий.
 
-NGINX как отдельный балансировщик не нужен: внешний вход — Traefik, внутри кластера — Service. Отдельный pg-балансировщик чтения (Pgpool-II) не нужен при одной БД — нужен только пул соединений (PgBouncer).
+<span class="gate">G4</span> ✅ 6 кандидатов; источники трёх видов; дата есть.
 
-## Последствия
+## Э5. Ценность функций {#e5}
 
-**Плюсы**
+| Функция | Потребность | Почему ценна | Доказательство | Класс |
+|---|---|---|---|---|
+| ACME | П1 | сертификат не истекает | Traefik (Б); cert-manager (Б) | базовая |
+| Живой проект | П5 | обновления безопасности | ingress-nginx архивирован (Б) | базовая |
+| Без установки на k3s | П6 | меньше компонентов | k3s (Б) | базовая |
+| Маршруты на стандарте | П2 | смена контроллера без переписывания | Gateway API; Traefik — рабочий режим с v3.1 (Б) | линейная |
+| Политики трафика | — | лимиты и авторизация на входе | Envoy Gateway (Б) | привлекательная |
 
-- Ноль новых компонентов для ingress — Traefik уже в k3s
-- PgBouncer защищает Postgres от роста числа клиентов (агенты, Runner, LiteLLM)
+**Вывод этапа.** Базовые функции есть у Traefik; переносимость маршрутов даёт Gateway API.
 
-**Минусы и риски**
+<span class="gate">G5</span> ✅ у функций есть доказательство уровня Б.
 
-- Transaction pooling несовместим с session-фичами (LISTEN/NOTIFY, prepared statements без поддержки) — проверить ICPlan и LiteLLM
-- Один экземпляр Traefik на одном узле
+## Э6. Перенос и критерии {#e6}
+
+| Функция | Решение | Как | Где |
+|---|---|---|---|
+| Traefik, ACME, Service, PgBouncer | оставить | D15, D18 | R-INF-04 – R-INF-06 |
+| Маршруты Gateway API | адаптировать | HTTPRoute для web, api, mcp; включить провайдер Gateway API в Traefik через HelmChartConfig k3s | подзадача 4.6.3 |
+| Политики трафика | не брать сейчас | при необходимости — middleware Traefik | — |
+| ingress-nginx, mesh | не брать | Э5, D18 | — |
+
+**Критерии:**
+
+| Критерий | Цепочка | Как проверяем |
+|---|---|---|
+| **M1** живой проект | П5 → базовая | не архивирован |
+| **M2** HTTPS по ACME | П1 → базовая | встроено или cert-manager |
+| **M3** работает на k3s | П6 | поддержка |
+| **К1** компоненты сверх k3s | П6 | что ставить |
+| **К2** стандарт маршрутов | П2 | Gateway API |
+
+<span class="gate">G6</span> ✅ у функций есть решения; критерии с цепочкой.
+
+## Э7. Отсев и встраивание {#e7}
+
+| Кандидат | M1 жив | M2 ACME | M3 k3s | Итог |
+|---|---|---|---|---|
+| Traefik | да | да: встроено | да | проходит |
+| Envoy Gateway | да | да: cert-manager | да | проходит |
+| NGINX Gateway Fabric | да | да: cert-manager | да | проходит |
+| HAProxy Ingress | да | да: cert-manager | да | проходит |
+| ingress-nginx | **нет** | да | да | ✗ |
+
+```
+ пользователи, MCP-клиенты ──I21 HTTPS──▶ Traefik (Gateway, ACME) ── HTTPRoute* ──▶ Service web / api / mcp ──▶ реплики
+ админки (LiteLLM UI, OPA) — без маршрутов: kubectl port-forward по SSH
+ сервисы ──I22──▶ PgBouncer ──▶ Postgres
+  * — Gateway API вместо Ingress (4.6.3)
+```
+
+| Стык | Traefik | Envoy Gateway | HAProxy Ingress |
+|---|---|---|---|
+| I21 вход | И2: в k3s | И1: контроллер, cert-manager | И1 |
+| I22 к Postgres | И2: PgBouncer, не зависит от входа | И2 | И2 |
+
+**Изменения у соседей:** нет; Gateway API меняет только манифесты маршрутов в чартах (задача 4.6).
+
+**Вывод этапа.** ==Traefik встаёт без новых компонентов; Gateway API меняет только формат маршрутов.==
+
+<span class="gate">G7</span> ✅ отсев; готовность стыков; изменения у соседей.
+
+## Э8. Спор ролей {#e8}
+
+| Роль | За | Довод | Опасение | Согласится, если |
+|---|---|---|---|---|
+| DevOps 🤖 | Traefik | в k3s, ACME встроен | Gateway API в k3s требует CRD | проверка в 4.6.3 |
+| Архитектор 🤖 | Traefik + Gateway API | маршруты переносимы | — | — |
+| Безопасность 🤖 | нейтрально | админки без маршрутов в любом варианте | — | — |
+| Разработчик 🤖 (оппонент) | Envoy Gateway | политики трафика богаче | лимиты на входе | middleware Traefik |
+
+| Спор | Разрешение |
+|---|---|
+| Разработчик: «Envoy богаче» | **условие:** пересмотр при сложных политиках между сервисами |
+| Адвокат дьявола: «Traefik тоже могут закрыть» | **условие:** маршруты на Gateway API — замена контроллера без переписывания |
+
+<span class="gate">G8</span> ✅ у каждого спора есть разрешение.
+
+## Э9. Выбор {#e9}
+
+| Потребность | Traefik + Gateway API | Envoy Gateway | NGINX Gateway Fabric | HAProxy Ingress |
+|---|---|---|---|---|
+| П1 ACME | закрывает | с доработкой: cert-manager | с доработкой | с доработкой |
+| П2 маршруты | закрывает | закрывает | закрывает | закрывает |
+| П3 реплики | закрывает | закрывает | закрывает | закрывает |
+| П4 админки закрыты | закрывает | закрывает | закрывает | закрывает |
+| П5 жив | закрывает | закрывает | закрывает | закрывает |
+| П6 без компонентов | закрывает | частично | частично | частично |
+
+- **Утверждение.** Traefik из k3s, маршруты на Gateway API (D15, D18).
+- **Основания.** Закрывает все 6 потребностей без новых компонентов.
+- **Связка.** Архивация ingress-nginx показала цену привязки к контроллеру; стандарт маршрутов её снимает.
+- **Опровержение.** Вывод неверен, если понадобятся политики трафика уровня Envoy. Тогда — Envoy Gateway с теми же HTTPRoute.
+
+<span class="gate">G9</span> ✅ вывод следует из покрытия, встраивания и спора; есть опровержение.
+
+## Э10. Последствия {#e10}
+
+| Изменение | Документ | Статус |
+|---|---|---|
+| Маршруты web, api, mcp — Gateway API HTTPRoute | [задача 4.6](../tasks/4.6-k8s-helm-ingress.md) (подзадача 4.6.3) | ✅ внесено |
+| Gateway API — Adopt; ingress-nginx — архивирован 23.03.2026 | [TECHNOLOGIES](../TECHNOLOGIES.md) | ✅ внесено |
+| Решения D15, D18 | design | ✅ подтверждено, без изменений |
+| Стыки I21, I22 | спека platform-infrastructure | — не требуется |
+| Техспека инфраструктуры | [техспека](../techspec/infrastructure.md) | — не требуется |
+| Требование «Ingress и TLS» | [R-INF-04](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-04) | — не требуется: формат маршрутов не задан требованием |
+
+<span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.
+
+<details markdown>
+<summary>Приложение A. Карточки кандидатов</summary>
+
+GitHub API на 11.10.2026.
+
+| Технология | Лицензия | ★ | Релиз | Активность |
+|---|---|---|---|---|
+| Traefik | MIT | 65 153 | v3.7.14 | 08.10.2026 |
+| ingress-nginx | Apache-2.0 | 19 454 | controller-v1.15.1 | **архивирован**, 23.03.2026 |
+| cert-manager | Apache-2.0 | 14 107 | v1.21.2 | 11.10.2026 |
+| Envoy Gateway | Apache-2.0 | 3 073 | v1.9.2 | 10.10.2026 |
+| Gateway API | Apache-2.0 | 3 016 | v1.6.3 | 09.10.2026 |
+| NGINX Gateway Fabric | Apache-2.0 | 1 175 | v2.7.2 | 11.10.2026 |
+| HAProxy Ingress | Apache-2.0 | 869 | v3.2.16 | 07.10.2026 |
+</details>
 
 ## Источники
 
-- [Traefik](https://github.com/traefik/traefik)
-- [ingress-nginx (архив)](https://github.com/kubernetes/ingress-nginx)
-- [PgBouncer](https://github.com/pgbouncer/pgbouncer)
-- [Pgpool-II](https://github.com/pgpool/pgpool2)
-- Методология: [методология R&D](../rules/rnd-methodology.md)
+Поиск и чтение — 11.10.2026; в скобках уровень доказательства.
+
+- Traefik: [Gateway API](https://doc.traefik.io/traefik/v3.3/reference/routing-configuration/kubernetes/gateway-api/) (Б), [Kubernetes, v3.7](https://doc.traefik.io/traefik/v3.7/getting-started/kubernetes/) (Б), [Gateway API и Traefik (сообщество)](https://community.traefik.io/t/getting-started-with-kubernetes-gateway-api-and-traefik/23601) (В), [k3s + Traefik + Gateway API](https://kodekloud.com/community/t/issues-with-k3s-traefik-gateway-api-tcp-udproute/493601) (В)
+- [Gateway API](https://github.com/kubernetes-sigs/gateway-api) (Б) · [Envoy Gateway](https://github.com/envoyproxy/gateway) (Б) · [NGINX Gateway Fabric](https://github.com/nginx/nginx-gateway-fabric) (Б) · [HAProxy Ingress](https://github.com/haproxytech/kubernetes-ingress) (Б) · [ingress-nginx — архивирован](https://github.com/kubernetes/ingress-nginx) (Б)
+- Наши: [D15, D18](../../openspec/changes/define-agent-platform/design.md) (А)

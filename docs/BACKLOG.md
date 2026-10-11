@@ -8,7 +8,7 @@
 |---|---|---|---|
 | Метрики и логи | Prometheus, Grafana, Loki — развёрнуты в `itsaplan-platform`, остаются пустыми | Метриками сейчас не занимаемся, есть другие ресурсы | [architecture.md → Observability](../architecture.md) |
 | Langfuse / Phoenix | LLM-трейсы, evals, анализ промптов; события — экспортом OTel GenAI (соответствие в каталоге API) | Тяжёлый self-host (Langfuse: ClickHouse, Redis, S3); в MVP хватает таблицы событий; выбор — прототипом | [design D12](../openspec/changes/define-agent-platform/design.md) |
-| RAG | Индексация документов и кода, `search_knowledge`, M4 | Корпус пока помещается в навигацию по документам | [design D13](../openspec/changes/define-agent-platform/design.md) |
+| RAG | Индексация документов, `search_knowledge`, M4; pgvector в той же Postgres; гибридный поиск (полнотекстовый + векторы), контекст документа во фрагменте, переранжирование ([R&D RAG](rnd/rag.md#e6)); код — поиском по файлам | Корпус пока помещается в навигацию по документам | [design D13](../openspec/changes/define-agent-platform/design.md) |
 | A2A | Делегирование между агентами | Нет потребности; процесс ведёт ICPlan | Проект AI-агент: фаза 4 |
 | web-research MCP | Выход агентов в интернет | Отдельная зона риска, нужна своя политика | [architecture.md → MCP-серверы](../architecture.md) |
 | Админ-MCP | `llmproxy-admin`, `guardrails-admin`, `rag-admin` | Управление пока через UI ICPlan | [tool-integration](../openspec/changes/define-agent-platform/specs/tool-integration/spec.md) |
@@ -22,3 +22,4 @@
 | Исполнение кода поверх MCP | Тулы как код в sandbox, загрузка только нужных определений (до −98,7% токенов, Anthropic) | Вызовы из кода обходят G2 на тул; вернуться после выноса проверки в MCP-шлюз (Q-MCP-01) | [R&D MCP, Э6](rnd/mcp-vs-direct.md#e6) |
 | Агент из файла в репозитории | Импорт определения агента из файла Markdown + YAML в репозитории проекта (как `.claude/agents`, `.github/agents`) в новую версию; БД остаётся источником правды; сверка полей с Agent File (Letta) | Агентов создают администраторы в интерфейсе | [R&D конфигурации, Э6](rnd/config-storage.md#e6) |
 | Зависимости задач | Шаг процесса задачи стартует, когда закрыты родительские задачи (как parent → child в Hermes Kanban) | Нет историй с порядком между задачами | [R&D автоподхвата, Э6](rnd/autopickup-rules.md#e6) |
+| Предупреждение агенту перед остановкой | На пороге повтора N — сообщение агенту «ты повторяешься», остановка на 2N (как пороги 3 и 6 в OpenClaw) | Сначала уточнить правило цикла (R-GRD-09) | [R&D защиты от разгона, Э6](rnd/runaway-protection.md#e6) |
