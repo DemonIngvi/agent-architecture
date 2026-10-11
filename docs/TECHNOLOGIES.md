@@ -21,10 +21,15 @@
 | LangGraph | Harness: агентский цикл |  1.2.14 (закреплена, D18) | MIT | [langchain-ai/langgraph](https://github.com/langchain-ai/langgraph) | PyPI `langgraph` | Trial → Adopt после прототипа AG1–AG5 (задача 1.3.9) | [фреймворк](rnd/harness-framework.md) |
 | LangChain MCP (`langchain.mcp`) | Tool Executor: MCP-тулы в LangGraph |  langchain 1.4.4, extra `mcp` (fastmcp ≥ 4.0.11) | MIT | [langchain-ai/langchain](https://github.com/langchain-ai/langchain/tree/master/libs/langchain_v1/langchain/mcp) | PyPI `langchain[mcp]` | Trial | [MCP](rnd/mcp-vs-direct.md) |
 | MCP Python SDK | протокол MCP (зависимость `langchain[mcp]`) | v2.3.0 | MIT | [modelcontextprotocol/python-sdk](https://github.com/modelcontextprotocol/python-sdk) | PyPI `mcp` | Adopt (косвенно) | [MCP](rnd/mcp-vs-direct.md) |
+| ContextForge (IBM) | кандидат MCP-шлюза: виртуальные серверы из разрешённых тулов, JWT | v1.0.11 | Apache-2.0 | [IBM/mcp-context-forge](https://github.com/IBM/mcp-context-forge) | PyPI / образ | Assess (вопрос Q-MCP-01) | [MCP](rnd/mcp-vs-direct.md) |
+| agentgateway | кандидат MCP-шлюза (Linux Foundation) | v1.6.0 | Apache-2.0 | [agentgateway/agentgateway](https://github.com/agentgateway/agentgateway) | GitHub Releases | Assess (вопрос Q-MCP-01) | [MCP](rnd/mcp-vs-direct.md) |
 | langchain-mcp-adapters | адаптер MCP → LangChain | 0.3.2 | MIT | [langchain-ai/langchain-mcp-adapters](https://github.com/langchain-ai/langchain-mcp-adapters) | — | **Hold — архивирован**: перенесён в `langchain[mcp]` ([гайд миграции](https://docs.langchain.com/oss/python/migrate/langchain-mcp-adapters)) | — |
 | LiteLLM Proxy | LLM gateway: алиасы, бюджеты, fallback |  v1.104.2 (закреплена, D18) | MIT ядро + платные enterprise-функции | [BerriAI/litellm](https://github.com/BerriAI/litellm) | `ghcr.io/berriai/litellm` | Adopt | [шлюз](rnd/llm-gateway.md) |
 | Open Policy Agent | Guardrails G1 / G2 | v1.21.1 | Apache-2.0 | [open-policy-agent/opa](https://github.com/open-policy-agent/opa) | `openpolicyagent/opa` | Adopt | [движок](rnd/guardrails-engine.md) |
+| LlamaFirewall (PurpleLlama) | детекторы для G4 и разбора запусков: PromptGuard 2, AlignmentCheck | — | лицензия Meta (проверить перед использованием) | [meta-llama/PurpleLlama](https://github.com/meta-llama/PurpleLlama) | PyPI `llamafirewall` | Assess | [guardrails](rnd/guardrails-engine.md) |
 | Langfuse | LLM-трейсы, evals | v4.56.0 | MIT ядро + EE | [langfuse/langfuse](https://github.com/langfuse/langfuse) | `langfuse/langfuse` | Assess (бэклог) | [наблюдаемость](rnd/observability.md) |
+| Phoenix (Arize) | разбор трасс и evals после MVP; Postgres | — | Elastic License 2.0 (по README) | [Arize-ai/phoenix](https://github.com/Arize-ai/phoenix) | PyPI / образ | Assess | [observability](rnd/observability.md) |
+| Opik (Comet) | трассы, evals, оптимизация промптов после MVP | 2.2.96 | Apache-2.0 | [comet-ml/opik](https://github.com/comet-ml/opik) | образ | Assess | [observability](rnd/observability.md) |
 | text-embeddings-inference | эмбеддинги для M4 / RAG | закреплена cpu-1.9.4 | Apache-2.0 | [huggingface/text-embeddings-inference](https://github.com/huggingface/text-embeddings-inference) | `ghcr.io/huggingface/text-embeddings-inference` | Assess (бэклог) | [RAG](rnd/rag.md) |
 
 ## Данные
@@ -42,7 +47,7 @@
 | PgBouncer | пул соединений Postgres | 1.26.0 | ISC | [pgbouncer/pgbouncer](https://github.com/pgbouncer/pgbouncer) | в составе Pooler CloudNativePG | Adopt | [балансировка](rnd/ingress-and-balancing.md) |
 | RustFS | объектное хранилище (S3) | 1.0.x | Apache-2.0 | [rustfs/rustfs](https://github.com/rustfs/rustfs) | `rustfs/rustfs` | Adopt | [СУБД](rnd/data-stores.md) |
 | SeaweedFS | запасное S3-хранилище | 4.48 | Apache-2.0 | [seaweedfs/seaweedfs](https://github.com/seaweedfs/seaweedfs) | `chrislusf/seaweedfs` | Assess | [СУБД](rnd/data-stores.md) |
-| MinIO | S3-хранилище | 2025-10-15 | AGPL-3.0 | [minio/minio](https://github.com/minio/minio) | — | **Hold — архивирован** | [СУБД](rnd/data-stores.md) |
+| MinIO | S3-хранилище | 2025-10-15 | AGPL-3.0 | [minio/minio](https://github.com/minio/minio) | — | **Hold — архивирован 24.04.2026** | [СУБД](rnd/data-stores.md) |
 
 ## Инфраструктура
 
@@ -50,6 +55,9 @@
 |---|---|---|---|---|---|---|---|
 | k3s | кластер Kubernetes | v1.37.1+k3s1 | Apache-2.0 | [k3s-io/k3s](https://github.com/k3s-io/k3s) | `curl -sfL https://get.k3s.io` | Adopt | [Kubernetes](rnd/kubernetes-runtime.md) |
 | k3d | локальный кластер (k3s в Docker) | v5.9.0 | MIT | [k3d-io/k3d](https://github.com/k3d-io/k3d) | GitHub Releases | Adopt | [Kubernetes](rnd/kubernetes-runtime.md) |
+| RKE2 | дистрибутив Kubernetes с CIS-защитой — запасной к k3s | v1.37.1+rke2r1 | Apache-2.0 | [rancher/rke2](https://github.com/rancher/rke2) | GitHub Releases | Assess (CIS-аудит или второй узел) | [Kubernetes](rnd/kubernetes-runtime.md) |
+| Talos | неизменяемая ОС для Kubernetes без SSH | v1.14.2 | MPL-2.0 | [siderolabs/talos](https://github.com/siderolabs/talos) | образ ОС | Assess | [Kubernetes](rnd/kubernetes-runtime.md) |
+| Kueue | квоты и допуск задач в K8s при нескольких узлах | v0.20.1 | Apache-2.0 | [kubernetes-sigs/kueue](https://github.com/kubernetes-sigs/kueue) | Helm | Assess | [Kubernetes](rnd/kubernetes-runtime.md), [Runner](rnd/runner-and-scheduling.md) |
 | Helm | упаковка и развёртывание | v4.3.0 | Apache-2.0 | [helm/helm](https://github.com/helm/helm) | [get.helm.sh](https://get.helm.sh) | Adopt | [Kubernetes](rnd/kubernetes-runtime.md) |
 | Traefik | ingress, TLS | v3.7 (в составе k3s) | MIT | [traefik/traefik](https://github.com/traefik/traefik) | в составе k3s | Adopt | [ingress](rnd/ingress-and-balancing.md) |
 | ingress-nginx | ingress | controller-v1.15.1 | Apache-2.0 | [kubernetes/ingress-nginx](https://github.com/kubernetes/ingress-nginx) | — | **Hold — архивирован** | [ingress](rnd/ingress-and-balancing.md) |

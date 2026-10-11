@@ -55,6 +55,16 @@ _шаг запуска (`/agent-runs/:id/events`, `/run/events`)_
   "data": { "tool": "itsaplan_get_issue", "status": "ok", "ms": 220 } }
 ```
 
+Соответствие OpenTelemetry GenAI (semconv v1.44.0, статус Development — имена атрибутов сверяются при экспорте; [R&D observability](../rnd/observability.md#e6)):
+
+| `type` | Спан или событие OTel | Атрибуты |
+|---|---|---|
+| `run_started` / `run_finished` | спан `invoke_agent` (начало / конец) | агент, версия, `runId`; итог и токены — на конце |
+| `llm_call` | спан `chat` (`gen_ai.operation.name`) | провайдер, модель запроса и ответа, токены ввода, вывода, размышлений |
+| `tool_call` / `tool_result` | спан `execute_tool` | имя тула, статус, длительность |
+| `memory_write` | спан `execute_tool` (тул памяти) | уровень памяти, область |
+| `needs_approval`, `question`, `guardrail_decision` | событие спана `invoke_agent` | решение, точка G, причина |
+
 ### RunResult
 
 _итог (`/agent-runs/:id/result`)_
