@@ -198,7 +198,7 @@ SUB = {
         why="Агенты не ходят в БД напрямую.", rnd="memory-model.md"),
     ("memory", "M3 задачная"): dict(
         tech="Таблица в БД ICPlan + тул записи",
-        params=[("Формат", "done / next / blockers + передача: artifacts, questions, criteria_next (D20)"), ("Срок", "до закрытия задачи")],
+        params=[("Формат", "done / next / blockers + передача: artifacts, questions, criteriaNext (D20)"), ("Срок", "до закрытия задачи")],
         does=["Агент записывает состояние работы по задаче", "Следующий агент получает его в контексте"],
         why="Самый дешёвый способ преемственности этапов.", rnd="memory-model.md"),
     # ---------- MCP / Tools ----------

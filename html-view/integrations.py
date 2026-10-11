@@ -131,19 +131,196 @@ def models_md(slug) -> list:
     ms = models_of(slug)
     if not ms:
         return []
-    L = ["## Контракты данных", "", "Структуры, которыми компонент обменивается с соседями. Примеры JSON — в [каталоге API](../../docs/api/README.md).", ""]
+    L = ["## Контракты данных", "", "Структуры, которыми компонент обменивается с соседями: поля, откуда взяты, почему такие, пример. "
+         "Правило имён — [на странице «Модель данных»](../../data-model.md#naming).", ""]
     for m in ms:
         L += model_block(m)
     return L
 
 
-def model_block(m) -> list:
+OPENAPI = json.loads((HERE / "icplan_openapi.json").read_text(encoding="utf-8"))
+
+
+def _api_examples() -> dict:
+    """Модель → пример JSON из docs/api/README.md (единственное место примеров)."""
+    t = (ROOT / "docs/api/README.md").read_text(encoding="utf-8")
+    out = {}
+    for m in re.finditer(r"^### (.+?)\n(.*?)(?=^### |\Z)", t, re.M | re.S):
+        js = "\n".join(re.findall(r"```json\n(.*?)```", m.group(2), re.S)).strip()
+        for n in (x.strip() for x in m.group(1).split("/")):
+            if js:
+                out[n] = js
+    return out
+
+
+def _schema_at(op, part, pointer):
+    """Свойства схемы операции OpenAPI форка по пути «a.b» (с раскрытием anyOf)."""
+    s = (OPENAPI["operations"].get(op) or {}).get(part)
+    for key in [k for k in (pointer or "").split(".") if k]:
+        s = _unwrap(s)
+        s = (s or {}).get("properties", {}).get(key)
+    return _unwrap(s)
+
+
+def _unwrap(s):
+    if isinstance(s, dict):
+        for k in ("anyOf", "oneOf"):
+            if k in s:
+                return next((_unwrap(x) for x in s[k] if x.get("type") != "null"), None)
+    return s
+
+
+def _names(field):
+    return [x.strip() for x in field.split("/")]
+
+
+def field_origin(m, field):
+    kind = DM.MODEL_META[m][0]
+    if kind == "fork":
+        plan = DM.PLANNED.get(m, {})
+        hit = next((plan[n] for n in _names(field) if n in plan), None)
+        return f"🛠 {hit}" if hit else "✅ форк"
+    return {"ext": "📘 протокол", "ours": "🧩 наше"}[kind]
+
+
+def model_block(m, base="../../") -> list:
     purpose, fields = DM.MODELS[m]
+    meta = DM.MODEL_META[m]
     users = [i for i, v in DM.INTEG.items() if m in v[4]]
+    if meta[0] == "fork":
+        src = f"✅ подтверждено OpenAPI ICPlan {OPENAPI['version']}: `{meta[1]}` → {meta[2]}; поля 🛠 — доработка форка"
+    elif meta[0] == "ext":
+        src = f"📘 внешняя спецификация: [{re.sub(r'^https?://', '', meta[1]).split('/')[0]}]({meta[1]})"
+    else:
+        src = f"🧩 наш контракт: {meta[1]}"
     L = [f'### {m} {{#model-{m.lower()}}}', "", f"_{purpose}_" + (f" · интерфейсы: {', '.join(users)}" if users else ""), "",
-         "| Поле | Тип | Обязательное | Описание |", "|---|---|---|---|"]
-    L += [f"| `{f}` | {t} | {'да' if req else '—'} | {d or '—'} |" for f, t, req, d in fields]
-    return L + [""]
+         f"**Источник:** {src}.", "",
+         "| Поле | Тип | Обязательное | Откуда | Описание |", "|---|---|---|---|---|"]
+    L += [f"| `{f}` | {t} | {'да' if req else '—'} | {field_origin(m, f)} | {d or '—'} |" for f, t, req, d in fields]
+    L += ["", f"**Почему так.** {meta[-1]} Имена — по [правилу]({base}data-model.md#naming).", ""]
+    ex = _api_examples().get(m)
+    if ex:
+        L += [f'??? example "Пример {m}"', "", "    ```json"] + [f"    {x}" for x in ex.split("\n")] + ["    ```", ""]
+    return L
+
+
+def _flat(s, pre="", out=None, depth=0):
+    """Поля схемы OpenAPI списком (имя, тип, обязательное, описание)."""
+    out = [] if out is None else out
+    s = _unwrap(s)
+    if not isinstance(s, dict) or depth > 3:
+        return out
+    if s.get("type") == "array" and "items" in s:
+        return _flat(s["items"], pre.rstrip(".") + "[].", out, depth + 1)
+    req = set(s.get("required", []))
+    for k, v in (s.get("properties") or {}).items():
+        u = _unwrap(v) or {}
+        typ = "enum: " + " · ".join(map(str, u["enum"])) if "enum" in u else \
+            " / ".join(str(x.get("const", x.get("type"))) for x in v["anyOf"]) if "anyOf" in v else u.get("type", "object")
+        out.append((pre + k, typ, k in req, (v.get("description") or u.get("description") or "").replace("|", "/")[:120]))
+        if u.get("type") in ("object", "array"):
+            _flat(u, pre + k + ".", out, depth + 1)
+    return out
+
+
+def _op_key(method, path):
+    return f"{method} " + re.sub(r":(\w+)", r"{\1}", path)
+
+
+def _io_cell(x, base):
+    """Модель → ссылка на её поля; иначе — структура как есть."""
+    def link(m):
+        n = m.group(1)
+        return f"[`{n}`]({base}data-model.md#model-{n.lower()})" if n in DM.MODELS else f"`{n}`"
+    return re.sub(r"\b([A-Z][A-Za-z0-9]+)\b", link, x.replace("|", "/"))
+
+
+def api_structure(method, path, base="../../") -> list:
+    """Блок «запрос / ответ» эндпоинта: из OpenAPI форка и / или datamodel.ENDPOINT_IO (О-45). [] — структуры нет."""
+    keys = [f"{method} {path}", f"{method} {path.split('?')[0]}"]
+    io_ = next((DM.ENDPOINT_IO[k] for k in keys if k in DM.ENDPOINT_IO), None)
+    op = OPENAPI["operations"].get(_op_key(method, path.split("?")[0]))
+    if not io_ and not op:
+        return []
+    L = []
+    if op:
+        L += [f"✅ **Из OpenAPI ICPlan {OPENAPI['version']}** — {op['summary']}.", ""]
+        if op["params"]:
+            L += ["Параметры: " + ", ".join(f"`{p['name']}` ({p['in']}{', обяз.' if p['required'] else ''})" for p in op["params"]), ""]
+        for title, part in (("Запрос", op["request"]), (f"Ответ {op['status']}", op["response"])):
+            rows = _flat(part)
+            if rows:
+                L += [f"**{title}:**", "", "| Поле | Тип | Обязательное | Описание |", "|---|---|---|---|"]
+                L += [f"| `{n}` | {t} | {'да' if r else '—'} | {d or '—'} |" for n, t, r, d in rows[:30]]
+                L.append("")
+            elif title.startswith("Ответ"):
+                L += [f"**{title}:** без тела.", ""]
+    if io_:
+        req, resp, note = io_
+        L += [("🛠 **Доработка:**" if op else "**Контракт:**") + f" запрос — {_io_cell(req, base)}; ответ — {_io_cell(resp, base)}." + (f" {note}." if note else ""), ""]
+    return L
+
+
+def api_page_structure(text, base="../../") -> str:
+    """Страница каталога API: после каждой таблицы — структура запросов и ответов её эндпоинтов."""
+    out, block = [], []
+    lines = text.split("\n")
+    for i, l in enumerate(lines):
+        out.append(l)
+        if l.startswith('| <span class="m '):
+            c = [x.strip() for x in re.split(r"(?<!\\)\|", l)[1:-1]]
+            meth = re.sub(r"<[^>]+>", "", c[0]).strip()
+            mm = re.search(r"`([^`]+)`", c[1])
+            path = (mm.group(1) if mm else _unlink(c[1])).split(" ")[0]
+            block.append((meth, path))
+        nxt = lines[i + 1] if i + 1 < len(lines) else ""
+        if block and not nxt.startswith("|"):
+            out += ["", "??? info \"Структура запросов и ответов\"", ""]
+            for meth, path in block:
+                body = api_structure(meth, path, base)
+                out += [f"    #### {meth} `{path}`", ""] + [("    " + x if x else "") for x in (body or ["структура не описана"])] + [""]
+            block = []
+    return "\n".join(out)
+
+
+def api_structure_check() -> list:
+    """У каждого эндпоинта каталога есть структура (OpenAPI форка или ENDPOINT_IO); 🛠 — с записью доработки (О-45)."""
+    issues = []
+    for f in sorted((ROOT / "docs/api").glob("*.md")):
+        if f.name == "README.md":
+            continue
+        for l in f.read_text(encoding="utf-8").splitlines():
+            if not l.startswith('| <span class="m '):
+                continue
+            c = [x.strip() for x in re.split(r"(?<!\\)\|", l)[1:-1]]
+            meth = re.sub(r"<[^>]+>", "", c[0]).strip()
+            mm = re.search(r"`([^`]+)`", c[1])
+            path = (mm.group(1) if mm else _unlink(c[1])).split(" ")[0]
+            if meth not in BADGE or "](" in c[1]:
+                continue  # строка-отсылка к другой странице каталога
+            if not api_structure(meth, path):
+                issues.append(f"docs/api/{f.name}: {meth} {path} — нет структуры (OpenAPI форка или datamodel.ENDPOINT_IO)")
+            elif "доработка" in c[2] and not any(k in DM.ENDPOINT_IO for k in (f"{meth} {path}", f"{meth} {path.split('?')[0]}")):
+                issues.append(f"docs/api/{f.name}: {meth} {path} — доработка без записи в ENDPOINT_IO")
+    return issues
+
+
+def fork_models_check() -> list:
+    """Модели «fork»: поля = схема OpenAPI форка; чего нет в форке — только с решением в PLANNED (О-45)."""
+    issues = []
+    for m, meta in DM.MODEL_META.items():
+        if meta[0] != "fork":
+            continue
+        s = _schema_at(meta[1], *meta[2].split(".", 1)) if "." in meta[2] else _schema_at(meta[1], meta[2], "")
+        if not s or "properties" not in s:
+            issues.append(f"{m}: в снимке OpenAPI нет схемы {meta[1]} → {meta[2]} (python html-view/openapi_import.py)")
+            continue
+        real = set(s["properties"])
+        ours = {n for f, *_ in DM.MODELS[m][1] for n in _names(f)}
+        issues += [f"{m}.{n}: поля нет в форке и нет решения в datamodel.PLANNED" for n in sorted(ours - real) if n not in DM.PLANNED.get(m, {})]
+        issues += [f"{m}.{n}: поле есть в форке, но не описано в модели" for n in sorted(real - ours)]
+    issues += [f"{m}: нет источника в datamodel.MODEL_META" for m in DM.MODELS if m not in DM.MODEL_META]
+    return issues
 
 
 def _mtype(t):
@@ -313,9 +490,10 @@ def data_model_page(components) -> str:
     L += ["## Контракты обмена {#models}", "",
           "Модели JSON, которыми обмениваются компоненты. Это единственное описание полей: потоки ссылаются сюда, "
           "примеры — в [каталоге API](docs/api/README.md) (сборка сверяет ключи примеров с полями). "
-          "Имена полей — как у владельца API: ICPlan и Runner — camelCase, сервисы на Python и внешние API (OpenAI, LiteLLM, OPA, MCP) — snake_case; колонки БД — snake_case.", ""]
+          "У каждой модели — источник: ✅ подтверждено OpenAPI форка, 📘 внешняя спецификация, 🧩 наш контракт (решение D…); у поля — откуда оно.", "",
+          "### Правило имён {#naming}", "", DM.NAMING, ""]
     for m in DM.MODELS:
-        L += model_block(m)
+        L += model_block(m, base="")
     L += ["## Все поля", ""]
     allt = s1 + [x for x in er_tables("mcp-tools") if x[0] not in {t for t, _, _ in s1}] + s2 + s345 + [(t, c, DM.LITELLM_REF) for t, c in DM.LITELLM_TABLES.items()]
     for t, cols, src in allt:
@@ -333,7 +511,7 @@ def _vocab(name, seen):
     v = set()
     for f in DM.MODELS[name][1]:
         txt = " ".join(str(x) for x in f)
-        v |= {w.replace("_", "").lower() for w in re.findall(r"[A-Za-z_]\w*", txt)}
+        v |= {w for w in re.findall(r"[A-Za-z_]\w*", txt)}
         for other in DM.MODELS:
             if other != name and other in txt and other not in seen:
                 seen.add(other)
@@ -375,7 +553,7 @@ def example_issues(where, names, js) -> list:
     issues = [f"{where}: модели {n} нет в datamodel.MODELS" for n in miss]
     v = set().union(*[_vocab(n, {n}) for n in names if n in DM.MODELS] or [set()])
     js = _strip_free(js, _free_fields(names))
-    keys = {k.replace("_", "").lower() for k in re.findall(r'"(\w+)"\s*:', js) if not k.isdigit()} - ENVELOPE
+    keys = {k for k in re.findall(r'"(\w+)"\s*:', js) if not k.isdigit()} - ENVELOPE
     return issues + [f"{where}: поле {k} не описано в модели {' / '.join(names)}" for k in sorted(keys - v)]
 
 
@@ -417,6 +595,8 @@ def check(components) -> list:
     issues += [f"{i}: неизвестный компонент {x}" for i, v in DM.INTEG.items() for x in v[:3] if x and not x.startswith("«") and x not in slugs]
     issues += api_examples_check()
     issues += policy_check()
+    issues += fork_models_check()
+    issues += api_structure_check()
     issues += param_mirror_check()
     # схема ICPlan не отстала от форка (О-44): коммит app.ts в форке = коммит импорта
     meta = json.loads((HERE / "icplan_schema.meta.json").read_text(encoding="utf-8"))

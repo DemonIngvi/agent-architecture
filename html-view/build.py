@@ -480,6 +480,8 @@ def copy_sources():
         txt = txt.replace("<!-- docgraph -->", graph_svg(docgraph.LAYERS, docgraph.EDGES))
         if rel.as_posix().startswith("docs/rnd/") or rel.as_posix() == "docs/rules/rnd-methodology.md":
             txt = rnd_highlight(txt)
+        if rel.as_posix().startswith("docs/api/") and rel.name != "README.md":
+            txt = IG.api_page_structure(txt)  # О-45: структура запросов и ответов из OpenAPI форка и datamodel
         dst.write_text(txt, encoding="utf-8")
     shutil.copy2(HERE / "home.md", SRC / "index.md")
     (SRC / "assets").mkdir(parents=True, exist_ok=True)

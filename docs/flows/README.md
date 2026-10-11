@@ -33,7 +33,7 @@
 | ⑧ | Шаги работы | Harness → Runner → ICPlan | `RunEvent` | поток событий |
 | ⑨ | Подтверждение | ICPlan → Runner → Harness | `ApprovalDecision` | HTTP |
 | ⑩ | Итог | Harness → Runner → ICPlan | `RunResult` | HTTP |
-| ⑪ | Уничтожение среды | Runner → Sandbox | `sandbox_id` | Docker API |
+| ⑪ | Уничтожение среды | Runner → Sandbox | `sandboxId` | Docker API |
 | ⑫ | Передача следующему этапу | агент → ICPlan | `update_issue` (статус) | MCP |
 
 ## Основные типы данных

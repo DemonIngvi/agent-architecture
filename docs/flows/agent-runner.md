@@ -10,14 +10,14 @@
 | 2 | Планирование: свободны ли слоты (глобальный, агента, модели, задачи) | Runner → таблица слотов | `queued` → `admitted` |
 | 2a | Допуск, бюджет (G1) | Runner → OPA | `PolicyInput` → `PolicyDecision` |
 | 3 | Профиль и бюджет агента | Runner → Platform module | `AgentSettings` |
-| 4 | Контейнер из тёплого пула | Runner → Sandbox | `profile` → `sandbox_id` |
+| 4 | Контейнер из тёплого пула | Runner → Sandbox | `profile` → `sandboxId` |
 | 5 | Токен репозиториев на запуск | Runner → git-провайдер | `RepoGrant` |
 | 6 | Задание для Harness | Runner → Harness | `RunBundle` |
 | 7 | События шагов | Harness → Runner → ICPlan | `RunEvent` |
 | 8 | Решение по паузе | ICPlan → Runner → Harness | `ApprovalDecision` |
 | 9 | Итог | Harness → Runner → ICPlan | `RunResult` |
 | 10 | Таймаут или отмена | Runner → Harness | сигнал остановки |
-| 11 | Уничтожение контейнера, долив пула | Runner → Sandbox | `sandbox_id` |
+| 11 | Уничтожение контейнера, долив пула | Runner → Sandbox | `sandboxId` |
 
 ## Состояния запуска
 

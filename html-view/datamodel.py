@@ -45,20 +45,26 @@ ALSO = {"I22": ["icplan", "platform-module", "agent-runner", "memory", "observab
 # ---------- модели обмена ----------
 # имя → (назначение, [(поле, тип, обязательное, описание)])
 MODELS = {
-    "Run": ("выдача запуска из очереди ICPlan (`POST /agent-runs/claim`)", [
-        ("id", "int", True, "идентификатор `agent_run.id`"), ("agentId", "int", True, "агент"),
-        ("issue", "{key, title, url}", False, "задача; нет — запуск по расписанию или чату"),
-        ("trigger", "enum: delegation · mention · schedule · field · process_step · manual", True, "что создало запуск"),
-        ("prompt", "string", True, "задание"), ("rule", "{type, process, step}", False, "правило автоподхвата (D17)")]),
-    "Heartbeat": ("продление аренды и обратный канал (`POST /agent-runs/:id/heartbeat`)", [
-        ("active", "bool", True, "`false` — запуск отменён, Runner останавливает"),
-        ("approvals", "ApprovalDecision[]", False, "решения пользователя"), ("messages", "UserMessage[]", False, "указания во время работы (D18)")]),
-    "RunBundle": ("задание Harness (`POST /run`)", [
-        ("runId", "int", True, "запуск"), ("agent", "{model, version, instruction, skills[]}", True, "определение агента версии запуска"),
+    "Run": ("запуск, выданный раннеру (`POST /agent-runs/claim` → `run`)", [
+        ("id", "int", True, "`agent_run.id`"),
+        ("trigger", "enum: mention · delegation · field · schedule · manual · process_step", True, "что создало запуск; `process_step` — шаг процесса (D17)"),
+        ("prompt", "string", True, "задание, собранное ICPlan"), ("systemPrompt", "string", True, "правила самого запуска от ICPlan"),
+        ("attempts", "int", True, "сколько раз запуск уже выдавался (аренда истекала)"),
+        ("issueId", "int | null", True, "задача; `null` — запуск без задачи (расписание)"), ("issueIdentifier", "string | null", True, "читаемый ключ задачи, `MKT-42`"),
+        ("rule", "{type, process, step}", False, "шаг процесса, создавший запуск (D17)")]),
+    "RunSummary": ("итог прошлого запуска для памяти M2 — строка `agent_run` форка", [
+        ("runId", "int", True, "`agent_run.id`"), ("agentId", "int", True, ""), ("status", "string", True, "как в `agent_run.status`"),
+        ("output", "string | null", False, "итог, обрезанный для контекста"), ("lastError", "string | null", False, ""),
+        ("inputTokens / outputTokens", "int | null", False, ""), ("finishedAt", "timestamp | null", False, "")]),
+    "Heartbeat": ("ответ на продление аренды (`POST /agent-runs/:runId/heartbeat`) — обратный канал к раннеру", [
+        ("canceled", "bool", True, "запуск остановлен пользователем — Runner останавливает Harness"),
+        ("approvals", "ApprovalDecision[]", False, "решения по вопросам и подтверждениям"), ("messages", "UserMessage[]", False, "указания пользователя во время работы")]),
+    "RunBundle": ("задание Harness от Runner (`POST /run`)", [
+        ("runId", "int", True, "= `Run.id`"), ("agent", "{model, version, instruction, skills[]}", True, "определение агента той версии, что была при выдаче"),
         ("guidance", "string", False, "руководство проекта"), ("params", "map<string, any>", True, "параметры L0–L3 (`model.*`, `limits.*`)"),
         ("workspace", "WorkspaceSource[]", False, "манифест рабочего пространства (R-RUN-17)"),
         ("memory", "{m3: M3Record, m2: RunSummary[]}", False, "память для продолжения"),
-        ("task", "{key, criteria: Criterion[], returnNote}", False, "задача, критерии с происхождением (D20), заметка возврата"),
+        ("task", "{issueId, issueIdentifier, criteria: Criterion[], returnNote}", False, "задача, критерии с происхождением (D20), заметка возврата"),
         ("mcp", "{server, url, tools[]}[]", False, "MCP через прокси Runner (D19)")]),
     "WorkspaceSource": ("источник рабочего пространства", [
         ("name", "string", True, "имя в `/workspace/<имя>`"), ("type", "enum: git · folder", True, "вид"),
@@ -66,12 +72,12 @@ MODELS = {
         ("right", "enum: read · write · handoff", True, "право по политике (D18)")]),
     "Criterion": ("критерий приёмки (D20)", [
         ("text", "string", True, "проверяемая формулировка"), ("origin", "enum: process · user:<имя> · agent:<шаг> · reviewer:<кто>", True, "происхождение"),
-        ("status", "enum: active · pending_approval", True, "ждёт подтверждения по `criteria_approval`")]),
+        ("status", "enum: active · pending_approval", True, "ждёт подтверждения по `criteriaApproval`")]),
     "RunEvent": ("событие запуска: конверт платформы вокруг события AG-UI (D21; NDJSON `/run/events`, `POST /agent-runs/:runId/events`)", [
-        ("runId", "int", True, "запуск, = `agent_run.id`"), ("seq", "int", True, "порядковый номер от Harness; ключ идемпотентности и порядка"),
+        ("runId", "int", True, "= `agent_run.id`"), ("seq", "int", True, "порядковый номер от Harness; ключ идемпотентности и порядка"),
         ("at", "timestamp", True, "время события в Harness"),
         ("event", "AgUiEvent", True, "событие AG-UI как есть: `type` и поля протокола")]),
-    "AgUiEvent": ("событие протокола AG-UI (docs.ag-ui.com; то же, что принимает чат агента форка)", [
+    "AgUiEvent": ("событие протокола AG-UI", [
         ("type", "enum: RUN_STARTED · RUN_FINISHED · RUN_ERROR · STEP_STARTED · STEP_FINISHED · TEXT_MESSAGE_START · TEXT_MESSAGE_CONTENT · TEXT_MESSAGE_END · REASONING_START · REASONING_MESSAGE_START · REASONING_MESSAGE_CONTENT · REASONING_MESSAGE_END · REASONING_END · TOOL_CALL_START · TOOL_CALL_ARGS · TOOL_CALL_END · TOOL_CALL_RESULT · ACTIVITY_SNAPSHOT · CUSTOM", True, "тип события по протоколу"),
         ("runId / threadId", "string", False, "у `RUN_*`: запуск и тред (тред = задача)"), ("stepName", "string", False, "у `STEP_*`: шаг цикла"),
         ("messageId / role / delta", "string", False, "у `TEXT_MESSAGE_*`, `REASONING_MESSAGE_*`: сообщение, роль, фрагмент текста"),
@@ -79,14 +85,16 @@ MODELS = {
         ("activityType / content", "string / object", False, "у `ACTIVITY_SNAPSHOT`: `plan` и содержимое плана"),
         ("name", "string", False, "у `CUSTOM`: `question`, `approval_request`, `guardrail_decision`, `memory_write`, `llm_call`"), ("value", "object", False, "у `CUSTOM`: данные события по `name`"),
         ("message / code", "string", False, "у `RUN_ERROR`: причина")]),
-    "RunResult": ("итог запуска (`POST /agent-runs/:id/result`)", [
-        ("status", "enum: success · failed · canceled", True, "статус ICPlan (R-RUN-07 → ICPlan)"), ("reason", "enum: done · limit · gate_failed · error", False, "причина Harness"),
-        ("output", "markdown", True, "итог для задачи"), ("artifacts", "{name, url}[]", False, "опубликованные файлы, ветка, PR"),
-        ("gate", "{passed, failed[]}", False, "результат quality gate (R-HRN-08)"),
-        ("usage", "{prompt_tokens, completion_tokens, reasoning_tokens, cost_usd, steps}", True, "расход")]),
-    "ApprovalDecision": ("решение пользователя по паузе", [
+    "RunResult": ("итог запуска (`POST /agent-runs/:runId/result`)", [
+        ("status", "enum: success · failed", True, "отмену фиксирует ICPlan сам, раннер её не сообщает"),
+        ("output", "string | null", False, "итог для истории (ICPlan хранит до 10 000 символов)"), ("error", "string | null", False, "причина при `failed` (до 500 символов)"),
+        ("usage", "{inputTokens, outputTokens, reasoningTokens, costUsd, steps}", False, "расход; `reasoningTokens`, `costUsd`, `steps` — добавляем (D18)"),
+        ("reason", "enum: done · limit · gate_failed · error", False, "причина Harness (R-RUN-07)"),
+        ("artifacts", "{name, url}[]", False, "опубликованные файлы, ветка, PR (D20)"),
+        ("gate", "{passed, failed[]}", False, "проверка по критериям (R-HRN-08, D20)")]),
+    "ApprovalDecision": ("решение пользователя по вопросу или подтверждению", [
         ("runId", "int", True, ""), ("seq", "int", True, "`seq` события `CUSTOM` `approval_request` или `question`"), ("decision", "enum: approve · reject · answer", True, ""),
-        ("scope", "enum: once · run", False, "только этот вызов или до конца запуска (R-GRD-03)"), ("by", "string", True, "кто решил"), ("comment", "string", False, "")]),
+        ("scope", "enum: once · run", False, "только этот вызов или до конца запуска (R-GRD-03)"), ("by", "string", True, "кто решил"), ("comment", "string", False, "ответ на вопрос или пояснение")]),
     "UserMessage": ("указание пользователя во время работы", [
         ("id", "string", True, ""), ("text", "string", True, ""), ("by", "string", True, ""), ("at", "timestamp", True, "")]),
     "Verdict": ("вердикт по результату шага (R-AP-19)", [
@@ -101,29 +109,29 @@ MODELS = {
         ("requireReview", "bool", True, "проверка человеком"), ("deliverable", "string", False, "результат шага (D20)"),
         ("doneCriteria", "Criterion[]", False, "готовность шага (D20)"), ("criteriaApproval", "enum: auto · review · always", True, "подтверждение критериев агента (D20)")]),
     "M3Record": ("состояние задачи и передача следующему шагу (R-MEM-04, D20)", [
-        ("issue_key", "string", True, ""), ("scope", "enum: issue · agent · project · team", True, "область"), ("agent", "string", True, "автор"),
+        ("issueId", "int", True, "задача, = `issue.id`"), ("scope", "enum: issue · agent · project · team", True, "область"), ("agent", "string", True, "автор"),
         ("done", "string[]", True, "сделано"), ("next", "string[]", True, "дальше"), ("blockers", "string[]", False, ""),
         ("artifacts", "{path, ref}[]", False, "артефакты: путь и ветка@коммит"), ("questions", "string[]", False, "открытые вопросы"),
-        ("criteria_next", "Criterion[]", False, "критерии, предложенные следующему шагу")]),
+        ("criteriaNext", "Criterion[]", False, "критерии, предложенные следующему шагу"), ("version", "int", True, "версия записи для конкурентной записи")]),
     "PolicyInput": ("вход OPA (G1, G2)", [
-        ("point", "enum: g1 · g2", True, ""), ("agent", "string", True, ""), ("run", "{id, issue, step}", True, ""),
-        ("tool / args_hash", "string", False, "для G2"), ("autonomy", "enum: R0–R5", True, "уровень автономии"), ("budget", "{run, day, month}", False, "для G1")]),
+        ("point", "enum: g1 · g2", True, ""), ("agent", "string", True, ""), ("run", "{id, issueId, step}", True, ""),
+        ("tool / argsHash", "string", False, "для G2"), ("autonomy", "enum: R0–R5", True, "уровень автономии"), ("budget", "{run, day, month}", False, "для G1")]),
     "PolicyDecision": ("решение OPA", [
         ("allow", "bool", True, ""), ("approval", "bool", True, "нужна пауза на подтверждение"), ("reason", "string", True, "причина для аудита")]),
     "AgentSettings": ("настройки агента из Platform module (I4)", [
         ("agentId", "int", True, ""), ("version", "int", True, "версия настроек (R-CP-04)"), ("autonomy", "enum: R0–R5", True, ""),
-        ("budget", "{run_usd, day_usd}", True, ""), ("sandboxProfile", "SandboxProfile", True, ""), ("memoryProfile", "MemoryProfile", True, ""),
+        ("budget", "{runUsd, dayUsd}", True, ""), ("sandboxProfile", "string", True, "имя профиля"), ("memoryProfile", "string", True, "имя профиля"),
         ("toolsAllow / approvalTools", "string[]", True, "данные guardrails"), ("scheduling", "{parallel, max}", False, ""), ("enabled", "bool", True, "выключение агента")]),
-    "SandboxClaim": ("заявка на среду запуска", [
-        ("profile", "string", True, ""), ("sandbox_id", "string", True, ""), ("image", "string", True, "образ Harness"),
-        ("runtime", "enum: runc · runsc", True, "D19 / R-SBX-05"), ("cpu / memory_mb / disk_gb", "number", True, ""), ("ready_ms", "int", False, "время готовности")]),
+    "SandboxClaim": ("заявка Runner на среду запуска", [
+        ("profile", "string", True, ""), ("sandboxId", "string", True, ""), ("image", "string", True, "образ Harness"),
+        ("runtime", "enum: runc · runsc", True, "R-SBX-05"), ("cpu / memoryMb / diskGb", "number", True, ""), ("readyMs", "int", False, "время готовности")]),
     "RepoGrant": ("доступ к репозиторию на один запуск", [
-        ("repo", "string", True, ""), ("access", "enum: read · write", True, ""), ("branch_prefix", "string", True, "`agent/<задача>`"),
-        ("protected", "string[]", True, "ветки без записи"), ("ttl_s", "int", True, "срок токена")]),
+        ("repo", "string", True, ""), ("access", "enum: read · write", True, ""), ("branchPrefix", "string", True, "`agent/<задача>`"),
+        ("protected", "string[]", True, "ветки без записи"), ("ttlSeconds", "int", True, "срок токена")]),
     "Checkpoint": ("состояние цикла (I12)", [
-        ("runId", "int", True, ""), ("step", "int", True, "ключ идемпотентности"), ("parent_step", "int", False, ""),
+        ("runId", "int", True, ""), ("step", "int", True, "ключ идемпотентности"), ("parentStep", "int", False, ""),
         ("state", "bytes", True, "сериализованное состояние графа LangGraph")]),
-    "ChatCompletionRequest": ("запрос к модели (OpenAI Chat Completions)", [
+    "ChatCompletionRequest": ("запрос к модели (OpenAI Chat Completions через LiteLLM)", [
         ("model", "string", True, "алиас из `model_list`"), ("messages", "{role, content}[]", True, "слои промпта (R-HRN-18)"), ("tools", "{type, function: {name, parameters}}[]", False, ""),
         ("tool_choice / parallel_tool_calls", "enum / bool", False, "Harness: `auto`, без параллельных вызовов"), ("temperature / max_tokens / reasoning_effort", "number / enum", False, "`model.*`; неподдерживаемое отбрасывает `drop_params`"),
         ("metadata", "{run_id, issue_key, agent}", True, "атрибуция затрат (R-LLM-03)"), ("stream", "bool", False, "")]),
@@ -133,12 +141,61 @@ MODELS = {
     "VirtualKey": ("ключ LiteLLM на агента (`/key/generate`)", [
         ("key_alias", "string", True, "`agent:<id>`"), ("models", "string[]", True, "разрешённые алиасы"), ("max_budget", "float", True, "бюджет $"),
         ("budget_duration", "string", True, "период"), ("rpm_limit / tpm_limit", "int", False, ""), ("metadata", "object", False, "")]),
-    "CostAggregate": ("сводка затрат по задаче и агенту (экран «Затраты», R-OBS-03)", [
-        ("issue_key", "string", True, "ключ задачи"), ("agent", "string", True, "агент"), ("runs", "int", True, "число запусков"),
-        ("prompt_tokens / completion_tokens", "int", True, "токены из журнала LiteLLM"), ("cost_usd", "float", True, "затраты")]),
+    "CostAggregate": ("сводка затрат по задаче и агенту (экран «Затраты», R-OBS-05)", [
+        ("issueId", "int", True, "задача"), ("agentId", "int", True, "агент"), ("runs", "int", True, "число запусков"),
+        ("inputTokens / outputTokens", "int", True, "токены из журнала LiteLLM"), ("costUsd", "float", True, "затраты")]),
     "OpaBundleData": ("данные бандла OPA (`data.json`)", [
         ("agents.<id>.tools_allow", "string[]", True, ""), ("agents.<id>.approval", "string[]", True, "тулы с паузой"),
         ("agents.<id>.autonomy", "enum: R0–R5", True, ""), ("agents.<id>.budget", "{run, day}", True, ""), ("platform.kill_switch", "bool", True, "")]),
+}
+
+# Откуда модель и почему она такая (О-45): вид источника, ссылка, сноска «почему так, почему такие имена».
+# fork — подтверждено OpenAPI форка (операция, часть, путь в JSON); сборка сверяет поля, не найденные в форке поля — только из PLANNED.
+# ext — внешняя спецификация (ссылка); ours — наш контракт, решение D-…
+NAMING = ("Имена полей: JSON наших контрактов — camelCase, как в API ICPlan (OpenAPI 1.3.0: `issueId`, `systemPrompt`, `inputTokens`, `lastError`); "
+          "задача — парой `issueId` (ключ БД) и `issueIdentifier` (`MKT-42`), как в форке; единица измерения — суффиксом (`readyMs`, `memoryMb`, `costUsd`, `ttlSeconds`, как `durationMs` в ICPlan). "
+          "Внешние протоколы — в их стиле без перевода: OpenAI и LiteLLM (`max_tokens`, `key_alias`), MCP (`jsonrpc`, `params.arguments`), AG-UI (`toolCallId`), OPA (`input`, `result`). Колонки БД — snake_case, как в схеме Drizzle форка (поле JSON `criteriaNext` ↔ колонка `criteria_next`). "
+          "Параметры конфигурации L0–L3 (YAML) — snake_case с точками (`limits.max_steps`, `guardrails.tools_allow`); данные, выгружаемые из конфигурации как есть (бандл OPA), сохраняют эти имена.")
+MODEL_META = {
+    "Run": ("fork", "POST /agent-runs/claim", "response.run",
+            "Это ответ форка любому внешнему раннеру: так ICPlan уже выдаёт запуски. `prompt` и `systemPrompt` разделены, потому что раннер передаёт первое как задание, второе — как системные правила. Мы добавляем только `rule` — какой шаг процесса создал запуск (D17): по нему Runner берёт критерии шага, а лента задачи — разделитель шага."),
+    "RunSummary": ("ours", "R-MEM-03, R-MEM-05",
+                   "M2 не хранится отдельно: это строки `agent_run` форка (статус, итог, ошибка, токены), которые платформа пишет сама. Поля и имена — как в API ICPlan (`GET /projects/:projectKey/analytics/agent-runs`: `agentId`, `lastError`)."),
+    "Heartbeat": ("ours", "D17, R-ICP-16",
+                  "Сейчас heartbeat в форке отвечает 204 без тела. Ответ с телом — доработка: так раннер узнаёт об отмене, ответах и указаниях без отдельного канала (раннер ходит наружу сам, входящих соединений нет). Имя `canceled` — как в ответе форка на события чата (`POST /agent-chats/:id/events` → `{canceled}`)."),
+    "RunBundle": ("ours", "D18, D19, D20",
+                  "Всё, что нужно Harness на один запуск, одним документом: Harness не ходит в ICPlan сам (нет учётных данных в sandbox). Группы `agent`, `task`, `memory`, `workspace`, `mcp` — по источнику данных, чтобы было видно, кто за что отвечает."),
+    "WorkspaceSource": ("ours", "D18", "Рабочее пространство собирается из источников проекта; `right` — право агента на источник по политике, его проверяет Runner при монтировании."),
+    "Criterion": ("ours", "D20", "Критерий хранится пунктом чек-листа задачи ICPlan (`issue_checklist_item`) с полями `origin` и `status`. Происхождение нужно, чтобы применить порядок «человек > процесс > агент» и показать, кто что задал."),
+    "RunEvent": ("ours", "D21", "Конверт добавляет к событию AG-UI то, чего в протоколе нет: номер запуска, сквозной `seq` для порядка и идемпотентности и время в Harness. Само событие не меняем — его понимает чат форка."),
+    "AgUiEvent": ("ext", "https://docs.ag-ui.com/concepts/events",
+                  "Протокол AG-UI без изменений; тот же формат форк уже принимает в чате агента (`POST /agent-chats/:messageId/events`, OpenAPI 1.3.0). Имена и регистр типов — по протоколу."),
+    "RunResult": ("fork", "POST /agent-runs/{runId}/result", "request",
+                  "Тело, которое форк уже принимает от раннера: `status`, `output`, `error`, `usage` с `inputTokens` и `outputTokens`. Добавляем то, без чего не работают D18 и D20: причину Harness, артефакты, проверку по критериям, стоимость и токены размышлений."),
+    "ApprovalDecision": ("ours", "D17, R-GRD-03", "Решение привязано к `seq` события-вопроса: так Harness понимает, на какой вопрос ответ, даже если их несколько. Доставляется в ответе heartbeat."),
+    "UserMessage": ("ours", "D17, R-ICP-16", "Указание пользователя во время запуска; доставляется в ответе heartbeat и попадает в ленту задачи."),
+    "Verdict": ("ours", "D20, R-AP-19", "Вердикт шага из карточки итога; при возврате ревьюер может добавить критерии с происхождением `reviewer:<кто>`."),
+    "Process": ("ours", "D17", "Процесс задаётся на тип задачи: тип задачи = тип процесса. Шаги — колонка, агент и переходы; так ICPlan сам двигает задачу, агент колонку не меняет."),
+    "ProcessStep": ("ours", "D17, D20", "Шаг = колонка + агент + переходы (D17) и контракт шага (D20): что сдать и как проверить."),
+    "M3Record": ("ours", "R-MEM-04, D20", "Передача между шагами: «сделано / дальше / блокеры» и ссылки на артефакты вместо содержимого. Хранится в `memory_m3` по ключу (задача, область); `version` защищает от одновременной записи."),
+    "PolicyInput": ("ext", "https://www.openpolicyagent.org/docs/rest-api", "Конверт `{input: …}` и ответ `{result: …}` — REST API OPA; содержимое наше: точка G1 или G2, агент, запуск, тул и бюджет. Вместо аргументов тула — их хеш, чтобы в аудите не было данных."),
+    "PolicyDecision": ("ext", "https://www.openpolicyagent.org/docs/rest-api", "Ответ правила Rego в `result`: разрешить, нужна ли пауза и причина для аудита."),
+    "AgentSettings": ("ours", "D9, R-CP-04", "Наши настройки агента, которых нет в ICPlan; версия нужна для отката и для того, чтобы запуск видел настройки на момент выдачи."),
+    "SandboxClaim": ("ours", "D1, R-SBX-05", "Заявка Runner провайдеру среды (Docker, позже Kubernetes): профиль, образ и ресурсы."),
+    "RepoGrant": ("ours", "D18, R-SBX-04", "Короткоживущий доступ к репозиторию на запуск: только ветки с префиксом агента, защищённые ветки без записи."),
+    "Checkpoint": ("ours", "D2, D18, R-HRN-05", "Состояние графа LangGraph между шагами; Harness пишет его через Runner, потому что в sandbox нет учётных данных БД."),
+    "ChatCompletionRequest": ("ext", "https://platform.openai.com/docs/api-reference/chat/create",
+                              "Стандартный запрос OpenAI Chat Completions, который LiteLLM принимает для любого провайдера. `metadata` — наши ключи для атрибуции затрат; их имена в стиле LiteLLM, потому что они попадают в его журнал затрат."),
+    "McpToolCall": ("ext", "https://modelcontextprotocol.io/specification", "Вызов тула по протоколу MCP поверх JSON-RPC 2.0; имена — по спецификации."),
+    "VirtualKey": ("ext", "https://docs.litellm.ai/docs/proxy/virtual_keys", "Ключ LiteLLM на агента: бюджет и модели ограничиваются шлюзом, а не кодом агента. Имена — API LiteLLM."),
+    "CostAggregate": ("ours", "R-OBS-05, R-LLM-03", "Сводка для экрана затрат собирается из журнала LiteLLM по `metadata.run_id`; токены названы как в ICPlan (`inputTokens`, `outputTokens`)."),
+    "OpaBundleData": ("ours", "D6, R-GRD-01", "Данные, которые Platform module кладёт в бандл OPA рядом с правилами Rego: что разрешено агенту, где нужна пауза, бюджет и аварийный выключатель. Это выгрузка параметров конфигурации как есть, поэтому имена — как у параметров (`guardrails.tools_allow`, `kill_switch`): их и читают правила Rego."),
+}
+
+# Поля моделей «fork», которых в форке ещё нет: поле → решение
+PLANNED = {
+    "Run": {"rule": "D17", "trigger": "D17 (значение `process_step`)"},
+    "RunResult": {"usage": "D18 (`reasoningTokens`, `costUsd`, `steps`)", "reason": "R-RUN-07", "artifacts": "D20", "gate": "D20"},
 }
 
 # ---------- хранилища ----------
@@ -186,7 +243,7 @@ PLATFORM_TABLES = {
     "scheduler_slot": ("S3", "agent-runner", [("slot_key", "text", "PK", "global:N / agent:<id> / model:<alias> / issue:<id>"), ("run_id", "int", "FK agent_run", ""),
                                               ("runner_id", "text", "", "экземпляр Runner"), ("lease_until", "timestamptz", "", "аренда слота"), ("acquired_at", "timestamptz", "", "")]),
     "run_event": ("S3", "observability", [("run_id", "int", "PK, FK agent_run", "целое, как `agent_run.id`"), ("seq", "int", "PK", ""), ("ts", "timestamptz", "", ""),
-                                          ("type", "text", "", "`event.type` AG-UI, для отбора"), ("event", "jsonb", "", "событие AG-UI целиком, маскированное; дельты собраны в сообщение"), ("issue_key", "text", "", "")]),
+                                          ("type", "text", "", "`event.type` AG-UI, для отбора"), ("event", "jsonb", "", "событие AG-UI целиком, маскированное; дельты собраны в сообщение"), ("issue_id", "int", "FK issue", "лента задачи")]),
     "setup_cache": ("S3", "agent-runner", [("lock_hash", "text", "PK", "хеш lock-файлов"), ("project_id", "int", "FK project", ""), ("path", "text", "", "том кэша"),
                                            ("created_at", "timestamptz", "", ""), ("expires_at", "timestamptz", "", "`setup.cache_ttl_h`")]),
     "memory_m3": ("S4", "memory", [("issue_id", "int", "PK, FK issue", ""), ("scope", "text", "PK", ""), ("agent", "text", "", "автор"), ("done", "jsonb", "", ""), ("next", "jsonb", "", ""),
@@ -247,7 +304,7 @@ TABLE_POLICY = {
     "kill_switch": ([], "бессрочно (текущее состояние)", "история переключений — в аудите guardrails", "cp"),
     "scheduler_slot": ([("index", "run_id", "FK; освобождение по запуску"), ("index", "lease_until", "забор просроченных аренд")],
                        "на время аренды", "строка удаляется при освобождении; просроченная аренда (`lease_until`) забирается", "runner"),
-    "run_event": ([("index", "ts", "очистка по сроку"), ("index", "issue_key, ts", "таймлайн задачи")],
+    "run_event": ([("index", "ts", "очистка по сроку"), ("index", "issue_id, ts", "лента задачи")],
                   "`retention_days` = 90 (observability)", "ночная пакетная очистка по `ts`; при медленной очистке (этап 4) — секции по дням", "obs"),
     "setup_cache": ([("index", "project_id", "FK"), ("index", "expires_at", "очистка")],
                     "`setup.cache_ttl_h` = 168 (agent-sandbox)", "очистка по `expires_at` вместе с томом кэша", "runner"),
@@ -275,4 +332,71 @@ TREES = {
     "S8": ("git", ["репозитории продукта — ветки agent/<задача>, PR", "репозиторий политик — Rego + тесты opa test"]),
     "S9": ("конфиг деплоя", ["values.yaml (git, без секретов) — параметры L0", "Secret / .env (вне git) — ключи, пароли"]),
     "S11": ("OPA в памяти", ["bundle = Rego (S8) + data.json из Platform module (OpaBundleData)"]),
+}
+
+# Структура эндпоинтов, которых нет в снимке OpenAPI форка, и доработок форка (О-45):
+# «МЕТОД путь» (как в каталоге API) → (запрос, ответ, заметка). Модель — по имени (ссылка на поля), иначе — структура строкой.
+# Эндпоинты, которые есть в OpenAPI форка, показываются из снимка автоматически; для 🛠 — снимок + эта запись.
+ENDPOINT_IO = {
+    # Harness (API вызывает только Runner)
+    "POST /run": ("RunBundle", "202 · {runId}", "запуск цикла; ответ сразу, ход — в `/run/events`"),
+    "GET /run/events": ("query: seq — с какого события продолжить", "200 · NDJSON: RunEvent по строке", "переподключение без потерь по `seq`"),
+    "POST /run/approval": ("ApprovalDecision", "204", ""),
+    "POST /run/message": ("UserMessage", "204", ""),
+    "POST /run/cancel": ("{reason}", "204", "Harness завершает шаг и отдаёт `RUN_FINISHED`"),
+    "GET /ready": ("—", "200 · {ready, version}", "Runner ждёт готовности перед `POST /run`"),
+    # Agent Runner
+    "PUT /runs/:runId/checkpoint": ("Checkpoint", "204", "одноразовый токен запуска"),
+    "GET /runs/:runId/checkpoint": ("query: step", "200 · Checkpoint", ""),
+    "POST /runs/:runId/mcp/:server": ("McpToolCall", "200 · McpToolCall (result)", "allowlist запуска и G2 проверяются до вызова сервера"),
+    "POST /runs/:runId/deps": ("{lockFiles?: string[]}", "200 · {status: ok · failed, log}", "повтор шага подготовки (D19)"),
+    "GET /healthz": ("—", "200 · {status}", ""),
+    # Guardrails (REST API OPA)
+    "POST /v1/data/agent/g1": ("PolicyInput", "200 · PolicyDecision", "конверт `{input}` → `{result}` — REST API OPA"),
+    "POST /v1/data/agent/g2": ("PolicyInput", "200 · PolicyDecision", ""),
+    "GET /health?bundles": ("—", "200 · {}", "200 — бандл загружен (OPA)"),
+    # ICPlan: доработки форка
+    "PATCH /teams/:teamId/ai-agents/:agentId": ("+ {enabled: bool, onDisable: finish · cancel}", "как в форке", "к телу форка добавляем выключение агента (D17)"),
+    "POST /agent-runs/:runId/heartbeat": ("—", "200 · Heartbeat (сейчас 204)", "тело ответа — доработка (D17, R-ICP-16)"),
+    "POST /agent-runs/:runId/events": ("{events: RunEvent[]}", "200 · {canceled: bool}", "как `POST /agent-chats/:messageId/events` форка (D21)"),
+    "GET /agent-runs/:runId/stream": ("—", "200 · SSE: `data: AgUiEvent`", "как `…/chat/:messageId/stream` форка (D21)"),
+    "GET /issues/:issueId/agent-feed": ("—", "200 · {runs: {run: RunSummary, step, events: RunEvent[], result: RunResult}[]}", "история ленты по шагам процесса (D21)"),
+    "POST /issues/:issueId/agent-verdict": ("Verdict", "204", ""),
+    "PATCH /issues/:issueId": ("+ {reviewWithMe: bool}", "как в форке", "к телу форка добавляем флаг (R-AP-18)"),
+    "POST /issues/:issueId/process/pause": ("—", "204", "также `/resume`"),
+    "POST /issues/:issueId/process/retry": ("{fromStep?: string}", "204", ""),
+    "GET /issues/:issueId/agent-status": ("—", "200 · {state, queuePosition, waitReason}", ""),
+    "GET /projects/:projectKey/processes": ("—", "200 · Process[]", ""),
+    "PUT /projects/:projectKey/processes/:issueTypeId": ("Process", "200 · Process (новая версия)", ""),
+    "GET /me/agent-summary": ("—", "200 · {working, queued, waitingMe: {issueId, issueIdentifier, agentId, since}[], costUsd}", ""),
+    "POST /mcp": ("McpToolCall", "200 · McpToolCall (result)", "MCP-сервер ICPlan, не в OpenAPI"),
+    # LiteLLM
+    "POST /v1/chat/completions": ("ChatCompletionRequest", "200 · ответ OpenAI Chat Completions (`choices`, `usage`)", "mock — тот же формат"),
+    "POST /key/generate": ("VirtualKey", "200 · {key, key_alias, expires}", "также `/key/update`"),
+    "GET /spend/logs": ("query: request_id или start_date / end_date", "200 · LiteLLM_SpendLogs[]", "отбор по `metadata.run_id`"),
+    # MCP
+    "POST tools/list": ("McpToolCall (method tools/list)", "200 · {tools: {name, description, inputSchema}[]}", "JSON-RPC 2.0"),
+    "POST tools/call": ("McpToolCall", "200 · McpToolCall (result)", ""),
+    # Memory API
+    "GET /context": ("query: issueId, agentId", "200 · {m1: UserMessage[], m2: RunSummary[], m3: M3Record, m5, m6}", "по профилю памяти агента"),
+    "PUT /m3/:issueId": ("M3Record", "200 · M3Record (новая version)", "409 — запись изменилась (конкурентная запись)"),
+    "DELETE /records/:level/:id": ("—", "204", ""),
+    "POST /retention/run": ("—", "200 · {deleted: {m1, m2, m3}}", "CronJob"),
+    # Platform module
+    "GET /platform/agents/:agentId/settings": ("—", "200 · AgentSettings", ""),
+    "PATCH /platform/agents/:agentId/settings": ("AgentSettings (часть полей)", "200 · AgentSettings (новая version)", "со следующего запуска"),
+    "GET /platform/agents/:agentId/export": ("—", "200 · YAML определения агента", ""),
+    "POST /platform/agents/import": ("YAML определения агента", "200 · {agentId, version}", ""),
+    "PUT /platform/projects/:projectKey/guidance": ("{guidance: string}", "204", ""),
+    "PUT /platform/projects/:projectKey/budget": ("{monthUsd: number}", "204", ""),
+    "GET /platform/projects/:projectKey/access": ("—", "200 · {agentId, resourceId, right}[]", ""),
+    "PUT /platform/projects/:projectKey/access": ("{agentId, resourceId, right}[]", "204", ""),
+    "GET /platform/runs/:runId/manifest": ("—", "200 · WorkspaceSource[]", "для Runner"),
+    "GET /platform/audit": ("query: from, to, entity", "200 · {at, by, entity, change}[]", ""),
+    # Sandbox, инфраструктура — внешние API
+    "POST Docker": ("Docker Engine API `POST /containers/create` (образ, ресурсы профиля, сеть)", "201 · {Id}", "через docker-socket-proxy"),
+    "DELETE Docker": ("Docker Engine API `DELETE /containers/:id`", "204", ""),
+    "POST Kubernetes": ("Kubernetes API: Pod из `SandboxClaim`", "201 · Pod", "этап 4"),
+    "GET https://<домен>/": ("—", "200 · web ICPlan", ""),
+    "GET https://<домен>/api/*": ("—", "как api ICPlan", ""),
 }

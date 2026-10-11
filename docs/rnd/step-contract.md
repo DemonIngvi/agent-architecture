@@ -203,7 +203,7 @@ MetaGPT закрепляет за каждой ролью стандартный
 | **Готовность шага** | критерии готовности для любой задачи на этом шаге | администратор в процессе | `process_step.done_criteria` |
 | **Критерии задачи** | цель конкретной задачи | человек (необязательно) | чек-лист задачи (D18) |
 | **Критерии от предыдущего шага** | что следующий шаг должен сделать и как проверить | агент предыдущего шага в передаче, с пометкой «предложено агентом X» | чек-лист задачи, пункт с происхождением |
-| **Передача** | сделано, дальше, артефакты (ссылки), открытые вопросы, предложенные критерии | агент шага при завершении | M3 (`M3Record` + поля `artifacts`, `questions`, `criteria_next`) |
+| **Передача** | сделано, дальше, артефакты (ссылки), открытые вопросы, предложенные критерии | агент шага при завершении | M3 (`M3Record` + поля `artifacts`, `questions`, `criteriaNext`) |
 | **Проверка** | gate по всем критериям: формат — кодом, смысл — судьёй по рубрике; шаг-ревью — агентом или человеком | Harness (gate), агент-ревьюер, человек при `require_review` | итог запуска (M2), события |
 
 **Правила:**
@@ -250,7 +250,7 @@ MetaGPT закрепляет за каждой ролью стандартный
  задача ── чек-лист критериев: человек · предложено агентом шага N-1* (с происхождением)
         │ I1 / I7 RunBundle: задание + критерии* + передача (M3) + M2 + ссылки на артефакты
         ▼
- Harness шага N ──I11──▶ Memory: M3 = передача* (сделано, дальше, артефакты, вопросы, criteria_next)
+ Harness шага N ──I11──▶ Memory: M3 = передача* (сделано, дальше, артефакты, вопросы, criteriaNext)
         │ gate R-HRN-08: формат — кодом, смысл — судья по рубрике*; критерии своего шага менять нельзя*
         └─ итог (M2) ─▶ ICPlan: переход по правилам шага; require_review → ждёт человека
   * — изменения контракта шага
@@ -260,7 +260,7 @@ MetaGPT закрепляет за каждой ролью стандартный
 |---|---|
 | I20 / S1 (ICPlan) | поля шага `deliverable`, `done_criteria`; происхождение пункта чек-листа |
 | I7 `RunBundle` | `task.criteria` — список с полем `origin` (`process`, `user`, `agent:<шаг>`) |
-| I11 / S4 (Memory) | `M3Record`: поля `artifacts`, `questions`, `criteria_next` |
+| I11 / S4 (Memory) | `M3Record`: поля `artifacts`, `questions`, `criteriaNext` |
 | Harness | gate проверяет все критерии; запрет менять критерии своего шага |
 
 **Изменения у соседей:** спека автоподхвата (R-AP-06, R-AP-15), harness (R-HRN-08), memory (R-MEM-04, `M3Record`), каталог API (`RunBundle`, `M3Record`), потоки памяти и ICPlan, задачи 3.1, 3.2, 1.6, 2.5. Новых сервисов и стыков нет.
@@ -352,7 +352,7 @@ MetaGPT закрепляет за каждой ролью стандартный
 | Изменение | Документ | Статус |
 |---|---|---|
 | Поля шага «результат шага», «готовность шага», `criteria_approval` | [R-AP-15](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-15), задача 3.1 | ✅ внесено |
-| Передача структурированная: `M3Record` + `artifacts`, `questions`, `criteria_next` | [R-AP-06](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-06), [R-MEM-04](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-04), задачи 3.2, 2.5 | ✅ внесено |
+| Передача структурированная: `M3Record` + `artifacts`, `questions`, `criteriaNext` | [R-AP-06](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-06), [R-MEM-04](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-04), задачи 3.2, 2.5 | ✅ внесено |
 | Критерии с происхождением; исполнитель не меняет свои; проверка судьёй по рубрике | [R-HRN-08](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-08), задачи 1.6, 3.2 | ✅ внесено |
 | Формат критериев приёмки (строка D18) и решение D20 | [design D18, D20](../../openspec/changes/define-agent-platform/design.md) | ✅ внесено |
 | Ревьюер добавляет критерий при возврате | [R-AP-19](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-19), задача 3.7 | ✅ внесено |

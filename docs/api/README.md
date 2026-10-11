@@ -29,8 +29,9 @@
 _выдача запуска (`/agent-runs/claim`)_
 
 ```json
-{ "run": { "id": 1042, "agentId": 7, "issue": { "key": "MKT-42", "title": "…", "url": "…" },
-          "trigger": "delegation", "prompt": "Work item MKT-42 has been delegated to you…",
+{ "run": { "id": 1042, "trigger": "process_step", "attempts": 0,
+          "prompt": "Work item MKT-42 has been delegated to you…", "systemPrompt": "You are running as agent analyst…",
+          "issueId": 318, "issueIdentifier": "MKT-42",
           "rule": { "type": "process_step", "process": "Фича", "step": "SDD" } } }
 ```
 
@@ -43,7 +44,10 @@ _Runner → Harness (`POST /run`)_
   "guidance": "…", "params": { "model.temperature": 0.2, "limits.max_steps": 30 },
   "workspace": [ { "name": "repo", "type": "git", "url": "…", "branch": "agent/MKT-42", "right": "write" },
                  { "name": "task", "type": "folder", "prefix": "projects/MKT/tasks/42/", "right": "read" } ],
-  "memory": { "m3": { … }, "m2": [ … ] }, "task": { "key": "MKT-42", "criteria": [ { "text": "…", "origin": "process" }, { "text": "…", "origin": "user:anna" }, { "text": "…", "origin": "agent:analyst" } ], "returnNote": null } }
+  "memory": { "m3": { … }, "m2": [ … ] },
+  "task": { "issueId": 318, "issueIdentifier": "MKT-42",
+            "criteria": [ { "text": "…", "origin": "process", "status": "active" }, { "text": "…", "origin": "user:anna", "status": "active" } ],
+            "returnNote": null } }
 ```
 
 ### RunEvent
@@ -76,8 +80,9 @@ _событие запуска — конверт вокруг события AG
 _итог (`/agent-runs/:id/result`)_
 
 ```json
-{ "status": "success", "output": "## Требования…", "artifacts": [ { "name": "requirements.md", "url": "s3://…" } ],
-  "usage": { "prompt_tokens": 18450, "completion_tokens": 2210, "reasoning_tokens": 900, "cost_usd": 0.12, "steps": 9 } }
+{ "status": "success", "output": "## Требования…", "error": null,
+  "usage": { "inputTokens": 18450, "outputTokens": 2210, "reasoningTokens": 900, "costUsd": 0.12, "steps": 9 },
+  "reason": "done", "artifacts": [ { "name": "requirements.md", "url": "s3://…" } ], "gate": { "passed": true, "failed": [] } }
 ```
 
 ### ApprovalDecision
@@ -122,10 +127,10 @@ _процесс типа задачи_
 _состояние задачи_
 
 ```json
-{ "issue_key": "MKT-42", "scope": "issue", "agent": "analyst", "done": ["…"], "next": ["…"], "blockers": ["…"],
+{ "issueId": 318, "scope": "issue", "agent": "analyst", "version": 3, "done": ["…"], "next": ["…"], "blockers": ["…"],
   "artifacts": [ { "path": "openspec/changes/mkt-42/spec.md", "ref": "agent/MKT-42@a1b2c3" } ],
   "questions": [ "…" ],
-  "criteria_next": [ { "text": "тест на пустой список", "origin": "agent:analyst" } ] }
+  "criteriaNext": [ { "text": "тест на пустой список", "origin": "agent:analyst", "status": "active" } ] }
 ```
 
 ### PolicyInput / PolicyDecision
@@ -133,16 +138,16 @@ _состояние задачи_
 _OPA G1 / G2_
 
 ```json
-{ "input": { "point": "g2", "agent": "dev", "tool": "git_push", "args_hash": "…", "autonomy": "R2" } }
+{ "input": { "point": "g2", "agent": "dev", "run": { "id": 1042, "issueId": 318, "step": "code" }, "tool": "git_push", "argsHash": "…", "autonomy": "R2" } }
 { "result": { "allow": false, "approval": true, "reason": "push требует подтверждения" } }
 ```
 
 ### Heartbeat
 
-_продление аренды; в ответе — подтверждения и указания (I3)_
+_ответ на продление аренды (доработка: сейчас форк отвечает 204 без тела) — отмена, подтверждения и указания (I3)_
 
 ```json
-{ "active": true, "approvals": [ { "runId": 1042, "seq": 8, "decision": "approve", "scope": "once", "by": "user:anna" } ],
+{ "canceled": false, "approvals": [ { "runId": 1042, "seq": 8, "decision": "approve", "scope": "once", "by": "user:anna" } ],
   "messages": [ { "id": "m-91", "text": "используй pytest", "by": "user:anna", "at": "2026-10-10T12:03:00Z" } ] }
 ```
 
@@ -151,7 +156,7 @@ _продление аренды; в ответе — подтверждения
 _настройки агента в Platform module (I4)_
 
 ```json
-{ "agentId": 7, "version": 5, "autonomy": "R2", "budget": { "run_usd": 1, "day_usd": 5 },
+{ "agentId": 7, "version": 5, "autonomy": "R2", "budget": { "runUsd": 1, "dayUsd": 5 },
   "sandboxProfile": "light", "memoryProfile": "default",
   "toolsAllow": ["itsaplan_get_issue", "itsaplan_add_comment", "git_push"], "approvalTools": ["git_push"],
   "scheduling": { "parallel": 1, "max": 3 }, "enabled": true }
@@ -162,7 +167,7 @@ _настройки агента в Platform module (I4)_
 _заявка на среду запуска (I6, I23)_
 
 ```json
-{ "profile": "light", "sandbox_id": "sbx-7f3a", "image": "harness:0.3.1", "runtime": "runc", "cpu": 1, "memory_mb": 1024, "disk_gb": 5, "ready_ms": 140 }
+{ "profile": "light", "sandboxId": "sbx-7f3a", "image": "harness:0.3.1", "runtime": "runc", "cpu": 1, "memoryMb": 1024, "diskGb": 5, "readyMs": 140 }
 ```
 
 ### RepoGrant
@@ -170,7 +175,7 @@ _заявка на среду запуска (I6, I23)_
 _доступ к репозиторию на один запуск (I6, I18)_
 
 ```json
-{ "repo": "org/app", "access": "write", "branch_prefix": "agent/MKT-42", "protected": ["main"], "ttl_s": 3600 }
+{ "repo": "org/app", "access": "write", "branchPrefix": "agent/MKT-42", "protected": ["main"], "ttlSeconds": 3600 }
 ```
 
 ### Checkpoint
@@ -178,7 +183,7 @@ _доступ к репозиторию на один запуск (I6, I18)_
 _состояние цикла Harness (I12, `PUT /runs/{id}/checkpoint`)_
 
 ```json
-{ "runId": 1042, "step": 7, "parent_step": 6, "state": "<base64>" }
+{ "runId": 1042, "step": 7, "parentStep": 6, "state": "<base64>" }
 ```
 
 ### ChatCompletionRequest
@@ -223,5 +228,5 @@ _данные бандла OPA (I16, `data.json`)_
 _сводка затрат по задаче (экран «Затраты»)_
 
 ```json
-{ "issue_key": "MKT-42", "agent": "analyst", "runs": 3, "prompt_tokens": 51200, "completion_tokens": 6400, "cost_usd": 0.34 }
+{ "issueId": 318, "agentId": 7, "runs": 3, "inputTokens": 51200, "outputTokens": 6400, "costUsd": 0.34 }
 ```
