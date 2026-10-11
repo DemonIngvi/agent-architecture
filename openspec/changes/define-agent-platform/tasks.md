@@ -28,7 +28,7 @@
 ## 3. ICPlan ведёт процесс
 
 - [ ] 3.1 ICPlan: процесс типа задачи и агент шага: Тип задачи задаёт процесс, шаг процесса — колонку и агента. Требования: R-AP-01, R-AP-02, R-AP-04, R-AP-05, R-AP-08, R-AP-15 и др.. Подробно: [docs/tasks/3.1-icplan-autodelegate-status.md](../../../docs/tasks/3.1-icplan-autodelegate-status.md)
-- [ ] 3.2 ICPlan: передача между агентами: Следующий агент должен получать итог предыдущего, а пользователь — понимать, почему агент начал работу. Требования: R-AP-06, R-AP-07. Подробно: [docs/tasks/3.2-icplan-handoff.md](../../../docs/tasks/3.2-icplan-handoff.md)
+- [ ] 3.2 ICPlan: передача между агентами: Следующий агент должен получать итог предыдущего, а пользователь — понимать, почему агент начал работу. Требования: R-AP-06, R-AP-07, R-HRN-08. Подробно: [docs/tasks/3.2-icplan-handoff.md](../../../docs/tasks/3.2-icplan-handoff.md)
 - [ ] 3.3 События запуска и таймлайн в задаче: Пользователь хочет видеть все этапы выполнения задачи агентом, а не только итог. Требования: R-ICP-04, R-GRD-16, R-OBS-01, R-OBS-02, R-OBS-03, R-OBS-04 и др.. Подробно: [docs/tasks/3.3-run-events-timeline.md](../../../docs/tasks/3.3-run-events-timeline.md)
 - [ ] 3.4 ICPlan: approve в задаче: Пауза на approve из 1.5 должна управляться из задачи ICPlan, иначе опасные действия блокируют работу. Требования: R-ICP-05, R-ICP-06, R-GRD-08. Подробно: [docs/tasks/3.4-icplan-approve-ui.md](../../../docs/tasks/3.4-icplan-approve-ui.md)
 - [ ] 3.5 ICPlan: эффект Действия, затраты: Расширение автоматизации (произвольные условия Действий) и видимость стоимости задачи. Требования: R-LLM-02, R-LLM-03, R-OBS-05, R-AP-03. Подробно: [docs/tasks/3.5-icplan-type-actions-cost.md](../../../docs/tasks/3.5-icplan-type-actions-cost.md)

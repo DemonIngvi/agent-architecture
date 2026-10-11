@@ -43,7 +43,7 @@ _Runner → Harness (`POST /run`)_
   "guidance": "…", "params": { "model.temperature": 0.2, "limits.max_steps": 30 },
   "workspace": [ { "name": "repo", "type": "git", "url": "…", "branch": "agent/MKT-42", "right": "write" },
                  { "name": "task", "type": "folder", "prefix": "projects/MKT/tasks/42/", "right": "read" } ],
-  "memory": { "m3": { … }, "m2": [ … ] }, "task": { "key": "MKT-42", "criteria": ["…"], "returnNote": null } }
+  "memory": { "m3": { … }, "m2": [ … ] }, "task": { "key": "MKT-42", "criteria": [ { "text": "…", "origin": "process" }, { "text": "…", "origin": "user:anna" }, { "text": "…", "origin": "agent:analyst" } ], "returnNote": null } }
 ```
 
 ### RunEvent
