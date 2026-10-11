@@ -96,7 +96,7 @@
 | [US-ICP-09](#us-icp-09) | [US-ICP-09](icplan.md#us-icp-09) → [US-RUN-01](agent-runner.md#us-run-01) → [US-MEM-06](memory.md#us-mem-06) → [US-HAR-01](harness.md#us-har-01) | ответ агента в ветке комментария |
 | [US-ICP-19](#us-icp-19) | [US-ICP-19](icplan.md#us-icp-19) → [US-RUN-01](agent-runner.md#us-run-01) → [US-HAR-01](harness.md#us-har-01) → [US-OBS-01](observability.md#us-obs-01) | итог в задаче расписания; следующее срабатывание — по расписанию |
 | [US-ICP-02](#us-icp-02) | [US-ICP-02](icplan.md#us-icp-02) → [US-HAR-01](harness.md#us-har-01) → [US-OBS-03](observability.md#us-obs-03) → [US-OBS-01](observability.md#us-obs-01) | пользователь видит шаги; при необходимости — указание (US-ICP-10) или отмена (US-ICP-04) |
-| [US-ICP-10](#us-icp-10) | [US-ICP-10](icplan.md#us-icp-10) → [US-HAR-06](harness.md#us-har-06) → [US-MEM-06](memory.md#us-mem-06) → [US-OBS-01](observability.md#us-obs-01) | в таймлайне «указание учтено», агент продолжает |
+| [US-ICP-10](#us-icp-10) | [US-ICP-10](icplan.md#us-icp-10) → [US-HAR-06](harness.md#us-har-06) → [US-MEM-06](memory.md#us-mem-06) → [US-OBS-01](observability.md#us-obs-01) | в чате запуска «указание учтено», агент продолжает |
 | [US-ICP-11](#us-icp-11) | [US-ICP-11](icplan.md#us-icp-11) → [US-ICP-03](icplan.md#us-icp-03) → [US-HAR-07](harness.md#us-har-07) → [US-MEM-06](memory.md#us-mem-06) | агент продолжает работу с ответом в контексте |
 | [US-ICP-03](#us-icp-03) | [US-ICP-03](icplan.md#us-icp-03) → [US-HAR-02](harness.md#us-har-02) → [US-HAR-07](harness.md#us-har-07) | пользователь подтвердил действие (US-HAR-02) или ответил (US-ICP-11) |
 | [US-ICP-12](#us-icp-12) | [US-ICP-12](icplan.md#us-icp-12) → [US-LLM-03](llm-gateway.md#us-llm-03) → [US-OBS-05](observability.md#us-obs-05) | сводка показана; переход к задаче — US-ICP-02 |
@@ -129,7 +129,7 @@
 | [US-ICP-08](#us-icp-08) | Пользователь ICPlan | сам поручить задачу конкретному агенту, минуя процесс | карточка задачи: поле «делегат» | 4 |
 | [US-ICP-09](#us-icp-09) | Пользователь ICPlan | задать агенту вопрос или поручение упоминанием в комментарии | комментарий с упоминанием | 4 |
 | [US-ICP-19](#us-icp-19) | Пользователь ICPlan | поставить агенту регулярную работу по расписанию | настройки агента: расписание (`agent_schedule`) | 3 |
-| [US-ICP-02](#us-icp-02) | Пользователь ICPlan | видеть, как агент работает над задачей | карточка задачи: таймлайн | 2 |
+| [US-ICP-02](#us-icp-02) | Пользователь ICPlan | видеть, как агент работает над задачей | карточка задачи: чат запуска | 2 |
 | [US-ICP-10](#us-icp-10) | Пользователь ICPlan | читать чат задачи с агентом и писать в него указания во время работы | чат агента в задаче; Telegram-бот | 3 |
 | [US-ICP-11](#us-icp-11) | Пользователь ICPlan | ответить на вопрос агента | уведомление; чат; комментарий; Telegram-бот | 3 |
 | [US-ICP-03](#us-icp-03) | Пользователь ICPlan | получить уведомление, когда агент ждёт моего решения или закончил | уведомления ICPlan, Telegram | 2 |
@@ -220,7 +220,7 @@
 
 **Как** пользователь icplan ([персона П](personas.md#п-пользователь-icplan)), **я хочу** видеть, как агент работает над задачей, **чтобы** понимать прогресс и вовремя вмешаться.
 
-**Точка входа:** карточка задачи: таймлайн
+**Точка входа:** карточка задачи: чат запуска
 
 **Участвует в цепочках ICPlan:** [US-ICP-01](icplan.md#us-icp-01)
 
@@ -230,7 +230,7 @@
 - [ ] Обрыв связи → пропущенные шаги досылаются без дублей
 - [ ] Итог — комментарием агента, файлы — вложениями
 
-**Требования:** [Стрим шагов и итог в задачу](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Таймлайн в задаче](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
+**Требования:** [Стрим шагов и итог в задачу](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Чат запуска в задаче](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
 
 ### US-ICP-10 {#us-icp-10}
 

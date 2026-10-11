@@ -199,7 +199,7 @@ _настройки агента в Platform module (I4)_
 _заявка на среду запуска (I6, I23)_
 
 ```json
-{ "profile": "light", "sandboxId": "sbx-7f3a", "image": "harness:0.3.1", "runtime": "runc", "cpu": 1, "memoryMb": 1024, "diskGb": 5, "readyMs": 140 }
+{ "profile": "light", "sandboxId": "sbx-7f3a", "image": "agent-harness:0.3.1", "runtime": "runc", "cpu": 1, "memoryMb": 1024, "diskGb": 5, "readyMs": 140 }
 ```
 
 ### RepoGrant

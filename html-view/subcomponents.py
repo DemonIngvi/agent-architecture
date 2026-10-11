@@ -8,7 +8,7 @@ SUB = {
     # ---------- ICPlan ----------
     ("icplan", "Task UI"): dict(
         tech="It's a Plan web (Next.js), доработки в форке",
-        params=[("Таймлайн запуска", "из таблицы событий (задача 3.3)"), ("Approve", "кнопки в задаче (3.4)"), ("Затраты задачи", "из LiteLLM (3.5)")],
+        params=[("Чат запуска", "из таблицы событий (задача 3.3)"), ("Approve", "кнопки в задаче (3.4)"), ("Затраты задачи", "из LiteLLM (3.5)")],
         does=["Доска, статусы, карточка задачи, комментарии, чат агента", "Показывает ход работы агента и итог", "Даёт человеку подтвердить опасное действие"],
         why="Пользователи остаются в привычном трекере; всё про агента видно в задаче.", rnd="tracker-choice.md"),
     ("icplan", "Control Plane UI"): dict(
@@ -54,12 +54,12 @@ SUB = {
         why="Иерархия бюджетов — стандарт (LiteLLM, облачные биллинги).", rnd="runaway-protection.md"),
     ("platform-module", "Профили sandbox"): dict(
         tech="Профили Sandbox (образ, ресурсы, сеть, пул)",
-        params=[("image", "harness:<версия>"), ("resources", "1 CPU / 1 ГБ / 2 ГБ"), ("egress_allow", "только платформа"), ("pool.size", "2")],
+        params=[("image", "agent-harness:<версия>"), ("resources", "1 CPU / 1 ГБ / 2 ГБ"), ("egress_allow", "только платформа"), ("pool.size", "2")],
         does=["Определяет, что агент может запускать и куда ходить"],
         why="Разным агентам — разная среда без изменения кода.", rnd="sandbox-isolation.md"),
     ("platform-module", "Профили памяти"): dict(
         tech="Профили Memory",
-        params=[("read", "M2, M3, M5, M6"), ("write", "M3"), ("m2_last_runs", "3"), ("retention", "M1 30 д, M2 180 д")],
+        params=[("read", "M2, M3, M5, M6"), ("write", "M3"), ("m2_last_runs", "3"), ("retention", "M1 30 д, M2 180 д, M3 до закрытия задачи, M4 до замены факта")],
         does=["Какие уровни памяти агент читает и пишет, сколько хранить"],
         why="Баланс преемственности и токенов на агента.", rnd="memory-model.md"),
     ("platform-module", "Данные guardrails"): dict(
@@ -117,7 +117,7 @@ SUB = {
         tech="Go, поток `RunEvent`",
         params=[("events.level", "всё"), ("Approve", "пробрасывает `ApprovalDecision`")],
         does=["Передаёт шаги Harness в ICPlan и таблицу событий", "Передаёт решение человека обратно"],
-        why="Один канал для таймлайна, approve и аудита.", rnd="observability.md"),
+        why="Один канал для чата запуска, approve и аудита.", rnd="observability.md"),
     ("agent-runner", "Finalizer"): dict(
         tech="Go",
         params=[("Итог", "комментарий + вложения"), ("M2", "запись итога"), ("Пул", "destroy + долив")],
@@ -162,7 +162,7 @@ SUB = {
         why="Длинные задачи не падают на окне модели, токены не тратятся на лишнее.", rnd="memory-model.md"),
     ("harness", "LLM client"): dict(
         tech="OpenAI-совместимый клиент → LiteLLM",
-        params=[("model", "алиас агента"), ("max_output_tokens", "4000"), ("metadata", "run_id, issue_key, agent")],
+        params=[("model", "алиас агента"), ("max_output_tokens", "8192"), ("metadata", "run_id, issue_key, agent")],
         does=["Вызывает модель только через LiteLLM", "Передаёт метаданные для учёта"],
         why="Одна точка выхода к моделям и учёт затрат по задаче.", rnd="llm-gateway.md"),
     ("harness", "Tool Executor"): dict(
@@ -189,7 +189,7 @@ SUB = {
         tech="Поток `RunEvent`",
         params=[("Типы", "AG-UI: RUN_*, TEXT_MESSAGE_*, REASONING_*, TOOL_CALL_*, CUSTOM (D21)")],
         does=["Отдаёт шаги по мере работы"],
-        why="Таймлайн в задаче и аудит.", rnd="observability.md"),
+        why="Чат запуска в задаче и аудит.", rnd="observability.md"),
     # ---------- Memory ----------
     ("memory", "Memory API"): dict(
         tech="Сервис над БД ICPlan",
@@ -278,8 +278,8 @@ SUB = {
     ("observability", "События запуска"): dict(
         tech="Таблица `run_event` в БД ICPlan",
         params=[("events.level", "всё"), ("retention_days", "90")],
-        does=["Хранит шаги запуска", "Источник таймлайна и аудита"],
-        why="Самый дешёвый способ дать таймлайн в MVP.", rnd="observability.md"),
+        does=["Хранит шаги запуска", "Источник чата запуска и аудита"],
+        why="Самый дешёвый способ дать чат запуска в MVP.", rnd="observability.md"),
     ("observability", "Агрегаты затрат"): dict(
         tech="Агрегаты из spend log LiteLLM",
         params=[("Разрезы", "запуск, задача, агент, модель, период")],

@@ -55,7 +55,7 @@ Squid: две подсети источника — `sbx-agent` (только с
 
 ```yaml
 profile: light
-image: harness:0.3.1
+image: agent-harness:0.3.1
 resources: { cpu: 1, memory_mb: 1024, disk_gb: 2 }
 network:
   egress_allow: [litellm, api, memory, opa, github.com]

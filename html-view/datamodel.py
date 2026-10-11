@@ -31,7 +31,7 @@ INTEG = {
     "I17": ("sandbox", "«внешние хосты»", "", "исходящий трафик через egress-прокси (allowlist)", []),
     "I18": ("agent-runner", "«git-провайдер»", "", "короткоживущие токены репозиториев", ["RepoGrant"]),
     "I19": ("agent-runner", "infrastructure", "", "файлы задачи и артефакты в RustFS (S3 API)", []),
-    "I20": ("icplan", "icplan", "", "интерфейс ICPlan ↔ API (в том числе экраны Platform module, таймлайн, сводка)", ["Process", "Verdict", "CostAggregate"]),
+    "I20": ("icplan", "icplan", "", "интерфейс ICPlan ↔ API (в том числе экраны Platform module, чат запуска, сводка)", ["Process", "Verdict", "CostAggregate"]),
     "I21": ("«пользователи»", "icplan", "infrastructure", "вход по HTTPS через Traefik: web, api, mcp", []),
     "I22": ("«сервисы»", "infrastructure", "", "Postgres через PgBouncer", []),
     "I23": ("agent-runner", "sandbox", "infrastructure", "среды запусков через Kubernetes API (этап 4)", ["SandboxClaim"]),

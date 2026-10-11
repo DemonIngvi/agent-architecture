@@ -45,7 +45,7 @@
 | Hooks | before/after llm и tool, on_stop | ⬜ не начато |
 | Pause / resume | interrupt на approve и вопрос, checkpoint через Runner (I12) | ⬜ не начато |
 | Policy / stop | лимиты шагов, времени, токенов | ⬜ не начато |
-| Event stream | шаги для таймлайна | ⬜ не начато |
+| Event stream | шаги для чата запуска | ⬜ не начато |
 
 ## Расширения и настройка
 

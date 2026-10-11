@@ -73,7 +73,7 @@ COMPONENTS = [
       ("Схема", f"{DAP}/specs/llm-gateway/architecture.md")],
      ["1.1", "4.5"]),
     ("observability", "Observability", "part", "",
-     "События запуска → таймлайн в задаче, затраты. Langfuse и метрики — в бэклоге.",
+     "События запуска → чат запуска в задаче, затраты. Langfuse и метрики — в бэклоге.",
      ["llm-gateway", "icplan"],
      [("Спека", f"{DAP}/specs/observability/spec.md"),
       ("Схема", f"{DAP}/specs/observability/architecture.md")],
@@ -100,7 +100,7 @@ BLOCKS = {
         [B("Пользователь", "задачи, доска, чат", "user"), B("Администратор", "агенты, процесс", "user")],
         "↓ работает с задачами · настраивает ↓",
         Z("ICPlan", [
-            [B("Task UI", "доска, статусы, комментарии, чат агента; нужны таймлайн, approve, затраты", "core", "part"),
+            [B("Task UI", "доска, статусы, комментарии, чат агента; нужны чат запуска, approve, затраты", "core", "part"),
              B("Control Plane UI", "настройка агента: модель, инструкция, тулы, навыки, MCP, проекты", "core", "done")],
             "↓ статус / делегат задачи · сохранение настроек ↓",
             [B("Автоподхват", "процесс типа задачи: шаг = колонка + агент + переход по итогу (D17)", "core", "todo"),
@@ -113,7 +113,7 @@ BLOCKS = {
         "↓ запуск из очереди · стрим и итог ↑",
         [B("Agent Runner", "исполняет запуск", "ext", to="agent-runner"),
          B("Platform module", "наши настройки в БД ICPlan", "ext", to="platform-module"),
-         B("Observability", "события → таймлайн", "ext", to="observability")],
+         B("Observability", "события → чат запуска", "ext", to="observability")],
     ],
     "platform-module": [
         [B("Control Plane UI", "экраны настроек в ICPlan", "ext", to="icplan")],
@@ -182,7 +182,7 @@ BLOCKS = {
              B("Pause / resume", "interrupt на approve и вопрос, checkpoint через Runner (I12)", "core", "todo"),
              B("Policy / stop", "лимиты шагов, времени, токенов", "core", "todo")],
             "↓",
-            [B("Event stream", "шаги для таймлайна", "core", "todo")],
+            [B("Event stream", "шаги для чата запуска", "core", "todo")],
         ], cls="sandbox", g="G2"),
         "↓",
         [B("LiteLLM gateway", "модели", "ext", to="llm-gateway"), B("MCP / Tools", "действия", "ext", to="mcp-tools"),
@@ -253,7 +253,7 @@ BLOCKS = {
             [B("События запуска", "таблица в БД ICPlan, срок хранения", "core", "todo"), B("Агрегаты затрат", "запуск, задача, агент, модель", "core", "todo")],
         ]),
         "↓",
-        [B("Таймлайн в задаче", "ICPlan Task UI", "ext", to="icplan"), B("Затраты в задаче", "ICPlan Task UI", "ext", to="icplan")],
+        [B("Чат запуска в задаче", "ICPlan Task UI", "ext", to="icplan"), B("Затраты в задаче", "ICPlan Task UI", "ext", to="icplan")],
         "бэклог",
         [B("Langfuse", "evals, анализ промптов", "back"), B("Prometheus / Grafana / Loki", "метрики и логи", "back")],
     ],
@@ -310,7 +310,7 @@ ABOUT = {
                 "Резервная модель при сбое", "Проверки G4 во входе и ответе", "Журнал токенов и стоимости"]),
     "observability": ([("Harness", "harness"), ("Observability", "observability"), ("ICPlan", "icplan")],
                "Прозрачность: что агент делал по шагам и сколько это стоило.",
-               ["Пишет события каждого запуска", "Строит таймлайн в задаче ICPlan",
+               ["Пишет события каждого запуска", "Строит чат запуска в задаче ICPlan",
                 "Считает затраты по запуску, задаче, агенту, модели", "Хранит аудит guardrails", "Удаляет старые события по сроку"]),
 }
 

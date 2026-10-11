@@ -694,8 +694,36 @@ def rationale_md(slug: str) -> list:
     L += ["", "## Конфигурация", "",
           "Что можно настроить и как это влияет на результат работы агента.", "",
           "| Параметр | Что задаёт | Как влияет на результат | По умолчанию | Где задаётся |", "|---|---|---|---|---|"]
-    L += [f"| `{cell(n)}` | {cell(w)} | {cell(e)} | {cell(d)} | {cell(where)} |" for n, w, e, d, where in r["config"]]
+    L += [f"| `{cell(n)}` | {cell(w)} | {cell(e)} | {cell(spec_value(n, slug, d))} | {cell(where)} |" for n, w, e, d, where in r["config"]]
     return L + [""]
+
+
+_SPEC_PARAMS = {}
+
+
+def spec_params() -> dict:
+    """Имя параметра → [(спека, значение по умолчанию)] из таблиц «Параметры модуля» interfaces.md."""
+    if not _SPEC_PARAMS:
+        for f in ROOT.glob("openspec/changes/*/specs/*/interfaces.md"):
+            for l in f.read_text(encoding="utf-8").splitlines():
+                m = re.match(r"^\| `([\w.]+)` \|(.*)", l)
+                if m:
+                    c = [x.strip() for x in m.group(2).split("|")]
+                    if len(c) > 3:
+                        _SPEC_PARAMS.setdefault(m.group(1), []).append((f.parent.name, c[3]))
+    return _SPEC_PARAMS
+
+
+def spec_value(name: str, slug: str, fallback: str) -> str:
+    """Значение параметра из interfaces.md спеки (один источник, О-50); нет в спеке — как в данных сайта."""
+    ps = spec_params()
+    specs = {Path(p).parent.name for _, p in BY_SLUG[slug][6] if p.endswith("spec.md")} if slug in BY_SLUG else set()
+    cands = [name] if name in ps else ([k for k in ps if k.endswith("." + name)] if "_" in name or "." in name else [])
+    vals = [v for k in cands for s, v in ps[k] if not specs or s in specs] or [v for k in cands for _, v in ps[k]]
+    vals = list(dict.fromkeys(vals))
+    if len(vals) != 1 or vals[0].startswith(("—", "нет", "из ")):
+        return fallback
+    return vals[0]
 
 
 # ---------- Готовность спек ----------
@@ -920,7 +948,7 @@ def write_component_pages():
         keyp = ""
         if cfg:
             keyp = ('<div class="keyparams"><span class="about-label">Ключевые параметры</span>'
-                    + "".join(f'<span class="kp"><code>{esc(n)}</code> {esc(d)}</span>' for n, _, _, d, _ in cfg)
+                    + "".join(f'<span class="kp"><code>{esc(n)}</code> {esc(spec_value(n, slug, d))}</span>' for n, _, _, d, _ in cfg)
                     + '<a class="side-all" href="#_5">все параметры ↓</a></div>')
         body = [f"# {name}", "", head, "", keyp, "", about, "",
                 "## Устройство", "",
@@ -963,7 +991,7 @@ def write_component_pages():
         L = [f"# {title}", "",
              f"Часть компонента [{name}]({rel(d, f'components/{slug}/index.md')}).", "",
              "## Технология и ключевые параметры", "", f"**Технология:** {s['tech']}", "",
-             "| Параметр | Значение |", "|---|---|"] + [f"| `{cell(a)}` | {cell(b)} |" for a, b in s["params"]]
+             "| Параметр | Значение |", "|---|---|"] + [f"| `{cell(a)}` | {cell(spec_value(a, slug, b))} |" for a, b in s["params"]]
         L += ["", "## Что делает", ""] + [f"- {x}" for x in s["does"]]
         L += ["", "## Почему так", "", s["why"]]
         if s["rnd"]:

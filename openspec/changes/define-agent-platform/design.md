@@ -31,7 +31,7 @@ Runner работает с интерфейсом `create / claim / exec / destr
 ### D2. Harness: LangGraph (Python) внутри sandbox — подтверждено
 Агентский цикл — граф LangGraph: `context → llm → tools → context`. Hooks (G2) реализуются как узлы/обёртки графа до и после `llm` и `tools`. LLM-клиент настроен на endpoint LiteLLM (OpenAI-совместимый API).
 - Альтернативы ([R&D v3.1](../../../docs/rnd/harness-framework.md), 11.10.2026): OpenAI Agents SDK (запасной: пауза через `RunState`, сравнение прототипом в 1.3.9), PydanticAI, Google ADK, Microsoft Agent Framework, Claude Agent SDK (формат Anthropic, CLI в образе), Hermes Agent (готовый агент: заменил бы Runner, Sandbox, Memory, Guardrails), свой минимальный цикл (всё писать самим).
-- Почему LangGraph: `interrupt` для approve (G2), checkpoint на каждом шаге для возобновления (хранится у Runner в S5, Harness пишет через I12 — D18), стрим шагов для таймлайна. Версию фиксируем, LangGraph держим за своим интерфейсом harness.
+- Почему LangGraph: `interrupt` для approve (G2), checkpoint на каждом шаге для возобновления (хранится у Runner в S5, Harness пишет через I12 — D18), стрим шагов для чата запуска. Версию фиксируем, LangGraph держим за своим интерфейсом harness.
 - Следствие: скиллы и MCP подключаем сами — MCP через `langchain[mcp]` (`langchain.mcp`; архивный `langchain-mcp-adapters` перенесён туда), скилл = промпт-фрагмент + набор тулов.
 
 ### D3. Go для Runner, TypeScript для Platform module (в ICPlan), Python для Harness
@@ -74,7 +74,7 @@ Agent Runner работает как внешний раннер ICPlan: опр�
 Workspace эфемерный; код — ветка `agent/<KEY>` + PR; документы и артефакты — в задачу ICPlan (RustFS, S3 API); M2/M3 — БД. Доступ к репозиториям — allowlist агента и короткоживущий токен на запуск через прокси. Общая папка на хосте (проект AI-агент) отклонена: изоляция и масштабирование.
 
 ### D12. Observability
-MVP — таблица событий запуска в БД ICPlan → таймлайн в задаче. Langfuse — после MVP (тяжёлый self-host: Postgres + ClickHouse + Redis + S3). Prometheus / Grafana / Loki — в бэклоге.
+MVP — таблица событий запуска в БД ICPlan → чат запуска в задаче. Langfuse — после MVP (тяжёлый self-host: Postgres + ClickHouse + Redis + S3). Prometheus / Grafana / Loki — в бэклоге.
 
 ### D14. Очередь и планирование запусков
 Альтернативы ([R&D v3.1](../../../docs/rnd/runner-and-scheduling.md), 11.10.2026): Hatchet (ключи параллельности CEL — вторая очередь и новый сервис), River Pro (лимиты по аргументам — платно), Temporal (кластер), Kueue (квоты ресурсов — на этапе 4, лимит модели остаётся у нас).
