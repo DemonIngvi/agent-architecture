@@ -30,3 +30,5 @@
 | [LiteLLM gateway](llm-gateway.md) | 5 | 2 |
 | [Observability](observability.md) | 5 | 2 |
 | [Инфраструктура](infrastructure.md) | 7 | 3 |
+
+Персоны для отыгрыша: [personas.md](personas.md).

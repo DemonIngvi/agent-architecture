@@ -2,7 +2,7 @@
 
 ← [README](../../README.md) · [как читать](../HOW-TO-READ.md)
 
-Как создавать и менять документы этого репозитория. Основа — **OpenSpec** (формат спек) и дополнения из **AIDLC** ([openspec/config.yaml](../../openspec/config.yaml)): quality gate, уровни автономии R0–R5, правило «98/2», трассировка требование → задача → запуск.
+Как создавать и менять документы этого репозитория. Основа — **OpenSpec** (формат спек) и дополнения из **AIDLC** ([openspec/config.yaml](https://github.com/DemonIngvi/agent-architecture/blob/main/openspec/config.yaml)): quality gate, уровни автономии R0–R5, правило «98/2», трассировка требование → задача → запуск.
 
 | Документ | Для чего |
 |---|---|

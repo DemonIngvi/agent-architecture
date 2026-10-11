@@ -41,9 +41,9 @@
 | Bootstrap | определение агента (YAML / ICPlan), скиллы, лимиты | ⬜ не начато |
 | Context Manager | промпт, сжатие истории, M0 + M2/M3 | ⬜ не начато |
 | LLM client | только через LiteLLM, алиас модели | ⬜ не начато |
-| Tool Executor | MCP-адаптер, allowlist, таймауты | ⬜ не начато |
+| Tool Executor | MCP через прокси Runner, allowlist, таймауты | ⬜ не начато |
 | Hooks | before/after llm и tool, on_stop | ⬜ не начато |
-| Pause / resume | interrupt на approve и вопрос, checkpointer | ⬜ не начато |
+| Pause / resume | interrupt на approve и вопрос, checkpoint через Runner (I12) | ⬜ не начато |
 | Policy / stop | лимиты шагов, времени, токенов | ⬜ не начато |
 | Event stream | шаги для таймлайна | ⬜ не начато |
 
@@ -62,8 +62,8 @@ checkpoint.ttl                     → Сколько можно ждать appr
 
 | ➕ | ➖ |
 |---|---|
-| Approve и возобновление без своего механизма | Частые изменения API LangChain — фиксируем версию и держим за своим интерфейсом |
-| Долгие задачи переживают падение процесса |  |
+| Approve и возобновление без своего механизма | Частые изменения API LangChain — версия закреплена (1.2.14), LangGraph за своим интерфейсом. |
+| Долгие задачи переживают падение процесса | Пересмотр: прототип 1.3.9 покажет, что OpenAI Agents SDK проходит AG1–AG5 не хуже при меньшем коде. |
 | Шаги агента видны в задаче по мере работы |  |
 
 Обоснование: [R&D](../../../../../docs/rnd/harness-framework.md).

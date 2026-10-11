@@ -31,10 +31,10 @@ README.md                                   ← уровень 0: все ком�
 |---|---|---|---|
 | 1 | Корень документации | [README.md](../README.md) — список компонентов | ✅ |
 | 2 | Гид по чтению | [HOW-TO-READ.md](HOW-TO-READ.md) | ✅ |
-| 3 | Карточка ICPlan + 4 подкомпонента | страницы компонентов и подкомпонентов на сайте (`html-view/components.py`, `subcomponents.py`) | ✅ |
+| 3 | Карточка ICPlan + 4 подкомпонента | страницы компонентов и подкомпонентов на сайте (`html-view/components.py`, `subcomponents.py`); синхронизация с решениями — по [процессу изменений](rules/change-process.md) | ✅ |
 | 4 | Карточки остальных компонентов | там же | ✅ |
-| 5 | Перенос спек из change `define-agent-platform` в `openspec/specs/` | действующие спеки | ⬜ |
-| 6 | Доработки: changes с `tasks.md` по INVEST, по каждому модулю | `openspec/changes/<доработка>/` | ⬜ |
+| 5 | Перенос спек в `openspec/specs/` | `openspec archive` каждого change **после реализации и приёмки** его задач ([правило](rules/change-process.md#archive)); до этого спеки — в `openspec/changes/` | ⏳ после реализации |
+| 6 | Доработки: changes с `tasks.md` по INVEST | `tasks.md` у всех трёх изменений, собираются из ROADMAP (`html-view/tasksmd.py`); INVEST и приёмка — в `docs/tasks` | ✅ |
 | 7 | Проверка ссылок и `openspec validate --strict` | без битых ссылок; готовность спек 100% | ✅ |
 
 После каждого этапа — проверка пользователем.

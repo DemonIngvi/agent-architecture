@@ -132,8 +132,29 @@ def sync_stories():
             L += ["", "**Требования:** " + ("⚠️ нет — открытый вопрос, см. open-questions спек" if not reqs else "") + " · ".join(
                 f"[{r.split(': ', 1)[1]}](../../{spec_path_of(r.split(': ', 1)[0])})" if spec_path_of(r.split(": ", 1)[0]) else r for r in reqs), ""]
         _write_if_changed(d / f"{slug}.md", "\n".join(L) + "\n")
-    _write_if_changed(d / "README.md", "\n".join(idx) + "\n")
+    _write_if_changed(d / "README.md", "\n".join(idx + ["", "Персоны для отыгрыша: [personas.md](personas.md)."]) + "\n")
     _write_if_changed(d / "coverage.md", stories_coverage())
+    _write_if_changed(d / "personas.md", personas_page())
+
+
+def persona_anchor(role: str, pname: str) -> str:
+    """Якорь персоны — тот же, что в ссылках из историй (sync_stories)."""
+    return f"{role.lower()}-{pname.lower().replace(' ', '-').replace('(', '').replace(')', '')}"
+
+
+def personas_page() -> str:
+    """docs/stories/personas.md из PERSONAS (stories.py): кто что может, хочет, с кем конфликт, промпт для отыгрыша."""
+    L = ["# Персоны", "", "← [Все истории](README.md) · [методика историй](../rules/us-methodology.md) · [роли документации](../rules/roles.md) · [отыгрыш](../rules/rnd-methodology.md#personas)", "",
+         "> Сгенерировано из `html-view/stories.py` (PERSONAS) — правьте там.", "",
+         "Персоны продукта — участники процесса, от лица которых пишутся истории и разыгрываются конфликты и споры ролей в R&D.", "",
+         "| Код | Персона | Историй |", "|---|---|---|"]
+    n = {k: sum(1 for l in STORIES.values() for s in l if s[1] == k) for k in PERSONAS}
+    L += [f"| {k} | [{v[0]}](#{persona_anchor(k, v[0])}) | {n[k]} |" for k, v in PERSONAS.items()]
+    for k, (name, can, want, conflict, prompt) in PERSONAS.items():
+        L += ["", f"## {k} · {name} {{#{persona_anchor(k, name)}}}", "",
+              f"**Может:** {can}", "", f"**Хочет:** {want}", "", f"**Конфликты:** {conflict}", "",
+              "??? note \"Промпт для отыгрыша\"", "", "    " + prompt]
+    return "\n".join(L) + "\n"
 
 
 
@@ -305,6 +326,8 @@ def check_docs() -> list:
         n_rtm = sum(1 for l in rtm.read_text(encoding="utf-8").splitlines() if l.startswith("| [R-")) if rtm.exists() else 0
         if n_req != n_rtm:
             issues.append(f"{sp.parent.name}: требований {n_req}, строк RTM {n_rtm}")
+    import tasksmd  # О-39: tasks.md изменений = ROADMAP
+    issues += tasksmd.check()
     rd = (ROOT / "docs/rnd/README.md").read_text(encoding="utf-8")  # О-34: структура R&D v3
     for f in sorted((ROOT / "docs/rnd").glob("*.md")):
         if f.name == "README.md":
@@ -451,6 +474,25 @@ def copy_sources():
     write_component_pages()
     write_rnd_consequences()
     write_pagebar_map()
+    check_links()
+
+
+def check_links() -> list:
+    """Битые относительные ссылки в собранных исходниках сайта (О-40)."""
+    bad = []
+    for f in SRC.rglob("*.md"):
+        t = re.sub(r"```.*?```|`[^`\n]*`", "", f.read_text(encoding="utf-8"), flags=re.S)
+        for m in re.finditer(r"\]\(([^)\s]+)\)", t):
+            u = m.group(1).split("#")[0]
+            if not u or re.match(r"^(https?:|mailto:)", u):
+                continue
+            tgt = f.parent / u
+            if not tgt.exists():
+                bad.append(f"{f.relative_to(SRC).as_posix()} → {m.group(1)}")
+    for b in bad:
+        print("⚠️ ссылка:", b)
+    print(f"ссылки: битых {len(bad)}")
+    return bad
 
 
 def write_rnd_consequences():

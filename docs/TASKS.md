@@ -171,7 +171,7 @@
 | ✅ | Roadmap и документы задач по INVEST с оценками | [ROADMAP](ROADMAP.md) | — (документация) |
 | ✅ | `define-agent-platform/tasks.md` обновлён по ROADMAP | [tasks.md](../openspec/changes/define-agent-platform/tasks.md) | — (документация) |
 | ✅ | Переписать спеки `control-plane` и `icplan-integration` | [control-plane](../openspec/changes/define-agent-platform/specs/control-plane/spec.md), [icplan-integration](../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) | — (документация) |
-| ⬜ | Карточки компонентов `docs/<компонент>/` | [PLAN этапы 3–4](PLAN.md) | — (документация) |
-| ⬜ | Перенос спек в `openspec/specs/`, проверка ссылок | [PLAN этапы 5–7](PLAN.md) | — (документация) |
+| ✅ | Карточки компонентов — страницы сайта из `components.py` и `subcomponents.py` (PLAN этапы 3–4); синхронизированы с D17–D19, схемы спек пересобраны | [PLAN этапы 3–4](PLAN.md) | — (документация) |
+| ✅ | Перенос спек в `openspec/specs/`: решено — архивация каждого change после реализации и приёмки его задач ([правило](rules/change-process.md#archive)), раздел «Архивация» в `tasks.md`; `tasks.md` всех изменений собраны из ROADMAP; проверка ссылок и `validate --strict` — в сборке | [PLAN этапы 5–7](PLAN.md) | — (документация) |
 
 Отложенное — в [BACKLOG.md](BACKLOG.md).

@@ -138,7 +138,7 @@ guardrails:
 | Аномальный расход шага | G2 | 5× медианы | пауза на approve |
 | Ошибки подряд (circuit breaker) | G2 | 3 | стоп `failed`, повторы с backoff |
 | RPM / TPM на модель и агента | G4 | по провайдеру | ожидание или отказ |
-| Kill switch агента / платформы | G1 | — | очередь закрыта, активные — `cancelled` |
+| Kill switch агента / платформы | G1 | — | очередь закрыта, активные — `canceled` |
 
 Все проверки детерминированные (кодом, без LLM). Обоснование: [R&D: защита от перерасхода](docs/rnd/runaway-protection.md). Спека: [guardrails](openspec/changes/define-agent-platform/specs/guardrails/spec.md).
 

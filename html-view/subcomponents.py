@@ -17,10 +17,10 @@ SUB = {
         does=["Создание и настройка агентов", "Ключи провайдеров (переводим на LiteLLM)", "Подключение тулов, навыков, MCP"],
         why="UI уже есть — не пишем свою консоль; наши настройки добавляются экранами Platform module.", rnd="tracker-choice.md"),
     ("icplan", "Автоподхват"): dict(
-        tech="Доработка форка: поле агента-делегата у статуса и типа, эффект Действия",
-        params=[("auto_delegate_user_id", "у статуса / типа"), ("Приоритет", "явный → статус → тип → действие"), ("Дубли", "один активный запуск на агента и задачу")],
-        does=["Задача вошла в статус или создана с типом → агент становится делегатом", "Делегирование ставит запуск в очередь", "Пишет в историю, по какому правилу агент взял задачу"],
-        why="Сейчас запуск — только по ручному делегату или упоминанию; без этого процесс не автоматизируется.", rnd=""),
+        tech="Доработка форка (D17): тип задачи задаёт процесс; шаг = колонка + агент + переходы по итогу; эффект Действия",
+        params=[("Шаг", "колонка + агент + переход при успехе / при неудаче"), ("max_runs", "3"), ("require_review", "проверка человеком"), ("Дубли", "один активный запуск на агента и задачу")],
+        does=["Задача вошла в шаг → агент шага становится делегатом, запуск в его очереди", "По итогу запуска ICPlan переводит задачу по правилам шага", "Пишет в историю, по какому правилу агент взял задачу"],
+        why="Процесс идёт сам, а переход делает трекер, а не агент — правило однозначно.", rnd="autopickup-rules.md"),
     ("icplan", "Registry"): dict(
         tech="Таблицы ICPlan: агенты, тулы, навыки, MCP, ключи",
         params=[("Версии агента", "доработка"), ("Экспорт / импорт", "YAML `agent/v1`"), ("Allowlist репозиториев", "доработка")],
@@ -98,6 +98,16 @@ SUB = {
         params=[("ttl", "1 ч"), ("access", "read / write"), ("branch_prefix", "agent/<KEY>")],
         does=["Выдаёт короткоживущий токен только на разрешённые репозитории", "Токен подставляет прокси, не env"],
         why="Минимальные права и короткий срок жизни секрета.", rnd="sandbox-isolation.md"),
+    ("agent-runner", "MCP-прокси"): dict(
+        tech="Go, официальный MCP Go SDK (D19)",
+        params=[("Путь", "/runs/:id/mcp/:server"), ("Проверки", "allowlist манифеста, G2 в OPA"), ("Ключи", "Secret по auth.secret_ref")],
+        does=["Отдаёт агенту только разрешённые тулы", "Проверяет каждый вызов вне sandbox", "Подставляет учётные данные MCP-сервера"],
+        why="Проверка внутри sandbox обходится кодом агента; Runner уже знает манифест, токен и подтверждения.", rnd="mcp-vs-direct.md"),
+    ("agent-runner", "Шаг подготовки"): dict(
+        tech="Контейнер подготовки в сети sbx-setup (D19)",
+        params=[("setup.script", "из каталога проекта"), ("setup.cache_ttl_h", "168"), ("setup.timeout_s", "600")],
+        does=["Ставит зависимости проекта до старта агента", "Кэширует по хешу lock-файлов в /workspace/.deps", "Повторяет установку по тулу install_dependencies"],
+        why="Агенту нужны зависимости для тестов, а доступ к реестрам — канал утечки; поэтому реестры только у подготовки.", rnd="agent-workspace.md"),
     ("agent-runner", "Run supervisor"): dict(
         tech="Go",
         params=[("timeout_s", "1800"), ("idle_s", "300"), ("retry", "0")],
@@ -135,8 +145,8 @@ SUB = {
         does=["Даёт git доступ к репозиторию без секрета в окружении"],
         why="Агент не видит токен — не может его утечь.", rnd="sandbox-isolation.md"),
     ("sandbox", "Egress-прокси"): dict(
-        tech="HTTP(S)-прокси с allowlist (Squid / mitmproxy / свой — решается в 4.2)",
-        params=[("egress_allow", "litellm, api, memory, opa, git-хост"), ("Секреты", "подставляются на выходе")],
+        tech="Squid (D18): allowlist доменов по CONNECT, без расшифровки TLS; две подсети — среда агента и шаг подготовки (D19)",
+        params=[("egress_allow", "litellm, memory, opa, git-хост"), ("setup.registries", "только шаг подготовки"), ("Секреты", "внешние хосты — прокси; MCP — Runner")],
         does=["Весь исходящий трафик только через прокси", "Блокирует запрещённые хосты, пишет событие"],
         why="Закрывает утечки и доступ к внутренним сервисам (G3).", rnd="sandbox-isolation.md"),
     # ---------- Harness ----------
@@ -157,23 +167,23 @@ SUB = {
         why="Одна точка выхода к моделям и учёт затрат по задаче.", rnd="llm-gateway.md"),
     ("harness", "Tool Executor"): dict(
         tech="Адаптер MCP → тулы LangGraph",
-        params=[("tools", "allowlist агента"), ("timeout_s", "30"), ("max_result_kb", "64")],
+        params=[("tools", "allowlist агента (проверяет и Runner)"), ("timeout_s", "30"), ("max_result_kb", "64"), ("MCP", "через прокси Runner")],
         does=["Вызывает тулы MCP и нативные", "Ошибки и таймауты возвращает агенту"],
-        why="Стандарт MCP, секреты на стороне сервера.", rnd="mcp-vs-direct.md"),
+        why="Стандарт MCP; вызовы идут через MCP-прокси Runner, ключи — у Runner (D19).", rnd="mcp-vs-direct.md"),
     ("harness", "Hooks"): dict(
         tech="Узлы графа before/after llm и tool, on_stop",
         params=[("G2", "OPA"), ("loop.repeat_calls", "3"), ("loop.no_progress_steps", "8")],
         does=["Проверяет каждое действие (G2)", "Ловит зацикливание и аномальный расход"],
         why="Правила применяются на каждом шаге детерминированно.", rnd="runaway-protection.md"),
     ("harness", "Pause / resume"): dict(
-        tech="LangGraph `interrupt` + checkpointer Postgres",
+        tech="LangGraph `interrupt` + свой checkpointer через API Runner (I12, D18)",
         params=[("approval.tools", "из guardrails"), ("checkpoint.ttl", "7 дней"), ("approval_timeout", "24 ч")],
         does=["Останавливается на approve или вопросе", "Продолжает с того же шага", "Восстанавливается после падения"],
         why="Ключевое преимущество LangGraph перед своим циклом.", rnd="harness-framework.md"),
     ("harness", "Policy / stop"): dict(
         tech="Python",
         params=[("max_steps", "30"), ("timeout_s", "1800"), ("max_tokens", "200 000"), ("circuit.max_errors", "3")],
-        does=["Соблюдает лимиты запуска", "Завершает с done / limit / error и частичным итогом"],
+        does=["Соблюдает лимиты запуска", "Завершает с done / limit / gate_failed / error и частичным итогом (статусы — R-RUN-07)"],
         why="Предсказуемые затраты и время.", rnd="runaway-protection.md"),
     ("harness", "Event stream"): dict(
         tech="Поток `RunEvent`",
