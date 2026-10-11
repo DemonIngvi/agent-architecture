@@ -305,6 +305,20 @@ def check_docs() -> list:
         n_rtm = sum(1 for l in rtm.read_text(encoding="utf-8").splitlines() if l.startswith("| [R-")) if rtm.exists() else 0
         if n_req != n_rtm:
             issues.append(f"{sp.parent.name}: требований {n_req}, строк RTM {n_rtm}")
+    rd = (ROOT / "docs/rnd/README.md").read_text(encoding="utf-8")  # О-34: структура R&D v3
+    for f in sorted((ROOT / "docs/rnd").glob("*.md")):
+        if f.name == "README.md":
+            continue
+        row = next((l for l in rd.splitlines() if f"]({f.name})" in l), "")
+        if not row:
+            issues.append(f"R&D {f.name} нет в реестре docs/rnd/README.md")
+        elif row.rstrip(" |").split("|")[-1].strip().startswith("v3"):
+            t = f.read_text(encoding="utf-8")
+            miss = [k for k in ('class="rnd-hero"', 'class="rnd-grid"', "**Утверждение", "Когда неверно" if "Когда неверно" in t else "Опровержение", "## Источники")
+                    if k not in t]
+            miss += [f"Э{n} / G{n}" for n in range(1, 8) if f"## Э{n}." not in t or f'gate">G{n}</span> ✅' not in t]
+            if miss:
+                issues.append(f"R&D {f.name} (v3): нет {', '.join(miss)}")
     for c in COMPONENTS:  # О-17: техспека у каждого компонента
         ts = ROOT / f"docs/techspec/{c[0]}.md"
         if not ts.exists():
