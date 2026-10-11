@@ -32,7 +32,7 @@ _выдача запуска (`/agent-runs/claim`)_
 { "run": { "id": 1042, "trigger": "process_step", "attempts": 0,
           "prompt": "Work item MKT-42 has been delegated to you…", "systemPrompt": "You are running as agent analyst…",
           "issueId": 318, "issueIdentifier": "MKT-42",
-          "rule": { "type": "process_step", "process": "Фича", "step": "SDD" } } }
+          "rule": { "process": "Фича", "step": "sdd" } } }
 ```
 
 ### RunBundle
@@ -40,7 +40,8 @@ _выдача запуска (`/agent-runs/claim`)_
 _Runner → Harness (`POST /run`)_
 
 ```json
-{ "runId": 1042, "agent": { "model": "team-default", "version": 5, "instruction": "…", "skills": ["…"] },
+{ "runId": 1042, "agent": { "agentId": 7, "model": "team-default", "version": 5, "instructions": "…", "skills": ["…"] },
+  "prompt": "Work item MKT-42…", "systemPrompt": "You are running as agent analyst…",
   "guidance": "…", "params": { "model.temperature": 0.2, "limits.max_steps": 30 },
   "workspace": [ { "name": "repo", "type": "git", "url": "…", "branch": "agent/MKT-42", "right": "write" },
                  { "name": "task", "type": "folder", "prefix": "projects/MKT/tasks/42/", "right": "read" } ],
@@ -59,8 +60,8 @@ _событие запуска — конверт вокруг события AG
   "event": { "type": "TEXT_MESSAGE_END", "messageId": "m-6", "role": "assistant", "delta": "Читаю задачу, чтобы понять границы экспорта." } }
 { "runId": 1042, "seq": 7, "at": "2026-10-10T12:00:05Z",
   "event": { "type": "TOOL_CALL_START", "toolCallId": "tc-7", "toolCallName": "itsaplan_get_issue", "parentMessageId": "m-6" } }
-{ "runId": 1042, "seq": 9, "at": "2026-10-10T12:00:09Z",
-  "event": { "type": "CUSTOM", "name": "approval_request", "value": { "tool": "git_push", "reason": "push требует подтверждения" } } }
+{ "runId": 1042, "seq": 8, "at": "2026-10-10T12:00:09Z",
+  "event": { "type": "CUSTOM", "name": "approval_request", "value": { "tool": "git_push", "argsHash": "…", "reason": "push требует подтверждения" } } }
 ```
 
 Сохранённое сообщение — одно событие на `*_END` с полным текстом в `delta`: дельты `*_CONTENT` идут только в живой поток (SSE).
@@ -87,10 +88,10 @@ _итог (`/agent-runs/:id/result`)_
 
 ### ApprovalDecision
 
-_решение пользователя; `scope`: `once` — только этот вызов, `run` — до конца запуска (R-GRD-03)_
+_решение пользователя; `scope` (только для `approve`): `once` — этот вызов, `run` — такие же вызовы до конца запуска (R-GRD-03)_
 
 ```json
-{ "runId": 1042, "seq": 8, "decision": "approve", "scope": "once", "by": "user:anna", "comment": null }
+{ "runId": 1042, "seq": 8, "decision": "approve", "scope": "once", "by": "anna", "comment": null }
 ```
 
 ### UserMessage
@@ -98,7 +99,7 @@ _решение пользователя; `scope`: `once` — только эт�
 _указание во время работы (ответ heartbeat)_
 
 ```json
-{ "messages": [ { "id": "m-91", "text": "используй pytest", "by": "user:anna", "at": "…" } ] }
+{ "id": "m-91", "text": "используй pytest", "by": "anna", "at": "2026-10-10T12:03:00Z" }
 ```
 
 ### Verdict
@@ -106,7 +107,8 @@ _указание во время работы (ответ heartbeat)_
 _вердикт по результату_
 
 ```json
-{ "runId": 1042, "verdict": "rejected", "note": "нет тестов" }
+{ "runId": 1042, "verdict": "rejected", "note": "нет тестов", "by": "lead",
+  "criteria": [ { "text": "есть тест на пустой список", "origin": "reviewer:lead", "status": "active" } ] }
 ```
 
 ### Process
@@ -114,12 +116,16 @@ _вердикт по результату_
 _процесс типа задачи_
 
 ```json
-{ "issueType": "Фича", "owner": "user:lead", "firstStep": "sdd",
-  "steps": [ { "id": "sdd", "column": "SDD", "agent": "agent:analyst", "maxRuns": 3, "requireReview": false,
+{ "issueType": "Фича", "owner": "lead", "firstStep": "sdd", "version": 4,
+  "steps": [ { "id": "sdd", "column": "SDD", "agentId": 7, "maxRuns": 3, "requireReview": false,
                "deliverable": "spec.md и tasks.md в ветке задачи",
-               "doneCriteria": [ { "text": "у каждого требования есть сценарий", "origin": "process" } ],
-               "criteriaApproval": "review",
-               "onSuccess": { "step": "code" }, "onFailure": { "step": "help" } } ] }
+               "doneCriteria": [ { "text": "у каждого требования есть сценарий", "origin": "process", "status": "active" } ],
+               "criteriaApproval": "auto",
+               "onSuccess": { "step": "code" }, "onFailure": { "step": "help" } },
+             { "id": "code", "column": "Код", "agentId": 9, "requireReview": true, "criteriaApproval": "review",
+               "onSuccess": { "done": true }, "onFailure": { "step": "help" } },
+             { "id": "help", "column": "Нужна помощь", "requireReview": true, "criteriaApproval": "always",
+               "onSuccess": { "step": "code" }, "onFailure": { "done": true } } ] }
 ```
 
 ### M3Record
@@ -127,7 +133,7 @@ _процесс типа задачи_
 _состояние задачи_
 
 ```json
-{ "issueId": 318, "scope": "issue", "agent": "analyst", "version": 3, "done": ["…"], "next": ["…"], "blockers": ["…"],
+{ "issueId": 318, "scope": "issue", "agentId": 7, "version": 3, "done": ["…"], "next": ["…"], "blockers": ["…"],
   "artifacts": [ { "path": "openspec/changes/mkt-42/spec.md", "ref": "agent/MKT-42@a1b2c3" } ],
   "questions": [ "…" ],
   "criteriaNext": [ { "text": "тест на пустой список", "origin": "agent:analyst", "status": "active" } ] }
@@ -138,7 +144,7 @@ _состояние задачи_
 _OPA G1 / G2_
 
 ```json
-{ "input": { "point": "g2", "agent": "dev", "run": { "id": 1042, "issueId": 318, "step": "code" }, "tool": "git_push", "argsHash": "…", "autonomy": "R2" } }
+{ "input": { "point": "g2", "agentId": 9, "run": { "id": 1042, "issueId": 318, "step": "code" }, "tool": "git_push", "argsHash": "…", "autonomy": "R2" } }
 { "result": { "allow": false, "approval": true, "reason": "push требует подтверждения" } }
 ```
 
@@ -168,8 +174,8 @@ sandbox: { profile: light }
 _ответ на продление аренды (доработка: сейчас форк отвечает 204 без тела) — отмена, подтверждения и указания (I3)_
 
 ```json
-{ "canceled": false, "approvals": [ { "runId": 1042, "seq": 8, "decision": "approve", "scope": "once", "by": "user:anna" } ],
-  "messages": [ { "id": "m-91", "text": "используй pytest", "by": "user:anna", "at": "2026-10-10T12:03:00Z" } ] }
+{ "canceled": false, "approvals": [ { "runId": 1042, "seq": 8, "decision": "approve", "scope": "once", "by": "anna" } ],
+  "messages": [ { "id": "m-91", "text": "используй pytest", "by": "anna", "at": "2026-10-10T12:03:00Z" } ] }
 ```
 
 ### AgentSettings
@@ -196,7 +202,7 @@ _заявка на среду запуска (I6, I23)_
 _доступ к репозиторию на один запуск (I6, I18)_
 
 ```json
-{ "repo": "org/app", "access": "write", "branchPrefix": "agent/MKT-42", "protected": ["main"], "ttlSeconds": 3600 }
+{ "repo": "org/app", "access": "write", "branchPrefix": "agent/", "protected": ["main"], "ttlSec": 3600 }
 ```
 
 ### Checkpoint
@@ -223,7 +229,7 @@ _вызов модели через LiteLLM (I8); полный пример со
 _вызов тула через MCP-прокси Runner (I9, JSON-RPC 2.0)_
 
 ```json
-{ "jsonrpc": "2.0", "id": 12, "method": "tools/call", "params": { "name": "itsaplan_update_issue", "arguments": { "issue": "MKT-42", "state": "Ревью" } } }
+{ "jsonrpc": "2.0", "id": 12, "method": "tools/call", "params": { "name": "itsaplan_add_comment", "arguments": { "issue": "MKT-42", "body": "Черновик требований готов" } } }
 { "jsonrpc": "2.0", "id": 12, "result": { "content": [ { "type": "text", "text": "ok" } ] } }
 ```
 
@@ -232,7 +238,7 @@ _вызов тула через MCP-прокси Runner (I9, JSON-RPC 2.0)_
 _ключ LiteLLM на агента (I15, `/key/generate`)_
 
 ```json
-{ "key_alias": "agent-7", "models": ["team-default"], "max_budget": 5, "budget_duration": "1d", "rpm_limit": 30, "tpm_limit": 200000, "metadata": { "agent": 7 } }
+{ "key_alias": "agent:7", "models": ["team-default"], "max_budget": 5, "budget_duration": "1d", "rpm_limit": 30, "tpm_limit": 200000, "metadata": { "agentId": 7 } }
 ```
 
 ### OpaBundleData
@@ -240,7 +246,7 @@ _ключ LiteLLM на агента (I15, `/key/generate`)_
 _данные бандла OPA (I16, `data.json`)_
 
 ```json
-{ "agents": { "7": { "tools_allow": ["itsaplan_get_issue", "git_push"], "approval": ["git_push"], "autonomy": "R2", "budget": { "run": 1, "day": 5 } } },
+{ "agents": { "7": { "tools_allow": ["itsaplan_get_issue", "git_push"], "approval": ["git_push"], "autonomy": "R2", "budget": { "run_usd": 1, "day_usd": 5 } } },
   "platform": { "kill_switch": false } }
 ```
 
