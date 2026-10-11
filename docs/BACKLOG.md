@@ -13,3 +13,4 @@
 | web-research MCP | Выход агентов в интернет | Отдельная зона риска, нужна своя политика | [architecture.md → MCP-серверы](../architecture.md) |
 | Админ-MCP | `llmproxy-admin`, `guardrails-admin`, `rag-admin` | Управление пока через UI ICPlan | [tool-integration](../openspec/changes/define-agent-platform/specs/tool-integration/spec.md) |
 | CI/CD, SSDLC | Gitea Actions, ArgoCD, SonarQube, ZAP, Trivy, k6 | Сначала решаем, что и как деплоим и проверяем | Проект AI-агент: `platform/technical/deployment/` |
+| Функции для людей из Plane | Сравнить циклы, модули, страницы Plane с функциями ICPlan по историям; недостающее — в истории и задачи форка | Не влияет на выбор трекера; ядро — агентная часть (П1–П3) | [R&D трекера, Э8](rnd/tracker-choice.md#e8) |

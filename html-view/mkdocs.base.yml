@@ -54,6 +54,7 @@ markdown_extensions:
       permalink: true
   - pymdownx.superfences
   - pymdownx.details
+  - pymdownx.mark
   - pymdownx.tasklist:
       custom_checkbox: true
 

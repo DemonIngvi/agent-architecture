@@ -314,9 +314,9 @@ def check_docs() -> list:
             issues.append(f"R&D {f.name} нет в реестре docs/rnd/README.md")
         elif row.rstrip(" |").split("|")[-1].strip().startswith("v3"):
             t = f.read_text(encoding="utf-8")
-            miss = [k for k in ('class="rnd-hero"', 'class="rnd-grid"', "**Утверждение", "Когда неверно" if "Когда неверно" in t else "Опровержение", "## Источники")
+            miss = [k for k in ('class="rnd-hero"', 'class="rnd-grid"', "```deck", "## Э10.", "**Утверждение", "Когда неверно" if "Когда неверно" in t else "Опровержение", "## Источники")
                     if k not in t]
-            miss += [f"Э{n} / G{n}" for n in range(1, 8) if f"## Э{n}." not in t or f'gate">G{n}</span> ✅' not in t]
+            miss += [f"Э{n} / G{n}" for n in range(1, 11) if f"## Э{n}." not in t or f'gate">G{n}</span> ✅' not in t]
             if miss:
                 issues.append(f"R&D {f.name} (v3): нет {', '.join(miss)}")
     for c in COMPONENTS:  # О-17: техспека у каждого компонента
@@ -330,6 +330,98 @@ def check_docs() -> list:
     for i in issues:
         print("⚠️ правила:", i)
     return issues
+
+
+HL = [  # О-35: цветовая разметка R&D — слово в начале ячейки → класс
+    (r"не закрывает|не брать[^|]*|нет\b|\*\*нет\*\*|✗|обратная", "no"),
+    (r"закрывает с доработкой|закрывает частично|с доработкой|частично|можно добавить", "part"),
+    (r"закрывает|проходит|брать|оставить|да\b|✅", "ok"),
+    (r"адаптировать|заменить", "info"),
+    (r"безразличная", "mute"),
+    (r"базовая", "kano-base"), (r"линейная", "kano-lin"), (r"привлекательная", "kano-att"),
+    (r"И[34]\b", "ok"), (r"И[12]\b", "part"), (r"И0\b", "no"),
+]
+EV = {"А": "a", "Б": "b", "В": "c", "Г": "d"}
+
+
+def rnd_highlight(txt: str) -> str:
+    """Подсветка R&D: оценки и решения в начале ячеек, уровни доказательства, рамка «Вывод этапа»."""
+    out, fence = [], False
+    for line in txt.split("\n"):
+        if line.startswith("```"):
+            fence = not fence
+        if not fence and line.startswith("|") and not re.match(r"^\|[\s:|-]+\|?$", line):
+            cells = re.split(r"(?<!\\)\|", line)
+            for i in range(1, len(cells) - 1):
+                c = cells[i]
+                m = re.match(r"(\s*)(\*\*)?(.*)$", c)
+                body = m.group(3)
+                for pat, cls in HL:
+                    mm = re.match(r"(" + pat + r")(\*\*)?", body)
+                    if mm and (m.group(2) is None or mm.group(2)):
+                        word = (m.group(2) or "") + mm.group(1) + (mm.group(2) or "")
+                        cells[i] = m.group(1) + f'<span class="hl {cls}">{word}</span>' + body[mm.end():]
+                        break
+            line = "|".join(cells)
+        line = re.sub(r"\(([АБВГ])\)", lambda m: f'<span class="ev {EV[m.group(1)]}">{m.group(1)}</span>', line)
+        out.append(line)
+    txt = "\n".join(out)
+    txt = re.sub(r"^\*\*Вывод этапа\.\*\*(.*?)(?=\n\n)", lambda m: f'<div class="rnd-concl" markdown>\n\n**Вывод этапа.**{m.group(1)}\n\n</div>', txt, flags=re.M | re.S)
+    parts = re.split(r"(````.*?````)", txt, flags=re.S)  # примеры разметки в ```` не превращаются в слайды
+    return "".join(p if p.startswith("````") else re.sub(r"^```deck\n(.*?)^```", lambda m: deck_html(m.group(1)), p, flags=re.S | re.M)
+                   for p in parts)
+
+
+def deck_html(src: str) -> str:
+    """Микропрезентация R&D: слайды 16:9 из компактной разметки (docs/rules/rnd-methodology.md#deck)."""
+    slides, cur = [], None
+    for raw in src.strip().split("\n"):
+        s = raw.strip()
+        if not s:
+            continue
+        if s.startswith("# "):
+            cur = {"title": s[2:], "body": []}
+            slides.append(cur)
+            continue
+        if cur is None:
+            continue
+        kind, _, rest = s.partition(" ")
+        b = cur["body"]
+        if kind == ">":
+            b.append(f'<div class="sl-take">{md_inline(rest)}</div>')
+        elif kind == "stack":  # stack Метка: 6 ok, 2 part, 0 no
+            lab, _, parts = rest.partition(":")
+            segs = [(int(n), c) for n, c in re.findall(r"(\d+)\s*(ok|part|no|info|mute)", parts)]
+            tot = sum(n for n, _ in segs) or 1
+            bar = "".join(f'<span class="seg {c}" style="flex:{n}">{n}</span>' for n, c in segs if n)
+            b.append(f'<div class="sl-row"><span class="sl-lab">{md_inline(lab)}</span><span class="sl-stack">{bar}</span></div>')
+        elif kind == "bar":  # bar Метка: 3/4 подпись [ok|part|no|info]
+            lab, _, v = rest.partition(":")
+            mm = re.match(r"\s*([\d.]+)\s*/\s*([\d.]+)\s*(.*?)\s*(ok|part|no|info|mute)?$", v)
+            val, mx, cap, cls = float(mm.group(1)), float(mm.group(2)), mm.group(3), mm.group(4) or "info"
+            b.append(f'<div class="sl-row"><span class="sl-lab">{md_inline(lab)}</span><span class="sl-bar"><span class="fill {cls}" style="width:{100 * val / mx:.0f}%"></span><em>{md_inline(cap)}</em></span></div>')
+        elif kind == "side":  # side Левый | Правый
+            l, _, r = rest.partition("|")
+            b.append(f'<div class="sl-side"><span>{md_inline(l.strip())}</span><span>{md_inline(r.strip())}</span></div>')
+        elif kind == "pos":  # pos Роль: -2..2 | довод
+            lab, _, v = rest.partition(":")
+            n, _, why = v.partition("|")
+            x = (float(n) + 2) / 4 * 100
+            b.append(f'<div class="sl-row"><span class="sl-lab">{md_inline(lab)}</span><span class="sl-track"><span class="dot" style="left:{x:.0f}%"></span></span><span class="sl-why">{md_inline(why.strip())}</span></div>')
+        elif kind == "-":
+            b.append(f'<div class="sl-li">{md_inline(rest)}</div>')
+        else:
+            b.append(f'<div class="sl-li">{md_inline(s)}</div>')
+    body = "".join(f'<div class="slide"><div class="sl-n">{i}/{len(slides)}</div><div class="sl-title">{md_inline(sl["title"])}</div>{"".join(sl["body"])}</div>'
+                   for i, sl in enumerate(slides, 1))
+    return f'<div class="deck">{body}</div>\n'
+
+
+def md_inline(s: str) -> str:
+    s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    s = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", s)
+    s = re.sub(r"==(.+?)==", r"<mark>\1</mark>", s)
+    return re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2">\1</a>', s)
 
 
 def copy_sources():
@@ -350,12 +442,45 @@ def copy_sources():
         txt = relink_readme(f.read_text(encoding="utf-8"), f)
         txt = re.sub(r"<!-- bpmn:([a-z-]+):(\d+) -->", lambda m: bpmn_svg(BPMN[m.group(1)][int(m.group(2))]) if m.group(1) in BPMN else "", txt)
         txt = txt.replace("<!-- docgraph -->", graph_svg(docgraph.LAYERS, docgraph.EDGES))
+        if rel.as_posix().startswith("docs/rnd/") or rel.as_posix() == "docs/rules/rnd-methodology.md":
+            txt = rnd_highlight(txt)
         dst.write_text(txt, encoding="utf-8")
     shutil.copy2(HERE / "home.md", SRC / "index.md")
     (SRC / "assets").mkdir(parents=True, exist_ok=True)
     shutil.copy2(HERE / "assets" / "extra.css", SRC / "assets" / "extra.css")
     write_component_pages()
+    write_rnd_consequences()
     write_pagebar_map()
+
+
+def write_rnd_consequences():
+    """Сводка последствий R&D (Э10): что из исследований внесено, предложено, не требуется (О-35)."""
+    rows = []
+    for f in sorted((ROOT / "docs/rnd").glob("*.md")):
+        t = f.read_text(encoding="utf-8")
+        if "## Э10." not in t:
+            continue
+        sec = re.split(r"\n## |\n<details", t.split("## Э10.", 1)[1])[0]
+        title = title_of(f, f"docs/rnd/{f.name}").replace("R&D: ", "")
+        for l in sec.splitlines():
+            if not l.startswith("| ") or l.startswith("| Изменение") or re.match(r"^\|[\s:|-]+\|$", l):
+                continue
+            c = [x.strip() for x in re.split(r"(?<!\\)\|", l)[1:-1]]
+            if len(c) < 3:
+                continue
+            doc = re.sub(r"\]\((?!https?:|#)([^)#]+)(#[^)]*)?\)",
+                         lambda m: "](" + rel(".", os.path.normpath(os.path.join("docs/rnd", m.group(1)))) + (m.group(2) or "") + ")", c[1])
+            rows.append((c[2][:1], f"[{title}](docs/rnd/{f.name}#e10)", c[0], doc, c[2]))
+    order = {"📌": 0, "✅": 1}
+    rows.sort(key=lambda r: order.get(r[0], 2))
+    n = lambda s: sum(1 for r in rows if r[0] == s)
+    L = ["# Последствия R&D", "",
+         "Что из исследований меняет решения, спеки, задачи и техспеки ([правило](docs/rules/rnd-methodology.md#consequences)). "
+         "Собирается из раздела «Э10. Последствия» каждого R&D. Предложения 📌 разбираются по [процессу изменений](docs/rules/change-process.md).", "",
+         f"**Предложено:** {n('📌')} · **внесено или подтверждено:** {n('✅')} · **не требуется:** {len(rows) - n('📌') - n('✅')}", "",
+         "| R&D | Изменение | Документ | Статус |", "|---|---|---|---|"]
+    L += [f"| {r[1]} | {r[2]} | {r[3]} | {r[4]} |" for r in rows]
+    (SRC / "rnd-consequences.md").write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
 def write_pagebar_map():
@@ -867,7 +992,7 @@ def nav_yaml() -> str:
     L += ["  - Обзоры:", item(4, "Сквозной поток", "docs/flows/README.md"), item(4, "Типы данных и потоки", "docs/flows/data-types.md"), item(4, "Техспеки компонентов", "docs/techspec/README.md"), item(4, "Каталог API", "docs/api/README.md"), item(4, "Все User Stories", "docs/stories/README.md"), item(4, "Покрытие историй", "docs/stories/coverage.md"),
           item(4, "Спеки по компонентам", "specs-by-component/index.md"), item(4, "Задачи по компонентам", "tasks-by-component/index.md"),
           item(4, "Roadmap MVP", "docs/ROADMAP.md"), item(4, "Сводная таблица задач", "docs/TASKS.md"), item(4, "Бэклог", "docs/BACKLOG.md"),
-          item(4, "R&D по компонентам", "rnd-by-component/index.md"), item(4, "Все R&D", "docs/rnd/README.md")]
+          item(4, "R&D по компонентам", "rnd-by-component/index.md"), item(4, "Все R&D", "docs/rnd/README.md"), item(4, "Последствия R&D", "rnd-consequences.md")]
     left = [t for t in tasks.values() if t not in used]
     if left:
         L.append("    - Прочие задачи:")
