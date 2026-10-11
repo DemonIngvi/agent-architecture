@@ -299,6 +299,12 @@ def check_docs() -> list:
     issues += [f"история {s[0]} без цепочки сквозной трассировки" for s in STORIES.get("icplan", []) if s[0] not in CHAINS]
     issues += [f"цепочка {k}: нет истории {x}" for k, (ch, _) in CHAINS.items() for x in ch if x not in ids]
     issues += [f"цепочка {k} без логической конечной точки" for k, (_, end) in CHAINS.items() if not end.strip()]
+    for sp in ROOT.glob("openspec/changes/*/specs/*/spec.md"):  # О-30: строка RTM на каждое требование
+        n_req = len(re.findall(r"^### Requirement: ", sp.read_text(encoding="utf-8"), re.M))
+        rtm = sp.parent / "traceability.md"
+        n_rtm = sum(1 for l in rtm.read_text(encoding="utf-8").splitlines() if l.startswith("| [R-")) if rtm.exists() else 0
+        if n_req != n_rtm:
+            issues.append(f"{sp.parent.name}: требований {n_req}, строк RTM {n_rtm}")
     for c in COMPONENTS:  # О-17: техспека у каждого компонента
         ts = ROOT / f"docs/techspec/{c[0]}.md"
         if not ts.exists():

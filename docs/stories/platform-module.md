@@ -168,5 +168,5 @@
 - [ ] Фильтр по агенту и периоду
 - [ ] Изменение через импорт YAML → тоже в журнале
 
-**Требования:** [Версии определения агента](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md) · [Права на настройки](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md)
+**Требования:** [Версии настроек агента](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md) · [Права на настройки](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md)
 
