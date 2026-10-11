@@ -1112,7 +1112,7 @@ def nav_yaml() -> str:
           item(6, "Типы документов и вкладки", "docs/rules/doc-types.md"), item(6, "Работа с документами", "docs/rules/doc-work.md"), item(6, "Процесс изменения", "docs/rules/change-process.md"),
           item(6, "Граф связности документов", "docs/rules/doc-graph.md"), item(6, "Роли", "docs/rules/roles.md"), item(6, "Промпты", "docs/rules/prompts.md"),
           item(6, "Критерии полноты спеки", "docs/rules/spec-criteria.md"), item(6, "Виды спек и подтверждение", "docs/rules/spec-kinds.md"),
-          item(6, "Методология SDD", "docs/rules/sdd-methodology.md"), item(6, "Методика User Stories", "docs/rules/us-methodology.md"),
+          item(6, "Методология архитектуры", "docs/rules/architecture-methodology.md"), item(6, "Методология данных и интеграций", "docs/rules/data-methodology.md"), item(6, "Методология API", "docs/rules/api-methodology.md"), item(6, "Методология решений", "docs/rules/decision-methodology.md"), item(6, "Методология задач и плана", "docs/rules/task-methodology.md"), item(6, "Методология ревью и отклонений", "docs/rules/review-methodology.md"), item(6, "Методология сопровождающих документов", "docs/rules/support-docs-methodology.md"), item(6, "Методология SDD", "docs/rules/sdd-methodology.md"), item(6, "Методика User Stories", "docs/rules/us-methodology.md"),
           item(6, "Методология R&D", "docs/rules/rnd-methodology.md"), item(6, "Техническая спецификация", "docs/rules/tech-spec.md"),
           item(6, "Проверка двумя читателями", "docs/rules/dual-read.md"), item(6, "Журнал отклонений", "docs/rules/deviations.md")]
     revs = sorted((SRC / "docs/reviews").glob("*.md")) if (SRC / "docs/reviews").exists() else []

@@ -106,7 +106,7 @@ def route(path) -> str:
         L.append(f"- Тип: {name}. Обязательно: {_plain(hit.get('Обязательные разделы', ''))}.")
         L.append(f"- Правила: {_plain(hit.get('Правила', ''))}.")
         if hit.get("Методология"):
-            L.append(f"- Методология: {_plain(hit['Методология'])}.")
+            L.append("- Методология: " + re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1 (docs/rules/\2)", hit["Методология"]) + ".")
         L.append(f"- Синхронизировать: {_plain(hit.get('Синхронизировать', ''))}.")
         key = name.split()[0].lower() if name else ""
         w = next((x for x in work if key and key in _plain(x.get("Документ", "")).lower()), None)
