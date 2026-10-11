@@ -67,17 +67,25 @@ MODELS = {
     "Criterion": ("критерий приёмки (D20)", [
         ("text", "string", True, "проверяемая формулировка"), ("origin", "enum: process · user:<имя> · agent:<шаг> · reviewer:<кто>", True, "происхождение"),
         ("status", "enum: active · pending_approval", True, "ждёт подтверждения по `criteria_approval`")]),
-    "RunEvent": ("шаг запуска (NDJSON, `/run/events`, `/agent-runs/:id/events`)", [
-        ("runId", "int", True, "запуск"), ("seq", "int", True, "порядковый номер, ключ идемпотентности"), ("at", "timestamp", True, "время"),
-        ("type", "enum: run_started · llm_call · tool_call · tool_result · needs_approval · question · memory_write · guardrail_decision · run_finished", True, "тип"),
-        ("data", "object", True, "содержимое по типу (`tool_call`: tool, status, ms); при `events.level: всё` — промпты и ответы (маскированные)")]),
+    "RunEvent": ("событие запуска: конверт платформы вокруг события AG-UI (D21; NDJSON `/run/events`, `POST /agent-runs/:runId/events`)", [
+        ("runId", "int", True, "запуск, = `agent_run.id`"), ("seq", "int", True, "порядковый номер от Harness; ключ идемпотентности и порядка"),
+        ("at", "timestamp", True, "время события в Harness"),
+        ("event", "AgUiEvent", True, "событие AG-UI как есть: `type` и поля протокола")]),
+    "AgUiEvent": ("событие протокола AG-UI (docs.ag-ui.com; то же, что принимает чат агента форка)", [
+        ("type", "enum: RUN_STARTED · RUN_FINISHED · RUN_ERROR · STEP_STARTED · STEP_FINISHED · TEXT_MESSAGE_START · TEXT_MESSAGE_CONTENT · TEXT_MESSAGE_END · REASONING_START · REASONING_MESSAGE_START · REASONING_MESSAGE_CONTENT · REASONING_MESSAGE_END · REASONING_END · TOOL_CALL_START · TOOL_CALL_ARGS · TOOL_CALL_END · TOOL_CALL_RESULT · ACTIVITY_SNAPSHOT · CUSTOM", True, "тип события по протоколу"),
+        ("runId / threadId", "string", False, "у `RUN_*`: запуск и тред (тред = задача)"), ("stepName", "string", False, "у `STEP_*`: шаг цикла"),
+        ("messageId / role / delta", "string", False, "у `TEXT_MESSAGE_*`, `REASONING_MESSAGE_*`: сообщение, роль, фрагмент текста"),
+        ("toolCallId / toolCallName / parentMessageId / content", "string", False, "у `TOOL_CALL_*`: вызов тула, имя, сообщение-родитель, результат"),
+        ("activityType / content", "string / object", False, "у `ACTIVITY_SNAPSHOT`: `plan` и содержимое плана"),
+        ("name", "string", False, "у `CUSTOM`: `question`, `approval_request`, `guardrail_decision`, `memory_write`, `llm_call`"), ("value", "object", False, "у `CUSTOM`: данные события по `name`"),
+        ("message / code", "string", False, "у `RUN_ERROR`: причина")]),
     "RunResult": ("итог запуска (`POST /agent-runs/:id/result`)", [
         ("status", "enum: success · failed · canceled", True, "статус ICPlan (R-RUN-07 → ICPlan)"), ("reason", "enum: done · limit · gate_failed · error", False, "причина Harness"),
         ("output", "markdown", True, "итог для задачи"), ("artifacts", "{name, url}[]", False, "опубликованные файлы, ветка, PR"),
         ("gate", "{passed, failed[]}", False, "результат quality gate (R-HRN-08)"),
         ("usage", "{prompt_tokens, completion_tokens, reasoning_tokens, cost_usd, steps}", True, "расход")]),
     "ApprovalDecision": ("решение пользователя по паузе", [
-        ("runId", "int", True, ""), ("seq", "int", True, "событие `needs_approval`"), ("decision", "enum: approve · reject · answer", True, ""),
+        ("runId", "int", True, ""), ("seq", "int", True, "`seq` события `CUSTOM` `approval_request` или `question`"), ("decision", "enum: approve · reject · answer", True, ""),
         ("scope", "enum: once · run", False, "только этот вызов или до конца запуска (R-GRD-03)"), ("by", "string", True, "кто решил"), ("comment", "string", False, "")]),
     "UserMessage": ("указание пользователя во время работы", [
         ("id", "string", True, ""), ("text", "string", True, ""), ("by", "string", True, ""), ("at", "timestamp", True, "")]),
@@ -178,7 +186,7 @@ PLATFORM_TABLES = {
     "scheduler_slot": ("S3", "agent-runner", [("slot_key", "text", "PK", "global:N / agent:<id> / model:<alias> / issue:<id>"), ("run_id", "int", "FK agent_run", ""),
                                               ("runner_id", "text", "", "экземпляр Runner"), ("lease_until", "timestamptz", "", "аренда слота"), ("acquired_at", "timestamptz", "", "")]),
     "run_event": ("S3", "observability", [("run_id", "int", "PK, FK agent_run", "целое, как `agent_run.id`"), ("seq", "int", "PK", ""), ("ts", "timestamptz", "", ""),
-                                          ("type", "text", "", "тип `RunEvent`"), ("data", "jsonb", "", "маскированное содержимое"), ("issue_key", "text", "", "")]),
+                                          ("type", "text", "", "`event.type` AG-UI, для отбора"), ("event", "jsonb", "", "событие AG-UI целиком, маскированное; дельты собраны в сообщение"), ("issue_key", "text", "", "")]),
     "setup_cache": ("S3", "agent-runner", [("lock_hash", "text", "PK", "хеш lock-файлов"), ("project_id", "int", "FK project", ""), ("path", "text", "", "том кэша"),
                                            ("created_at", "timestamptz", "", ""), ("expires_at", "timestamptz", "", "`setup.cache_ttl_h`")]),
     "memory_m3": ("S4", "memory", [("issue_id", "int", "PK, FK issue", ""), ("scope", "text", "PK", ""), ("agent", "text", "", "автор"), ("done", "jsonb", "", ""), ("next", "jsonb", "", ""),

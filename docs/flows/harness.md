@@ -24,7 +24,7 @@ RunBundle ─▶ Bootstrap ─▶ Context Manager ─▶ LLM client ──▶ о
 | 3 | Вызов модели | Harness → LiteLLM | `chat.completions` |
 | 4 | Проверка действия (G2) | Harness → OPA | `PolicyInput` G2 |
 | 5 | Вызов тула | Harness → MCP | `tools/call` |
-| 6 | Пауза на подтверждение | Harness → Runner → ICPlan | `RunEvent` `needs_approval` |
+| 6 | Пауза на подтверждение | Harness → Runner → ICPlan | `RunEvent` (`CUSTOM` `approval_request`) |
 | 7 | Сохранение шага | Harness → checkpointer | состояние графа |
 | 8 | Шаги работы | Harness → Runner | `RunEvent` |
 | 9 | Итог | Harness → Runner | `RunResult` |
@@ -101,7 +101,7 @@ RunBundle ─▶ Bootstrap ─▶ Context Manager ─▶ LLM client ──▶ о
 
 Поля — [`RunEvent`](../../data-model.md#model-runevent); пример — [каталог API](../api/README.md#runevent). Здесь копия не ведётся: модели и примеры живут в одном источнике ([правило](../rules/change-process.md#single-source)).
 
-Типы событий: `run_started`, `llm_call`, `tool_call`, `tool_result`, `needs_approval`, `question`, `memory_write`, `guardrail_decision`, `run_finished`.
+Типы событий — протокол AG-UI (D21): `RUN_*`, `STEP_*`, `TEXT_MESSAGE_*` (реплика агента перед действием), `REASONING_*` (рассуждения модели из `reasoning_content`, если есть), `TOOL_CALL_*`, `ACTIVITY_SNAPSHOT` (план); события платформы — `CUSTOM`: `question`, `approval_request`, `guardrail_decision`, `memory_write`, `llm_call`. Поля — [`RunEvent`](../../data-model.md#model-runevent), [`AgUiEvent`](../../data-model.md#model-aguievent); что видит пользователь — [чат запуска](icplan.md#agent-feed).
 
 `RunResult`:
 

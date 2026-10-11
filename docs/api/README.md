@@ -48,22 +48,28 @@ _Runner → Harness (`POST /run`)_
 
 ### RunEvent
 
-_шаг запуска (`/agent-runs/:id/events`, `/run/events`)_
+_событие запуска — конверт вокруг события AG-UI (D21; `/run/events`, `POST /agent-runs/:runId/events`)_
 
 ```json
-{ "runId": 1042, "seq": 7, "type": "tool_call", "at": "2026-10-10T12:00:05Z",
-  "data": { "tool": "itsaplan_get_issue", "status": "ok", "ms": 220 } }
+{ "runId": 1042, "seq": 6, "at": "2026-10-10T12:00:04Z",
+  "event": { "type": "TEXT_MESSAGE_END", "messageId": "m-6", "role": "assistant", "delta": "Читаю задачу, чтобы понять границы экспорта." } }
+{ "runId": 1042, "seq": 7, "at": "2026-10-10T12:00:05Z",
+  "event": { "type": "TOOL_CALL_START", "toolCallId": "tc-7", "toolCallName": "itsaplan_get_issue", "parentMessageId": "m-6" } }
+{ "runId": 1042, "seq": 9, "at": "2026-10-10T12:00:09Z",
+  "event": { "type": "CUSTOM", "name": "approval_request", "value": { "tool": "git_push", "reason": "push требует подтверждения" } } }
 ```
+
+Сохранённое сообщение — одно событие на `*_END` с полным текстом в `delta`: дельты `*_CONTENT` идут только в живой поток (SSE).
 
 Соответствие OpenTelemetry GenAI (semconv v1.44.0, статус Development — имена атрибутов сверяются при экспорте; [R&D observability](../rnd/observability.md#e6)):
 
-| `type` | Спан или событие OTel | Атрибуты |
+| `event.type` | Спан или событие OTel | Атрибуты |
 |---|---|---|
-| `run_started` / `run_finished` | спан `invoke_agent` (начало / конец) | агент, версия, `runId`; итог и токены — на конце |
-| `llm_call` | спан `chat` (`gen_ai.operation.name`) | провайдер, модель запроса и ответа, токены ввода, вывода, размышлений |
-| `tool_call` / `tool_result` | спан `execute_tool` | имя тула, статус, длительность |
-| `memory_write` | спан `execute_tool` (тул памяти) | уровень памяти, область |
-| `needs_approval`, `question`, `guardrail_decision` | событие спана `invoke_agent` | решение, точка G, причина |
+| `RUN_STARTED` / `RUN_FINISHED` | спан `invoke_agent` (начало / конец) | агент, версия, `runId`; итог и токены — на конце |
+| `CUSTOM` `llm_call` | спан `chat` (`gen_ai.operation.name`) | провайдер, модель запроса и ответа, токены ввода, вывода, размышлений |
+| `TOOL_CALL_START` … `TOOL_CALL_RESULT` | спан `execute_tool` | имя тула, статус, длительность |
+| `CUSTOM` `memory_write` | спан `execute_tool` (тул памяти) | уровень памяти, область |
+| `CUSTOM` `approval_request`, `question`, `guardrail_decision` | событие спана `invoke_agent` | решение, точка G, причина |
 
 ### RunResult
 

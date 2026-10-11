@@ -28,7 +28,7 @@ Registry  Agent Runner Harness/G2   Runner/Obs
 | Агенты | `list_agents`, `describe_agent` — выбор агента | Да |
 | Runs | `start_run`, `get_run`, `cancel_run`, `get_artifacts` | Да — ядро |
 | Approvals | `approve_action`, `answer_run` | Да — требование G2 |
-| Events | `status`, `needs_approval`, `question`, `done` | Да — push вместо polling |
+| Events | события AG-UI запуска (D21): `RUN_*`, `TEXT_MESSAGE_*`, `TOOL_CALL_*`, `CUSTOM` `approval_request` / `question` | Да — push (SSE) вместо polling |
 
 ## Расширения
 

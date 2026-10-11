@@ -13,7 +13,7 @@
 | 5 | Проверка действия | G2 | Harness → OPA | `PolicyInput` → `PolicyDecision` |
 | 6 | Изоляция | G3 | профиль → Sandbox | сеть, ФС, ресурсы |
 | 7 | Проверка запроса к модели | G4 | LiteLLM хуки | PII, injection, модерация |
-| 8 | Аудит | все | точки → Observability | `RunEvent` `guardrail_decision` |
+| 8 | Аудит | все | точки → Observability | `RunEvent` (`CUSTOM` `guardrail_decision`) |
 
 ## Данные
 

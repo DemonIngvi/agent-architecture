@@ -187,7 +187,7 @@ SUB = {
         why="Предсказуемые затраты и время.", rnd="runaway-protection.md"),
     ("harness", "Event stream"): dict(
         tech="Поток `RunEvent`",
-        params=[("Типы", "llm_call, tool_call, needs_approval, run_finished…")],
+        params=[("Типы", "AG-UI: RUN_*, TEXT_MESSAGE_*, REASONING_*, TOOL_CALL_*, CUSTOM (D21)")],
         does=["Отдаёт шаги по мере работы"],
         why="Таймлайн в задаче и аудит.", rnd="observability.md"),
     # ---------- Memory ----------
