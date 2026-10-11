@@ -1,6 +1,6 @@
 # User Stories: Platform module
 
-← [Все истории](README.md) · [потоки](../flows/platform-module.md)
+← [Все истории](README.md) · [как работает](../techspec/platform-module.md#how)
 
 > Сгенерировано из `html-view/stories.py` — правьте там.
 

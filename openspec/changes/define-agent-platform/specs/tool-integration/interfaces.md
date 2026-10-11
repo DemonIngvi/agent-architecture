@@ -45,7 +45,7 @@
 | **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | вызовы MCP ~1 RPS; таймаут 30 с |
 | **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | MCP `itsaplan-core` — часть api ICPlan; внешние MCP — через egress-прокси |
 
-Детали форматов — [потоки](../../../../../docs/flows/mcp-tools.md).
+Детали форматов — [потоки](../../../../../docs/techspec/mcp-tools.md#how).
 
 ## Отказы (FMEA)
 

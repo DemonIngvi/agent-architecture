@@ -63,7 +63,7 @@
 | **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | шаг цикла 5–20 с; ~0.1 RPS к LiteLLM на запуск; до 200 тыс. токенов на запуск |
 | **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | процесс внутри контейнера sandbox, образ `ghcr.io/demoningvi/agent-agent-harness:<версия>`; ресурсы — профиль sandbox |
 
-Детали форматов — [потоки](../../../../../docs/flows/harness.md).
+Детали форматов — [потоки](../../../../../docs/techspec/harness.md#how).
 
 ## Отказы (FMEA)
 

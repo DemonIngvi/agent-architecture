@@ -332,7 +332,7 @@ stack Документы: 6 ok, 0 part, 2 mute
 | Параметр профиля `runtime`: runc / runsc | [interfaces agent-sandbox](../../openspec/changes/define-agent-platform/specs/agent-sandbox/interfaces.md), [R-SBX-05](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md#r-sbx-05) | ✅ внесено: по умолчанию runc; значение по умолчанию пересматривается после 2.2.8 |
 | agent-sandbox (пул как объект K8s) — провайдер этапа 4 | [R&D Kubernetes](kubernetes-runtime.md) | ✅ учтено при переводе R&D Kubernetes |
 | Решение D18 (rootless Docker, Squid) | design | ✅ подтверждено, без изменений |
-| Стыки I6, I7, I17, I23 | спека agent-sandbox, [поток Sandbox](../flows/sandbox.md) | — не требуется |
+| Стыки I6, I7, I17, I23 | спека agent-sandbox, [поток Sandbox](../techspec/sandbox.md#how) | — не требуется |
 | Тёплый пул | [задача 4.1](../tasks/4.1-sandbox-warm-pool.md) | — не требуется |
 
 <span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.

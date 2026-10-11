@@ -53,7 +53,7 @@
 | **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | API ICPlan ~20 RPS пик (UI 8, Runner 3, события 4, MCP 1), p95 < 300 мс; 15 одновременных пользователей |
 | **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | ICPlan: Deployment `web` (1–2), `api` (2), `worker` (1), `bot` (1) в `itsaplan-core`; вход — Traefik Ingress (HTTPS) |
 
-Детали форматов — [потоки](../../../../../docs/flows/icplan.md).
+Детали форматов — [потоки](../../../../../docs/techspec/icplan.md#how).
 
 ## Отказы (FMEA)
 

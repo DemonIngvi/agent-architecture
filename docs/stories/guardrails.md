@@ -1,6 +1,6 @@
 # User Stories: Guardrails
 
-← [Все истории](README.md) · [потоки](../flows/guardrails.md)
+← [Все истории](README.md) · [как работает](../techspec/guardrails.md#how)
 
 > Сгенерировано из `html-view/stories.py` — правьте там.
 

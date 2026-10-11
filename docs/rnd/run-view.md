@@ -315,9 +315,9 @@ Linear выделяет вопрос к человеку (elicitation) и отв
 | Реплика перед действием, рассуждения модели в поток | [R-HRN-06](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-06) | ✅ внесено |
 | Модель `RunEvent` = событие AG-UI | [Модель данных](../../data-model.md#model-runevent) | ✅ внесено |
 | `POST /agent-runs/:runId/events`, `GET /agent-runs/:runId/stream`, `GET /issues/:issueId/agent-feed` | [каталог API ICPlan](../api/icplan.md) | ✅ внесено |
-| Поток «Как пользователь видит работу агента» | [потоки ICPlan](../flows/icplan.md#agent-feed) | ✅ внесено |
+| Поток «Как пользователь видит работу агента» | [потоки ICPlan](../stories/icplan.md#agent-feed) | ✅ внесено |
 | Задача 3.3: чат запуска вместо таймлайна | [3.3](../tasks/3.3-run-events-timeline.md) | ✅ внесено |
-| Хранение: сообщение целиком на `*_END` | [потоки Observability](../flows/observability.md) | ✅ внесено |
+| Хранение: сообщение целиком на `*_END` | [потоки Observability](../techspec/observability.md#how) | ✅ внесено |
 
 <span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.
 

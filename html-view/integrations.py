@@ -76,7 +76,7 @@ GLOSSARY = [
     "| **M0–M6** | уровни памяти: M0 рабочая, M1 переписка, M2 итоги прошлых запусков, M3 состояние задачи, M4 факты, M5 агент, M6 документы проекта |",
     "| **L0–L3** | уровни конфигурации: L0 развёртывание, L1 проект, L2 агент, L3 запуск; нижний уровень переопределяет верхний |",
     "| **R0–R5** | автономия агента: R0 — каждое действие с подтверждением … R5 — без подтверждений |",
-    "| **I1–I23, S1–S11, Т1–Т8** | интерфейсы, хранилища, типы данных ([матрица](docs/flows/data-types.md)) |",
+    "| **I1–I23, S1–S11, Т1–Т8** | интерфейсы, хранилища, типы данных ([матрица](docs/data-types.md)) |",
     "| **D1–D21, R-…, US-…** | решения design, требования спек, истории пользователей |",
 ]
 
@@ -498,7 +498,7 @@ def stores_md(slug, page, href) -> list:
 
 def data_model_page(components) -> str:
     nm = names(components)
-    L = ["# Модель данных", "", "← [Архитектура](architecture.md) · [типы данных](docs/flows/data-types.md) · [каталог API](docs/api/README.md)", "",
+    L = ["# Модель данных", "", "← [Архитектура](architecture.md) · [типы данных](docs/data-types.md) · [каталог API](docs/api/README.md)", "",
          "Все хранилища платформы и их таблицы. **Источник** у каждой таблицы: код форка ICPlan (`packages/db/src/schema/app.ts`, действующая схема), "
          "проект схемы платформы (по спекам и решениям D4, D17–D20 — до реализации) или `schema.prisma` LiteLLM.", "",
          "| Хранилище | Где | Владелец |", "|---|---|---|",
@@ -603,7 +603,7 @@ def api_examples_check() -> list:
         names = [x.strip() for x in m.group(1).split("/")]
         js = "".join(re.findall(r"```json\n(.*?)```", m.group(2), re.S))
         issues += example_issues(f"API: пример {m.group(1)}", names, js)
-    for f in sorted((ROOT / "docs/flows").glob("*.md")):
+    for f in sorted((ROOT / "docs/techspec").glob("*.md")):  # JSON — только с подписью-моделью (О-46, О-52)
         L = f.read_text(encoding="utf-8").split("\n")
         for i, line in enumerate(L):
             if line.strip() != "```json":
@@ -611,7 +611,7 @@ def api_examples_check() -> list:
             cap = next((L[k] for k in range(i - 1, max(-1, i - 4), -1) if L[k].strip()), "")
             j = next(k for k in range(i + 1, len(L)) if L[k].strip() == "```")
             names = [n for n in re.findall(r"`(\w+)`", cap) if n in DM.MODELS]
-            where = f"docs/flows/{f.name}:{i + 1}"
+            where = f"docs/techspec/{f.name}:{i + 1}"
             if not names:
                 issues.append(f"{where}: пример JSON без модели в подписи — модель в datamodel.py, пример в docs/api/README.md")
             else:
@@ -631,7 +631,7 @@ def _link_models(text, base):
     return "".join(parts)
 
 
-def flow_page(text, slug, nm) -> str:
+def flow_page(text, slug, nm, base="../../") -> str:
     """Страница потоков: модели — ссылками; раздел «Данные» — ссылки на контракты, хранилища и API, без копий (О-46)."""
     used = [m for m in DM.MODELS if re.search(rf"`{m}`", text)]
     data = ["Поля, источник и пример каждой структуры — по ссылке; здесь они не повторяются ([правило](../rules/doc-types.md#tabs)).", ""]
@@ -651,21 +651,22 @@ def flow_page(text, slug, nm) -> str:
             path = "ICPlan web → ICPlan api" if a == b == "icplan" else path
             rows.append(f"| {i} | {path} | {what} | {', '.join(f'`{m}`' for m in models) or '—'} | {DM.INTEG_TYPES.get(i, '—')} |")
         text = text.replace("<!-- iface-matrix -->", "\n".join(rows))
-    return _link_models(text, "../../")
+    return _link_models(text, base)
 
 
 def flows_check() -> list:
-    """Потоки: нет рукописных копий полей и конфигов; имена моделей существуют (О-46)."""
+    """Вкладки «Потоки» нет (О-52); «Как работает» в техспеке — порядок работы без конфигов и с существующими моделями."""
     issues = []
-    for f in sorted((ROOT / "docs/flows").glob("*.md")):
+    if (ROOT / "docs/flows").exists():
+        issues.append("docs/flows: вкладка «Потоки» упразднена — порядок работы в техспеке («Как работает»), процесс пользователя в историях, взаимодействие — в architecture.md")
+    for f in sorted((ROOT / "docs/techspec").glob("*.md")):
         t = f.read_text(encoding="utf-8")
-        if re.search(r"^```(yaml|json|rego)", t, re.M) and f.name != "harness.md":
-            issues.append(f"docs/flows/{f.name}: блок конфигурации или JSON — место в техспеке или каталоге API")
-        body = re.sub(r"```.*?```", "", t, flags=re.S)
+        how = t.split("## Как работает", 1)[1].split("\n## ", 1)[0] if "## Как работает" in t else ""
+        if re.search(r"^```(yaml|rego)", how, re.M):
+            issues.append(f"docs/techspec/{f.name}: конфиг в «Как работает» — место в «Пример конфигурации»")
+        body = re.sub(r"```.*?```", "", how, flags=re.S)
         for n in sorted(set(re.findall(r"`([A-Z][a-z]+[A-Z][A-Za-z]*)`", body)) - set(DM.MODELS) - FLOW_NON_MODELS):
-            issues.append(f"docs/flows/{f.name}: `{n}` — нет такой модели в datamodel.MODELS")
-        if f.name not in ("README.md", "data-types.md") and "<!-- flow-data -->" not in t:
-            issues.append(f"docs/flows/{f.name}: раздел «Данные» должен быть меткой <!-- flow-data --> (генерируется)")
+            issues.append(f"docs/techspec/{f.name}: `{n}` — нет такой модели в datamodel.MODELS")
     return issues
 
 

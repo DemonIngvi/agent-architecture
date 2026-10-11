@@ -62,7 +62,7 @@
 | **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | ~1 RPS чтения и записи; запись M3 до 16 КБ (`m3_max_kb`); p95 < 200 мс |
 | **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | Memory API — Deployment в `itsaplan-agents`, 1–2 реплики, Service ClusterIP; данные — Postgres через PgBouncer |
 
-Детали форматов — [потоки](../../../../../docs/flows/memory.md).
+Детали форматов — [потоки](../../../../../docs/techspec/memory.md#how).
 
 ## Отказы (FMEA)
 

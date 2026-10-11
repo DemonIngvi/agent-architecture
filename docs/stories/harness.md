@@ -1,6 +1,6 @@
 # User Stories: Harness
 
-← [Все истории](README.md) · [потоки](../flows/harness.md)
+← [Все истории](README.md) · [как работает](../techspec/harness.md#how)
 
 > Сгенерировано из `html-view/stories.py` — правьте там.
 

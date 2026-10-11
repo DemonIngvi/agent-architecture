@@ -1,6 +1,6 @@
 # R&D: Тулы агента — MCP, прямые вызовы, нативные тулы
 
-← [Все R&D](README.md) · [методология R&D v3.1](../rules/rnd-methodology.md) · компонент: **MCP / Tools** · решение: [design D2, D7](../../openspec/changes/define-agent-platform/design.md) · спека: [tool-integration](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md) · потоки: [MCP / Tools](../flows/mcp-tools.md)
+← [Все R&D](README.md) · [методология R&D v3.1](../rules/rnd-methodology.md) · компонент: **MCP / Tools** · решение: [design D2, D7](../../openspec/changes/define-agent-platform/design.md) · спека: [tool-integration](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md) · потоки: [MCP / Tools](../techspec/mcp-tools.md#how)
 
 <div class="rnd-hero" markdown>
 <div class="rnd-q">Вопрос</div>
@@ -322,7 +322,7 @@ Allowlist (R-MCP-02) и G2 (R-GRD-03) исполняются в Harness — вн
 | Исполнение кода поверх MCP | [BACKLOG](../BACKLOG.md) | ✅ внесено в бэклог |
 | ContextForge, agentgateway — Assess | [TECHNOLOGIES](../TECHNOLOGIES.md) | ✅ внесено |
 | Правила R-MCP-04 | спека tool-integration | — не требуется |
-| Потоки MCP | [потоки](../flows/mcp-tools.md) | ✅ внесено: потоки 1–3 через прокси Runner |
+| Потоки MCP | [потоки](../techspec/mcp-tools.md#how) | ✅ внесено: потоки 1–3 через прокси Runner |
 
 <span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.
 

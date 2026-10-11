@@ -96,7 +96,7 @@ def sync_stories():
             continue
         procs = BPMN.get(slug, [])
         idx.append(f"| [{name}]({slug}.md) | {len(lst)} | {len(procs) or '—'} |")
-        L = [f"# User Stories: {name}", "", "← [Все истории](README.md) · [потоки](../flows/" + slug + ".md)", "",
+        L = [f"# User Stories: {name}", "", "← [Все истории](README.md) · [как работает](../techspec/" + slug + ".md#how)", "",
              "> Сгенерировано из `html-view/stories.py` — правьте там.", ""]
         typ = {"start": "начало", "task": "задача", "gateway": "развилка", "end": "конец", "error": "ошибка"}
         for i, pr in enumerate(procs):
@@ -117,6 +117,9 @@ def sync_stories():
             for sid0, (chain, end) in CHAINS.items():
                 L.append(f"| [{sid0}](#{sid0.lower()}) | " + " → ".join(f"[{x}]({where[x]}.md#{x.lower()})" for x in chain) + f" | {end} |")
             L.append("")
+        extra = HERE / "stories_extra" / f"{slug}.md"  # процесс и правила пользователя вне BPMN (О-52)
+        if extra.exists():
+            L += [extra.read_text(encoding="utf-8").strip(), ""]
         L += ["## Сводка", "", "| История | Персона | Хочу | Точка входа | Требований |", "|---|---|---|---|---|"]
         L += [f"| [{s[0]}](#{s[0].lower()}) | {PERSONAS.get(s[1], (ROLES.get(s[1], s[1]),))[0]} | {s[2]} | {s[6] if len(s) > 6 else '—'} | {len(s[5]) or '⚠️ 0'} |" for s in lst]
         L += ["", "## Истории", ""]
@@ -480,8 +483,9 @@ def copy_sources():
         txt = txt.replace("<!-- docgraph -->", graph_svg(docgraph.LAYERS, docgraph.EDGES))
         if rel.as_posix().startswith("docs/rnd/") or rel.as_posix() == "docs/rules/rnd-methodology.md":
             txt = rnd_highlight(txt)
-        if rel.as_posix().startswith("docs/flows/"):
-            txt = IG.flow_page(txt, rel.stem, IG.names(COMPONENTS))  # О-46: потоки — ссылками, без копий
+        if rel.as_posix().startswith("docs/techspec/") or rel.as_posix() in ("docs/data-types.md", "architecture.md"):
+            base = "../" * (len(rel.parts) - 1)
+            txt = IG.flow_page(txt, rel.stem, IG.names(COMPONENTS), base)  # О-46, О-52: модели — ссылками, матрица интерфейсов — из datamodel
         if rel.as_posix().startswith("docs/api/") and rel.name != "README.md":
             txt = IG.api_page_structure(txt)  # О-45: структура запросов и ответов из OpenAPI форка и datamodel
         dst.write_text(txt, encoding="utf-8")
@@ -557,7 +561,6 @@ def write_pagebar_map():
                 pages[tasks[t]] = slug
     pages.setdefault(f"{AP}/tasks.md", "icplan")
     for slug, *_ in COMPONENTS:
-        pages[f"docs/flows/{slug}.md"] = slug
         pages[f"docs/stories/{slug}.md"] = slug
     for slug, name, st, g, desc, links, docs, tids in COMPONENTS:
         for _, p in docs:
@@ -841,7 +844,7 @@ def _spec_readiness(spec: str) -> dict:
     slug = next((c[0] for c in COMPONENTS for _, pth in c[6] if pth == spec), None)
     conn = 5 if (folder / "architecture.md").exists() else 0
     conn += 5 if f"specs/{cap}/spec.md" in (SRC / "architecture.md").read_text(encoding="utf-8") else 0
-    conn += 5 if slug and (SRC / f"docs/flows/{slug}.md").exists() else 0
+    conn += 5 if slug and "## Как работает" in ((SRC / f"docs/techspec/{slug}.md").read_text(encoding="utf-8") if (SRC / f"docs/techspec/{slug}.md").exists() else "") else 0
     for h in ("## Нагрузка и развёртывание",):
         fail += 2 if h in it else 0
     fail = min(fail, 15)
@@ -932,9 +935,9 @@ def write_component_pages():
             '<div><div class="about-label">Отдаёт</div>'
             f'<ul class="does">{"".join(f"<li>{code(x)}</li>" for x in gave)}</ul></div></div>'
             '</div><aside class="about-side">'
-            f'<div class="side-card"><div class="side-head"><span class="dtype dtype-flow">ПОТОКИ</span>'
-            f'<a class="side-all" href="{href(page, f"docs/flows/{slug}.md")}">открыть →</a></div>'
-            '<ul><li>Шаги, типы данных, примеры</li></ul></div>'
+            f'<div class="side-card"><div class="side-head"><span class="dtype dtype-flow">КАК РАБОТАЕТ</span>'
+            f'<a class="side-all" href="{href(page, f"docs/techspec/{slug}.md")}#how">открыть →</a></div>'
+            '<ul><li>Порядок работы, запуск, конфигурация</li></ul></div>'
             f'<div class="side-card"><div class="side-head"><span class="dtype dtype-rnd">R&amp;D</span>'
             f'<a class="side-all" href="{href(page, f"rnd-by-component/{slug}/index.md")}">все →</a></div><ul>'
             + "".join(f'<li><a href="{href(page, p)}">{esc(lab)}</a></li>' for lab, p in REFS.get(slug, []) if p.startswith("docs/rnd/"))
@@ -1059,8 +1062,6 @@ def nav_yaml() -> str:
         if subs:
             L.append("    - Компоненты:")
             L += [item(6, title, sub_page(slug, title)) for title in subs]
-        if (SRC / f"docs/flows/{slug}.md").exists():
-            L += ["    - Потоки:", item(6, "Потоки " + name, f"docs/flows/{slug}.md")]
         if (SRC / f"docs/stories/{slug}.md").exists():
             L += ["    - User Stories:", item(6, "User Stories " + name, f"docs/stories/{slug}.md")]
         L += ["    - Спеки:", item(6, "Спеки " + name, f"specs-by-component/{slug}/index.md")]
@@ -1081,7 +1082,7 @@ def nav_yaml() -> str:
         L += [item(6, title_of(SRC / p, p).replace("R&D: ", ""), p) for p in rs]
     # Разделы сайта (doc-types.md#tabs): архитектура → требования → R&D → план → справка
     L += ["  - Архитектура:", item(4, "Компоненты (таблица)", "overview.md"), item(4, "Схемы C1 / C2", "architecture.md"),
-          item(4, "Сквозной поток", "docs/flows/README.md"), item(4, "Типы данных и интерфейсы", "docs/flows/data-types.md"),
+          item(4, "Типы данных и интерфейсы", "docs/data-types.md"),
           item(4, "Модель данных", "data-model.md"), item(4, "Каталог API", "docs/api/README.md"), item(4, "Техспеки компонентов", "docs/techspec/README.md")]
     L.append("    - Решения (OpenSpec):")
     for ch in sorted(p for p in (SRC / "openspec/changes").iterdir() if p.is_dir() and p.name != "archive"):

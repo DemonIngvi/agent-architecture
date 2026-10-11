@@ -1,6 +1,6 @@
 # User Stories: Memory
 
-← [Все истории](README.md) · [потоки](../flows/memory.md)
+← [Все истории](README.md) · [как работает](../techspec/memory.md#how)
 
 > Сгенерировано из `html-view/stories.py` — правьте там.
 

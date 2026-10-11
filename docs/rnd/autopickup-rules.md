@@ -1,6 +1,6 @@
 # R&D: Автоподхват задач агентом
 
-← [Все R&D](README.md) · [методология R&D v3.1](../rules/rnd-methodology.md) · компонент: **ICPlan** · решение: [design D17](../../openspec/changes/define-agent-platform/design.md) · спека: [icplan-agent-autopickup](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · поток: [процесс задачи](../flows/icplan.md#process)
+← [Все R&D](README.md) · [методология R&D v3.1](../rules/rnd-methodology.md) · компонент: **ICPlan** · решение: [design D17](../../openspec/changes/define-agent-platform/design.md) · спека: [icplan-agent-autopickup](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · поток: [процесс задачи](../stories/icplan.md#process)
 
 <div class="rnd-hero" markdown>
 <div class="rnd-q">Вопрос</div>
@@ -298,7 +298,7 @@ n8n или Temporal умеют ветвления и ожидания, но пр
 | Решение D17 | design | ✅ подтверждено, без изменений |
 | Требования R-AP-01 – R-AP-23 | спека icplan-agent-autopickup | — не требуется |
 | Задачи 3.1, 3.6 | [задачи](../TASKS.md) | — не требуется |
-| Поток процесса | [поток ICPlan](../flows/icplan.md#process) | — не требуется |
+| Поток процесса | [поток ICPlan](../stories/icplan.md#process) | — не требуется |
 | Стыки I1, I2, I20 | спеки | — не требуется |
 
 <span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.

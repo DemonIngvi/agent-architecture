@@ -321,7 +321,7 @@ OPA решает «можно ли вызвать тул с такими арг�
 | Детектор инъекций как вариант G4 | [R-GRD-05](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-05) | — не требуется: R-GRD-05 задаёт хуки G4, детектор выбирается при включении G4 (бэклог) |
 | Решения D6, D18 (OPA v1.21.1, p95 ≤ 20 мс, кэш 60 с) | design | ✅ подтверждено, без изменений |
 | Стыки I5, I10, I16, S11 | спека guardrails | — не требуется |
-| Поток guardrails | [поток](../flows/guardrails.md) | — не требуется |
+| Поток guardrails | [поток](../techspec/guardrails.md#how) | — не требуется |
 | Техспека guardrails | [техспека](../techspec/guardrails.md) | — не требуется |
 
 <span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.

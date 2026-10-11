@@ -278,7 +278,7 @@ stack Документы: 4 ok, 0 part, 3 mute
 | Предупреждение агенту перед остановкой | [BACKLOG](../BACKLOG.md) | ✅ внесено в бэклог |
 | Решения D6, D18 | design | ✅ подтверждено, без изменений |
 | Параметры `loop.*`, `limits.*`, `budget.*` | [interfaces guardrails](../../openspec/changes/define-agent-platform/specs/guardrails/interfaces.md) | — не требуется |
-| Поток guardrails | [поток](../flows/guardrails.md) | — не требуется |
+| Поток guardrails | [поток](../techspec/guardrails.md#how) | — не требуется |
 | Статусы запуска | R-RUN-07 | — не требуется |
 
 <span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.

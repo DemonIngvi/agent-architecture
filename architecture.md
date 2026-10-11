@@ -21,7 +21,7 @@
                              └──────────┘ └──────────────┘
 ```
 
-Интеграция с ICPlan: Agent Runner — внешний раннер ICPlan (забирает запуски, шлёт события и итог, получает решения пользователя в ответе heartbeat). Интерфейсы — [матрица I1–I23](docs/flows/data-types.md), поля — [Модель данных](data-model.md), вызовы — [каталог API](docs/api/README.md).
+Интеграция с ICPlan: Agent Runner — внешний раннер ICPlan (забирает запуски, шлёт события и итог, получает решения пользователя в ответе heartbeat). Интерфейсы — [матрица I1–I23](docs/data-types.md), поля — [Модель данных](data-model.md), вызовы — [каталог API](docs/api/README.md).
 
 ## C2 — Containers (внутренняя структура)
 
@@ -64,6 +64,44 @@ ICPlan назначает агента на задачу. Agent Runner толь�
                               ▼
                  Anthropic │ OpenAI │ local
 ```
+
+## Взаимодействие компонентов {#interaction}
+
+Сквозной поток MVP: пользователь двигает задачу — агент выполняет — итог возвращается в задачу. Форматы данных ниже — **черновик контрактов**, уточняются в задачах [1.2](docs/tasks/1.2-agent-definition-yaml.md) и [2.1](docs/tasks/2.1-runner-external.md).
+
+```
+Пользователь   ICPlan            Agent Runner      Sandbox+Harness      LiteLLM   MCP / Memory
+    │ статус →     │                   │                   │                │           │
+    ├─────────────▶│ ① автоподхват     │                   │                │           │
+    │              │ ② run в очередь   │                   │                │           │
+    │              │◀──────────────────┤ ③ опрос очереди   │                │           │
+    │              │                   │ ④ G1 допуск       │                │           │
+    │              │                   ├──────────────────▶│ ⑤ claim + bundle               │
+    │              │                   │                   ├───────────────▶│ ⑥ LLM     │
+    │              │                   │                   ├───────────────────────────▶│ ⑦ тулы, память
+    │              │◀──────────────────┤◀──────────────────┤ ⑧ события      │           │
+    │ approve  ───▶│──────────────────▶│──────────────────▶│ ⑨ пауза/ответ  │           │
+    │              │◀──────────────────┤◀──────────────────┤ ⑩ итог         │           │
+    │              │                   ├──────────────────▶│ ⑪ destroy      │           │
+    │              │ ⑫ агент сменил статус → следующий агент (снова ①)       │           │
+```
+
+| # | Шаг | От → к | Данные | Канал |
+|---|---|---|---|---|
+| ① | Задача вошла в статус с агентом-делегатом | ICPlan → ICPlan | событие `issue.state_changed` | внутри ICPlan |
+| ② | Запуск в очередь | ICPlan → БД | `Run` (pending) | БД ICPlan |
+| ③ | Runner забирает запуск | Runner → ICPlan | `Run` | HTTP, ключ агента |
+| ④ | Допуск и бюджет | Runner → OPA | `PolicyInput` G1 → `PolicyDecision` | HTTP |
+| ⑤ | Выдача sandbox и задания | Runner → Harness | `RunBundle` | HTTP / stdin |
+| ⑥ | Вызов модели | Harness → LiteLLM | `ChatCompletionRequest` (`metadata.run_id`) | OpenAI API |
+| ⑦ | Действия и память | Harness → MCP-прокси Runner → MCP / Memory | `McpToolCall`, `M3Record` | MCP, HTTP |
+| ⑧ | Шаги работы | Harness → Runner → ICPlan | `RunEvent` | поток событий |
+| ⑨ | Подтверждение | ICPlan → Runner → Harness | `ApprovalDecision` | HTTP |
+| ⑩ | Итог | Harness → Runner → ICPlan | `RunResult` | HTTP |
+| ⑪ | Уничтожение среды | Runner → Sandbox | `sandboxId` | Docker API |
+| ⑫ | Передача следующему этапу | агент → ICPlan | `update_issue` (статус) | MCP |
+
+Порядок работы каждого компонента — раздел «Как работает» его техспеки; поля данных — [Модель данных](data-model.md); типы данных по интерфейсам — [типы данных и интерфейсы](docs/data-types.md).
 
 ## Развёртывание (C4 deployment)
 

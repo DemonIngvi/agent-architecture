@@ -38,7 +38,7 @@
 | spec.md | | R | R | | W | R | R | R | R | |
 | interfaces.md (конфигурация, данные, интерфейсы, FMEA, нагрузка) | | | | | R | W | W | R | R | |
 | traceability.md, open-questions.md | A | R | R | R | W | R | | | R | |
-| Потоки (`docs/flows`) | | | R | | R | W | | | R | |
+| Техспека: «Как работает» (`docs/techspec`) | | | R | | R | W | | | R | |
 | TECHNOLOGIES.md | A | | | W | | R | R | R | | |
 | Задачи (`docs/tasks`), ROADMAP, TASKS | A | W | | | W (приёмка) | R | R | | R | статус задачи |
 | Ревью (`docs/reviews`) | R | | | | | W (проверяющий) | W | W | W | |

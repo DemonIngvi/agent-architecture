@@ -328,7 +328,7 @@ ICPlan держит очередь каждого агента с арендой
 | Kueue для ёмкости узлов на этапе 4 | [R&D Kubernetes](kubernetes-runtime.md) | ✅ учтено при переводе R&D Kubernetes |
 | Решения D8, D14 | design | ✅ подтверждено, без изменений |
 | Слоты и аренда | спека agent-runner (R-RUN-02 – R-RUN-06) | — не требуется |
-| Стыки I1–I7, I22 | спека agent-runner, [поток Runner](../flows/agent-runner.md) | — не требуется |
+| Стыки I1–I7, I22 | спека agent-runner, [поток Runner](../techspec/agent-runner.md#how) | — не требуется |
 | Техспека Runner | [техспека](../techspec/agent-runner.md) | — не требуется |
 
 <span class="gate">G10</span> ✅ у каждого изменения есть документ и статус.
