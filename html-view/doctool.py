@@ -88,14 +88,14 @@ def route(path) -> str:
     gen = generated(path)
     types = _rows(RULES / "doc-types.md", "| Тип |")
     work = _rows(RULES / "doc-work.md", "| Документ |")
-    hit = None
-    for t in types:
-        for pat in _patterns(t.get("Где", "")):
+    hit, best = None, None
+    for t in types:  # побеждает строка, где путь стоит раньше: основное место документа (О-56)
+        for k, pat in enumerate(_patterns(t.get("Где", ""))):
             if fnmatch.fnmatch(r, pat) or fnmatch.fnmatch(r, pat.rstrip("/") + "/*") or r == pat.rstrip("/"):
-                hit = t
+                score = (0 if "*" not in pat else 1, k)  # точный путь важнее шаблона, затем порядок в «Где»
+                if best is None or score < best:
+                    hit, best = t, score
                 break
-        if hit:
-            break
     if not hit and not gen:
         return ""
     L = [f"Правила для `{r}` (doctool route; подробно — docs/rules/doc-work.md):"]
@@ -116,13 +116,37 @@ def route(path) -> str:
     return "\n".join(L)
 
 
+def tooling_check() -> list:
+    """Инструменты соответствуют правилам (О-56): методологии из таблицы существуют, пути в навыках и AGENTS.md есть,
+    route узнаёт основной путь каждого типа документа."""
+    issues = []
+    types = _rows(RULES / "doc-types.md", "| Тип |")
+    for t in types:
+        for f in re.findall(r"\]\(([\w.-]+\.md)", t.get("Методология", "")):
+            if not (RULES / f).exists():
+                issues.append(f"doc-types.md: методология {f} не найдена")
+        pats = _patterns(t.get("Где", ""))
+        if pats and "*" not in pats[0] and (ROOT / pats[0]).is_file():
+            got = route(ROOT / pats[0])
+            name = _plain(t.get("Тип", ""))
+            if got and f"Тип: {name}." not in got:
+                issues.append(f"doctool route {pats[0]}: выдаёт правила другого типа, ожидался «{name}»")
+    for f in [ROOT / "AGENTS.md", *ROOT.glob(".claude/skills/doc-*/SKILL.md")]:
+        for p in re.findall(r"`((?:html-view|docs|tools|\.claude|\.githooks)/[\w./-]+?)`", f.read_text(encoding="utf-8")):
+            if "<" in p or "*" in p:
+                continue
+            if not (ROOT / p).exists():
+                issues.append(f"{f.relative_to(ROOT).as_posix()}: путь `{p}` не существует")
+    return issues
+
+
 def check() -> list:
-    """Проверки сборки без сборки сайта."""
+    """Проверки сборки без сборки сайта + соответствие инструментов правилам."""
     sys.path.insert(0, str(HERE))
     with contextlib.redirect_stdout(io.StringIO()):
         import build as B
         issues = B.check_docs() + B.check_req_tasks()
-    return issues
+    return issues + tooling_check()
 
 
 RND = """# R&D: {title}
