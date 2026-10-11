@@ -228,7 +228,7 @@ Postgres SHALL резервироваться базовыми копиями и
 <a id="r-inf-13"></a>**ID:** `R-INF-13` · **Реализует задача:** [4.6](../../../../../docs/tasks/4.6-k8s-helm-ingress.md)
 
 ### Requirement: Хранилища данных
-Модуль SHALL хранить и читать свои данные только в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`), S6 (PostgreSQL 17 (тот же кластер), БД `litellm`), S7 (RustFS (S3 API), бакет `planner-attachments`), S9 (Конфиг деплоя: `values.yaml` (git, без секретов) + Secret / `.env` (вне git)) (`interfaces.md`); к данным других модулей — только через их API. Секреты MUST NOT храниться в БД и git.
+Модуль SHALL хранить свои данные только в S7 (RustFS (S3 API), бакет `planner-attachments`) (`interfaces.md`); данные S1, S6, S9 — доступ только через API или конфигурацию владельца. Секреты MUST NOT храниться в БД и git.
 
 #### Scenario: Запись в своё хранилище
 - **WHEN** модуль сохраняет вложения задач, артефакты агентов, резервные копии
@@ -238,9 +238,9 @@ Postgres SHALL резервироваться базовыми копиями и
 - **WHEN** S7 (RustFS (S3 API), бакет `planner-attachments`) не отвечает
 - **THEN** вложения и артефакты не сохраняются, итоги публикуются без вложений; копии БД вне площадки не затронуты
 
-#### Scenario: Доступ вне своих хранилищ
-- **WHEN** код platform-infrastructure обращается к таблицам вне S1, S6, S7, S9
-- **THEN** доступа нет: роль БД platform-infrastructure ограничена S1, S6, S7, S9
+#### Scenario: Прямой доступ к БД
+- **WHEN** код platform-infrastructure пытается подключиться к БД платформы напрямую
+- **THEN** подключение невозможно: в среде нет учётных данных БД и сетевого доступа к ней
 
 <a id="r-inf-14"></a>**ID:** `R-INF-14` · **Реализует задача:** [4.7](../../../../../docs/tasks/4.7-postgres-storage-backup.md)
 

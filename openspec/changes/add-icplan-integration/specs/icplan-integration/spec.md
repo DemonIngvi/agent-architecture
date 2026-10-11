@@ -228,7 +228,7 @@ ICPlan SHALL показывать агентов платформы в обще�
 <a id="r-icp-10"></a>**ID:** `R-ICP-10` · **Реализует задача:** [2.1](../../../../../docs/tasks/2.1-runner-external.md)
 
 ### Requirement: Хранилища данных
-Модуль SHALL хранить и читать свои данные только в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`), S7 (RustFS (S3 API), бакет `planner-attachments`) (`interfaces.md`); к данным других модулей — только через их API. Секреты MUST NOT храниться в БД и git.
+Модуль SHALL хранить свои данные только в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`), S7 (RustFS (S3 API), бакет `planner-attachments`) (`interfaces.md`). Секреты MUST NOT храниться в БД и git.
 
 #### Scenario: Запись в своё хранилище
 - **WHEN** модуль сохраняет агенты (вид, ключ, `enabled`), `agent_run` (очередь, аренда, итоги),…

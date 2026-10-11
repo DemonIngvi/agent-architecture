@@ -20,6 +20,7 @@
 |---|---|---|---|---|
 | **Сервис платформы** | agent-runner, agent-harness, agent-sandbox, agent-memory, llm-gateway, guardrails, observability, tool-integration | параметры уровня L0 (конфиг деплоя) и L1–L3 (настройки агента, запуск) | L0 — при перезапуске сервиса; L1–L3 — со следующего запуска, если не сказано иное (бюджеты LiteLLM — сразу) | Разработчик, DevOps-инженер |
 | **Модуль ICPlan** | icplan-integration, agent-registry, control-plane, icplan-agent-autopickup | настройки сущностей в интерфейсе ICPlan (агент, процесс, шаг, задача) | проверка при сохранении; действует со следующего запуска или перехода | Разработчик, Администратор |
+| **Образ на запуск** | agent-harness (среда sandbox) | параметры запуска в `RunBundle`, образ закреплён по digest | новый образ — для новых запусков, активные доделываются на прежнем | Разработчик, DevOps-инженер, Инженер сборки |
 | **Инфраструктура** | platform-infrastructure | Helm values и манифесты кластера | `helm upgrade` с поочерёдной заменой реплик; проверка схемой `values.schema.json` | DevOps-инженер |
 
 ## Таблица параметров {#params}

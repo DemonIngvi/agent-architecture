@@ -143,7 +143,7 @@ Observability SHALL отдавать сводку по задачам с аге�
 <a id="r-obs-07"></a>**ID:** `R-OBS-07` · **Реализует задача:** [3.3](../../../../../docs/tasks/3.3-run-events-timeline.md)
 
 ### Requirement: Хранилища данных
-Модуль SHALL хранить и читать свои данные только в S3 (Postgres ICPlan, схема `platform`), S6 (PostgreSQL 17 (тот же кластер), БД `litellm`) (`interfaces.md`); к данным других модулей — только через их API. Секреты MUST NOT храниться в БД и git.
+Модуль SHALL хранить свои данные только в S3 (Postgres ICPlan, схема `platform`) (`interfaces.md`); данные S6 — доступ только через API или конфигурацию владельца. Секреты MUST NOT храниться в БД и git.
 
 #### Scenario: Запись в своё хранилище
 - **WHEN** модуль сохраняет события запусков, слоты планировщика

@@ -42,8 +42,8 @@
 
 | ID | Хранилище | Что хранит | Владелец | Резервирование / срок |
 |---|---|---|---|---|
-| S5 | Postgres ICPlan, схема `harness_ckpt` | checkpoint LangGraph | Harness | 7 дней |
-| S10 | `/workspace` в контейнере | рабочие файлы запуска | Sandbox | удаляется с контейнером |
+| S5 | Postgres ICPlan, схема `harness_ckpt` | checkpoint LangGraph (Harness пишет и читает только через API Runner, I12) | Agent Runner | 7 дней |
+| S10 | `/workspace` в контейнере | рабочие файлы запуска | Sandbox / Harness | удаляется с контейнером |
 
 ## Интерфейсы обмена
 
@@ -61,7 +61,7 @@
 | | |
 |---|---|
 | **Нагрузка** (гипотеза, [R&D](../../../../../docs/rnd/load-profile.md)) | шаг цикла 5–20 с; ~0.1 RPS к LiteLLM на запуск; до 200 тыс. токенов на запуск |
-| **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | процесс внутри контейнера sandbox, образ `harness:<версия>`; ресурсы — профиль sandbox |
+| **Развёртывание** ([R&D](../../../../../docs/rnd/kubernetes-runtime.md)) | процесс внутри контейнера sandbox, образ `ghcr.io/demoningvi/agent-agent-harness:<версия>`; ресурсы — профиль sandbox |
 
 Детали форматов — [потоки](../../../../../docs/flows/harness.md).
 

@@ -321,7 +321,7 @@ ICPlan SHALL ставить запуск агента в очередь при: 
 <a id="r-ap-09"></a>**ID:** `R-AP-09` · **Реализует задача:** [3.1](../../../../../docs/tasks/3.1-icplan-autodelegate-status.md)
 
 ### Requirement: Хранилища данных
-Модуль SHALL хранить и читать свои данные только в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`) (`interfaces.md`); к данным других модулей — только через их API. Секреты MUST NOT храниться в БД и git.
+Модуль SHALL хранить свои данные только в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`) (`interfaces.md`). Секреты MUST NOT храниться в БД и git.
 
 #### Scenario: Запись в своё хранилище
 - **WHEN** модуль сохраняет процессы и шаги (`process`, `process_step`), флаги задач, Действия,…

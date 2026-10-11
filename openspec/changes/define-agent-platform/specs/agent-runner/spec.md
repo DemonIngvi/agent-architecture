@@ -13,8 +13,8 @@ Runner SHALL забирать запуск из очереди ICPlan по кл�
 - **WHEN** в очереди есть запуск агента, обслуживаемого Runner
 - **THEN** Runner берёт его, создаёт запись с `run_id` и статусом `queued`
 
-#### Scenario: Агент отключён или не найден
-- **WHEN** определение агента отключено или отсутствует
+#### Scenario: Агент выключен или не найден
+- **WHEN** агент выключен (R-ICP-17) или его определение отсутствует
 - **THEN** запуск завершается с ошибкой `agent_unavailable`, sandbox не создаётся
 
 #### Scenario: Указана версия агента
@@ -113,19 +113,19 @@ Runner MUST NOT запускать второй запуск по задаче, 
 <a id="r-run-06"></a>**ID:** `R-RUN-06` · **Реализует задача:** [2.7](../../../../../docs/tasks/2.7-runner-scheduler.md)
 
 ### Requirement: Статусы запуска
-Система SHALL вести статус каждого запуска: `queued`, `starting`, `running`, `succeeded`, `failed`, `canceled`, `limit_exceeded`, и отдавать его по `run_id` и событиями.
+Система SHALL вести статус каждого запуска: `queued`, `starting`, `running`, `waiting_approval`, `succeeded`, `failed`, `gate_failed`, `canceled`, `limit_exceeded` и передавать смену статуса в ICPlan событием (I2); терминальный статус — итогом `/agent-runs/{id}/result`.
 
-#### Scenario: Запрос статуса
-- **WHEN** ICPlan запрашивает статус по `run_id`
-- **THEN** система возвращает текущий статус, потраченные токены/$ и время
-
-#### Scenario: Неизвестный run_id
-- **WHEN** запрошен статус несуществующего запуска
-- **THEN** ошибка `run_not_found`
-
-#### Scenario: Событие смены статуса
+#### Scenario: Смена статуса
 - **WHEN** запуск перешёл из `queued` в `running`
-- **THEN** ICPlan получает событие смены статуса
+- **THEN** ICPlan получает событие смены статуса, в задаче виден новый статус
+
+#### Scenario: Терминальный статус
+- **WHEN** запуск завершился `gate_failed`
+- **THEN** итог с причиной отправлен в ICPlan, статус в ICPlan — `failed` с пометкой «не прошёл проверку»
+
+#### Scenario: Runner перезапущен
+- **WHEN** Runner перезапустился с активными запусками
+- **THEN** статусы активных запусков восстанавливаются из S3, ICPlan получает актуальный статус без дублей
 
 <a id="r-run-07"></a>**ID:** `R-RUN-07` · **Реализует задача:** [2.1](../../../../../docs/tasks/2.1-runner-external.md)
 
@@ -215,7 +215,7 @@ Runner SHALL собирать для запуска манифест рабоч�
 <a id="r-run-11"></a>**ID:** `R-RUN-11` · **Реализует задача:** [2.1](../../../../../docs/tasks/2.1-runner-external.md), [2.7](../../../../../docs/tasks/2.7-runner-scheduler.md), [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md)
 
 ### Requirement: Хранилища данных
-Модуль SHALL хранить и читать свои данные только в S2 (Postgres ICPlan, схема `platform`), S3 (Postgres ICPlan, схема `platform`), S9 (Конфиг деплоя: `values.yaml` (git, без секретов) + Secret / `.env` (вне git)) (`interfaces.md`); к данным других модулей — только через их API. Секреты MUST NOT храниться в БД и git.
+Модуль SHALL хранить свои данные только в S3 (Postgres ICPlan, схема `platform`), S5 (Postgres ICPlan, схема `harness_ckpt`) (`interfaces.md`); данные S2, S9 — доступ только через API или конфигурацию владельца. Секреты MUST NOT храниться в БД и git.
 
 #### Scenario: Запись в своё хранилище
 - **WHEN** модуль сохраняет события запусков, слоты планировщика
@@ -226,8 +226,8 @@ Runner SHALL собирать для запуска манифест рабоч�
 - **THEN** новые запуски не стартуют; события активных буферизуются в памяти Runner
 
 #### Scenario: Доступ вне своих хранилищ
-- **WHEN** код agent-runner обращается к таблицам вне S2, S3, S9
-- **THEN** доступа нет: роль БД agent-runner ограничена S2, S3, S9
+- **WHEN** код agent-runner обращается к таблицам вне S2, S3, S5, S9
+- **THEN** доступа нет: роль БД agent-runner ограничена S2, S3, S5, S9
 
 <a id="r-run-12"></a>**ID:** `R-RUN-12` · **Реализует задача:** [2.1](../../../../../docs/tasks/2.1-runner-external.md), [2.7](../../../../../docs/tasks/2.7-runner-scheduler.md)
 

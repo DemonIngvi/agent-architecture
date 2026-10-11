@@ -181,7 +181,7 @@ M4 SHALL вводиться вместе с RAG: запись фактов аг�
 <a id="r-mem-09"></a>**ID:** `R-MEM-09` · **Реализует задача:** [2.5](../../../../../docs/tasks/2.5-memory-m2-m3.md), [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md)
 
 ### Requirement: Хранилища данных
-Модуль SHALL хранить и читать свои данные только в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`), S4 (Postgres ICPlan, схема `platform`) (`interfaces.md`); к данным других модулей — только через их API. Секреты MUST NOT храниться в БД и git.
+Модуль SHALL хранить свои данные только в S4 (Postgres ICPlan, схема `platform`) (`interfaces.md`); данные S1 — доступ только через API или конфигурацию владельца. Секреты MUST NOT храниться в БД и git.
 
 #### Scenario: Запись в своё хранилище
 - **WHEN** модуль сохраняет состояние задач (M3); факты (M4)

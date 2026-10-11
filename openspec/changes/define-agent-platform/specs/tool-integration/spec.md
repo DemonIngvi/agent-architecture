@@ -143,7 +143,7 @@
 <a id="r-mcp-07"></a>**ID:** `R-MCP-07` · **Реализует задача:** [1.4](../../../../../docs/tasks/1.4-harness-mcp-tools.md), [2.8](../../../../../docs/tasks/2.8-config-storage-interfaces-fmea.md)
 
 ### Requirement: Хранилища данных
-Модуль SHALL хранить и читать свои данные только в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`) (`interfaces.md`); к данным других модулей — только через их API. Секреты MUST NOT храниться в БД и git.
+Модуль SHALL хранить свои данные только в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`) (`interfaces.md`). Секреты MUST NOT храниться в БД и git.
 
 #### Scenario: Запись в своё хранилище
 - **WHEN** модуль сохраняет mCP-серверы проекта, тулы и навыки, ссылки на секреты

@@ -39,6 +39,7 @@
 |---|---|---|---|---|
 | S2 | Postgres ICPlan, схема `platform` | настройки агентов, версии, профили sandbox и памяти, данные guardrails, параметры планирования | Platform module | вместе с S1 |
 | S3 | Postgres ICPlan, схема `platform`, таблицы `run_event`, `scheduler_slot` | события запусков, слоты планировщика | Agent Runner / Observability | события — 90 дней; слоты — оперативные |
+| S5 | Postgres ICPlan, схема `harness_ckpt` | checkpoint цикла Harness по API I12 | Agent Runner | 7 дней (`checkpoint.ttl`) |
 | S9 | Конфиг деплоя: `values.yaml` (git, без секретов) + Secret / `.env` (вне git) | параметры платформы, адреса, переключатели guardrails, секреты | эксплуатация | версии в git; секреты — вне git |
 
 ## Интерфейсы обмена

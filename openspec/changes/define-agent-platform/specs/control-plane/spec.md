@@ -160,7 +160,7 @@ Platform module — модуль ICPlan для настроек агентов, 
 <a id="r-cp-08"></a>**ID:** `R-CP-08` · **Реализует задача:** [4.4](../../../../../docs/tasks/4.4-platform-module.md)
 
 ### Requirement: Хранилища данных
-Модуль SHALL хранить и читать свои данные только в S2 (Postgres ICPlan, схема `platform`), S6 (PostgreSQL 17 (тот же кластер), БД `litellm`), S9 (Конфиг деплоя: `values.yaml` (git, без секретов) + Secret / `.env` (вне git)) (`interfaces.md`); к данным других модулей — только через их API. Секреты MUST NOT храниться в БД и git.
+Модуль SHALL хранить свои данные только в S2 (Postgres ICPlan, схема `platform`) (`interfaces.md`); данные S6, S9 — доступ только через API или конфигурацию владельца. Секреты MUST NOT храниться в БД и git.
 
 #### Scenario: Запись в своё хранилище
 - **WHEN** модуль сохраняет настройки агентов, версии, профили sandbox и памяти, данные…

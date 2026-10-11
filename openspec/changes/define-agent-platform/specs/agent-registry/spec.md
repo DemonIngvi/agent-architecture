@@ -126,7 +126,7 @@ Registry MUST отклонять сохранение определения а�
 <a id="r-reg-07"></a>**ID:** `R-REG-07` · **Реализует задача:** [2.3](../../../../../docs/tasks/2.3-config-from-icplan.md)
 
 ### Requirement: Хранилища данных
-Модуль SHALL хранить и читать свои данные только в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`), S2 (Postgres ICPlan, схема `platform`) (`interfaces.md`); к данным других модулей — только через их API. Секреты MUST NOT храниться в БД и git.
+Модуль SHALL хранить свои данные только в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`) (`interfaces.md`); данные S2 — доступ только через API или конфигурацию владельца. Секреты MUST NOT храниться в БД и git.
 
 #### Scenario: Запись в своё хранилище
 - **WHEN** модуль сохраняет определения агентов: модель, инструкция, тулы, навыки, MCP-серверы,…
