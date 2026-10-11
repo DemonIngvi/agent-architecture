@@ -1,0 +1,5019 @@
+{
+"appSetting": {
+"table": "app_setting",
+"cols": [
+{
+"name": "key",
+"type": "text",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "value",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "key",
+"type": "text",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "ciphertext",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "iv",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "auth_tag",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "redacted",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "color",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "team_creation",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"workspaceManager": {
+"table": "workspace_manager",
+"cols": [
+{
+"name": "workspace_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "workspace"
+},
+{
+"name": "user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "role",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"team": {
+"table": "team",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "workspace_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "workspace"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "slug",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "mcp_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "default_agent_ids",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"teamMember": {
+"table": "team_member",
+"cols": [
+{
+"name": "team_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "team"
+},
+{
+"name": "user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "role",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "source",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"project": {
+"table": "project",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "team_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "team"
+},
+{
+"name": "key",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "description",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "next_sequence",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "mcp_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "initiatives_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "dashboards_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "documents_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "notes_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "cycles_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "subtasks_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "checklists_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "issue_stats_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "points_estimate_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "time_estimate_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "time_logging_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "archived_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"projectSetting": {
+"table": "project_setting",
+"cols": [
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "key",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "value",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"userPreference": {
+"table": "user_preference",
+"cols": [
+{
+"name": "user_id",
+"type": "text",
+"pk": true,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "timezone",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "locale",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "theme",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "issue_open_mode",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "start_page",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "show_chat_by_default",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "issue_stats_open",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "issue_stats_view",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "issue_activity_view",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "auto_watch",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "hotkeys",
+"type": "jsonb",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "last_project_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "project"
+},
+{
+"name": "seen_version",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"teamRole": {
+"table": "team_role",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "team_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "team"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "is_default",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "permissions",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"projectMember": {
+"table": "project_member",
+"cols": [
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "role",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "role_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "teamRole"
+},
+{
+"name": "description",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "source",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "is_favorite",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "is_hidden",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"teamInvite": {
+"table": "team_invite",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "token",
+"type": "uuid",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "team_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "team"
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "project"
+},
+{
+"name": "email",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "team_role",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "project_role",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "role_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "teamRole"
+},
+{
+"name": "status",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "invited_by_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "accepted_by_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "responded_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+}
+]
+},
+"projectColumn": {
+"table": "project_column",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "state_type",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "color",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "position",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "wip_limit",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "wip_mode",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "auto_assign_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issueType": {
+"table": "issue_type",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "icon",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "color",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "is_default",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "position",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"labelGroup": {
+"table": "label_group",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "color",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"label": {
+"table": "label",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "group_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "labelGroup"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "color",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"aiAgent": {
+"table": "ai_agent",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "team_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "team"
+},
+{
+"name": "user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "username",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "kind",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "model_credential_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "integrationCredential"
+},
+{
+"name": "model",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "instructions",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "tools",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "temperature",
+"type": "doublePrecision",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "max_steps",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "trigger_on_mention",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "trigger_on_assign",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "delegation_delay_sec",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "api_key_ciphertext",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "api_key_iv",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "api_key_auth_tag",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "memory_enabled",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "memory_last_messages",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "owner_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "runner_scope",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "last_seen_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"agentSchedule": {
+"table": "agent_schedule",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "agent_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "aiAgent"
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "prompt",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "cron",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "timezone",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "status",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "next_run_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "last_run_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"agentRun": {
+"table": "agent_run",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "agent_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "aiAgent"
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "issue"
+},
+{
+"name": "schedule_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "agentSchedule"
+},
+{
+"name": "trigger",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "scheduled_for",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "source_activity_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "issueActivity"
+},
+{
+"name": "prompt",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "status",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "attempts",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "next_attempt_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "last_error",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "output",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "input_tokens",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "output_tokens",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "started_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "finished_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"agentChatThread": {
+"table": "agent_chat_thread",
+"cols": [
+{
+"name": "id",
+"type": "text",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "agent_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "aiAgent"
+},
+{
+"name": "user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "title",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "cli_session_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"agentChatMessage": {
+"table": "agent_chat_message",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "thread_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "agentChatThread"
+},
+{
+"name": "agent_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "aiAgent"
+},
+{
+"name": "role",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "content",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "status",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "attempts",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "next_attempt_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "last_error",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "started_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "finished_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"agentChatEvent": {
+"table": "agent_chat_event",
+"cols": [
+{
+"name": "id",
+"type": "bigserial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "message_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "agentChatMessage"
+},
+{
+"name": "payload",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"agentChatUsage": {
+"table": "agent_chat_usage",
+"cols": [
+{
+"name": "thread_id",
+"type": "text",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "agent_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "aiAgent"
+},
+{
+"name": "input_tokens",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "output_tokens",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"agentChatFavorite": {
+"table": "agent_chat_favorite",
+"cols": [
+{
+"name": "user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "agent_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "aiAgent"
+},
+{
+"name": "thread_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"integrationCredential": {
+"table": "integration_credential",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "team_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "team"
+},
+{
+"name": "integration_key",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "label",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "ciphertext",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "iv",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "auth_tag",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "redacted",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"gitProviderConnection": {
+"table": "git_provider_connection",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "team_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "team"
+},
+{
+"name": "provider",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "base_url",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "account_login",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "ciphertext",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "iv",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "auth_tag",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"gitManagedRepository": {
+"table": "git_managed_repository",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "connection_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "gitProviderConnection"
+},
+{
+"name": "external_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "full_name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "web_url",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "webhook_external_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "status",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "last_error",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"teamNotificationSetting": {
+"table": "team_notification_setting",
+"cols": [
+{
+"name": "team_id",
+"type": "integer",
+"pk": true,
+"nn": false,
+"ref": "team"
+},
+{
+"name": "ciphertext",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "iv",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "auth_tag",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "redacted",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "email_events",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "telegram_events",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"userTelegramAccount": {
+"table": "user_telegram_account",
+"cols": [
+{
+"name": "user_id",
+"type": "text",
+"pk": true,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "chat_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "username",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "first_name",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "link_code",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "link_code_expires_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "linked_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"notificationDelivery": {
+"table": "notification_delivery",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "channel",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "recipient",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "payload",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "status",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "attempts",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "next_attempt_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "last_error",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"agentSkill": {
+"table": "agent_skill",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "team_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "team"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "description",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "source",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "source_url",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "files",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"agentSkillLink": {
+"table": "agent_skill_link",
+"cols": [
+{
+"name": "agent_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "aiAgent"
+},
+{
+"name": "skill_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "agentSkill"
+}
+]
+},
+"agentTool": {
+"table": "agent_tool",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "team_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "team"
+},
+{
+"name": "tool_key",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "credential_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "integrationCredential"
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"agentToolLink": {
+"table": "agent_tool_link",
+"cols": [
+{
+"name": "agent_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "aiAgent"
+},
+{
+"name": "agent_tool_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "agentTool"
+}
+]
+},
+"customField": {
+"table": "custom_field",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "issue_type_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "issueType"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "field_type",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "member_scope",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "show_in_body",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "position",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"customFieldOption": {
+"table": "custom_field_option",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "field_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "customField"
+},
+{
+"name": "value",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "color",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "position",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"agentFieldTrigger": {
+"table": "agent_field_trigger",
+"cols": [
+{
+"name": "agent_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "aiAgent"
+},
+{
+"name": "field_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "customField"
+},
+{
+"name": "delay_sec",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issueTemplate": {
+"table": "issue_template",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "description",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "title_template",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "description_template",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "type_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "issueType"
+},
+{
+"name": "column_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "projectColumn"
+},
+{
+"name": "priority",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "assignee_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issueTemplateLabel": {
+"table": "issue_template_label",
+"cols": [
+{
+"name": "template_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issueTemplate"
+},
+{
+"name": "label_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "label"
+}
+]
+},
+"initiative": {
+"table": "initiative",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "title",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "description",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "status",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "owner_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "priority",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "start_date",
+"type": "date",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "target_date",
+"type": "date",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "position",
+"type": "doublePrecision",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"initiativeLabel": {
+"table": "initiative_label",
+"cols": [
+{
+"name": "initiative_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "initiative"
+},
+{
+"name": "label_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "label"
+}
+]
+},
+"initiativeAttachment": {
+"table": "initiative_attachment",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "public_id",
+"type": "uuid",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "initiative_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "initiative"
+},
+{
+"name": "filename",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "content_type",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "size_bytes",
+"type": "bigint",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"cycle": {
+"table": "cycle",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "goal",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "start_date",
+"type": "date",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "end_date",
+"type": "date",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "completed_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issue": {
+"table": "issue",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "sequence_number",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "type_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "issueType"
+},
+{
+"name": "initiative_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "initiative"
+},
+{
+"name": "cycle_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "cycle"
+},
+{
+"name": "column_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "projectColumn"
+},
+{
+"name": "parent_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "assignee_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "delegate_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "title",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "description",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "priority",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "estimate_points",
+"type": "numeric",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "estimate_minutes",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "start_date",
+"type": "date",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "due_date",
+"type": "date",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "position",
+"type": "doublePrecision",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "archived_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "share_token",
+"type": "uuid",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "share_extended",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issueCycle": {
+"table": "issue_cycle",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "cycle_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "cycle"
+},
+{
+"name": "entered_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "left_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+}
+]
+},
+"issueStatus": {
+"table": "issue_status",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "column_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "projectColumn"
+},
+{
+"name": "column_name",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "state_type",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "entered_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "left_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+}
+]
+},
+"issueLabel": {
+"table": "issue_label",
+"cols": [
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "label_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "label"
+}
+]
+},
+"issueLink": {
+"table": "issue_link",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "source_issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "target_issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "kind",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issueWatcher": {
+"table": "issue_watcher",
+"cols": [
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "subscribed",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issueFieldValue": {
+"table": "issue_field_value",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "field_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "customField"
+},
+{
+"name": "value_text",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "value_number",
+"type": "numeric",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "value_bool",
+"type": "boolean",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "value_date",
+"type": "date",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "value_datetime",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "value_datetime_end",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "value_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+}
+]
+},
+"issueFieldOption": {
+"table": "issue_field_option",
+"cols": [
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "field_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "customField"
+},
+{
+"name": "option_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "customFieldOption"
+}
+]
+},
+"issueAttachment": {
+"table": "issue_attachment",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "public_id",
+"type": "uuid",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "filename",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "content_type",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "size_bytes",
+"type": "bigint",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issueDevelopmentLink": {
+"table": "issue_development_link",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "provider",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "repository",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "kind",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "external_key",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "number",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "title",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "url",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "state",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "draft",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "source_branch",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "target_branch",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "head_sha",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "pipeline_status",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "pipeline_url",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issueDevelopmentCheck": {
+"table": "issue_development_check",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "development_link_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issueDevelopmentLink"
+},
+{
+"name": "external_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "app_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "status",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "url",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "head_sha",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"chatAttachment": {
+"table": "chat_attachment",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "public_id",
+"type": "uuid",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "uploaded_by_user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "filename",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "content_type",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "size_bytes",
+"type": "bigint",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issueImport": {
+"table": "issue_import",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "public_id",
+"type": "uuid",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "attachment_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "chatAttachment"
+},
+{
+"name": "status",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "mapping",
+"type": "jsonb",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "error_text",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issueChecklist": {
+"table": "issue_checklist",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "title",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "position",
+"type": "doublePrecision",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issueChecklistItem": {
+"table": "issue_checklist_item",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "checklist_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issueChecklist"
+},
+{
+"name": "content",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "done",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "position",
+"type": "doublePrecision",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issueWorklog": {
+"table": "issue_worklog",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "minutes",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "spent_on",
+"type": "date",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "note",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"issueActivity": {
+"table": "issue_activity",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "issue"
+},
+{
+"name": "initiative_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "initiative"
+},
+{
+"name": "kind",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "reply_to_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "actor_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "actor_name",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "body",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "action",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "payload",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "edited_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"projectView": {
+"table": "project_view",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "icon",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "filters",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "display",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "position",
+"type": "doublePrecision",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "share_token",
+"type": "uuid",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "share_extended",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"projectViewFavorite": {
+"table": "project_view_favorite",
+"cols": [
+{
+"name": "view_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "projectView"
+},
+{
+"name": "user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+}
+]
+},
+"projectDashboard": {
+"table": "project_dashboard",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "icon",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "layout",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "position",
+"type": "doublePrecision",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"projectDocument": {
+"table": "project_document",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "parent_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "title",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "content",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "content_json",
+"type": "jsonb",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "icon",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "metadata",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "full_width",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "is_private",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "is_locked",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "archived_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "archived_by_ancestor_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "position",
+"type": "doublePrecision",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "version",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "owner_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "created_by_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "updated_by_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"projectDocumentRevision": {
+"table": "project_document_revision",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "document_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "projectDocument"
+},
+{
+"name": "version",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "parent_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "title",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "content",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "content_json",
+"type": "jsonb",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "icon",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "metadata",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "full_width",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "is_private",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "is_locked",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "archived_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "position",
+"type": "doublePrecision",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "owner_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "created_by_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"projectDocumentPreference": {
+"table": "project_document_preference",
+"cols": [
+{
+"name": "document_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "projectDocument"
+},
+{
+"name": "user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "is_favorite",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"projectDocumentIssue": {
+"table": "project_document_issue",
+"cols": [
+{
+"name": "document_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "projectDocument"
+},
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "created_by_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"projectDocumentInitiative": {
+"table": "project_document_initiative",
+"cols": [
+{
+"name": "document_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "projectDocument"
+},
+{
+"name": "initiative_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "initiative"
+},
+{
+"name": "created_by_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"documentAsset": {
+"table": "document_asset",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "public_id",
+"type": "uuid",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "document_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "projectDocument"
+},
+{
+"name": "uploaded_by_user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "filename",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "content_type",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "size_bytes",
+"type": "bigint",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"noteBoard": {
+"table": "note_board",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "owner_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "created_by_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "canvas",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"noteBoardMember": {
+"table": "note_board_member",
+"cols": [
+{
+"name": "board_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "noteBoard"
+},
+{
+"name": "user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+}
+]
+},
+"projectAction": {
+"table": "project_action",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "name",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "icon",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "condition",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "effect",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "position",
+"type": "doublePrecision",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"webhook": {
+"table": "webhook",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "url",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "secret",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "events",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "is_active",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "consecutive_failures",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"webhookDelivery": {
+"table": "webhook_delivery",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "webhook_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "webhook"
+},
+{
+"name": "event_id",
+"type": "uuid",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "event_type",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "payload",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "status",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "attempts",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "next_attempt_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "last_error",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "response_status",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "response_body",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"importJob": {
+"table": "import_job",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "created_by_user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "source",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "phase",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "status",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "config",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "cursor",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "credential_ciphertext",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "credential_iv",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "credential_auth_tag",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "attempts",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "next_attempt_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "last_error",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"importRecord": {
+"table": "import_record",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "import_job_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "importJob"
+},
+{
+"name": "source_entity_type",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "source_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "source_display_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "local_entity_type",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "local_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"notification": {
+"table": "notification",
+"cols": [
+{
+"name": "id",
+"type": "serial",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "user_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": "user"
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "project"
+},
+{
+"name": "issue_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "issue"
+},
+{
+"name": "source_activity_id",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": "issueActivity"
+},
+{
+"name": "type",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "actor_user_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "actor_name",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "read_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "snoozed_until",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"revision": {
+"table": "revision",
+"cols": [
+{
+"name": "scope",
+"type": "text",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "project_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "rev",
+"type": "bigint",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"documentCollaboration": {
+"table": "document_collaboration",
+"cols": [
+{
+"name": "document_id",
+"type": "integer",
+"pk": true,
+"nn": false,
+"ref": "projectDocument"
+},
+{
+"name": "epoch",
+"type": "uuid",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "version",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "content_json",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "document_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "projectDocument"
+},
+{
+"name": "version",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "client_id",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "step",
+"type": "jsonb",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+},
+"documentComment": {
+"table": "document_comment",
+"cols": [
+{
+"name": "id",
+"type": "uuid",
+"pk": true,
+"nn": false,
+"ref": null
+},
+{
+"name": "document_id",
+"type": "integer",
+"pk": false,
+"nn": true,
+"ref": "projectDocument"
+},
+{
+"name": "parent_id",
+"type": "uuid",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "author_id",
+"type": "text",
+"pk": false,
+"nn": false,
+"ref": "user"
+},
+{
+"name": "body",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "quote",
+"type": "text",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "selection_from",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "selection_to",
+"type": "integer",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "orphaned",
+"type": "boolean",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "resolved_at",
+"type": "timestamp",
+"pk": false,
+"nn": false,
+"ref": null
+},
+{
+"name": "created_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+},
+{
+"name": "updated_at",
+"type": "timestamp",
+"pk": false,
+"nn": true,
+"ref": null
+}
+]
+}
+}

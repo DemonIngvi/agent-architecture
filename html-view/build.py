@@ -21,7 +21,8 @@ from subcomponents import SUB  # noqa: E402
 from stories import ARTIFACTS, BPMN, CHAINS, PERSONAS, ROLES, STORIES  # noqa: E402
 from diagrams import bpmn_svg, graph_svg  # noqa: E402
 import docgraph  # noqa: E402
-from components import ABOUT, AP, IO, BLOCKS, BY_SLUG, COMPONENTS, STATUS  # noqa: E402
+from components import ABOUT, AP, BLOCKS, BY_SLUG, COMPONENTS, STATUS  # noqa: E402
+import integrations as IG  # noqa: E402
 
 ROOT = HERE.parent
 BUILD = HERE / ".build"
@@ -328,6 +329,7 @@ def check_docs() -> list:
             issues.append(f"{sp.parent.name}: требований {n_req}, строк RTM {n_rtm}")
     import tasksmd  # О-39: tasks.md изменений = ROADMAP
     issues += tasksmd.check()
+    issues += IG.check(COMPONENTS)  # О-41: интеграции и модели
     rd = (ROOT / "docs/rnd/README.md").read_text(encoding="utf-8")  # О-34: структура R&D v3
     for f in sorted((ROOT / "docs/rnd").glob("*.md")):
         if f.name == "README.md":
@@ -473,6 +475,7 @@ def copy_sources():
     shutil.copy2(HERE / "assets" / "extra.css", SRC / "assets" / "extra.css")
     write_component_pages()
     write_rnd_consequences()
+    (SRC / "data-model.md").write_text(IG.data_model_page(COMPONENTS), encoding="utf-8")
     write_pagebar_map()
     check_links()
 
@@ -860,6 +863,7 @@ def write_component_pages():
         gtxt = f' <span class="g">{g}</span>' if g else ""
         head = f'<div class="comp-head"><span class="pill">{STATUS[st]}</span>{gtxt}</div>'
         chain, purpose, does = ABOUT.get(slug, ([], desc, []))
+        got, gave = IG.io_lists(slug, IG.names(COMPONENTS))  # из интеграций, не вручную
         ch = []
         for label, s in chain:
             if s == slug:
@@ -881,9 +885,9 @@ def write_component_pages():
             '<div class="about-label">Что делает</div>'
             f'<ul class="does">{"".join(f"<li>{esc(x)}</li>" for x in does)}</ul>'
             '<div class="io"><div><div class="about-label">Получает</div>'
-            f'<ul class="does">{"".join(f"<li>{code(x)}</li>" for x in IO.get(slug, ([], []))[0])}</ul></div>'
+            f'<ul class="does">{"".join(f"<li>{code(x)}</li>" for x in got)}</ul></div>'
             '<div><div class="about-label">Отдаёт</div>'
-            f'<ul class="does">{"".join(f"<li>{code(x)}</li>" for x in IO.get(slug, ([], []))[1])}</ul></div></div>'
+            f'<ul class="does">{"".join(f"<li>{code(x)}</li>" for x in gave)}</ul></div></div>'
             '</div><aside class="about-side">'
             f'<div class="side-card"><div class="side-head"><span class="dtype dtype-flow">ПОТОКИ</span>'
             f'<a class="side-all" href="{href(page, f"docs/flows/{slug}.md")}">открыть →</a></div>'
@@ -907,6 +911,7 @@ def write_component_pages():
                 "## Устройство", "",
                 f'<div class="map">{render_rows(BLOCKS.get(slug, []), page, slug)}</div>', ""]
         body += rationale_md(slug)
+        body += [""] + IG.integrations_md(slug, page, IG.names(COMPONENTS), href) + IG.models_md(slug) + IG.stores_md(slug, page, href)
         (SRC / page).parent.mkdir(parents=True, exist_ok=True)
         (SRC / page).write_text("\n".join(body), encoding="utf-8")
 
@@ -1050,7 +1055,7 @@ def nav_yaml() -> str:
             L.append(f"      - {q(ch.name)}:")
             L += [item(8, title_of(SRC / x, Path(x).parent.name), x) for x in rest]
     L += ["  - Справка:", item(4, "Компоненты (таблица)", "overview.md"), item(4, "Как читать", "docs/HOW-TO-READ.md"),
-          item(4, "Схемы C1 / C2 (текст)", "architecture.md"), item(4, "План документации", "docs/PLAN.md"), item(4, "Формат схем", "FORMAT.md"),
+          item(4, "Схемы C1 / C2 (текст)", "architecture.md"), item(4, "Модель данных", "data-model.md"), item(4, "План документации", "docs/PLAN.md"), item(4, "Формат схем", "FORMAT.md"),
           "    - Правила документации:", item(6, "Правила документации", "docs/rules/README.md"),
           item(6, "Критерии полноты спеки", "docs/rules/spec-criteria.md"), item(6, "Роли", "docs/rules/roles.md"),
           item(6, "Типы документов", "docs/rules/doc-types.md"), item(6, "Граф связности документов", "docs/rules/doc-graph.md"),

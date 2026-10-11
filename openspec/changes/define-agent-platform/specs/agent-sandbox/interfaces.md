@@ -47,6 +47,7 @@
 | I7 | Agent Runner ↔ Harness | HTTP внутри сети sandbox; события — NDJSON-поток | `RunBundle`, `RunEvent`, `RunResult`, `ApprovalDecision` | одноразовый токен запуска | поток | = `timeout_s` | переподключение с последнего `seq` | да, по `seq` |
 | I17 | Sandbox → egress-прокси → внешние хосты | HTTP / HTTPS (CONNECT) | — | allowlist хостов, подстановка секретов | синхронно | по хосту | нет | — |
 | I18 | Agent Runner → git-провайдер (токены) | HTTPS REST (GitHub App / Gitea API) | JSON | ключ приложения (Secret) | синхронно | 10 с | 2 раза | да |
+| I23 | Agent Runner → Kubernetes API (этап 4) | HTTPS REST (client-go) | JSON манифесты Pod / Job | ServiceAccount с правами только на namespace `itsaplan-agents` | синхронно | 30 с | 1 раз | create — нет |
 
 ## Нагрузка и развёртывание
 

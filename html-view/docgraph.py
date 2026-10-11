@@ -23,7 +23,7 @@ EDGES = [
     ("R&D", "design.md", "решение D-номер"),
     ("R&D", "Данные сайта (components.py)", "RATIONALE, REFS, SUB"),
     ("design.md", "architecture.md", "раздел и «Обоснование»"),
-    ("architecture.md", "Данные сайта (components.py)", "BLOCKS, ABOUT, IO"),
+    ("architecture.md", "Данные сайта (components.py)", "BLOCKS, ABOUT; интеграции и данные — datamodel.py"),
     ("architecture.md", "spec.md", "границы и названия"),
     ("Данные сайта (components.py)", "Схема capability", "блоки схемы"),
     ("spec.md", "traceability.md", "строка RTM"),

@@ -105,6 +105,9 @@ _процесс типа задачи_
 ```json
 { "issueType": "Фича", "owner": "user:lead", "firstStep": "sdd",
   "steps": [ { "id": "sdd", "column": "SDD", "agent": "agent:analyst", "maxRuns": 3, "requireReview": false,
+               "deliverable": "spec.md и tasks.md в ветке задачи",
+               "doneCriteria": [ { "text": "у каждого требования есть сценарий", "origin": "process" } ],
+               "criteriaApproval": "review",
                "onSuccess": { "step": "code" }, "onFailure": { "step": "help" } } ] }
 ```
 
@@ -113,7 +116,10 @@ _процесс типа задачи_
 _состояние задачи_
 
 ```json
-{ "issue_key": "MKT-42", "scope": "issue", "agent": "analyst", "done": ["…"], "next": ["…"], "blockers": ["…"] }
+{ "issue_key": "MKT-42", "scope": "issue", "agent": "analyst", "done": ["…"], "next": ["…"], "blockers": ["…"],
+  "artifacts": [ { "path": "openspec/changes/mkt-42/spec.md", "ref": "agent/MKT-42@a1b2c3" } ],
+  "questions": [ "…" ],
+  "criteria_next": [ { "text": "тест на пустой список", "origin": "agent:analyst" } ] }
 ```
 
 ### PolicyInput / PolicyDecision

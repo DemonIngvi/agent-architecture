@@ -15,19 +15,7 @@
 
 ## Данные
 
-Таблица событий (черновик):
-
-```sql
-create table run_event (
-  run_id    text        not null,
-  seq       int         not null,
-  ts        timestamptz not null,
-  type      text        not null,   -- tool_call, llm_call, needs_approval, ...
-  data      jsonb       not null,
-  issue_key text        not null,
-  primary key (run_id, seq)
-);
-```
+Таблица событий `run_event` (ключ `run_id` + `seq`, `run_id` → `agent_run.id`, тип, время, `data` jsonb, ключ задачи) — поля и связи в [Модели данных](../../data-model.md#s3) (источник `html-view/datamodel.py`; SQL здесь не дублируется — правило О-43).
 
 Агрегат затрат:
 

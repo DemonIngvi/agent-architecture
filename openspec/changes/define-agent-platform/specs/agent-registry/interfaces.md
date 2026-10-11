@@ -40,6 +40,9 @@
 |---|---|---|---|---|---|---|---|---|
 | I20 | ICPlan UI ↔ ICPlan API | HTTP REST (существующий) | JSON | сессия пользователя | синхронно | — | — | — |
 | I1 | ICPlan → Agent Runner: определение агента в выданном запуске (`/agent-runs/claim`) | HTTP REST | JSON `Run` с агентом и версией | Bearer ключ агента | pull | 10 с | backoff до 60 с | аренда: выдаётся одному Runner |
+| I2 | Agent Runner → ICPlan (шаги, итог) | HTTP REST | JSON-пакеты `RunEvent` с `seq`, `RunResult` | Bearer API-ключ агента | асинхронно | 10 с | повтор с дедупликацией по (run_id, seq) | да, по (run_id, seq) |
+| I3 | ICPlan → Agent Runner (approve, отмена) | HTTP REST, опрос состояния запуска | JSON `ApprovalDecision`, статус | Bearer API-ключ агента | pull | 10 с | backoff | да, по (run_id, seq) |
+| I21 | Пользователи → Traefik → web / api / mcp | HTTPS (TLS 1.2+), HTTP/2 | HTML / JSON | сессия ICPlan; ACME-сертификат | синхронно | 60 с (ingress) | нет | — |
 
 ## Нагрузка и развёртывание
 

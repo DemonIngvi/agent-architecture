@@ -55,6 +55,7 @@
 | I7 | Agent Runner ↔ Harness | HTTP внутри сети sandbox; события — NDJSON-поток | `RunBundle`, `RunEvent`, `RunResult`, `ApprovalDecision` | одноразовый токен запуска | поток | = `timeout_s` | переподключение с последнего `seq` | да, по `seq` |
 | I9 | Harness → MCP-прокси Agent Runner → MCP-серверы (D19) | MCP Streamable HTTP, JSON-RPC 2.0 | `tools/list` (фильтр по allowlist запуска), `tools/call` (allowlist и G2 в Runner) | токен запуска до Runner; учётные данные сервера подставляет Runner из Secret | синхронно | 30 с | чтение — 2 раза; запись — нет | запись — нет |
 | I10 | Agent Runner → OPA (G2 для вызовов MCP, D19) | HTTP REST `POST /v1/data/agent/g2` | JSON `PolicyInput` / `PolicyDecision` | внутренняя сеть | синхронно | 200 мс | нет → `on_engine_error` | да |
+| I12 | Harness → Agent Runner (checkpoint, приём) | HTTP внутри сети sandbox: `PUT / GET /runs/{id}/checkpoint`; Runner пишет в схему `harness_ckpt` (S5) | LangGraph checkpoint | одноразовый токен запуска (учётных данных БД в sandbox нет) | синхронно | 5 с | 3 раза | да, по (run_id, step) |
 | I18 | Agent Runner → git-провайдер (токены) | HTTPS REST (GitHub App / Gitea API) | JSON | ключ приложения (Secret) | синхронно | 10 с | 2 раза | да |
 | I19 | Agent Runner / ICPlan → объектное хранилище (RustFS) | S3 API | файлы | ключи сервиса (Secret) | синхронно | 30 с | 3 раза | да, по ключу объекта |
 | I22 | Сервисы → PgBouncer → Postgres | протокол PostgreSQL | SQL | логин / пароль из Secret, роль на схему | синхронно | 5 с на запрос | 1 раз (только чтение) | — |

@@ -45,6 +45,7 @@
 | I22 | Сервисы → PgBouncer → Postgres | протокол PostgreSQL | SQL | логин / пароль из Secret, роль на схему | синхронно | 5 с на запрос | 1 раз (только чтение) | — |
 | I23 | Agent Runner → Kubernetes API (этап 4) | HTTPS REST (client-go) | JSON манифесты Pod / Job | ServiceAccount с правами только на namespace `itsaplan-agents` | синхронно | 30 с | 1 раз | create — нет |
 | I19 | Agent Runner / ICPlan → объектное хранилище (RustFS) | S3 API | файлы | ключи сервиса (Secret) | синхронно | 30 с | 3 раза | да, по ключу объекта |
+| I14 | LiteLLM → БД `litellm` | протокол PostgreSQL | таблицы LiteLLM | пароль из Secret | синхронно | 5 с | встроенный | — |
 
 ## Нагрузка и развёртывание
 
