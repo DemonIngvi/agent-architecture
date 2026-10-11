@@ -27,6 +27,8 @@
 | `PLATFORM_API_URL`, `PLATFORM_TOKEN` | настройки агентов | Secret |
 | `DOCKER_HOST` | rootless Docker | values |
 | `HARNESS_IMAGE` | образ sandbox | values |
+| секреты MCP-серверов (`auth.secret_ref`) | MCP-прокси подставляет учётные данные (D19) | Secret в `itsaplan-agents`, чтение — ServiceAccount Runner |
+| `SETUP_NETWORK` | сеть шага подготовки `sbx-setup` | values |
 
 ## Сборка и поставка
 

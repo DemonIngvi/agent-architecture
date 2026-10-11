@@ -33,9 +33,9 @@ pos Архитектор: -1 | всё, что нужно, есть: NetworkPolic
 pos Безопасность: 2 | RKE2 защищён по CIS из коробки
 # Что меняется
 > D15 и D16 подтверждены; провайдер sandbox для K8s добавлен в 4.6
-stack Документы: 4 ok, 1 part, 3 mute
+stack Документы: 5 ok, 0 part, 3 mute
 - ✅ задача 4.6: провайдер sandbox (Pod или agent-sandbox, RuntimeClass) · ✅ CIS-проверка узла
-- ✅ TECHNOLOGIES: RKE2, Talos, Kueue — Assess · 📌 R-INF-02: CIS-профиль
+- ✅ TECHNOLOGIES: RKE2, Talos, Kueue — Assess · ✅ R-INF-02: сценарий CIS
 ```
 
 **Почему k3s.** Три вывода:
@@ -205,7 +205,7 @@ RKE2 закрывает рекомендации CIS из коробки. У k3s
 | Функция | Решение | Как | Где |
 |---|---|---|---|
 | k3s, Helm, k3d, namespaces, NetworkPolicy, SA | оставить | D15, D16 | задача 4.6 |
-| CIS-защита | адаптировать | проверка узла k3s по CIS (kube-bench), исправления по руководству k3s | подзадача 4.6.9; 📌 R-INF-02 |
+| CIS-защита | адаптировать | проверка узла k3s по CIS (kube-bench), исправления по руководству k3s | подзадача 4.6.9; R-INF-02 |
 | Провайдер сред в K8s | брать | Runner создаёт Pod или `SandboxClaim` (agent-sandbox) через I23; RuntimeClass после 2.2.8 | подзадача 4.6.8 |
 | Kueue | не брать сейчас | один узел, ёмкость держат слоты Runner | [R&D Runner](runner-and-scheduling.md) |
 | Talos, облако, HA | не брать | Э5 | — |
@@ -310,7 +310,7 @@ RKE2 закрывает рекомендации CIS из коробки. У k3s
 | Провайдер сред в K8s: Pod или agent-sandbox (`SandboxClaim`), RuntimeClass после 2.2.8 | [задача 4.6](../tasks/4.6-k8s-helm-ingress.md) (подзадача 4.6.8) | ✅ внесено |
 | CIS-проверка узла k3s (kube-bench) | задача 4.6 (подзадача 4.6.9) | ✅ внесено |
 | RKE2, Talos, Kueue — Assess | [TECHNOLOGIES](../TECHNOLOGIES.md) | ✅ внесено |
-| CIS-профиль узла как требование | [R-INF-02](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-02) | 📌 предложено |
+| CIS-профиль узла как требование | [R-INF-02](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-02) | ✅ внесено: сценарий «Защита узла» |
 | Решения D15, D16, D18 | design | ✅ подтверждено, без изменений |
 | Стыки I21, I23 | спека platform-infrastructure | — не требуется |
 | Техспека инфраструктуры | [техспека](../techspec/infrastructure.md) | — не требуется до 4.6.8 |

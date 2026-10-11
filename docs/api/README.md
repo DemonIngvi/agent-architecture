@@ -76,10 +76,10 @@ _итог (`/agent-runs/:id/result`)_
 
 ### ApprovalDecision
 
-_решение пользователя_
+_решение пользователя; `scope`: `once` — только этот вызов, `run` — до конца запуска (R-GRD-03)_
 
 ```json
-{ "runId": 1042, "seq": 8, "decision": "approve", "by": "user:anna", "comment": null }
+{ "runId": 1042, "seq": 8, "decision": "approve", "scope": "once", "by": "user:anna", "comment": null }
 ```
 
 ### UserMessage

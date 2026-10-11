@@ -35,9 +35,9 @@ pos Владелец продукта: -1 | сроки этапов 2 и 4
 pos Безопасность: 1 | агент запускает чужой код
 # Что меняется
 > D18 подтверждён; в задачу 2.2 добавлена проверка gVisor
-stack Документы: 5 ok, 1 part, 2 mute
+stack Документы: 6 ok, 0 part, 2 mute
 - ✅ задача 2.2: проверка gVisor · ✅ TECHNOLOGIES: gVisor, Daytona архивирован, версия Squid
-- 📌 параметр `runtime` профиля (runc / runsc) — после проверки
+- ✅ параметр `runtime` профиля: по умолчанию runc, runsc — после проверки 2.2.8
 ```
 
 **Почему одноразовый контейнер с пулом.** Три вывода:
@@ -208,7 +208,7 @@ stack Документы: 5 ok, 1 part, 2 mute
 | Функция | Решение | Как | Где |
 |---|---|---|---|
 | Одноразовый контейнер, пул, rootless | брать | как в D18 | задачи 2.2, 4.1 |
-| gVisor | адаптировать | проверка в 2.2: образ Harness под runsc — git, Python, тесты, сеть через Squid, время старта; при успехе — параметр профиля `runtime` | задача 2.2 (подзадача 2.2.8); 📌 R-SBX-05 |
+| gVisor | адаптировать | проверка в 2.2: образ Harness под runsc — git, Python, тесты, сеть через Squid, время старта; при успехе — параметр профиля `runtime` | задача 2.2 (подзадача 2.2.8); R-SBX-05 |
 | Пул как объект K8s (agent-sandbox) | адаптировать | провайдер этапа 4 | [R&D Kubernetes](kubernetes-runtime.md) |
 | Kata, Firecracker, снимки | не брать сейчас | Assess: нужен KVM; вернуться при внешнем недоверенном коде | TECHNOLOGIES |
 | Вложенный Docker | не брать | нет истории | — |
@@ -291,7 +291,7 @@ stack Документы: 5 ok, 1 part, 2 mute
 
 | Спор | Разрешение |
 |---|---|
-| Безопасность: «общее ядро — недопустимо» | ✅ **внесено:** проверка gVisor в 2.2.8; 📌 параметр `runtime` после проверки |
+| Безопасность: «общее ядро — недопустимо» | ✅ **внесено:** проверка gVisor в 2.2.8; параметр `runtime` в профиле |
 | Адвокат дьявола: «пул держит ресурсы впустую» | **условие:** `pool.size` 2 при `global_max` 4; 0 — без пула (параметр уже есть) |
 | DevOps: «а если runsc сломает сеть через Squid?» | **условие:** проверка I17 в 2.2.8; при провале — runc + seccomp-профиль по умолчанию |
 
@@ -329,7 +329,7 @@ stack Документы: 5 ok, 1 part, 2 mute
 | Проверка gVisor: образ Harness под runsc, сеть через Squid, время старта | [задача 2.2](../tasks/2.2-sandbox-docker-oneshot.md) (подзадача 2.2.8) | ✅ внесено |
 | gVisor — Assess; Daytona архивирован (не используем) | [TECHNOLOGIES](../TECHNOLOGIES.md) | ✅ внесено |
 | Версия Squid: TECHNOLOGIES 7.7 против образа `ubuntu/squid:6` в техспеке | TECHNOLOGIES, [техспека Sandbox](../techspec/sandbox.md) | ✅ внесено: в TECHNOLOGIES — образ `ubuntu/squid` 6.x (upstream 7.7) |
-| Параметр профиля `runtime`: runc / runsc | [interfaces agent-sandbox](../../openspec/changes/define-agent-platform/specs/agent-sandbox/interfaces.md), [R-SBX-05](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md#r-sbx-05) | 📌 предложено: после проверки 2.2.8 |
+| Параметр профиля `runtime`: runc / runsc | [interfaces agent-sandbox](../../openspec/changes/define-agent-platform/specs/agent-sandbox/interfaces.md), [R-SBX-05](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md#r-sbx-05) | ✅ внесено: по умолчанию runc; значение по умолчанию пересматривается после 2.2.8 |
 | agent-sandbox (пул как объект K8s) — провайдер этапа 4 | [R&D Kubernetes](kubernetes-runtime.md) | ✅ учтено при переводе R&D Kubernetes |
 | Решение D18 (rootless Docker, Squid) | design | ✅ подтверждено, без изменений |
 | Стыки I6, I7, I17, I23 | спека agent-sandbox, [поток Sandbox](../flows/sandbox.md) | — не требуется |

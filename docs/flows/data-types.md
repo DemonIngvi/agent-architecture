@@ -29,8 +29,8 @@
 | I6 | Agent Runner → Docker API | Т4 (профиль среды), Т6 |
 | I7 | Agent Runner ↔ Harness | Т6 (`RunBundle`), Т1, Т2, Т4, Т7, Т8 |
 | I8 | Harness → LiteLLM | Т1, Т2, Т8, Т7 (`metadata`), Т5 (virtual key) |
-| I9 | Harness → MCP-серверы | Т6 (вызов), Т8 (вывод), Т3 |
-| I10 | Harness → OPA (G2) | Т6, Т4 |
+| I9 | Harness → MCP-прокси Runner → MCP-серверы (D19) | Т6 (вызов), Т8 (вывод), Т3 |
+| I10 | Harness → OPA (G2); для MCP — Runner (D19) | Т6, Т4 |
 | I11 | Harness → Memory API | Т2 |
 | I12 | Harness → Agent Runner: checkpoint | Т2 (состояние цикла) |
 | I13 | LiteLLM → провайдеры / mock | Т1, Т2, Т8, Т5 (ключ провайдера) |

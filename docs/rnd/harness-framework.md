@@ -216,7 +216,7 @@ Hermes Agent силён: подтверждения, 7 видов термина
 | Checkpointer | адаптировать | свой saver: `PUT / GET /runs/{id}/checkpoint` в Runner | I12, R-HRN-11 |
 | События графа | адаптировать | преобразование в `RunEvent` NDJSON | I7, R-HRN-06 |
 | Подтверждение на тул | оставить | уже есть: `approval.tools` из guardrails | R-HRN-05 |
-| «Одобрить один раз / на сессию» (Hermes) | адаптировать | поле в `ApprovalDecision`: только этот вызов или до конца запуска | 📌 предложено в R-GRD-03 |
+| «Одобрить один раз / на сессию» (Hermes) | адаптировать | поле в `ApprovalDecision`: только этот вызов или до конца запуска | R-GRD-03, поле `scope` в `ApprovalDecision` |
 | «Умное» подтверждение (Hermes) | не брать сейчас | нужна оценка ложных пропусков; в бэклог | [BACKLOG](../BACKLOG.md) |
 | Durable execution на Temporal | не брать | новый сервис, состояние у Runner | — |
 | Память, расписание, sandbox Hermes | не брать | это наши компоненты | — |
@@ -348,7 +348,7 @@ Hermes Agent силён: подтверждения, 7 видов термина
 | Статус LangGraph: Trial до прототипа | [TECHNOLOGIES](../TECHNOLOGIES.md) | ✅ внесено |
 | Альтернативы в решении D2: OpenAI SDK, PydanticAI, ADK, MAF, Hermes | [design D2](../../openspec/changes/define-agent-platform/design.md) | ✅ внесено |
 | «Умное» подтверждение (Hermes) | [BACKLOG](../BACKLOG.md) | ✅ внесено в бэклог |
-| «Одобрить только этот вызов / до конца запуска» в `ApprovalDecision` | [R-GRD-03](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-03), I7 | 📌 предложено: на ревью спеки guardrails |
+| «Одобрить только этот вызов / до конца запуска» в `ApprovalDecision` | [R-GRD-03](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-03), I7 | ✅ внесено: сценарий в R-GRD-03, поле `scope`, подзадача 1.5.6 |
 | Решение D2 и версия 1.2.14 | design D2, D18 | ✅ подтверждено, без изменений |
 | Стыки I7–I12 | спека agent-harness, [поток Harness](../flows/harness.md) | — не требуется: протоколы не меняются |
 | Техспека Harness | [техспека](../techspec/harness.md) | — не требуется |

@@ -758,7 +758,7 @@ def _spec_readiness(spec: str) -> dict:
         fail += 2 if h in it else 0
     fail = min(fail, 15)
     oqf = folder / "open-questions.md"
-    oq = [l for l in oqf.read_text(encoding="utf-8").splitlines() if l.startswith("| ОВ-")] if oqf.exists() else []
+    oq = [l for l in oqf.read_text(encoding="utf-8").splitlines() if l.startswith("| ") and re.search(r"\| (❓|📌) \|", l)] if oqf.exists() else []  # О-38: по колонке типа, а не по префиксу ID
     n_q = sum(1 for l in oq if "| ❓ |" in l); n_d = sum(1 for l in oq if "| 📌 |" in l)
     pen = min(2 * n_q, 10) + min(4 * n_d, 16)
     dup = duplicates(cap)

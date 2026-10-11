@@ -33,9 +33,9 @@ pos Администратор: 0 | затраты и статистика — �
 pos Разработчик: 2 | разбор промптов и evals
 # Что меняется
 > D12 подтверждён; RunEvent сопоставлен с OTel GenAI
-stack Документы: 4 ok, 1 part, 3 mute
+stack Документы: 4 ok, 0 part, 4 mute
 - ✅ каталог API: RunEvent → OTel GenAI · ✅ TECHNOLOGIES: Phoenix, Opik — Assess
-- 📌 после MVP: экспорт событий в OTel (вопрос выбора платформы — прототип)
+- — экспорт в OTel: после MVP, в бэклоге
 ```
 
 **Почему таблица событий.** Три вывода:
@@ -312,7 +312,7 @@ Langfuse и Phoenix сильнее в разборе промптов и evals. 
 | Phoenix, Opik — Assess | [TECHNOLOGIES](../TECHNOLOGIES.md) | ✅ внесено |
 | Эталонные задачи 1.3.9 — первый датасет evals | [задача 1.3](../tasks/1.3-harness-core.md) | ✅ учтено (подзадача 1.3.9 из R&D фреймворка) |
 | Экспорт событий в OTel и выбор платформы после MVP | [BACKLOG](../BACKLOG.md) (строка Langfuse) | ✅ внесено в бэклог |
-| Требование экспорта в OTel | [R-OBS-01](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-01) | 📌 предложено: после MVP |
+| Требование экспорта в OTel | [R-OBS-01](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-01) | — не требуется до MVP: соответствие — в каталоге API, экспорт — в бэклоге |
 | Решение D12 | design | ✅ подтверждено, без изменений |
 | Стыки I2, I14, I20 | спека observability | — не требуется |
 | Поток observability | [поток](../flows/observability.md) | — не требуется |
