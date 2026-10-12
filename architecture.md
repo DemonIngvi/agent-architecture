@@ -1,262 +1,131 @@
-# Агентная архитектура (v0.8)
+# Агентная архитектура (v0.9)
 
-Модель C4: **C1** — наша система (Agent Platform) и её связь с ICPlan и внешним миром. **C2** — внутренняя структура платформы.
+Модель C4: **C1** — наша система (Agent Platform) и её связь с ICPlan и внешним миром (ниже). **C2** — карта платформы выше: компоненты и связи между ними. Устройство каждого компонента (C3) — на его вкладке «Архитектура». Схемы — по [FORMAT.md](FORMAT.md).
 
 ## C1 — System Context
 
+```mermaid
+flowchart LR
+  classDef self fill:#c5cae9,color:#1a237e,stroke:#1a237e,stroke-width:3px
+  classDef comp fill:#e8eaf6,stroke:#5c6bc0,color:#1a237e
+  classDef user fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+  classDef ext fill:#fff3e0,stroke:#ef6c00,color:#e65100,stroke-dasharray:4 3
+  U(["Пользователь ICPlan"]):::user
+  A(["Администратор платформы"]):::user
+  IC["ICPlan<br/><small>задачи, процесс, чат запуска</small>"]:::comp
+  P["Agent Platform<br/><small>Runner, Sandbox, Harness, Memory, Guardrails, LLM Gateway</small>"]:::self
+  L(["LLM-провайдеры"]):::ext
+  X(["Внешние системы, MCP, git"]):::ext
+  U -->|"задачи, approve"| IC
+  A -->|"агенты, модели, правила"| IC
+  P -->|"I1–I3: запуски, события, итог ↩ решения"| IC
+  P -->|"I24: тулы ICPlan (MCP)"| IC
+  P -->|"I13: запросы к моделям"| L
+  P -->|"I17, I18: исходящий трафик, git"| X
 ```
-┌──────────────┐               ┌───────────────┐
-│ Пользователь │               │ Администратор │
-│ ICPlan       │               │ платформы     │
-└──────┬───────┘               └───────┬───────┘
-       │ задачи                        │ агенты, модели, правила
-┌──────▼───────┐ задача, approve ┌─────▼───────┐
-│   ICPlan     ├────────────────▶│ Agent       │
-│              │◀────────────────┤ Platform    │
-└──────────────┘ события,        └──┬───────┬──┘
-                 результат          │ LLM   │ tools
-                             ┌──────▼───┐ ┌─▼────────────┐
-                             │ LLM-     │ │ Внешние      │
-                             │ провайд. │ │ системы, MCP │
-                             └──────────┘ └──────────────┘
-```
 
-Интеграция с ICPlan: Agent Runner — внешний раннер ICPlan (забирает запуски, шлёт события и итог, получает решения пользователя в ответе heartbeat). Интерфейсы — [матрица I1–I23](docs/data-types.md), поля — [Модель данных](data-model.md), вызовы — [каталог API](docs/api/README.md).
-
-## C2 — Containers (внутренняя структура)
-
-ICPlan назначает агента на задачу. Agent Runner только исполняет.
-
-Верхний блок **ICPlan** — то, что уже есть в It's a Plan и дорабатывается в нём. Всё ниже — наша платформа.
-
-```
-┌──────────────────── ICPlan (It's a Plan) ────────────────────┐
-│ ┌───────────┐ ┌───────────┐ ┌─────────────┐  ┌─────────────┐ │
-│ │ Control   │ │ Registry  │ │ Run Queue   │  │ Task UI     │ │
-│ │ Plane UI  ├▶│ агенты,   │ │ + runner API│  │ доска, чат  │ │
-│ │ настройки │ │ тулы,MCP  │ │ (внешн.)    │  │ запуска     │ │
-│ └───┬───────┘ └─────┬─────┘ └───┬───▲─────┘  └─────────────┘ │
-└─────┼───────────────┼───────────┼───┼────────────────────────┘
-      │ доп.настройки │ agent def │   │ стрим, результат
-      │             ┌─▼───────────▼───┴──┐
-      │             │ Agent Runner [G1]  │
-      │             │ допуск, лимиты, $  │
-      │             └─────────┬──────────┘
-      │                       │ up(agent_def) / run / cleanup
-┌─────▼─────┐     ┌───────────▼ Sandbox [G3] ──────────────────┐
-│ Platform  ├────▶│ ┌─────────────── Harness ────────────────┐ │       ┌────────────┐
-│ мод.ICPlan│     │ │ ┌──────────────┐                       │ │       │ Memory API │
-│ автономия │     │ │ │ Context Mgr  │◀──────────────────────┼─┼──────▶│ M3 (M4)    │
-│ бюджеты   │     │ │ └──┬───────▲───┘                       │ │  r/w  │ M1 M2 M5 M6│
-│ профили   │     │ │    │prompt │ ответ + результат тула    │ │       │ — в ICPlan │
-│ доступы   │     │ │ ┌──▼───────┴───┐        ┌───────────┐  │ │       └────────────┘
-│ версии    │     │ │ │ LLM client   ├───────▶│ Tool Exec │  │ │ MCP-  ┌────────────┐
-└─────┬─────┘     │ │ └───────┬──────┘        │ MCP client│◀─┼─┼прокси▶│ MCP/Tools  │
-      │ правила   │ │         │               └───────────┘  │ │Runner └────────────┘
-┌─────▼─────┐     │ │         │ [G2] hooks: тулы,память,итог │ │
-│ Guardrail ├────▶│ │         │ policy: лимиты шагов, права  │ │
-│ Policy    │     │ └─────────┼──────────────────────────────┘ │
-│ G1 G2 G3  │     └───────────┼────────────────────────────────┘
-│ G4        │                 │ prompt ▼ ▲ ответ
-└─────┬─────┘       ┌─────────▼─────────┐
-      └────────────▶│ LiteLLM gw   [G4] ├──▶ Observability (события AG-UI, токены, $)
-                    └─────────┬─────────┘
-                              ▼
-                 Anthropic │ OpenAI │ local
-```
+Интеграция с ICPlan: Agent Runner — внешний раннер ICPlan (забирает запуски, шлёт события и итог, получает решения пользователя в ответе heartbeat). Стыки каждого компонента — вкладка «Интеграции», типы данных и матрица интерфейсов — [Справка](docs/data-types.md).
 
 ## Взаимодействие компонентов {#interaction}
 
-Сквозной поток MVP: пользователь двигает задачу — агент выполняет — итог возвращается в задачу. Форматы данных ниже — **черновик контрактов**, уточняются в задачах [1.2](docs/tasks/1.2-agent-definition-yaml.md) и [2.1](docs/tasks/2.1-runner-external.md).
+Сквозной поток MVP: пользователь двигает задачу — агент выполняет — итог возвращается в задачу. Правило оформления — [«Порядок работы и сценарии»](docs/rules/architecture-methodology.md#how); порядок работы каждого компонента — раздел «Как работает» на его вкладке «Архитектура».
 
+### Порядок работы и сценарии
+
+#### Порядок работы
+
+| # | Шаг | Участники | Данные | I | Сценарий |
+|---|---|---|---|---|---|
+| 1 | Задача вошла в шаг процесса с агентом | ICPlan → ICPlan | `delegateUserId` задачи | — | С1 |
+| 2 | Запуск в очередь | ICPlan → БД ICPlan | `Run` (pending) | — | С1 |
+| 3 | Runner забирает запуск | Agent Runner → ICPlan | `Run` | I1 | С1 |
+| 4 | Допуск и бюджет (G1) | Agent Runner → Guardrails | `PolicyInput` → `PolicyDecision` | I5 | С1 |
+| 5 | Среда и задание | Agent Runner → Sandbox, Harness | `SandboxClaim`, `RunBundle` | I6, I7 | С1 |
+| 6 | Вызов модели | Harness → LLM Gateway | `ChatCompletionRequest` | I8 | С1 |
+| 7 | Действия и память | Harness → MCP-прокси Runner → MCP; Harness → Memory | `McpToolCall`, `M3Record` | I9, I11 | С1 |
+| 8 | Шаги работы | Harness → Agent Runner → ICPlan | `RunEvent` | I7, I2 | С1 |
+| 9 | Подтверждение | ICPlan → Agent Runner → Harness | `ApprovalDecision` | I3, I7 | С1 |
+| 10 | Итог | Harness → Agent Runner → ICPlan | `RunResult` | I7, I2 | С1 |
+| 11 | Уничтожение среды | Agent Runner → Sandbox | `sandboxId` | I6 | С1 |
+| 12 | Переход задачи по итогу запуска — следующий шаг процесса (снова 1) | ICPlan → ICPlan | `process_step.on_success / on_failure` | — | С1 |
+
+#### С1. Сквозной поток MVP
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor U as Пользователь
+  participant IC as ICPlan
+  participant R as Agent Runner
+  participant G as Guardrails
+  participant H as Sandbox + Harness
+  participant L as LLM Gateway
+  participant M as MCP / Memory
+  U->>IC: двигает задачу
+  IC->>IC: агент шага — делегат, запуск в очередь
+  R->>IC: POST /agent-runs/claim (I1)
+  IC-->>R: Run ↩
+  R->>G: PolicyInput G1 (I5)
+  G-->>R: PolicyDecision ↩
+  R->>H: среда из пула, RunBundle (I6, I7)
+  loop шаги агента
+    H->>L: ChatCompletionRequest (I8)
+    L-->>H: ответ модели ↩
+    H->>M: тулы через MCP-прокси Runner, память (I9, I11)
+    H-->>R: RunEvent (I7)
+    R->>IC: события в чат запуска (I2)
+  end
+  opt нужно подтверждение
+    U->>IC: approve
+    IC-->>R: ApprovalDecision в ответе heartbeat ↩ (I3)
+    R->>H: ApprovalDecision (I7)
+  end
+  H-->>R: RunResult (I7)
+  R->>IC: итог запуска (I2)
+  R->>H: уничтожить среду (I6)
+  IC->>IC: переход по итогу запуска (D17) — следующий шаг
 ```
-Пользователь   ICPlan            Agent Runner      Sandbox+Harness      LiteLLM   MCP / Memory
-    │ статус →     │                   │                   │                │           │
-    ├─────────────▶│ ① автоподхват     │                   │                │           │
-    │              │ ② run в очередь   │                   │                │           │
-    │              │◀──────────────────┤ ③ опрос очереди   │                │           │
-    │              │                   │ ④ G1 допуск       │                │           │
-    │              │                   ├──────────────────▶│ ⑤ claim + bundle               │
-    │              │                   │                   ├───────────────▶│ ⑥ LLM     │
-    │              │                   │                   ├───────────────────────────▶│ ⑦ тулы, память
-    │              │◀──────────────────┤◀──────────────────┤ ⑧ события      │           │
-    │ approve  ───▶│──────────────────▶│──────────────────▶│ ⑨ пауза/ответ  │           │
-    │              │◀──────────────────┤◀──────────────────┤ ⑩ итог         │           │
-    │              │                   ├──────────────────▶│ ⑪ destroy      │           │
-    │              │ ⑫ агент сменил статус → следующий агент (снова ①)       │           │
-```
-
-| # | Шаг | От → к | Данные | Канал |
-|---|---|---|---|---|
-| ① | Задача вошла в статус с агентом-делегатом | ICPlan → ICPlan | событие `issue.state_changed` | внутри ICPlan |
-| ② | Запуск в очередь | ICPlan → БД | `Run` (pending) | БД ICPlan |
-| ③ | Runner забирает запуск | Runner → ICPlan | `Run` | HTTP, ключ агента |
-| ④ | Допуск и бюджет | Runner → OPA | `PolicyInput` G1 → `PolicyDecision` | HTTP |
-| ⑤ | Выдача sandbox и задания | Runner → Harness | `RunBundle` | HTTP / stdin |
-| ⑥ | Вызов модели | Harness → LiteLLM | `ChatCompletionRequest` (`metadata.run_id`) | OpenAI API |
-| ⑦ | Действия и память | Harness → MCP-прокси Runner → MCP / Memory | `McpToolCall`, `M3Record` | MCP, HTTP |
-| ⑧ | Шаги работы | Harness → Runner → ICPlan | `RunEvent` | поток событий |
-| ⑨ | Подтверждение | ICPlan → Runner → Harness | `ApprovalDecision` | HTTP |
-| ⑩ | Итог | Harness → Runner → ICPlan | `RunResult` | HTTP |
-| ⑪ | Уничтожение среды | Runner → Sandbox | `sandboxId` | Docker API |
-| ⑫ | Передача следующему этапу | агент → ICPlan | `update_issue` (статус) | MCP |
-
-Порядок работы каждого компонента — раздел «Как работает» его техспеки; поля данных — [Модель данных](data-model.md); типы данных по интерфейсам — [типы данных и интерфейсы](docs/data-types.md).
 
 ## Развёртывание (C4 deployment)
 
-```
-Пользователи ──HTTPS──▶ Traefik (k3s ingress, TLS) ──▶ itsaplan-core: web ×1–2 · api ×2 · worker · bot
-                                                      itsaplan-agents: Runner · LiteLLM ×2 · OPA ×2 · Memory · egress · запуски
-                                                      itsaplan-data: PgBouncer ─▶ PostgreSQL 17 + pgvector (CloudNativePG) · RustFS (S3)
-                                                      копии ─▶ S3 вне узла
-Узел: k3s, 8 vCPU / 32 ГБ / 400 ГБ (один узел для MVP)
+```mermaid
+flowchart LR
+  classDef user fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+  classDef ext fill:#fff3e0,stroke:#ef6c00,color:#e65100,stroke-dasharray:4 3
+  U(["Пользователи"]):::user -->|"HTTPS (I21)"| T["Traefik — k3s ingress, TLS"]
+  subgraph K["Узел k3s (один узел для MVP)"]
+    T
+    subgraph NC["itsaplan-core"]
+      W["web ×1–2 · api ×2 · worker · bot"]
+    end
+    subgraph NA["itsaplan-agents"]
+      AG["Runner · LiteLLM ×2 · OPA ×2 · Memory · egress · запуски"]
+    end
+    subgraph ND["itsaplan-data"]
+      PB["PgBouncer"] --> PG[("PostgreSQL 17 + pgvector<br/>CloudNativePG")]
+      RF[("RustFS (S3)")]
+    end
+    T --> W
+  end
+  PG -->|"копии"| S3[("S3 вне узла")]:::ext
 ```
 
-Профиль нагрузки MVP (гипотеза): до 50 пользователей, около 400 запусков агентов в день, 4 активных запуска; значения и пороги — [R&D: профиль нагрузки](docs/rnd/load-profile.md) и разделы «Нагрузка и производительность» спек.
-
-Подробно: спека [platform-infrastructure](openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md) и [схема](openspec/changes/define-agent-platform/specs/platform-infrastructure/architecture.md). Технологии — [сводная таблица](docs/TECHNOLOGIES.md). Обоснование: [R&D: профиль нагрузки](docs/rnd/load-profile.md) · [Kubernetes](docs/rnd/kubernetes-runtime.md) · [ingress](docs/rnd/ingress-and-balancing.md) · [СУБД и хранилища](docs/rnd/data-stores.md) · [design D15, D16](openspec/changes/define-agent-platform/design.md).
+Ресурсы узла и профиль нагрузки — [R&D: профиль нагрузки](docs/rnd/load-profile.md), разделы «Нагрузка и производительность» спек. Подробно: спека [platform-infrastructure](openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md) и [схема](openspec/changes/define-agent-platform/specs/platform-infrastructure/architecture.md). Технологии — [сводная таблица](docs/TECHNOLOGIES.md). Обоснование: [Kubernetes](docs/rnd/kubernetes-runtime.md) · [ingress](docs/rnd/ingress-and-balancing.md) · [СУБД и хранилища](docs/rnd/data-stores.md) · [design D15, D16](openspec/changes/define-agent-platform/design.md).
 
 ## Сквозные решения
 
-Что выбрано и почему — коротко; значения параметров, конфиги, поля и задачи — по ссылкам ([правило](docs/rules/doc-work.md#architecture)).
+Что выбрано — одной фразой; почему и подробности — в решении (design) и на странице компонента ([правило](docs/rules/architecture-methodology.md)).
 
-### Harness (внутри Sandbox)
-
-Рантайм агентского цикла: модель только «думает», всё остальное — сборку промпта, вызовы тулов, проверки, лимиты, остановку — делает Harness. Основа — **LangGraph** за своим интерфейсом: `interrupt` для подтверждений, checkpoint для возобновления, стрим шагов для ленты задачи. Обоснование: [R&D: фреймворк цикла](docs/rnd/harness-framework.md) · [design D2](openspec/changes/define-agent-platform/design.md). Блоки — [страница Harness](components/harness/index.md).
-
-### Guardrails
-
-Четыре точки: мягкие G1, G2 видят смысл, жёсткие G3, G4 не обойти. Логика правил (Rego) — в git, данные (тулы, лимиты, автономия) — в Platform module; каждая точка включается отдельно, выключенная не ломает платформу.
-
-| Точка | Где | Что проверяет |
-|---|---|---|
-| **G1 Admission** | Agent Runner → OPA | допуск запуска: агент включён, бюджет, kill switch |
-| **G2 Action** | Harness → OPA; для MCP — повторно в MCP-прокси Runner (D19) | действие агента: тул разрешён, нужна ли пауза на подтверждение |
-| **G3 Isolation** | Sandbox | сеть только через egress-прокси, файловая система, ресурсы |
-| **G4 LLM** | LiteLLM | модели агента, лимиты токенов и $ на ключ |
-
-Пороги защиты от зацикливания и перерасхода — [параметры guardrails](openspec/changes/define-agent-platform/specs/guardrails/interfaces.md), конфиг включения точек — [техспека Guardrails](docs/techspec/guardrails.md). Обоснование: [R&D: движок](docs/rnd/guardrails-engine.md) · [защита от перерасхода](docs/rnd/runaway-protection.md) · [design D6](openspec/changes/define-agent-platform/design.md).
-
-### Очередь и планирование запусков
-
-Очередь — в ICPlan; Agent Runner забирает запуск и стартует его, только когда свободны все слоты: общий, агента, модели, задачи (один активный запуск на задачу). Режимы — параллельный или строго последовательный. Параметры — [Agent Runner](openspec/changes/define-agent-platform/specs/agent-runner/interfaces.md). Обоснование: [R&D: Runner и очередь](docs/rnd/runner-and-scheduling.md) · [design D14](openspec/changes/define-agent-platform/design.md).
-
-### Исполнение: тёплый пул + одноразовое использование
-
-```
-┌──────────────┐ claim  ┌──────────────┐ run  ┌──────────────┐ destroy ┌──────────────┐
-│ Тёплый пул   ├───────▶│ Sandbox      ├─────▶│ Harness      ├────────▶│ Пул доливает │
-│ N на профиль │        │ (один запуск)│      │ работает     │         │ новый        │
-└──────▲───────┘        └──────────────┘      └──────────────┘         └──────┬───────┘
-       └──────────────────────────────────────────────────────────────────────┘
-```
-
-Старт за доли секунды, изоляция как у «контейнер на запуск»; рабочие данные в контейнере не живут. Профили и ресурсы — [Sandbox](openspec/changes/define-agent-platform/specs/agent-sandbox/interfaces.md), [техспека](docs/techspec/sandbox.md). Обоснование: [R&D: изоляция](docs/rnd/sandbox-isolation.md) · [design D1](openspec/changes/define-agent-platform/design.md).
-
-### Память M0–M6
-
-| Уровень | Что | Где |
-|---|---|---|
-| M0 рабочая | контекст запуска | Harness (процесс) |
-| M1 сессионная | переписка в треде | ICPlan (`agent_chat_message`) |
-| M2 эпизодическая | итоги прошлых запусков | ICPlan (`agent_run`) |
-| M3 задачная | сделано / дальше / блокеры, передача между шагами | Memory API, схема `platform` (`memory_m3`) |
-| M4 семантическая | факты, поиск по смыслу | Memory API, pgvector — после MVP |
-| M5 процедурная | инструкция, навыки | ICPlan (`ai_agent`, навыки) |
-| M6 организационная | документы проекта | ICPlan (документы) |
-
-Область видимости (задача, агент, проект, команда) — атрибут записи, не уровень. Поля и сроки — [Модель данных](data-model.md#s3), [Memory](components/memory/index.md). Обоснование: [R&D: модель памяти](docs/rnd/memory-model.md) · [design D4, D20](openspec/changes/define-agent-platform/design.md).
-
-### RAG
-
-Не в MVP: документы — через `get_document` (M6), код — агентным поиском тулами. RAG вводится, когда корпус перестаёт помещаться в навигацию; хранилище — pgvector, эмбеддер — локальный контейнер; новых уровней памяти не добавляет. Обоснование: [R&D: RAG](docs/rnd/rag.md) · [design D13](openspec/changes/define-agent-platform/design.md).
-
-### Хранение конфигурации
-
-| Что | Где |
-|---|---|
-| Определения агентов, MCP, тулы, навыки | БД ICPlan — источник правды |
-| Наши настройки: автономия, бюджеты, профили, доступы, данные guardrails | Platform module — модуль ICPlan, схема `platform` |
-| Ревью и перенос между окружениями | экспорт и импорт YAML ([`AgentDefinition`](data-model.md#model-agentdefinition)) |
-| Логика guardrails (Rego) | git: код, тесты `opa test`, ревью |
-
-Уровни параметров L0–L3 и их значения — в `interfaces.md` спек. Обоснование: [R&D: хранение конфигурации](docs/rnd/config-storage.md) · [design D9](openspec/changes/define-agent-platform/design.md).
-
-### MCP или прямой вызов
-
-Правила R1–R7 — часть решения D10:
-
-| # | Правило | Как |
-|---|---|---|
-| R1 | Последовательность известна заранее (детерминированно) | прямой вызов (REST / gRPC / SDK) |
-| R2 | Следующий шаг решает модель | тул агента |
-| R3 | Тул нужен нескольким агентам или держит секрет вне агента | MCP-сервер |
-| R4 | Тул один, стабильный, только внутри Harness | нативный тул Harness |
-| R5 | Пакетные и массовые операции | прямой вызов (MCP медленнее и дороже по токенам) |
-| R6 | Админ-функции | отдельные MCP-серверы по уровню доверия, рабочим агентам недоступны |
-| R7 | Внутренности платформы: Runner ↔ ICPlan, Harness ↔ LiteLLM, проверки G1–G4, автозапись M1, M2 | только прямой вызов |
-
-Агент ходит к MCP-серверам только через MCP-прокси Runner (D19). Серверы и тулы — [MCP / Tools](components/mcp-tools/index.md). Обоснование: [R&D](docs/rnd/mcp-vs-direct.md) · [design D10, D19](openspec/changes/define-agent-platform/design.md).
-
-### Рабочие данные и доступы
-
-Рабочие файлы — в `/workspace` среды и исчезают с ней. Код — ветка `agent/<задача>` и PR, запись в защищённые ветки запрещена. Документы и артефакты — папка задачи в RustFS. Права агента задаёт политика «агент × ресурс × право» в Platform module: `read` — вся папка и ветка задачи, `write` — своя подпапка шага; короткоживущий токен репозитория подставляет прокси, в среду он не попадает. Поля — [`WorkspaceSource`](data-model.md#model-workspacesource), [`RepoGrant`](data-model.md#model-repogrant); переменные среды — [техспека Sandbox](docs/techspec/sandbox.md). Обоснование: [R&D: рабочее пространство](docs/rnd/agent-workspace.md) · [design D11, D18](openspec/changes/define-agent-platform/design.md).
-
-### Observability
-
-События запуска пишутся всегда (`events.level: всё`, D18) в формате AG-UI и показываются в задаче чатом запуска: реплики агента, рассуждения, тулы, вопросы, итог (D21). Затраты — из журнала LiteLLM. Langfuse и метрики — [бэклог](docs/BACKLOG.md). Обоснование: [R&D: наблюдаемость](docs/rnd/observability.md) · [вид работы агента](docs/rnd/run-view.md) · [design D12, D21](openspec/changes/define-agent-platform/design.md).
-
-## Блоки
-
-| Блок | Задача | Нужен? |
-|---|---|---|
-| Agent Runner | жизненный цикл запуска: среда → запуск → лимиты, таймауты → итог → очистка; MCP-прокси | да — некому поднимать среду |
-| Control Plane UI (ICPlan) | настройка агентов | да — уже есть в ICPlan |
-| Platform module (модуль ICPlan) | настройки, которых нет в ICPlan: автономия, бюджеты, профили, доступы, данные guardrails | да |
-| Registry (ICPlan) | агенты, тулы, навыки, MCP, ключи | да — уже есть в ICPlan |
-| Run Queue + runner API (ICPlan) | очередь запусков, протокол внешнего раннера | да — точка входа Agent Runner |
-| Task UI (ICPlan) | доска, чат запуска, подтверждения, итог | да |
-| Sandbox | изоляция каждого запуска | да — требование |
-| Harness | агентский цикл + хуки | да — ядро |
-| Memory API | память M3 (позже M4) вне среды | да |
-| MCP / Tools | внешние действия агента | да |
-| Guardrail Policy (OPA) | Rego (git) + данные, решения для G1, G2 | да — одно место правды для политик |
-| LiteLLM | единственный выход к моделям, учёт токенов, fallback, G4 | да |
-| Observability | события запуска, лента задачи, затраты | да |
-
-Устройство каждого блока, интеграции и данные — на [страницах компонентов](README.md).
-
-## Расширения
-
-```
-новый агент   → ICPlan (UI / импорт YAML) ▶ Agent Runner берёт из очереди
-новая модель  → алиас в LiteLLM ──────▶ меняется в определении агента
-новый тул     → MCP-сервер в Registry ▶ подключается агенту (через MCP-прокси Runner)
-новый навык   → пакет (промпт + тулы) ─▶ Registry
-своя логика   → плагин ──▶ хуки Harness (до / после вызова модели или тула)
-новая политика→ Rego (git) + данные (Platform module) ▶ OPA ──▶ точка G1–G4
-```
-
-## Плюсы / минусы по модулям
-
-| Модуль | ➕ | ➖ |
-|---|---|---|
-| Agent Runner | простой, без логики планирования в агенте | единая точка отказа; после сбоя запуски возвращаются в очередь по аренде |
-| Control Plane | управление без кода | отдельный UI |
-| Registry | версии, переиспользование, сборка из конфига | нужна проверка связей |
-| Sandbox | безопасность, чистая среда | ресурсы на тёплый пул |
-| Harness | единые правила, хуки | хуки могут ломать цикл — строгий интерфейс |
-| Memory API | переживает перезапуск, передача между шагами | права, конкурентная запись, очистка |
-| MCP / Tools | стандарт, подключение без кода | ненадёжные внешние серверы — таймауты и права |
-| Guardrail Policy | правила в одном месте, версии | сложно отлаживать — нужен аудит решений |
-| G1 Admission | отсекает до запуска, дёшево | видит только метаданные |
-| G2 Action | понимает контекст действия | обходится при сломанном Harness — поэтому MCP проверяется повторно в Runner |
-| G3 Isolation | жёстко на уровне ОС | грубо, не понимает смысла |
-| G4 LLM | не обойти — весь трафик к моделям | не видит тулы, добавляет задержку |
-| LiteLLM | одна точка, смена модели, учёт токенов | лишний шаг, неполная поддержка функций провайдеров |
-| Observability | лента и затраты по задаче | объём данных, политика хранения |
-
-## Доработки
-
-Что есть в ICPlan и что дорабатываем — [сводная таблица задач](docs/TASKS.md) и вкладка «Задачи» каждого компонента; объём и порядок — [Roadmap](docs/ROADMAP.md).
+| Решение | Что выбрано | D | Подробно |
+|---|---|---|---|
+| Агентский цикл | Harness на LangGraph внутри sandbox: модель «думает», остальное — Harness | D2 | [Harness](components/harness/index.md) |
+| Guardrails | четыре точки: G1, G2 видят смысл (OPA), G3, G4 не обойти; Rego в git, данные в Platform module | D6, D19 | [Guardrails](components/guardrails/index.md) |
+| Очередь и планирование | очередь в ICPlan; Runner стартует запуск, когда свободны все слоты | D14 | [Agent Runner](components/agent-runner/index.md) |
+| Исполнение | тёплый пул + одноразовый контейнер на запуск | D1 | [Sandbox](components/sandbox/index.md) |
+| Память | уровни M0–M6, область видимости — атрибут записи; M3 — Memory API | D4, D20 | [Memory](components/memory/index.md) |
+| RAG | не в MVP: документы — `get_document`, код — агентный поиск | D13 | [Memory](components/memory/index.md) |
+| Хранение конфигурации | определения — БД ICPlan; наши настройки — Platform module; Rego — git; перенос — YAML | D9 | [Platform module](components/platform-module/index.md) |
+| MCP или прямой вызов | правила R1–R7; агент ходит к MCP только через MCP-прокси Runner | D10, D19 | [MCP / Tools](components/mcp-tools/index.md) |
+| Рабочие данные | `/workspace` исчезает со средой; код — ветка и PR; документы — в задачу | D11 | [Sandbox](components/sandbox/index.md) |
+| Observability | события пишутся всегда в формате AG-UI, показываются в задаче чатом запуска | D12, D18, D21 | [Observability](components/observability/index.md) |
+| Ход задачи | процесс задачи: шаг = колонка + агент, переход делает ICPlan по итогу | D17 | [ICPlan](components/icplan/index.md) |

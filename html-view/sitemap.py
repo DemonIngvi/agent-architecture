@@ -15,7 +15,7 @@ ROOT = HERE.parent
 
 # не отдельные страницы сайта
 NOT_PAGE_DIRS = ("docs/how/",)  # «Как работает» встраивается в страницу компонента
-NOT_PAGES = {"README.md", "architecture.md", "docs/data-types.md", "docs/api/README.md", "docs/techspec/README.md",
+NOT_PAGES = {"README.md", "architecture.md", "docs/api/README.md", "docs/techspec/README.md",
              "docs/stories/README.md", "docs/stories/coverage.md"}
 
 STORE_PAGE = {"s1": "icplan", "s1-tools": "mcp-tools", "s2": "platform-module", "s3": "agent-runner", "s6": "llm-gateway"}
@@ -48,13 +48,11 @@ def moved(target: str, anchor: str):
         return "index.md", ""
     if target == "architecture.md":
         return "index.md", anchor
-    if target == "docs/data-types.md":
-        return "index.md", anchor or "types"
     if target == "data-model.md":
         if anchor == "naming":
             return "docs/rules/data-methodology.md", "naming"
         if anchor == "terms":
-            return "index.md", "terms"
+            return "docs/rules/terms.md", ""
         if anchor in STORE_PAGE:
             return f"data-by-component/{STORE_PAGE[anchor]}/index.md", "stores"
         return _model_target(anchor) or ("docs/rules/data-methodology.md", "")
@@ -94,13 +92,9 @@ def relink(text: str, src_rel: str, page_rel: str = None) -> str:
 
 
 def home_page(home_md: str, flow_page) -> str:
-    """Главная: карта + обзор архитектуры + термины и коды + типы данных и интерфейсы."""
+    """Главная: карта (C2) + обзор архитектуры; термины и типы данных — в «Справке» (architecture-methodology.md)."""
     arch = (ROOT / "architecture.md").read_text(encoding="utf-8")
     arch = re.sub(r"^# .*\n", "", arch, count=1)
     arch = relink(arch, "architecture.md", "index.md")
-    types = (ROOT / "docs/data-types.md").read_text(encoding="utf-8")
-    types = re.sub(r"^# .*\n(\n?← .*\n)?", "", types, count=1)
-    types = types.replace("## Типы\n", "## Типы данных {#types}\n", 1)
-    types = relink(types, "docs/data-types.md", "index.md")
-    body = ("\n\n# Обзор архитектуры\n" + arch + "\n## Термины и коды {#terms}\n\n" + "\n".join(IG.GLOSSARY) + "\n\n" + types)
+    body = "\n\n# Обзор архитектуры\n" + arch
     return home_md.rstrip("\n") + "\n" + flow_page(body, "index", IG.names(__import__("components").COMPONENTS), "")

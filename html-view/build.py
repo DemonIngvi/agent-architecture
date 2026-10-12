@@ -16,7 +16,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from rationale import RATIONALE, REFS  # noqa: E402
+from rationale import EXTEND, PROS_CONS, RATIONALE, REFS  # noqa: E402
 from subcomponents import SUB  # noqa: E402
 from stories import ARTIFACTS, BPMN, CHAINS, PERSONAS, ROLES, STORIES  # noqa: E402
 from diagrams import bpmn_svg, graph_svg  # noqa: E402
@@ -544,6 +544,10 @@ def copy_sources():
             txt = head.rstrip("\n") + "\n\n" + "\n".join(IG.integrations_page_head(rel.stem, IG.names(COMPONENTS))) + "\n\n## " + rest if rest else head
             txt = IG.api_page_structure(txt)  # О-45: структура запросов и ответов из OpenAPI форка и datamodel
         dst.write_text(txt, encoding="utf-8")
+    # «Справка»: термины и коды — генерируются из integrations.GLOSSARY (не страница главной)
+    (SRC / "docs/rules").mkdir(parents=True, exist_ok=True)
+    (SRC / "docs/rules/terms.md").write_text("# Термины и коды\n\n← [Правила документации](README.md) · [типы данных](../data-types.md)\n\n"
+                                              "Легенда кодов и терминов, общая для всех страниц.\n\n" + "\n".join(IG.GLOSSARY) + "\n", encoding="utf-8")
     (SRC / "index.md").write_text(SM.home_page((HERE / "home.md").read_text(encoding="utf-8"), IG.flow_page), encoding="utf-8")
     (SRC / "assets").mkdir(parents=True, exist_ok=True)
     shutil.copy2(HERE / "assets" / "extra.css", SRC / "assets" / "extra.css")
@@ -757,6 +761,12 @@ def rationale_md(slug: str) -> list:
     L += ["", "**Что даёт**", ""] + [f"- {x}" for x in r["gain"]]
     L += ["", "**Отвергнутые альтернативы**", "", "| Вариант | Почему нет |", "|---|---|"]
     L += [f"| {cell(a)} | {cell(b)} |" for a, b in r["alts"]]
+    pc = PROS_CONS.get(slug, [])
+    if pc:
+        L += ["", "**Плюсы и минусы**", "", "| Модуль | ➕ | ➖ |", "|---|---|---|"] + [f"| {cell(m)} | {cell(a)} | {cell(b)} |" for m, a, b in pc]
+    ex = EXTEND.get(slug, [])
+    if ex:
+        L += ["", "**Как расширить**", "", "| Что добавляем | Куда | Кто подхватывает |", "|---|---|---|"] + [f"| {cell(w)} | {cell(x)} | {cell(y)} |" for w, x, y in ex]
     L += ["", f"Настраиваемые параметры — на вкладке [Deploy]({rel(d, f'docs/techspec/{slug}.md')}#config)."]
     return L + [""]
 
@@ -1270,7 +1280,7 @@ def nav_yaml() -> str:
     if revs0:
         L.append("    - Ревью:")
         L += [item(6, title_of(f, f.stem), f"docs/reviews/{f.name}") for f in revs0]
-    L += ["  - Справка:", item(4, "Правила документации", "docs/rules/README.md"), item(4, "Путь изменения документа", "docs/rules/agent-workflow.md"), item(4, "Формат схем", "FORMAT.md"),
+    L += ["  - Справка:", item(4, "Правила документации", "docs/rules/README.md"), item(4, "Путь изменения документа", "docs/rules/agent-workflow.md"), item(4, "Формат схем", "FORMAT.md"), item(4, "Термины и коды", "docs/rules/terms.md"), item(4, "Типы данных", "docs/data-types.md"),
           item(4, "Персоны", "docs/stories/personas.md"),
           "    - Методологии:",
           item(6, "Методология архитектуры", "docs/rules/architecture-methodology.md"), item(6, "Методология данных и интеграций", "docs/rules/data-methodology.md"),
