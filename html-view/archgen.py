@@ -20,41 +20,67 @@ REGISTRY = [
     [B("Agent Runner", "", "ext", to="agent-runner"), B("Harness", "", "ext", to="harness")],
 ]
 MARK = {"done": "✓", "part": "~", "todo": "·", "": ""}
-W = 76
+CLASSES = [
+    "  classDef done fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20",
+    "  classDef part fill:#fff8e1,stroke:#f9a825,color:#5d4037",
+    "  classDef todo fill:#f5f5f5,stroke:#9e9e9e,color:#424242",
+    "  classDef ext fill:#fff3e0,stroke:#ef6c00,color:#e65100,stroke-dasharray:4 3",
+    "  classDef user fill:#e3f2fd,stroke:#1565c0,color:#0d47a1",
+    "  classDef store fill:#ede7f6,stroke:#5e35b1,color:#311b92",
+    "  classDef back fill:#fafafa,stroke:#bdbdbd,color:#9e9e9e,stroke-dasharray:2 2",
+    "  classDef zone fill:#fafafa,stroke:#9fa8da,color:#1a237e",
+]
 
 
-def box_row(blocks, width):
-    n = len(blocks)
-    base = (width - 2 * (n - 1)) // n
-    rest = width - 2 * (n - 1) - base * n
-    top, mid, bot = [], [], []
-    for k, b in enumerate(blocks):
-        bw = base + (rest if k == n - 1 else 0)
-        mark = MARK.get(b["st"], "")
-        title = (("↗ " if b["kind"] == "ext" else "") + b["title"] + (f" [{b['g']}]" if b["g"] else "") + (f" {mark}" if mark else ""))
-        if b["kind"] == "back":
-            title += " (бэклог)"
-        title = title[: bw - 4]
-        top.append("┌" + "─" * (bw - 2) + "┐")
-        mid.append("│ " + title.ljust(bw - 4) + " │")
-        bot.append("└" + "─" * (bw - 2) + "┘")
-    return ["  ".join(top), "  ".join(mid), "  ".join(bot)]
+def _q(s):
+    return s.replace('"', "'")
 
 
-def render(rows, width=W, indent=""):
+def mermaid_c3(rows):
+    """C3 — устройство компонента (FORMAT.md): зона — подграф; ряд блоков — один уровень (невидимые связи ~~~);
+    подпись потока — одна стрелка между рядами."""
+    n = [0]
     out = []
-    for r in rows:
-        if isinstance(r, str):
-            out.append(indent + r.center(width).rstrip())
-        elif isinstance(r, dict):
-            title = f" {r['zone']}" + (f" [{r['g']}]" if r.get("g") else "") + " "
-            out.append(indent + "┌─" + title + "─" * (width - 3 - len(title)) + "┐")
-            for line in render(r["rows"], width - 4, ""):
-                out.append(indent + "│ " + line.ljust(width - 4) + " │")
-            out.append(indent + "└" + "─" * (width - 2) + "┘")
-        else:
-            out += [indent + l for l in box_row(r, width)]
-    return out
+
+    def node(b):
+        n[0] += 1
+        i = f"b{n[0]}"
+        title = b["title"] + (f" [{b['g']}]" if b["g"] else "") + (" (бэклог)" if b["kind"] == "back" else "")
+        lab = f"<b>{_q(title)}</b>" + (f"<br/><small>{_q(b['desc'])}</small>" if b["desc"] else "")
+        shape = {"store": ('[("', '")]'), "user": ('(["', '"])')}.get(b["kind"], ('["', '"]'))
+        cls = b["kind"] if b["kind"] in ("ext", "user", "store", "back") else (b["st"] or "todo")
+        return i, f"{i}{shape[0]}{lab}{shape[1]}:::{cls}"
+
+    def walk(rs, ind):
+        """→ (узлы первого ряда, узлы последнего ряда)."""
+        first, prev, label = None, None, ""
+        for r in rs:
+            if isinstance(r, str):
+                label = r.strip(" ↓↑")
+                continue
+            if isinstance(r, dict):
+                n[0] += 1
+                out.append(f'{ind}subgraph z{n[0]}["{_q(r["zone"])}' + (f' [{r["g"]}]' if r.get("g") else "") + '"]')
+                zid = f"z{n[0]}"
+                top, bottom = walk(r["rows"], ind + "  ")
+                out.append(f"{ind}end")
+                out.append(f"{ind}class {zid} zone")
+            else:
+                ids = []
+                for blk in r:
+                    i, line = node(blk)
+                    out.append(ind + line)
+                    ids.append(i)
+                top = bottom = ids
+            if prev and top:
+                out.append(f'{ind}{prev[0]} -->|"{_q(label)}"| {top[0]}' if label else f"{ind}{prev[0]} --> {top[0]}")
+                out.extend(f"{ind}{prev[0]} ~~~ {x}" for x in top[1:])  # тот же уровень для всего ряда
+            first = first or top
+            prev, label = bottom, ""
+        return first or [], prev or []
+
+    walk(rows, "  ")
+    return ["```mermaid", "flowchart TB", *CLASSES, *out, "```"]
 
 
 def blocks_of(rows):
@@ -83,8 +109,8 @@ for cap, slug in CAP.items():
     rows = REGISTRY if cap == "agent-registry" else BLOCKS[slug]
     name = "Registry (ICPlan)" if cap == "agent-registry" else BY_SLUG[slug][1]
     L = [f"# {cap} — схема", "", "← [spec.md](spec.md)", "",
-         "Схема в формате [FORMAT.md](../../../../../FORMAT.md). Легенда: ✓ есть · ~ частично · · не начато · ↗ соседний компонент.", "",
-         "## Схема", "", "```"] + render(rows) + ["```", "",
+         "Схема C3 по [FORMAT.md](../../../../../FORMAT.md). Цвет: зелёный — есть, жёлтый — частично, серый — не начато; оранжевый пунктир — соседний компонент.", "",
+         "## Схема", ""] + mermaid_c3(rows) + ["",
          "## Блоки", "", "| Блок | Задача | Статус |", "|---|---|---|"]
     seen = set()
     for b in blocks_of(rows):
@@ -95,9 +121,8 @@ for cap, slug in CAP.items():
         L.append(f"| {b['title']} | {b['desc'] or '—'} | {st} |")
     cfg = RATIONALE.get(slug, {}).get("config", [])
     if cfg:
-        L += ["", "## Расширения и настройка", "", "```"]
-        L += [f"{n:<34} → {e}" for n, _, e, _, _ in cfg[:8]]
-        L += ["```"]
+        L += ["", "## Расширения и настройка", "", "| Что настраивается | На что влияет |", "|---|---|"]
+        L += [f"| `{n}` | {e} |" for n, _, e, _, _ in cfg[:8]]
     minus, p = rnd_minus(slug)
     plus = RATIONALE.get(slug, {}).get("gain", [])
     if plus or minus:

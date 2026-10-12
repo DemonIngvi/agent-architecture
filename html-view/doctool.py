@@ -2,6 +2,7 @@
 
     python html-view/doctool.py route <файл>      тип документа, выжимка правил, методология (из doc-types.md, doc-work.md)
     python html-view/doctool.py next <файл>       следующие документы по графу связности и их методологии
+    python html-view/doctool.py diagram <файл>    mermaid-схемы файла → HTML-страница (посмотреть отрисованной)
     python html-view/doctool.py generated <файл>  если файл генерируется — откуда и чем; иначе пусто
     python html-view/doctool.py check             все проверки сборки без сборки сайта (секунды)
     python html-view/doctool.py rnd <slug> <тема> заготовка R&D v3.1, проходящая проверку структуры
@@ -274,6 +275,27 @@ def rnd(slug: str, title: str) -> Path:
     return p
 
 
+def diagram(path) -> Path:
+    """Отрисовать mermaid-схемы файла (ответ по архитектуре, R&D, спека) в HTML-страницу (FORMAT.md)."""
+    src = Path(path)
+    text = src.read_text(encoding="utf-8")
+    blocks = re.findall(r"```mermaid\n(.*?)```", text, flags=re.S)
+    if not blocks:
+        raise SystemExit(f"{src}: нет блоков ```mermaid")
+    import html as H
+    title = next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), src.stem)
+    body = "\n".join(f'<pre class="mermaid">{H.escape(b)}</pre>' for b in blocks)
+    page = (f'<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>{H.escape(title)}</title>'
+            '<style>body{font-family:system-ui,sans-serif;margin:24px;background:#fff;color:#212121}pre.mermaid{margin:32px 0}</style></head>'
+            f'<body><h1>{H.escape(title)}</h1>{body}'
+            '<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs";'
+            'mermaid.initialize({startOnLoad:true,securityLevel:"loose",flowchart:{htmlLabels:true}});</script></body></html>')
+    out = HERE / ".diagrams" / (src.stem + ".html")
+    out.parent.mkdir(exist_ok=True)
+    out.write_text(page, encoding="utf-8")
+    return out
+
+
 def _hook_input():
     try:
         d = json.loads(sys.stdin.buffer.read().decode("utf-8"))
@@ -288,6 +310,8 @@ def main():
     cmd, args = (sys.argv[1] if len(sys.argv) > 1 else ""), sys.argv[2:]
     if cmd == "route":
         print(route(args[0]) or "нет правил для этого пути")
+    elif cmd == "diagram":
+        print(diagram(args[0]).as_uri())
     elif cmd == "next":
         print(next_docs(args[0]))
     elif cmd == "generated":

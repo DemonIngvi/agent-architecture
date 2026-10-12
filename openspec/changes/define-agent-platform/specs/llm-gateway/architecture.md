@@ -2,31 +2,46 @@
 
 ← [spec.md](spec.md)
 
-Схема в формате [FORMAT.md](../../../../../FORMAT.md). Легенда: ✓ есть · ~ частично · · не начато · ↗ соседний компонент.
+Схема C3 по [FORMAT.md](../../../../../FORMAT.md). Цвет: зелёный — есть, жёлтый — частично, серый — не начато; оранжевый пунктир — соседний компонент.
 
 ## Схема
 
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│ ↗ Harness · LLM client                                                   │
-└──────────────────────────────────────────────────────────────────────────┘
-                            ↓ virtual key агента
-┌─ LiteLLM [G4] ───────────────────────────────────────────────────────────┐
-│ ┌────────────────────┐  ┌────────────────────┐  ┌──────────────────────┐ │
-│ │ Virtual keys ~     │  │ Бюджеты, rate limi │  │ G4 хуки [G4] ·       │ │
-│ └────────────────────┘  └────────────────────┘  └──────────────────────┘ │
-│ ┌────────────────────┐  ┌────────────────────┐  ┌──────────────────────┐ │
-│ │ Алиасы ~           │  │ Fallback ·         │  │ Spend log ~          │ │
-│ └────────────────────┘  └────────────────────┘  └──────────────────────┘ │
-└──────────────────────────────────────────────────────────────────────────┘
-                                     ↓
-┌───────────────┐  ┌───────────────┐  ┌───────────────┐  ┌─────────────────┐
-│ mock-LLM ·    │  │ Anthropic     │  │ OpenAI        │  │ Локальные модел │
-└───────────────┘  └───────────────┘  └───────────────┘  └─────────────────┘
-                                → spend log
-┌──────────────────────────────────────────────────────────────────────────┐
-│ ↗ Observability                                                          │
-└──────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+  classDef done fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+  classDef part fill:#fff8e1,stroke:#f9a825,color:#5d4037
+  classDef todo fill:#f5f5f5,stroke:#9e9e9e,color:#424242
+  classDef ext fill:#fff3e0,stroke:#ef6c00,color:#e65100,stroke-dasharray:4 3
+  classDef user fill:#e3f2fd,stroke:#1565c0,color:#0d47a1
+  classDef store fill:#ede7f6,stroke:#5e35b1,color:#311b92
+  classDef back fill:#fafafa,stroke:#bdbdbd,color:#9e9e9e,stroke-dasharray:2 2
+  classDef zone fill:#fafafa,stroke:#9fa8da,color:#1a237e
+  b1["<b>Harness · LLM client</b><br/><small>OpenAI-совместимый API</small>"]:::ext
+  subgraph z2["LiteLLM [G4]"]
+    b3["<b>Virtual keys</b><br/><small>ключ на агента</small>"]:::part
+    b4["<b>Бюджеты, rate limit</b><br/><small>отказ до траты</small>"]:::todo
+    b5["<b>G4 хуки [G4]</b><br/><small>PII, injection, модерация</small>"]:::todo
+    b6["<b>Алиасы</b><br/><small>team-default → модель</small>"]:::part
+    b7["<b>Fallback</b><br/><small>резервная модель</small>"]:::todo
+    b8["<b>Spend log</b><br/><small>токены и $ по ключу</small>"]:::part
+    b3 --> b6
+    b3 ~~~ b7
+    b3 ~~~ b8
+  end
+  class z2 zone
+  b1 -->|"virtual key агента"| b3
+  b1 ~~~ b4
+  b1 ~~~ b5
+  b9["<b>mock-LLM</b><br/><small>разработка и тесты</small>"]:::todo
+  b10[("<b>Anthropic</b>")]:::store
+  b11[("<b>OpenAI</b>")]:::store
+  b12[("<b>Локальные модели</b>")]:::store
+  b6 --> b9
+  b6 ~~~ b10
+  b6 ~~~ b11
+  b6 ~~~ b12
+  b13["<b>Observability</b><br/><small>затраты</small>"]:::ext
+  b9 -->|"→ spend log"| b13
 ```
 
 ## Блоки
@@ -46,13 +61,13 @@
 
 ## Расширения и настройка
 
-```
-model_list                         → Какая модель отвечает агенту
-fallbacks                          → Устойчивость к сбоям
-key.max_budget                     → Жёсткий стоп перерасхода
-key.rpm / tpm                      → Защита от пиков
-guardrails (G4)                    → Безопасность запросов против латентности
-```
+| Что настраивается | На что влияет |
+|---|---|
+| `model_list` | Какая модель отвечает агенту |
+| `fallbacks` | Устойчивость к сбоям |
+| `key.max_budget` | Жёсткий стоп перерасхода |
+| `key.rpm / tpm` | Защита от пиков |
+| `guardrails (G4)` | Безопасность запросов против латентности |
 
 ## Плюсы / минусы
 

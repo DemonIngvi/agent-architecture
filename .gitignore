@@ -34,6 +34,7 @@ tmp/
 
 # Сборка HTML-view
 html-view/.build/
+html-view/.diagrams/
 html-view/site/
 html-view/.venv/
 __pycache__/
