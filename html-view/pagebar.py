@@ -115,8 +115,11 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     ap = DATA.get("approvals", {}).get(src)  # значки ролей, подтвердивших документ (approval-methodology.md)
     if ap:
         cls = {"✅": "ok", "❌": "no"}
-        dots = "".join(f'<span class="ap-dot ap-{cls.get(s, "wait")}" title="{name}: {dict(ok="подтвердил", no="отказ").get(cls.get(s, ""), "ждёт")}{" (" + who + ")" if who and who != "—" else ""}">{letter}</span>'
-                       for letter, name, s, who in ap)
+        def dot(letter, name, s, who, prev=""):
+            state = dict(ok="подтвердил", no="отказ").get(cls.get(s, ""), "ждёт" + (f" повторной проверки, было: {dict(ok='подтвердил', no='отказ')[cls[prev]]}" if prev in cls else ""))
+            was = f" ap-was-{cls[prev]}" if prev in cls else ""
+            return f'<span class="ap-dot ap-{cls.get(s, "wait")}{was}" title="{name}: {state}{" (" + who + ")" if who and who != "—" else ""}">{letter}</span>'
+        dots = "".join(dot(*x) for x in ap)
         bar = bar.replace('<div class="topbar">', f'<div class="topbar"><a class="ap-badges" href="{_rel(page.url, "docs/approvals-summary/")}" title="Подтверждения ролей">{dots}</a>', 1)
     rd = DATA.get("readiness", {}).get(src)
     if rd:

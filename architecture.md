@@ -124,8 +124,9 @@ flowchart LR
 | Исполнение | тёплый пул + одноразовый контейнер на запуск | D1 | [Sandbox](components/sandbox/index.md) |
 | Память | уровни M0–M6, область видимости — атрибут записи; M3 — Memory API | D4, D20 | [Memory](components/memory/index.md) |
 | RAG | не в MVP: документы — `get_document`, код — агентный поиск | D13 | [Memory](components/memory/index.md) |
-| Хранение конфигурации | определения — БД ICPlan; наши настройки — Platform module; Rego — git; перенос — YAML | D9 | [Platform module](components/platform-module/index.md) |
+| Хранение конфигурации | определения — БД ICPlan; наши настройки — Platform module; Runner получает определение и настройки одной версии у Platform module; экраны — у объекта настройки; Rego — git; перенос — YAML | D9, D23, D24 | [Platform module](components/platform-module/index.md) |
 | MCP или прямой вызов | правила R1–R7; агент ходит к MCP только через MCP-прокси Runner | D10, D19 | [MCP / Tools](components/mcp-tools/index.md) |
 | Рабочие данные | `/workspace` исчезает со средой; код — ветка и PR; документы — в задачу | D11 | [Sandbox](components/sandbox/index.md) |
 | Observability | события пишутся всегда в формате AG-UI, показываются в задаче чатом запуска | D12, D18, D21 | [Observability](components/observability/index.md) |
 | Ход задачи | процесс задачи: шаг = колонка + агент, переход делает ICPlan по итогу | D17 | [ICPlan](components/icplan/index.md) |
+| Сроки хранения | срок памяти — фильтр чтения Memory; запуски и переписку удаляет владелец таблиц, ICPlan; журнал задачи живёт с задачей | D22, D25 | [ICPlan](components/icplan/index.md) |

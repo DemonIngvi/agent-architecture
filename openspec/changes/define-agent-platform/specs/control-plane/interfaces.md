@@ -21,7 +21,7 @@
 |---|---|---|---|---|---|---|---|---|
 | `prompt.guidance` | Руководство проекта для всех агентов проекта | L1 | S2 | нет | общие правила проекта задаёт администратор при необходимости | нет | `prompt.guidance_max_chars` | повторяющиеся замечания к агентам проекта |
 | `prompt.guidance_max_chars` | Предельная длина руководства проекта | L0 | S9 | 4000 | ≈ 1 тыс. токенов — 0,5% окна | 0 | 16000 | доля окна модели под постоянные слои |
-| `model_alias` | Алиас модели агента | L1 | S2 | team-default | см. `agent.model` (agent-registry) | алиас из `model_list` | алиас из `model_list` | см. agent-registry |
+| `model_alias` | Алиас модели агента — поле определения в Registry (`ai_agent.model`, D23), модуль не хранит | L2 | S1 | team-default | см. `agent.model` (agent-registry) | алиас из `model_list` | алиас из `model_list` | см. agent-registry |
 | `fallback` | Резервная модель | L0 | S9 | нет | см. `fallbacks` (llm-gateway) | нет | список алиасов | см. llm-gateway |
 | `budget.daily_usd` | Дневной бюджет агента | L1 | S2 | 5 $ | ~10 запусков × ~55 тыс. токенов ≈ 2–4 $ на средних моделях + запас | 0 $ | `project_month` / 20 рабочих дней | фактические затраты агента (3.9); 0 — агент фактически выключен |
 | `budget.per_run_tokens` | Токены на один запуск | L1 | S2 | 200 000 | см. `limits.max_tokens` (agent-harness) | 20 000 | окно модели | см. agent-harness |
@@ -54,7 +54,7 @@
 
 | ID | От → к | Протокол | Формат | Аутентификация | Режим | Таймаут | Повтор | Идемпотентность |
 |---|---|---|---|---|---|---|---|---|
-| I4 | Agent Runner → Platform module API | HTTP REST | JSON `AgentSettings` | сервисный токен | синхронно | 2 с | 3 раза | чтение |
+| I4 | Agent Runner → Platform module API | HTTP REST | JSON `AgentSettings`; на старте запуска `GET /platform/runs/:runId/agent` → `{version, definition: AgentDefinition, settings: AgentSettings}` (D23) | сервисный токен | синхронно | 2 с | 3 раза | чтение |
 | I15 | Platform module → LiteLLM admin API | HTTP REST `/key/generate`, `/key/update` | JSON | master key (Secret) | синхронно | 5 с | 3 раза | да, по алиасу ключа |
 | I16 | Platform module + git (Rego) → OPA | OPA bundles API, HTTP pull | tar.gz bundle | токен bundle-сервера | опрос 30 с | 10 с | встроенный в OPA | да |
 | I20 | ICPlan UI ↔ ICPlan API | HTTP REST (существующий) | JSON | сессия пользователя | синхронно | — | — | — |

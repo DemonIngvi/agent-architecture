@@ -20,6 +20,7 @@
 ## 4. После MVP
 
 - [ ] 4.6 Kubernetes: k3s, Helm, namespaces, Traefik, сетевые политики: Платформа должна разворачиваться воспроизводимо на сервере: кластер, чарты, вход по HTTPS, изоляция namespaces, секреты вне git. Требования: R-ICP-15, R-HRN-15, R-MEM-14, R-REG-12, R-RUN-16, R-SBX-13 и др.. Подробно: [docs/tasks/4.6-k8s-helm-ingress.md](../../../docs/tasks/4.6-k8s-helm-ingress.md)
+- [ ] 4.7 Postgres (CloudNativePG), PgBouncer, RustFS, бэкап вне узла: Одна СУБД обслуживает ICPlan, платформу и LiteLLM — нужны пул соединений, бэкапы вне узла и проверка восстановления (риск X5 ревью). Требования: R-INF-06, R-INF-07, R-INF-08, R-INF-14, R-INF-16, R-ICP-19. Подробно: [docs/tasks/4.7-postgres-storage-backup.md](../../../docs/tasks/4.7-postgres-storage-backup.md)
 - [ ] 4.8 Нагрузочный тест и подтверждение профиля: Профиль нагрузки — гипотеза; без замера нельзя выпускать в продуктив и настраивать лимиты. Требования: R-ICP-14, R-HRN-14, R-MEM-13, R-REG-11, R-RUN-15, R-SBX-12 и др.. Подробно: [docs/tasks/4.8-load-test.md](../../../docs/tasks/4.8-load-test.md)
 
 ## Архивация

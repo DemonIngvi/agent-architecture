@@ -371,6 +371,18 @@ def main():
         print(f"ждёт решения: {len(q)}")
         for p, r in q[:200]:
             print(f"- {p} × {r}")
+    elif cmd == "lint":  # нестрогие проверки методологий по компонентам (не блокируют коммит)
+        sys.path.insert(0, str(HERE))
+        import lint as LN
+        res = LN.lint()
+        for comp in sorted(res):
+            if args and comp != args[0]:
+                continue
+            print(f"{comp}: {len(res[comp])}")
+            for m in res[comp]:
+                print(f"  - {m}")
+        if not res or (args and args[0] not in res):
+            print("пробелов нет")
     elif cmd == "finding":  # статус замечания на вкладке «Замечания» (review-methodology.md#findings)
         comp, fid, st = args[0], args[1], args[2]
         note = " ".join(args[3:])

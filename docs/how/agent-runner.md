@@ -9,7 +9,7 @@
 | 1 | Опрос очереди | Agent Runner → ICPlan | `Run` | I1 | С1 |
 | 2 | Планирование: свободны ли слоты (глобальный, агента, модели, задачи) | Agent Runner → таблица слотов | `queued` → `admitted` | — | С1 |
 | 3 | Допуск и бюджет (G1) | Agent Runner → Guardrails | `PolicyInput` → `PolicyDecision` | I5 | С1 |
-| 4 | Профиль и бюджет агента | Agent Runner → Platform module | `AgentSettings` | I4 | С1 |
+| 4 | Определение и настройки версии запуска, после слотов; версия закрепляется в запуске (D23) | Agent Runner → Platform module | `AgentDefinition`, `AgentSettings` | I4 | С1 |
 | 5 | Контейнер из тёплого пула | Agent Runner → Sandbox | `SandboxClaim` | I6 | С1 |
 | 6 | Токен репозиториев на запуск | Agent Runner → git-провайдер | `RepoGrant` | I18 | — |
 | 7 | Задание для Harness | Agent Runner → Harness | `RunBundle` | I7 | С1 |
@@ -39,8 +39,9 @@ sequenceDiagram
   alt отказ G1
     R->>IC: POST /agent-runs/:runId/result — failed (I2)
   else допущен
-    R->>PM: настройки агента (I4)
-    PM-->>R: AgentSettings ↩
+    Note over R,PM: сервисный токен; 404 — запуск не pending или агент не external
+    R->>PM: GET /platform/runs/:runId/agent (I4, D23)
+    PM-->>R: {version, definition: AgentDefinition, settings: AgentSettings} ↩
     R->>S: контейнер из пула — SandboxClaim (I6)
     R->>H: RunBundle (I7)
     loop шаги агента

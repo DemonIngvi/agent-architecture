@@ -95,7 +95,8 @@ def sync(src: Path) -> dict:
                 c = [f"`{page}`", letter, "—", "—", "—", "⏳", ver, f"текст изменён после решения «{c[5]}» от {c[2]}"]
             c[6] = ver
             rows[key] = c
-            status.setdefault(page, []).append((letter, ROLES[letter], c[5], c[3]))
+            prev = re.search(r"после решения «(.)»", c[7])  # решение до правки текста — видно и после сброса
+            status.setdefault(page, []).append((letter, ROLES[letter], c[5], c[3], prev.group(1) if prev and c[5] == "⏳" else ""))
     rows = {k: v for k, v in rows.items() if k in seen}  # документ удалён или правило изменилось
     write_registry(rows)
     # спеки: значок из подтверждений требований
@@ -113,7 +114,7 @@ def sync(src: Path) -> dict:
             if letter in per:
                 v = per[letter]
                 s = "❌" if "❌" in v else ("✅" if all(x == "✅" for x in v) else "⏳")
-                st.append((letter, ROLES[letter] + f" (требований: {len(v)})", s, ""))
+                st.append((letter, ROLES[letter] + f" (требований: {len(v)})", s, "", ""))
         if st:
             status[page] = st
     return status
@@ -125,16 +126,27 @@ def summary_md(status: dict) -> str:
     used = [x for x in letters if any(x == s[0] for v in status.values() for s in v)]
     L = ["# Подтверждения документов", "",
          "← [Методология подтверждений](rules/approval-methodology.md) · [реестр](approvals.md)", "",
-         "Кто из ролей подтвердил документ: ✅ — подтвердил, ❌ — отказ, ⏳ — ждёт, пусто — роль этот тип не подтверждает. "
+         "Кто из ролей подтвердил документ: ✅ — подтвердил, ❌ — отказ, ⏳ — ждёт; «⏳ было ❌» — документ исправлен после отказа и ждёт повторной проверки; пусто — роль этот тип не подтверждает. "
          "Роли: " + ", ".join(f"**{x}** — {ROLES[x]}" for x in used) + ".", ""]
     total = sum(1 for v in status.values() for s in v)
     ok = sum(1 for v in status.values() for s in v if s[2] == "✅")
     L += [f"Подтверждено {ok} из {total} пар «документ × роль»; документов полностью подтверждено: "
           f"{sum(1 for v in status.values() if all(s[2] == '✅' for s in v))} из {len(status)}.", ""]
-    L += ["| Документ | " + " | ".join(used) + " | Готов |", "|---|" + "---|" * len(used) + "---|"]
-    for page in sorted(status):
-        st = {s[0]: s[2] for s in status[page]}
-        L.append(f"| [{page}](../{page}) | " + " | ".join(st.get(x, "") for x in used) + f" | {'✅' if all(v == '✅' for v in st.values()) else ''} |")
+    def cell(s):
+        return f"⏳ было {s[4]}" if s[4] else s[2]
+
+    def table(pages):
+        out = ["| Документ | " + " | ".join(used) + " | Готов |", "|---|" + "---|" * len(used) + "---|"]
+        for page in pages:
+            st = {s[0]: s for s in status[page]}
+            out.append(f"| [{page}](../{page}) | " + " | ".join(cell(st[x]) if x in st else "" for x in used)
+                       + f" | {'✅' if all(s[2] == '✅' for s in st.values()) else ''} |")
+        return out
+    checked = [p for p in sorted(status) if any(s[2] != "⏳" or s[4] for s in status[p])]
+    waiting = [p for p in sorted(status) if p not in checked]
+    L += [f"## Проверенные документы ({len(checked)})", "", "Хотя бы одна роль поставила решение — сейчас или до последней правки текста.", ""]
+    L += table(checked) + ["", f'??? note "Ещё не проверялись ролями ({len(waiting)})"', ""]
+    L += ["    " + x for x in table(waiting)]
     return "\n".join(L) + "\n"
 
 

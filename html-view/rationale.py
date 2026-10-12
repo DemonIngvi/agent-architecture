@@ -105,12 +105,12 @@ RATIONALE = {
 # Подтверждающие документы для блока «Почему так»
 D = "openspec/changes/define-agent-platform/design.md"
 REFS = {
-    "icplan": [("R&D: выбор таск-трекера", "docs/rnd/tracker-choice.md"), ("R&D: автоподхват задач", "docs/rnd/autopickup-rules.md"), ("R&D: потоки аналогов", "docs/rnd/us-analogs-agent-tracker.md")],
-    "platform-module": [("R&D: хранение конфигурации", "docs/rnd/config-storage.md"), ("Design D9", D)],
-    "agent-runner": [("R&D: Runner и очередь", "docs/rnd/runner-and-scheduling.md"), ("Design D8, D14", D)],
+    "icplan": [("R&D: выбор таск-трекера", "docs/rnd/tracker-choice.md"), ("R&D: автоподхват задач", "docs/rnd/autopickup-rules.md"), ("R&D: потоки аналогов", "docs/rnd/us-analogs-agent-tracker.md"), ("R&D: определение агента для запуска", "docs/rnd/runner-agent-definition.md"), ("R&D: экраны Platform module", "docs/rnd/platform-module-screens.md"), ("R&D: срок хранения в таблицах форка", "docs/rnd/fork-run-retention.md"), ("Design D23, D24, D25", D)],
+    "platform-module": [("R&D: хранение конфигурации", "docs/rnd/config-storage.md"), ("R&D: определение агента для запуска", "docs/rnd/runner-agent-definition.md"), ("R&D: экраны Platform module", "docs/rnd/platform-module-screens.md"), ("Design D9, D23, D24", D)],
+    "agent-runner": [("R&D: Runner и очередь", "docs/rnd/runner-and-scheduling.md"), ("R&D: определение агента для запуска", "docs/rnd/runner-agent-definition.md"), ("Design D8, D14, D23", D)],
     "sandbox": [("R&D: изоляция запусков", "docs/rnd/sandbox-isolation.md"), ("Design D1", D)],
     "harness": [("R&D: фреймворк цикла", "docs/rnd/harness-framework.md"), ("Design D2", D)],
-    "memory": [("R&D: модель памяти", "docs/rnd/memory-model.md"), ("R&D: RAG", "docs/rnd/rag.md"), ("Design D4, D13", D)],
+    "memory": [("R&D: модель памяти", "docs/rnd/memory-model.md"), ("R&D: RAG", "docs/rnd/rag.md"), ("R&D: срок хранения в таблицах форка", "docs/rnd/fork-run-retention.md"), ("Design D4, D13, D25", D)],
     "mcp-tools": [("R&D: MCP или прямой вызов", "docs/rnd/mcp-vs-direct.md"), ("Design D10", D)],
     "guardrails": [("R&D: движок guardrails", "docs/rnd/guardrails-engine.md"), ("R&D: защита от перерасхода", "docs/rnd/runaway-protection.md"), ("Design D6", D)],
     "llm-gateway": [("R&D: шлюз к моделям", "docs/rnd/llm-gateway.md"), ("Design D5", D)],

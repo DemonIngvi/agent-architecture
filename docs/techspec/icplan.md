@@ -46,6 +46,8 @@
 | `TELEMETRY_DISABLED` | `"1"` — телеметрия upstream выключена (в `values.yaml` форка уже стоит для api и worker) | values |
 | `SKIP_PRE_MIGRATION_BACKUP` | `1`, если дамп перед миграцией не нужен (бэкап CloudNativePG) | values |
 | `AGENT_RUN_LEASE_SECONDS` | аренда запуска; значение — [interfaces.md интеграции](../../openspec/changes/add-icplan-integration/specs/icplan-integration/interfaces.md) | values |
+| `AGENT_RUN_RETENTION_DAYS` (нужно) | worker: срок завершённых запусков `agent_run` — параметр `runs.retention_days`; 0 — не чистить; задача очистки по образцу `cleanupOldDeliveries` / `WEBHOOK_CLEANUP_DAYS` (R-ICP-19, D25); значение — [interfaces.md интеграции](../../openspec/changes/add-icplan-integration/specs/icplan-integration/interfaces.md) | values |
+| `AGENT_CHAT_RETENTION_DAYS` (нужно) | worker: срок тредов чата агента — параметр `chat.retention_days`; 0 — не чистить (R-ICP-19, D25) | values |
 | `TELEGRAM_BOT_TOKEN` | бот | Secret |
 
 ## Сборка и поставка
@@ -75,7 +77,7 @@ api:
   env: { TELEMETRY_DISABLED: "1", SSRF_ALLOWED_HOSTS: "<хосты LiteLLM и Memory API в кластере>" }
   backups: { persistence: { enabled: true, size: 10Gi } }   # или SKIP_PRE_MIGRATION_BACKUP=1 при PITR CloudNativePG
 worker:
-  env: { TELEMETRY_DISABLED: "1" }
+  env: { TELEMETRY_DISABLED: "1", AGENT_RUN_RETENTION_DAYS: "365", AGENT_CHAT_RETENTION_DAYS: "90" }   # runs.retention_days, chat.retention_days (D25)
 ```
 
 ## Обновление и откат

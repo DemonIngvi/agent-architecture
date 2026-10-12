@@ -38,13 +38,15 @@ SUB = {
         kind="ui",
         stories=["US-ICP-20", "US-ICP-21", "US-ICP-22", "US-ICP-23", "US-ICP-24", "US-ICP-28", "US-ICP-19", "US-ICP-06", "US-ICP-05", "US-ICP-25", "US-ICP-26", "US-ICP-27"],
         screens=[("Агенты команды", "Команда → Настройки → ИИ-агенты", "список агентов, поиск, создание; у внешнего агента — в сети ли раннер", "есть", "apps/web/src/app/[teamRef]/settings/ai-agents/page.tsx", "US-ICP-20, US-ICP-06"),
-                 ("Карточка агента", "ИИ-агенты → агент (боковая панель)", "модель и ключ провайдера (внутренний), инструкция, проекты, доступ (кто даёт работу), действия в проекте, триггеры (упоминание, делегат, поле), ключ API и раннер (внешний)", "есть", "apps/web/src/features/teams/components/ai-agents/AgentSheetForm.tsx", "US-ICP-21"),
-                 ("Выключение агента", "карточка агента", "выключить / включить; судьба активных запусков `onDisable`: finish / cancel", "доработка", "apps/web/src/features/teams/components/ai-agents/AgentSheetForm.tsx", "US-ICP-22"),
+                 ("Карточка агента", "ИИ-агенты → агент (боковая панель)", "модель и ключ провайдера (внутренний), инструкция, проекты, доступ (кто даёт работу), действия в проекте, триггеры (упоминание, делегат, поле), ключ API и раннер (внешний); у внешнего агента платформы — поля Registry: модель-алиас, навыки, тулы, MCP — `PATCH /teams/:teamId/ai-agents/:agentId`, `PUT /teams/:teamId/ai-agents/:agentId/skills`, `/tool-configs` (доработка, R-REG-02, D23, D24)", "доработка", "apps/web/src/features/teams/components/ai-agents/AgentSheetForm.tsx, TeamAiAgentFields.tsx", "US-ICP-21"),
+                 ("Выключение агента", "карточка агента", "выключить / включить; судьба активных запусков `onDisable`: finish / cancel — `PATCH /teams/:teamId/ai-agents/:agentId`", "доработка", "apps/web/src/features/teams/components/ai-agents/AgentSheetForm.tsx", "US-ICP-22"),
                  ("История запусков агента", "карточка агента → запуски", "запуски по триггеру, новые сверху, по 25; у запуска — задача и итог", "есть", "apps/web/src/features/teams/components/ai-agents/TeamAiAgentRunsSheet.tsx", "US-ICP-28"),
                  ("Тулы, навыки, MCP команды", "Команда → Настройки → Инструменты / Навыки / MCP", "каталог тулов с учётными данными, навыки с файлами, MCP-серверы", "есть", "apps/web/src/app/[teamRef]/settings/agent-tools, agent-skills, mcp", "US-ICP-20"),
                  ("Агенты проекта и расписания", "Проект → Агенты", "агенты, работающие в проекте; чат с агентом; регулярная работа по расписанию", "есть", "apps/web/src/app/[teamRef]/(shell)/[projectKey]/agents", "US-ICP-24, US-ICP-19"),
                  ("Редактор процесса", "Проект → Настройки → Типы задач → процесс", "шаги: колонка, агент, переходы при успехе и ошибке, лимит, проверка — `GET`, `PUT /projects/:projectKey/processes`; Действие «делегировать агенту» — `POST /projects/:projectKey/actions`", "новое", "рядом с apps/web/src/features/settings/SettingsIssueTypesPage.tsx", "US-ICP-05, US-ICP-25, US-ICP-26, US-ICP-27"),
-                 ("Настройки платформы для агента", "не решено (открытый вопрос control-plane)", "бюджеты, профили sandbox и памяти, доступы к репозиториям, kill switch — экраны Platform module", "новое", "—", "US-ICP-21")],
+                 ("Платформа: агент", "карточка агента → «Платформа»", "автономия, бюджеты, профили, тулы с подтверждением, kill switch агента, история и откат настроек — `GET`, `PATCH /platform/agents/:agentId/settings`, `…/settings/versions`, `…/settings/rollback`, экспорт и импорт, `PUT /platform/kill-switch/:scope` (`agent:<id>`); право `ai_agents` (D24)", "новое", "раздел в стеке apps/web/src/features/teams/components/ai-agents/TeamAiAgentFields.tsx; после PR в upstream — точка расширения `@/cloud`", "US-ICP-21"),
+                 ("Платформа: проект", "Проект → ИИ-команда → «Платформа»", "руководство, месячный бюджет, ресурсы и доступы агентов, шаг подготовки — `/platform/projects/:projectKey/guidance`, `/budget`, `/access`, `/resources`, `/setup`; право `ai_agents` (D24)", "новое", "раздел в apps/web/src/utils/settingsSections.ts (`SETTINGS_SECTIONS`), сообщения messages/*/sections.json", "US-ICP-21"),
+                 ("Платформа: экземпляр", "God mode → «Платформа»", "профили среды и памяти, глобальный kill switch, журнал изменений — `/platform/sandbox-profiles`, `/platform/memory-profiles`, `PUT /platform/kill-switch/:scope` (`platform`), `GET /platform/audit`; владелец экземпляра (D24)", "новое", "точка расширения `@/cloud` (как godSections.ts), новая страница маршрута", "US-ICP-21")],
         params=[("agent.model", "—"), ("agent.instruction", "—"), ("agent.tools", "нет"), ("agent.skills", "нет"), ("agent.mcp_servers", "нет"),
                 ("agent.projects", "нет"), ("agent.kind", "internal"), ("agent.enabled", "да")],
         does=["Создание и настройка агентов", "Подключение тулов, навыков, MCP", "Проверка агента в чате, выключение агента (3.8)",
@@ -58,7 +60,7 @@ SUB = {
         failures=["БД ICPlan недоступна — настройки не сохраняются, определения не читаются, запуски не стартуют (FMEA agent-registry)",
                   "Модель не настроена в LiteLLM — сохранение агента отклоняется с указанием модели (R-REG-06 «Модель без доступа»)",
                   "Platform module работает внутри api ICPlan — отдельного отказа нет: недоступен api — недоступен весь экран"],
-        why="UI уже есть — не пишем свою консоль; наши настройки добавляются экранами Platform module.", rnd="tracker-choice.md"),
+        why="UI уже есть — не пишем свою консоль; наши настройки добавляются экранами Platform module у своего объекта: агент — в карточке, проект — в проекте, экземпляр — в God mode (D24).", rnd="tracker-choice.md"),
     ("icplan", "Автоподхват"): dict(
         tech="Доработка форка (D17): тип задачи задаёт процесс; шаг = колонка + агент + переходы по итогу; эффект Действия",
         kind="service",
@@ -90,15 +92,15 @@ SUB = {
              ("`PUT /teams/:teamId/ai-agents/:agentId/projects`, `/skills`, `/tool-configs` — ресурсы агента", "Control Plane UI", "I20"),
              ("`POST /teams/:teamId/ai-agents/:agentId/regenerate-key` — новый ключ агента", "Control Plane UI", "I20"),
              ("версии и экспорт / импорт YAML — `GET /platform/agents/:agentId/export`, `POST /platform/agents/import` (Platform module)", "Администратор", "I20"),
-             ("определение агента для запуска — способ выбирается в R&D (Z-ICP-3): claim форка отдаёт только запуск", "Agent Runner", "I1")],
+             ("определение агента для запуска — `GET /platform/runs/:runId/agent`: Platform module читает таблицы Registry и отдаёт `{version, definition, settings}`; claim форка не меняется (D23)", "Agent Runner", "I4")],
         params=[("agent.version", "последняя")],
         does=["Хранит определения агентов и их ресурсы", "Отдаёт определение агента Runner и Harness", "Версии определения агента (доработка, R-REG-03)",
               "Экспорт и импорт определения в YAML `agent/v1` (доработка, R-REG-04)", "Не даёт удалить ресурс, на который ссылаются (R-REG-05)"],
         io=[("←", "Control Plane UI", "определения агентов, тулы, навыки, MCP-серверы"),
-            ("→", "Harness через Agent Runner", "инструкция и навыки версии запуска, M5 (I1, I7)")],
+            ("→", "Harness через Agent Runner", "инструкция и навыки версии запуска, M5 (через Platform module — I4, D23; I7)")],
         data=[("ai_agent", "запись, чтение: определение"), ("agent_tool", "запись, чтение: каталог тулов"), ("agent_skill", "запись, чтение: каталог навыков"),
               ("agent_tool_link", "запись, чтение"), ("agent_skill_link", "запись, чтение"),
-              ("agent_settings_version", "чтение: версии — снимок определения и наших настроек ведёт Platform module (D9)"), ("agent_run", "запись: `agent_version` запуска")],
+              ("agent_settings_version", "чтение: версии — снимок определения и наших настроек ведёт Platform module (D9)"), ("agent_run", "запись: `agent_version` запуска — задачей или Platform module при первом вызове I4 (D23)")],
         reqs=["R-REG-01", "R-REG-02", "R-REG-03", "R-REG-04", "R-REG-05", "R-REG-06"], tasks=["1.2", "2.3", "4.4"],
         failures=["БД ICPlan недоступна — определения не читаются, запуски не стартуют",
                   "Удаляется ресурс, на который ссылаются, — удаление отклоняется",
@@ -130,12 +132,13 @@ SUB = {
     ("platform-module", "API модуля"): dict(
         tech="Модуль форка ICPlan (TypeScript), схема `platform` в Postgres",
         params=[("Права", "роли ICPlan"), ("Валидация", "ссылки и диапазоны"), ("Версии", "каждое изменение — версия")],
-        does=["CRUD наших настроек агента", "Отдаёт настройки Runner, LiteLLM, OPA"],
+        does=["CRUD наших настроек агента", "Отдаёт настройки Runner, LiteLLM, OPA",
+              "Отдаёт Runner определение и настройки версии запуска одним ответом — `GET /platform/runs/:runId/agent` (I4, D23); таблицы Registry читает той же ролью `itsaplan`"],
         why="Одна БД и одна авторизация с ICPlan.", rnd="config-storage.md"),
     ("platform-module", "Алиасы LLM"): dict(
         tech="Алиасы LiteLLM, синхронизация из модуля",
         params=[("model_alias", "team-default"), ("fallback", "резервная модель")],
-        does=["Связывает агента с моделью через алиас", "Смена модели — без изменения агента"],
+        does=["Связывает агента с моделью через алиас; сам алиас — поле определения агента в Registry (`ai_agent.model`, R-REG-02, D23), модуль его не хранит", "Смена модели — без изменения агента"],
         why="Модель меняется в одном месте.", rnd="llm-gateway.md"),
     ("platform-module", "Бюджеты"): dict(
         tech="Бюджеты virtual key LiteLLM + проверка G1 в Runner",
@@ -150,7 +153,7 @@ SUB = {
     ("platform-module", "Профили памяти"): dict(
         tech="Профили Memory",
         params=[("read", "M2, M3, M5, M6"), ("write", "M3"), ("m2_last_runs", "3"), ("retention", "M1 30 д, M2 180 д, M3 до закрытия задачи, M4 до замены факта")],
-        does=["Какие уровни памяти агент читает и пишет, сколько хранить"],
+        does=["Какие уровни памяти агент читает и пишет, сколько хранить; для M1 и M2 срок — фильтр чтения, строки форка удаляет ICPlan (D25)"],
         why="Баланс преемственности и токенов на агента.", rnd="memory-model.md"),
     ("platform-module", "Данные guardrails"): dict(
         tech="Данные для OPA (bundle data)",
@@ -159,7 +162,7 @@ SUB = {
         why="Логика — в git (Rego), данные — в БД: стандартное разделение OPA.", rnd="guardrails-engine.md"),
     ("platform-module", "Версии агентов"): dict(
         tech="Таблица версий + экспорт / импорт YAML",
-        params=[("Формат", "`agent/v1`"), ("Пин версии", "в запуске можно указать версию")],
+        params=[("Формат", "`agent/v1`"), ("Пин версии", "в запуске можно указать версию; иначе версия на старте пишется в `agent_run.agent_version` при первом вызове I4 (D23)")],
         does=["История изменений агента", "Перенос dev → prod", "Ревью через YAML"],
         why="Воспроизводимость запусков и ревью без Config Repo.", rnd="config-storage.md"),
     # ---------- Agent Runner ----------
@@ -201,7 +204,7 @@ SUB = {
     ("agent-runner", "Run supervisor"): dict(
         tech="Go",
         params=[("timeout_s", "1800"), ("idle_s", "300"), ("retry", "0")],
-        does=["Запускает Harness с `RunBundle`", "Следит за таймаутом, простоем, отменой"],
+        does=["На старте после слотов берёт определение и настройки версии запуска — `GET /platform/runs/:runId/agent` (I4, D23)", "Запускает Harness с `RunBundle`", "Следит за таймаутом, простоем, отменой"],
         why="Зависшие запуски не держат слоты.", rnd="runaway-protection.md"),
     ("agent-runner", "Event relay"): dict(
         tech="Go, поток `RunEvent`",
@@ -284,7 +287,8 @@ SUB = {
     ("memory", "Memory API"): dict(
         tech="Сервис над БД ICPlan",
         params=[("Профиль", "read / write / retention"), ("Область", "задача, агент, проект, команда")],
-        does=["Проверяет права и области", "Отдаёт память в контекст запуска"],
+        does=["Проверяет права и области", "Отдаёт память в контекст запуска",
+              "M1 и M2 старше `retention` профиля не отдаёт; строки форка не удаляет — их удаляет ICPlan, `POST /retention/run` чистит только M3 (D25)"],
         why="Агенты не ходят в БД напрямую.", rnd="memory-model.md"),
     ("memory", "M3 задачная"): dict(
         tech="Таблица в БД ICPlan + тул записи",
