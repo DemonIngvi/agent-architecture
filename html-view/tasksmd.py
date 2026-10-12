@@ -41,7 +41,7 @@ def why(file):
     if not m:
         return ""
     s = re.split(r"(?<=[.!?])\s", m.group(1).strip().replace("\n", " "))[0]
-    return s
+    return re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", s)  # ссылки задачи относительны docs/tasks — в tasks.md изменения только текст
 
 
 def render(title, header, stages, keep):
