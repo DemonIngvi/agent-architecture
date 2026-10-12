@@ -15,8 +15,8 @@
 | `components/agent-runner/finalizer/index.md` | А | — | — | — | ⏳ | 0bc476df | Блок |
 | `components/agent-runner/finalizer/index.md` | Р | — | — | — | ⏳ | 0bc476df | Блок |
 | `components/agent-runner/finalizer/index.md` | Т | — | — | — | ⏳ | 0bc476df | Блок |
-| `components/agent-runner/index.md` | А | — | — | — | ⏳ | 8edf38bb | Архитектура компонента |
-| `components/agent-runner/index.md` | Р | — | — | — | ⏳ | 8edf38bb | Архитектура компонента |
+| `components/agent-runner/index.md` | А | — | — | — | ⏳ | eae9005d | Архитектура компонента |
+| `components/agent-runner/index.md` | Р | — | — | — | ⏳ | eae9005d | Архитектура компонента |
 | `components/agent-runner/mcp-proksi/index.md` | А | — | — | — | ⏳ | a83d7e34 | Блок |
 | `components/agent-runner/mcp-proksi/index.md` | Р | — | — | — | ⏳ | a83d7e34 | Блок |
 | `components/agent-runner/mcp-proksi/index.md` | Т | — | — | — | ⏳ | a83d7e34 | Блок |
@@ -75,26 +75,26 @@
 | `components/harness/tool-executor/index.md` | А | — | — | — | ⏳ | 5d447140 | Блок |
 | `components/harness/tool-executor/index.md` | Р | — | — | — | ⏳ | 5d447140 | Блок |
 | `components/harness/tool-executor/index.md` | Т | — | — | — | ⏳ | 5d447140 | Блок |
-| `components/icplan/avtopodhvat/index.md` | А | — | — | — | ⏳ | 6f99462b | Блок |
-| `components/icplan/avtopodhvat/index.md` | Р | — | — | — | ⏳ | 6f99462b | Блок |
-| `components/icplan/avtopodhvat/index.md` | Т | — | — | — | ⏳ | 6f99462b | Блок |
-| `components/icplan/control-plane-ui/index.md` | А | — | — | — | ⏳ | 348e510b | Блок |
-| `components/icplan/control-plane-ui/index.md` | Р | — | — | — | ⏳ | 348e510b | Блок |
-| `components/icplan/control-plane-ui/index.md` | Т | — | — | — | ⏳ | 348e510b | Блок |
+| `components/icplan/avtopodhvat/index.md` | А | — | — | — | ⏳ | b6beb9f9 | Блок |
+| `components/icplan/avtopodhvat/index.md` | Р | — | — | — | ⏳ | b6beb9f9 | Блок |
+| `components/icplan/avtopodhvat/index.md` | Т | — | — | — | ⏳ | b6beb9f9 | Блок |
+| `components/icplan/control-plane-ui/index.md` | А | — | — | — | ⏳ | 09844c69 | Блок |
+| `components/icplan/control-plane-ui/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-12 | ❌ | 09844c69 | Экран «Настройки платформы для агента» (новое) не реализуем: место в интерфейсе «не решено», открыт ОВ-control-plane-1 (нужен R&D), полей и действий нет, R-кода control-plane в reqs нет; выход → Platform module AgentSettings (I20) не согласован: в INTEG у I20 нет AgentSettings, в control-plane/interfaces.md AgentSettings идёт по I4 → провести R&D и решение D по ОВ-control-plane-1, затем в subcomponents.py (icplan, Control Plane UI) задать путь, поля и действия экрана, добавить R-коды control-plane и исправить I-код/модель выхода; либо убрать экран и выход из карточки до решения. Остальные 6 экранов сверены с кодом форка, параметры есть в interfaces.md, onDisable описан в docs/api/icplan.md |
+| `components/icplan/control-plane-ui/index.md` | Т | — | — | — | ⏳ | 09844c69 | Блок |
 | `components/icplan/index.md` | А | — | — | — | ⏳ | db358709 | Архитектура компонента |
 | `components/icplan/index.md` | Р | — | — | — | ⏳ | db358709 | Архитектура компонента |
 | `components/icplan/mcp-itsaplan-core/index.md` | А | — | — | — | ⏳ | 52aaa92d | Блок |
 | `components/icplan/mcp-itsaplan-core/index.md` | Р | — | — | — | ⏳ | 52aaa92d | Блок |
 | `components/icplan/mcp-itsaplan-core/index.md` | Т | — | — | — | ⏳ | 52aaa92d | Блок |
-| `components/icplan/registry/index.md` | А | — | — | — | ⏳ | 46f1d64f | Блок |
-| `components/icplan/registry/index.md` | Р | — | — | — | ⏳ | 46f1d64f | Блок |
-| `components/icplan/registry/index.md` | Т | — | — | — | ⏳ | 46f1d64f | Блок |
-| `components/icplan/run-queue-runner-api/index.md` | А | — | — | — | ⏳ | b94ac53c | Блок |
-| `components/icplan/run-queue-runner-api/index.md` | Р | — | — | — | ⏳ | b94ac53c | Блок |
-| `components/icplan/run-queue-runner-api/index.md` | Т | — | — | — | ⏳ | b94ac53c | Блок |
-| `components/icplan/task-ui/index.md` | А | — | — | — | ⏳ | fd91a985 | Блок |
-| `components/icplan/task-ui/index.md` | Р | — | — | — | ⏳ | fd91a985 | Блок |
-| `components/icplan/task-ui/index.md` | Т | — | — | — | ⏳ | fd91a985 | Блок |
+| `components/icplan/registry/index.md` | А | — | — | — | ⏳ | b51a790b | Блок |
+| `components/icplan/registry/index.md` | Р | — | — | — | ⏳ | b51a790b | Блок |
+| `components/icplan/registry/index.md` | Т | — | — | — | ⏳ | b51a790b | Блок |
+| `components/icplan/run-queue-runner-api/index.md` | А | — | — | — | ⏳ | 547b62f2 | Блок |
+| `components/icplan/run-queue-runner-api/index.md` | Р | — | — | — | ⏳ | 547b62f2 | Блок |
+| `components/icplan/run-queue-runner-api/index.md` | Т | — | — | — | ⏳ | 547b62f2 | Блок |
+| `components/icplan/task-ui/index.md` | А | — | — | — | ⏳ | 982166e4 | Блок |
+| `components/icplan/task-ui/index.md` | Р | — | — | — | ⏳ | 982166e4 | Блок |
+| `components/icplan/task-ui/index.md` | Т | — | — | — | ⏳ | 982166e4 | Блок |
 | `components/infrastructure/index.md` | А | — | — | — | ⏳ | d8325b1e | Архитектура компонента |
 | `components/infrastructure/index.md` | Р | — | — | — | ⏳ | d8325b1e | Архитектура компонента |
 | `components/infrastructure/pgbouncer/index.md` | А | — | — | — | ⏳ | 69b9c278 | Блок |
@@ -177,8 +177,8 @@
 | `components/platform-module/dannye-guardrails/index.md` | А | — | — | — | ⏳ | 442a4023 | Блок |
 | `components/platform-module/dannye-guardrails/index.md` | Р | — | — | — | ⏳ | 442a4023 | Блок |
 | `components/platform-module/dannye-guardrails/index.md` | Т | — | — | — | ⏳ | 442a4023 | Блок |
-| `components/platform-module/index.md` | А | — | — | — | ⏳ | b0e382bf | Архитектура компонента |
-| `components/platform-module/index.md` | Р | — | — | — | ⏳ | b0e382bf | Архитектура компонента |
+| `components/platform-module/index.md` | А | — | — | — | ⏳ | 0b71a670 | Архитектура компонента |
+| `components/platform-module/index.md` | Р | — | — | — | ⏳ | 0b71a670 | Архитектура компонента |
 | `components/platform-module/profili-pamyati/index.md` | А | — | — | — | ⏳ | 80a0df91 | Блок |
 | `components/platform-module/profili-pamyati/index.md` | Р | — | — | — | ⏳ | 80a0df91 | Блок |
 | `components/platform-module/profili-pamyati/index.md` | Т | — | — | — | ⏳ | 80a0df91 | Блок |
@@ -238,18 +238,18 @@
 | `data-by-component/sandbox/index.md` | А | — | — | — | ⏳ | dbcbfc2f | Данные |
 | `data-by-component/sandbox/index.md` | Р | — | — | — | ⏳ | dbcbfc2f | Данные |
 | `data-by-component/sandbox/index.md` | Д | — | — | — | ⏳ | dbcbfc2f | Данные |
-| `docs/api/agent-runner.md` | А | — | — | — | ⏳ | 02d51df8 | Интеграции |
-| `docs/api/agent-runner.md` | Р | — | — | — | ⏳ | 02d51df8 | Интеграции |
-| `docs/api/agent-runner.md` | Т | — | — | — | ⏳ | 02d51df8 | Интеграции |
+| `docs/api/agent-runner.md` | А | — | — | — | ⏳ | 30355b43 | Интеграции |
+| `docs/api/agent-runner.md` | Р | — | — | — | ⏳ | 30355b43 | Интеграции |
+| `docs/api/agent-runner.md` | Т | — | — | — | ⏳ | 30355b43 | Интеграции |
 | `docs/api/guardrails.md` | А | — | — | — | ⏳ | 3c56d741 | Интеграции |
 | `docs/api/guardrails.md` | Р | — | — | — | ⏳ | 3c56d741 | Интеграции |
 | `docs/api/guardrails.md` | Т | — | — | — | ⏳ | 3c56d741 | Интеграции |
 | `docs/api/harness.md` | А | — | — | — | ⏳ | 5a527a72 | Интеграции |
 | `docs/api/harness.md` | Р | — | — | — | ⏳ | 5a527a72 | Интеграции |
 | `docs/api/harness.md` | Т | — | — | — | ⏳ | 5a527a72 | Интеграции |
-| `docs/api/icplan.md` | А | — | — | — | ⏳ | b1942990 | Интеграции |
-| `docs/api/icplan.md` | Р | — | — | — | ⏳ | b1942990 | Интеграции |
-| `docs/api/icplan.md` | Т | — | — | — | ⏳ | b1942990 | Интеграции |
+| `docs/api/icplan.md` | А | — | — | — | ⏳ | f61c0be4 | Интеграции |
+| `docs/api/icplan.md` | Р | — | — | — | ⏳ | f61c0be4 | Интеграции |
+| `docs/api/icplan.md` | Т | — | — | — | ⏳ | f61c0be4 | Интеграции |
 | `docs/api/infrastructure.md` | А | — | — | — | ⏳ | e5b694e2 | Интеграции |
 | `docs/api/infrastructure.md` | Р | — | — | — | ⏳ | e5b694e2 | Интеграции |
 | `docs/api/infrastructure.md` | Т | — | — | — | ⏳ | e5b694e2 | Интеграции |
@@ -262,12 +262,12 @@
 | `docs/api/memory.md` | А | — | — | — | ⏳ | 67adec2f | Интеграции |
 | `docs/api/memory.md` | Р | — | — | — | ⏳ | 67adec2f | Интеграции |
 | `docs/api/memory.md` | Т | — | — | — | ⏳ | 67adec2f | Интеграции |
-| `docs/api/observability.md` | А | — | — | — | ⏳ | 89791f14 | Интеграции |
-| `docs/api/observability.md` | Р | — | — | — | ⏳ | 89791f14 | Интеграции |
-| `docs/api/observability.md` | Т | — | — | — | ⏳ | 89791f14 | Интеграции |
-| `docs/api/platform-module.md` | А | — | — | — | ⏳ | df41e9e5 | Интеграции |
-| `docs/api/platform-module.md` | Р | — | — | — | ⏳ | df41e9e5 | Интеграции |
-| `docs/api/platform-module.md` | Т | — | — | — | ⏳ | df41e9e5 | Интеграции |
+| `docs/api/observability.md` | А | — | — | — | ⏳ | 47c63ee8 | Интеграции |
+| `docs/api/observability.md` | Р | — | — | — | ⏳ | 47c63ee8 | Интеграции |
+| `docs/api/observability.md` | Т | — | — | — | ⏳ | 47c63ee8 | Интеграции |
+| `docs/api/platform-module.md` | А | — | — | — | ⏳ | 3064568d | Интеграции |
+| `docs/api/platform-module.md` | Р | — | — | — | ⏳ | 3064568d | Интеграции |
+| `docs/api/platform-module.md` | Т | — | — | — | ⏳ | 3064568d | Интеграции |
 | `docs/api/sandbox.md` | А | — | — | — | ⏳ | 3cc054a5 | Интеграции |
 | `docs/api/sandbox.md` | Р | — | — | — | ⏳ | 3cc054a5 | Интеграции |
 | `docs/api/sandbox.md` | Т | — | — | — | ⏳ | 3cc054a5 | Интеграции |

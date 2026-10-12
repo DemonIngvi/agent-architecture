@@ -31,7 +31,7 @@ INTEG = {
     "I17": ("sandbox", "«внешние хосты»", "", "исходящий трафик через egress-прокси (allowlist)", []),
     "I18": ("agent-runner", "«git-провайдер»", "", "короткоживущие токены репозиториев", ["RepoGrant"]),
     "I19": ("agent-runner", "infrastructure", "", "файлы задачи и артефакты в RustFS (S3 API)", []),
-    "I20": ("icplan", "icplan", "", "интерфейс ICPlan ↔ API (в том числе экраны Platform module, чат запуска, сводка)", ["Process", "Verdict", "CostAggregate", "AgentDefinition"]),
+    "I20": ("icplan", "icplan", "", "интерфейс ICPlan ↔ API (в том числе экраны Platform module, чат запуска, сводка)", ["Process", "Verdict", "CostAggregate", "AgentDefinition", "AgentSettings"]),
     "I21": ("«пользователи»", "icplan", "infrastructure", "вход по HTTPS через Traefik: web, api, mcp", []),
     "I22": ("«сервисы»", "infrastructure", "", "Postgres через PgBouncer", []),
     "I24": ("agent-runner", "icplan", "", "MCP-прокси Runner вызывает MCP-сервер itsaplan-core в api ICPlan (`POST /mcp`) с ключом агента из Secret (D19); дальше I9 — к Harness", ["McpToolCall"]),
