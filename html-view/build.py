@@ -387,6 +387,7 @@ def check_docs() -> list:
     issues += tasksmd.check()
     issues += IG.check(COMPONENTS)  # О-41: интеграции и модели
     issues += config_check()  # tech-spec.md: имя параметра — как в конфиге
+    issues += block_check()  # architecture-methodology.md#block: ссылки карточек блоков
     rd = (ROOT / "docs/rnd/README.md").read_text(encoding="utf-8")  # О-34: структура R&D v3
     for f in sorted((ROOT / "docs/rnd").glob("*.md")):
         if f.name == "README.md":
@@ -860,6 +861,46 @@ def config_check() -> list:
     return issues
 
 
+def _param_names(slug: str) -> set:
+    return {d.get("Параметр", "").strip("`") for _, d in component_params(slug)} if slug in BY_SLUG else set()
+
+
+def block_card(slug: str, title: str, s: dict):
+    """Поля карточки блока (architecture-methodology.md#block): (заполнены, не хватает)."""
+    names = _param_names(slug)
+    checks = {
+        "что делает": bool(s.get("does")),
+        "технология": bool(s.get("tech")),
+        "входы и выходы": bool(s.get("io")),
+        "данные": bool(s.get("data")),
+        "параметры с именами из interfaces.md": bool(s.get("params")) and all(a in names for a, _ in s["params"]),
+        "требования": bool(s.get("reqs")),
+        "задачи": bool(s.get("tasks")),
+        "при сбое": bool(s.get("failures")),
+        "почему так": bool(s.get("why")),
+    }
+    return [k for k, v in checks.items() if v], [k for k, v in checks.items() if not v]
+
+
+def block_check() -> list:
+    """Ссылки в карточках блоков существуют: I-коды, таблицы, требования, задачи, соседние блоки (заполненность — отдельно, не ошибка)."""
+    import datamodel as DMx
+    issues = []
+    tables = set(DMx.PLATFORM_TABLES) | {v["table"] for v in json.loads((HERE / "icplan_schema.json").read_text(encoding="utf-8")).values()} | set(DMx.LITELLM_TABLES)
+    allspec = "".join(f.read_text(encoding="utf-8") for f in ROOT.glob("openspec/changes/*/specs/*/spec.md"))
+    for (slug, title), s in SUB.items():
+        where = f"блок «{title}» ({slug})"
+        for w, x, y in s.get("io", []):
+            issues += [f"{where}: I-код {i} нет в INTEG" for i in re.findall(r"\bI\d+\b", y + " " + x) if i not in DMx.INTEG]
+        for x, _ in s.get("data", []):
+            tname = x.split(" ")[0].strip("`")
+            if not re.match(r"S\d+", tname) and tname not in tables:
+                issues.append(f"{where}: таблицы `{tname}` нет в модели данных")
+        issues += [f"{where}: требования {r} нет" for r in s.get("reqs", []) if f"`{r}`" not in allspec]
+        issues += [f"{where}: задачи {k} нет" for k in s.get("tasks", []) if not list((ROOT / "docs/tasks").glob(f"{k}-*.md"))]
+    return issues
+
+
 def spec_value(name: str, slug: str, fallback: str) -> str:
     """Значение параметра из interfaces.md спеки (один источник, О-50); нет в спеке — как в данных сайта."""
     ps = spec_params()
@@ -1051,7 +1092,8 @@ def write_component_pages():
         docs_ok = [(l, p) for l, p in docs if (SRC / p).exists()]
         ts = [t for t in tids if t in tasks]
         gtxt = f' <span class="g">{g}</span>' if g else ""
-        head = f'<div class="comp-head"><span class="pill">{STATUS[st]}</span>{gtxt}</div>'
+        etype = f"встроенный компонент (внутри {BY_SLUG[HOST[slug]][1]})" if slug in HOST else "компонент"  # architecture-methodology#entity
+        head = f'<div class="comp-head"><span class="pill">Тип: {etype}</span><span class="pill">{STATUS[st]}</span>{gtxt}</div>'
         chain, purpose, does = ABOUT.get(slug, ([], desc, []))
         got, gave = IG.io_lists(slug, IG.names(COMPONENTS))  # из интеграций, не вручную
         ch = []
@@ -1165,24 +1207,35 @@ def write_component_pages():
             (SRC / page).write_text("\n".join(L) + "\n", encoding="utf-8")
             continue
         host = HOST.get((slug, title))
+        filled, missing = block_card(slug, title, s)
         L = [f"# {title}", "",
-             f"Часть компонента [{name}]({rel(d, f'components/{slug}/index.md')})"
-             + (f"; работает внутри [{BY_SLUG[host][1]}]({rel(d, f'components/{host}/index.md')})." if host else "."), "",
-             "## Технология и ключевые параметры", "", f"**Технология:** {s['tech']}", "",
-             "| Параметр | Значение |", "|---|---|"] + [f"| `{cell(a)}` | {cell(spec_value(a, slug, b))} |" for a, b in s["params"]]
-        L += ["", "## Что делает", ""] + [f"- {x}" for x in s["does"]]
-        L += ["", "## Почему так", "", s["why"]]
-        if s.get("reqs") or s.get("tasks") or s.get("iface"):  # документы встроенного блока
-            L += ["", "## Документы блока", ""]
+             f"**Тип:** {'встроенный блок' if host else 'блок'} компонента [{name}]({rel(d, f'components/{slug}/index.md')})"
+             + (f", работает внутри [{BY_SLUG[host][1]}]({rel(d, f'components/{host}/index.md')})" if host else "")
+             + f" · карточка заполнена на {len(filled)} из {len(filled) + len(missing)}"
+             + (f" — не хватает: {', '.join(missing)}" if missing else "")
+             + f" ([правило]({rel(d, 'docs/rules/architecture-methodology.md')}#block))", "",
+             "## Что делает", ""] + [f"- {x}" for x in s["does"]]
+        L += ["", "## Технология", "", s["tech"]]
+        if s.get("io"):
+            L += ["", "## Входы и выходы", "", "| | С кем | Что |", "|---|---|---|"] + [f"| {cell(w)} | {cell(x)} | {cell(y)} |" for w, x, y in s["io"]]
+        if s.get("data"):
+            L += ["", "## Данные", "", "| Таблица или хранилище | Как |", "|---|---|"] + [f"| `{cell(x)}` | {cell(y)} |" for x, y in s["data"]]
+        if s["params"]:
+            L += ["", "## Параметры", "", "| Параметр | Значение |", "|---|---|"] + [f"| `{cell(a)}` | {cell(spec_value(a, slug, b))} |" for a, b in s["params"]]
+        if s.get("reqs") or s.get("tasks") or s.get("iface"):
+            L += ["", "## Требования и задачи", ""]
             if s.get("reqs"):
                 def _rq(r):
                     f = next((x for x in ROOT.glob("openspec/changes/*/specs/*/spec.md") if f"`{r}`" in x.read_text(encoding="utf-8")), None)
                     return f"[{r}]({rel(d, str(f.relative_to(ROOT)).replace(chr(92), '/'))}#{r.lower()})" if f else r
-                L.append("**Требования:** " + ", ".join(_rq(r) for r in s["reqs"]))
+                L += ["**Требования:** " + ", ".join(_rq(r) for r in s["reqs"]), ""]
             if s.get("tasks"):
-                L.append("**Задачи:** " + ", ".join(f"[{t}]({rel(d, str(next((ROOT / 'docs/tasks').glob(t + '-*.md')).relative_to(ROOT)).replace(chr(92), '/'))})" for t in s["tasks"]))
+                L += ["**Задачи:** " + ", ".join(f"[{t}]({rel(d, str(next((ROOT / 'docs/tasks').glob(t + '-*.md')).relative_to(ROOT)).replace(chr(92), '/'))})" for t in s["tasks"]), ""]
             if s.get("iface"):
-                L.append("**Интерфейсы:** " + ", ".join(s["iface"]) + f" — [Интеграции]({rel(d, f'docs/api/{slug}.md')}#integrations)")
+                L += ["**Интерфейсы:** " + ", ".join(s["iface"]) + f" — [Интеграции]({rel(d, f'docs/api/{slug}.md')}#integrations)", ""]
+        if s.get("failures"):
+            L += ["", "## При сбое", ""] + [f"- {x}" for x in s["failures"]]
+        L += ["", "## Почему так", "", s["why"]]
         if s["rnd"]:
             L += ["", f"**Исследование:** [R&D]({rel(d, 'docs/rnd/' + s['rnd'])})"]
         (SRC / d).mkdir(parents=True, exist_ok=True)

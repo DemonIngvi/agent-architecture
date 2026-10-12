@@ -4,6 +4,7 @@
     python html-view/doctool.py next <файл>       следующие документы по графу связности и их методологии
     python html-view/doctool.py diagram <файл>    mermaid-схемы файла → HTML-страница (посмотреть отрисованной)
     python html-view/doctool.py move <старый> <новый>  переименовать документ и сразу обновить все ссылки на него
+    python html-view/doctool.py blocks             заполненность карточек блоков: чего не хватает для реализации
     python html-view/doctool.py generated <файл>  если файл генерируется — откуда и чем; иначе пусто
     python html-view/doctool.py check             все проверки сборки без сборки сайта (секунды)
     python html-view/doctool.py rnd <slug> <тема> заготовка R&D v3.1, проходящая проверку структуры
@@ -347,6 +348,16 @@ def main():
     cmd, args = (sys.argv[1] if len(sys.argv) > 1 else ""), sys.argv[2:]
     if cmd == "route":
         print(route(args[0]) or "нет правил для этого пути")
+    elif cmd == "blocks":  # заполненность карточек блоков (architecture-methodology.md#block)
+        sys.path.insert(0, str(HERE))
+        with contextlib.redirect_stdout(io.StringIO()):
+            import build as B
+        rows = [(slug, title, *B.block_card(slug, title, s)) for (slug, title), s in B.SUB.items() if not s["tech"].startswith("→ ")]
+        full = sum(1 for r in rows if not r[3])
+        print(f"блоков {len(rows)}, карточка заполнена полностью у {full}")
+        for slug, title, ok, miss in rows:
+            if miss:
+                print(f"- {slug} / {title}: {len(ok)}/{len(ok) + len(miss)}, нет: {', '.join(miss)}")
     elif cmd == "move":
         ch = move(args[0], args[1])
         print(f"перенесено: {args[0]} → {args[1]}; ссылки обновлены в {len(ch)} файлах" + ("".join(f"\n- {c}" for c in ch)))
