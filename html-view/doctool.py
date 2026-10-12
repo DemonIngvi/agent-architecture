@@ -371,6 +371,11 @@ def main():
         print(f"ждёт решения: {len(q)}")
         for p, r in q[:200]:
             print(f"- {p} × {r}")
+    elif cmd == "review-pack":  # пакет проверки: весь контекст роли в одном файле (approval-methodology.md)
+        sys.path.insert(0, str(HERE))
+        import review as RV
+        p = RV.pack(args[0], args[1])
+        print(f"{p} — {len(p.read_text(encoding='utf-8')) // 4} ток. (примерно)")
     elif cmd == "lint":  # нестрогие проверки методологий по компонентам (не блокируют коммит)
         sys.path.insert(0, str(HERE))
         import lint as LN
