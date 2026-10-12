@@ -143,7 +143,7 @@ MODELS = {
         ("issueType", "string", True, "тип задачи"), ("owner", "string", True, "`username` владельца процесса"), ("firstStep", "string", True, "`id` первого шага"),
         ("steps", "ProcessStep[]", True, "шаги"), ("version", "int", True, "версия; растёт при каждом изменении; задача на шаге дорабатывает его по старой версии, следующий шаг берёт из новой")]),
     "ProcessStep": ("шаг процесса (D17, D20)", [
-        ("id", "string", True, "идентификатор шага в процессе (`sdd`)"), ("column", "string", True, "название колонки проекта (`SDD`)"), ("agentId", "int", False, "агент шага; нет — ручной шаг"),
+        ("id", "string", True, "ключ шага в процессе (`sdd`) — колонка `process_step.key`, уникальна в процессе"), ("column", "string", True, "название колонки проекта (`SDD`)"), ("agentId", "int", False, "агент шага; нет — ручной шаг"),
         ("onSuccess / onFailure", "{step} · {process} · {done: true}", True, "куда переходит задача: на шаг этого процесса по `id`, на первый шаг другого процесса (тип задачи меняется) или завершается"), ("maxRuns", "int", False, "сколько раз шаг может запускаться по одной задаче, 1–10, по умолчанию 3 (R-AP-16); превышен — `onFailure`"),
         ("requireReview", "bool", True, "итог шага проверяет человек (вердикт), прежде чем задача перейдёт дальше"), ("deliverable", "string", False, "что шаг сдаёт: артефакты и формат (D20)"),
         ("doneCriteria", "Criterion[]", False, "готовность шага (D20)"), ("criteriaApproval", "enum: auto · review · always", True, "как подтверждаются критерии, предложенные агентом (D20): `auto` — без подтверждения, но если у шага `requireReview` или у агента-автора автономия R0–R1, работает как `review`; `review` — подтверждает человек при проверке шага; `always` — подтверждает человек всегда, до запуска шага")]),
@@ -182,7 +182,7 @@ MODELS = {
         ("budget_duration", "string", True, "всегда `1d`: бюджет ключа = дневной лимит агента; лимит на запуск проверяет G1"), ("rpm_limit / tpm_limit", "int", False, ""), ("metadata", "object", False, "наши ключи в стиле LiteLLM: `agent_id`")]),
     "CostAggregate": ("сводка затрат по задаче и агенту (экран «Затраты», R-OBS-05)", [
         ("issueId", "int", True, "задача: `run_id` из журнала LiteLLM → `agent_run.issue_id`"), ("agentId", "int", True, "агент: `agent_run.agent_id`"), ("runs", "int", True, "число запусков за всё время задачи; запуски без задачи — в сводке агента (задача 3.9)"),
-        ("inputTokens / outputTokens", "int", True, "токены из журнала LiteLLM"), ("costUsd", "float", True, "затраты")]),
+        ("inputTokens / outputTokens", "int", True, "токены из журнала LiteLLM"), ("costUsd", "float | null", True, "затраты; `null` — цена модели не задана, стоимость неизвестна (R-OBS-05)")]),
     "OpaBundleData": ("данные бандла OPA (`data.json`)", [
         ("agents.<id>.tools_allow", "string[]", True, "`<id>` — `agentId`"), ("agents.<id>.approval", "string[]", True, "тулы с паузой"),
         ("agents.<id>.autonomy", "enum: R0–R5", True, ""), ("agents.<id>.budget", "{run_usd, day_usd}", True, "лимиты $ = `AgentSettings.budget`"), ("projects.<id>.budget.month_usd", "number", False, "лимит проекта на месяц = `project_platform.budget_month_usd`"), ("platform.kill_switch", "bool", True, "аварийная остановка всех агентов")]),
@@ -247,7 +247,7 @@ FIELD_SRC = {
 # Поля моделей «fork», которых в форке ещё нет: поле → решение
 PLANNED = {
     "Run": {"rule": "D17", "trigger": "D17 (значение `process_step`)"},
-    "RunResult": {"usage": "D18 (`reasoningTokens`, `costUsd`, `steps`)", "reason": "R-RUN-07", "artifacts": "D20", "gate": "D20"},
+    "RunResult": {"usage": "D18 (`reasoningTokens`, `costUsd`, `iterations`)", "reason": "R-RUN-07", "artifacts": "D20", "gate": "D20"},
 }
 
 # ---------- хранилища ----------
@@ -268,7 +268,7 @@ ICPLAN_TABLES = {
 PLATFORM_TABLES = {
     "process": ("S1", "icplan", [("id", "serial", "PK", ""), ("project_id", "int", "FK project", ""), ("issue_type_id", "int", "FK issue_type", "один процесс на тип"),
                                  ("owner_user_id", "text", "", "владелец"), ("first_step_id", "int", "FK process_step", ""), ("version", "int", "", "версия процесса")]),
-    "process_step": ("S1", "icplan", [("id", "serial", "PK", ""), ("process_id", "int", "FK process", ""), ("column_id", "int", "FK project_column", "колонка"),
+    "process_step": ("S1", "icplan", [("id", "serial", "PK", ""), ("key", "text", "", "ключ шага в процессе (`sdd`) — `ProcessStep.id`"), ("process_id", "int", "FK process", ""), ("column_id", "int", "FK project_column", "колонка"),
                                       ("agent_id", "int", "FK ai_agent", "нет — ручной шаг"), ("on_success", "jsonb", "", "шаг / процесс / завершить"), ("on_failure", "jsonb", "", ""),
                                       ("max_runs", "int", "", "3"), ("require_review", "bool", "", ""), ("deliverable", "text", "", "результат шага (D20)"),
                                       ("done_criteria", "jsonb", "", "готовность шага (D20)"), ("criteria_approval", "text", "", "auto / review / always")]),
@@ -303,6 +303,12 @@ PLATFORM_TABLES = {
                                    ("version", "int", "", ""), ("updated_at", "timestamptz", "", "")]),
     "m4_fact": ("S4", "memory", [("id", "bigserial", "PK", "после MVP"), ("scope", "text", "", ""), ("text", "text", "", "маскированный"), ("embedding", "vector", "", "pgvector"),
                                  ("source", "text", "", ""), ("valid_from", "timestamptz", "", ""), ("valid_to", "timestamptz", "", ""), ("superseded_by", "bigint", "FK m4_fact", "")]),
+    "agent_run_delivery": ("S1", "icplan", [("id", "serial", "PK", ""), ("run_id", "int", "FK agent_run", "запуск"),
+                           ("kind", "text", "", "approval · message"), ("seq", "int", "", "событие запроса подтверждения (для approval)"),
+                           ("payload", "jsonb", "", "`ApprovalDecision` или `UserMessage`"), ("created_at", "timestamptz", "", ""),
+                           ("delivered_at", "timestamptz", "", "Runner подтвердил получение: `decision_applied` · `message_received` (R-ICP-16)")]),
+    "process_version": ("S1", "icplan", [("process_id", "int", "PK, FK process", ""), ("version", "int", "PK", "версия процесса"),
+                        ("steps", "jsonb", "", "снимок шагов: задача дорабатывает шаг по версии, с которой вошла (R-AP-22)"), ("created_at", "timestamptz", "", "")]),
     "run_checkpoint": ("S5", "agent-runner", [("run_id", "int", "PK, FK agent_run", ""), ("iteration", "int", "PK", "итерация цикла"), ("parent_iteration", "int", "", ""), ("state", "bytea", "", "состояние LangGraph"),
                                               ("created_at", "timestamptz", "", ""), ("expires_at", "timestamptz", "", "`checkpoint.ttl`")]),
 }
@@ -357,7 +363,7 @@ DB_GRANTS = [
 ]
 # Таблица платформы → «база.схема»; таблицы форка — itsaplan.public, LiteLLM — litellm.public
 SCHEMA_OF = {
-    "process": "itsaplan.public", "process_step": "itsaplan.public", "issue_process_state": "itsaplan.public",
+    "process": "itsaplan.public", "process_step": "itsaplan.public", "issue_process_state": "itsaplan.public", "agent_run_delivery": "itsaplan.public", "process_version": "itsaplan.public",
     "agent_settings": "itsaplan.platform", "agent_settings_version": "itsaplan.platform", "sandbox_profile": "itsaplan.platform",
     "memory_profile": "itsaplan.platform", "project_resource": "itsaplan.platform", "access_policy": "itsaplan.platform",
     "project_platform": "itsaplan.platform", "kill_switch": "itsaplan.platform", "run_event": "itsaplan.platform",
@@ -384,7 +390,7 @@ TABLE_POLICY = {
     "issue_activity": (None, "пока жива задача", "каскадно с задачей; комментарий удаляется по одному; по времени форк не чистит — срок открыт (icplan-integration, открытые вопросы)", "fork"),
     "process": ([("unique", "project_id, issue_type_id", "один процесс на тип задачи"), ("index", "issue_type_id", "FK; процесс по типу задачи"), ("index", "first_step_id", "FK")],
                 "пока жив проект", "каскадно с проектом; версия процесса растёт при правке", "fork"),
-    "process_step": ([("unique", "process_id, column_id", "одна колонка — один шаг"), ("index", "column_id", "FK; переход по колонке"), ("index", "agent_id", "FK; шаги агента")],
+    "process_step": ([("unique", "process_id, key", "ключ шага уникален в процессе"), ("unique", "process_id, column_id", "одна колонка — один шаг"), ("index", "column_id", "FK; переход по колонке"), ("index", "agent_id", "FK; шаги агента")],
                      "пока жив процесс", "каскадно с процессом", "fork"),
     "issue_process_state": ([("index", "process_id", "FK"), ("index", "step_id, state", "задачи на шаге — доска и подхват")],
                             "пока жива задача", "каскадно с задачей", "fork"),
@@ -407,6 +413,9 @@ TABLE_POLICY = {
     "memory_m3": ([], "`memory.retention`: M3 до закрытия задачи (agent-memory)", "удаляется по профилю после закрытия задачи; M2 остаётся", "memory"),
     "m4_fact": ([("index", "superseded_by", "FK"), ("index", "scope, valid_to", "действующие факты области"), ("hnsw", "embedding", "поиск похожих (pgvector)")],
                 "`memory.retention`: M4 до замены факта (agent-memory)", "заменённый факт получает `valid_to`, удаляется по профилю", "memory"),
+    "agent_run_delivery": ([("index", "run_id", "FK; недоставленное по запуску"), ("index", "delivered_at", "выборка недоставленного")],
+                           "пока жив запуск", "каскадно с `agent_run`; доставленное — со сроком `agent_run`", "fork"),
+    "process_version": ([], "пока жив процесс", "каскадно с процессом", "fork"),
     "run_checkpoint": ([("index", "expires_at", "очистка")], "`checkpoint.ttl` = 7 дней (agent-harness)", "очистка по `expires_at`", "runner"),
 }
 
@@ -459,13 +468,17 @@ ENDPOINT_IO = {
     "POST /agent-runs/:runId/events": ("{events: RunEvent[]}", "200 · {canceled: bool}", "как `POST /agent-chats/:messageId/events` форка (D21)"),
     "GET /agent-runs/:runId/stream": ("—", "200 · SSE: `data: AgUiEvent`", "как `…/chat/:messageId/stream` форка (D21)"),
     "GET /issues/:issueId/agent-feed": ("—", "200 · {runs: {run: RunSummary, step, events: RunEvent[], result: RunResult}[]}", "история ленты по шагам процесса (D21)"),
-    "POST /issues/:issueId/agent-verdict": ("Verdict", "204", ""),
+    "POST /issues/:issueId/agent-verdict": ("Verdict", "204", "ошибки: 403 — нет права на задачу; 409 — нет итога, ждущего вердикта (R-AP-19)"),
     "PATCH /issues/:issueId": ("+ {reviewWithMe: bool}", "как в форке", "к телу форка добавляем флаг (R-AP-18)"),
     "POST /issues/:issueId/process/pause": ("—", "204", "также `/resume`"),
-    "POST /issues/:issueId/process/retry": ("{fromStep?: string}", "204", ""),
-    "GET /issues/:issueId/agent-status": ("—", "200 · {state, queuePosition, waitReason}", ""),
+    "POST /issues/:issueId/process/retry": ("{fromStep?: string}", "204", "ошибки: 403 — нет права; 409 — превышен `step.max_runs` или процесс остановлен (R-AP-21)"),
+    "GET /issues/:issueId/agent-status": ("—", "200 · {state, queuePosition, waitReason}", "`state`: queued · running · waiting · paused · idle; `waitReason`: slot · approval · answer · runner_offline · agent_disabled (R-AP-07, R-AP-17)"),
     "GET /projects/:projectKey/processes": ("—", "200 · Process[]", ""),
-    "PUT /projects/:projectKey/processes/:issueTypeId": ("Process", "200 · Process (новая версия)", ""),
+    "PUT /projects/:projectKey/processes/:issueTypeId": ("Process", "200 · Process (новая версия)", "ошибки: 400 — ошибка структуры `{step, reason}` (R-AP-15); 403 — не администратор проекта"),
+    "POST /agent-runs/:runId/decisions": ("ApprovalDecision", "204", "решение пользователя по `seq` события; доставляется Runner в ответе heartbeat (R-ICP-05, R-ICP-16); ошибки: 403 — нет права на задачу; 409 — запуск завершён или решение уже есть"),
+    "POST /agent-runs/:runId/messages": ("UserMessage", "204", "указание пользователя активному запуску; доставка — через heartbeat (R-ICP-16); ошибки: 403; 409 — запуск завершён"),
+    "POST /agent-runs/:runId/cancel": ("—", "204", "отмена запуска по задаче; Runner узнаёт по 404 на heartbeat (R-ICP-07); ошибки: 403; 409 — запуск уже завершён; для запусков по расписанию в форке есть `…/agent-schedules/:scheduleId/runs/:runId/cancel`"),
+    "GET /issues/:issueId/costs": ("—", "200 · CostAggregate[] (по агентам задачи)", "журнал затрат LiteLLM по `run_id` (I14, роль `litellm_read`); `costUsd = null`, если цена не задана (R-OBS-05)"),
     "GET /me/agent-summary": ("—", "200 · {working, queued, waitingMe: {issueId, issueIdentifier, agentId, since}[], costUsd}", ""),
     "POST /mcp": ("McpToolCall", "200 · McpToolCall (result)", "MCP-сервер ICPlan, не в OpenAPI"),
     # LiteLLM
@@ -497,4 +510,22 @@ ENDPOINT_IO = {
     "POST Kubernetes": ("Kubernetes API: Pod из `SandboxClaim`", "201 · Pod", "этап 4"),
     "GET https://<домен>/": ("—", "200 · web ICPlan", ""),
     "GET https://<домен>/api/*": ("—", "как api ICPlan", ""),
+}
+
+
+# Доработки колонок форка ICPlan (Z-ICP-10, Z-ICP-13, Z-ICP-14): таблица → [(колонка, тип, ключ, описание)].
+# Показываются на «Данных» вместе с колонками схемы форка, с пометкой доработки.
+FORK_COLUMNS = {
+    "issue": [("review_with_me", "bool", "", "🛠 проверять со мной все шаги (D17, R-AP-18)")],
+    "ai_agent": [("enabled", "bool", "", "🛠 агент включён: создаются и выдаются запуски (D17, R-ICP-17)")],
+    "issue_checklist_item": [("origin", "text", "", "🛠 кто задал критерий: process · user:<username> · agent:<username> · reviewer:<username> (D20)"),
+                             ("status", "text", "", "🛠 active · pending_approval (D20)")],
+    "agent_run": [("process_step_id", "int", "FK process_step", "🛠 шаг процесса запуска — `Run.rule.stepId` (D17)"),
+                  ("agent_version", "int", "", "🛠 версия определения агента запуска (R-REG-03)"),
+                  ("reason", "text", "", "🛠 причина итога — `RunResult.reason` (R-RUN-07)"),
+                  ("artifacts", "jsonb", "", "🛠 опубликованное — `RunResult.artifacts` (D20)"),
+                  ("gate", "jsonb", "", "🛠 проверка по критериям — `RunResult.gate` (D20)"),
+                  ("reasoning_tokens", "int", "", "🛠 `RunResult.usage.reasoningTokens` (D18)"),
+                  ("iterations", "int", "", "🛠 `RunResult.usage.iterations` (D18)"),
+                  ("cost_usd", "numeric", "", "🛠 `RunResult.usage.costUsd`; null — неизвестна (R-OBS-05)")],
 }

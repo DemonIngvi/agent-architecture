@@ -148,7 +148,7 @@ k3s на одном узле; namespaces `itsaplan-core`, `itsaplan-data`, `itsa
 | Формат критериев приёмки | чек-лист «Критерии приёмки» в задаче ICPlan (`issue_checklist`), у пункта — происхождение (процесс, человек, агент); источники и подтверждение — D20 | в ICPlan есть чек-листы задач |
 | Версии | LangGraph 1.2.14, `langchain` 1.4.4 с extra `mcp` (fastmcp ≥ 4.0.11; `langchain-mcp-adapters` в архиве), LiteLLM v1.104.2, OPA v1.21.1 | PyPI и релизы GitHub на 10.10.2026 |
 | Запись M2 | M2 = `agent_run` ICPlan: пишет ICPlan по итогу Runner (`/agent-runs/{id}/result`) и вердикту; Memory API только читает | протокол раннера ICPlan |
-| Где M3 | БД ICPlan, схема `platform`, таблица M3 (S4) | одна БД, бэкап вместе с S1 |
+| Где M3 | БД ICPlan, таблица M3 (S4); схема — `memory`, владелец Memory API (уточнено D22, было `platform`) | одна БД, бэкап вместе с S1 |
 | Граница Registry и Platform module | Registry = сущности агента ICPlan (модель, инструкция, тулы, навыки, MCP, проекты, версия); Platform module — бюджеты, профили, данные guardrails, автономия, политика доступа | D9 |
 | Голодание при `order: priority` | старение приоритета: +1 уровень за каждые `scheduling.aging_s` (600 с) ожидания | стандартная техника планировщиков |
 | Рабочее пространство (ОВ-WS-1…5) | вариант B; каталог проекта в Platform module; при смене шага — `read` на workspace задачи, `write` — своя подпапка; ограничение токенами Runner и MCP-серверами (промпт права не расширяет); шаблоны политики по ролям агентов с ручной правкой | [R&D](../../../docs/rnd/agent-workspace.md): B = 87 |

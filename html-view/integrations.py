@@ -213,7 +213,7 @@ def models_md(slug) -> list:
     L = ["## Контракты данных {#contracts}", "", "Структуры, которыми компонент обменивается с соседями: поля, откуда взяты, почему такие, пример. "
          "Правило имён — [на странице «Модель данных»](../../data-model.md#naming).", ""]
     for m in ms:
-        L += model_block(m)
+        L += model_block(m, on_page=set(ms))
     return L
 
 
@@ -264,7 +264,7 @@ def field_origin(m, field):
     return {"ext": "📘 протокол", "ours": "🧩 наше"}[kind]
 
 
-def model_block(m, base="../../") -> list:
+def model_block(m, base="../../", on_page=None) -> list:
     purpose, fields = DM.MODELS[m]
     meta = DM.MODEL_META[m]
     users = [i for i, v in DM.INTEG.items() if m in v[4]]
@@ -275,7 +275,12 @@ def model_block(m, base="../../") -> list:
     else:
         src = f"🧩 наш контракт: {meta[1]}"
     parents = [o for o, (_, fs) in DM.MODELS.items() if o != m and any(re.search(rf"\b{m}\b", f[1]) for f in fs)]
-    where = (f" · интерфейсы: {', '.join(users)}" if users else "") + (f" · вложена в: {', '.join(f'[{x}](#model-{x.lower()})' for x in parents)}" if parents else "")
+    def _href(x):  # модель на этой странице — якорь, иначе — страница владельца (Z-ICP-7)
+        if on_page is None or x in on_page:
+            return f"#model-{x.lower()}"
+        owner = next((c[0] for c in __import__("components").COMPONENTS if x in models_of(c[0])), None)
+        return f"{owner}.md#model-{x.lower()}" if owner else f"#model-{x.lower()}"
+    where = (f" · интерфейсы: {', '.join(users)}" if users else "") + (f" · вложена в: {', '.join(f'[{x}]({_href(x)})' for x in parents)}" if parents else "")
     L = [f'### {m} {{#model-{m.lower()}}}', "", f"_{purpose}_" + where, "",
          f"**Источник:** {src}.", "",
          "| Поле | Тип | Обязательное | Откуда | Описание |", "|---|---|---|---|---|"]
@@ -428,6 +433,7 @@ def er_tables(slug):
     for key, note in DM.ICPLAN_TABLES.get(slug, []):
         v = SCHEMA[key]
         cols = [(c["name"], c["type"], ("PK" if c["pk"] else "") + (("FK " + BY_VAR.get(c["ref"], c["ref"])) if c["ref"] else ""), "") for c in v["cols"]]
+        cols += [c for c in DM.FORK_COLUMNS.get(v["table"], []) if c[0] not in {x[0] for x in cols}]  # доработки форка (🛠)
         out.append((v["table"], cols, "код форка" + (f"; {note}" if note else "")))
     for t, (store, owner, cols) in DM.PLATFORM_TABLES.items():
         if owner == slug or (slug == "observability" and t == "run_event") or (slug == "agent-runner" and t == "run_event"):
@@ -569,7 +575,11 @@ def where_md(slug) -> list:
         db, sc = pl.split(".")
         s = DM.DATABASES.get(db, {}).get("schemas", {}).get(sc)
         parts.append(f"база `{db}`, схема `{sc}`" + (f" (роль `{s['role']}`)" if s else ""))
-    return ["**Где лежит:** " + "; ".join(parts) + " — [все базы и роли](../infrastructure/index.md#databases).", ""]
+    L = ["**Где лежит:** " + "; ".join(parts) + " — [все базы и роли](../infrastructure/index.md#databases).", ""]
+    incoming = [g for g in DM.DB_GRANTS if g[2].split(".")[-1] in tables]  # кто вне компонента читает его таблицы (Z-ICP-17)
+    if incoming:
+        L += ["**Доступ других сервисов к таблицам компонента:** " + "; ".join(f"`{r}` — {gr} `{tb.split('.')[-1]}` ({w})" for r, gr, tb, w in incoming) + ".", ""]
+    return L
 
 
 def db_check(components) -> list:
