@@ -34,6 +34,7 @@ INTEG = {
     "I20": ("icplan", "icplan", "", "интерфейс ICPlan ↔ API (в том числе экраны Platform module, чат запуска, сводка)", ["Process", "Verdict", "CostAggregate", "AgentDefinition"]),
     "I21": ("«пользователи»", "icplan", "infrastructure", "вход по HTTPS через Traefik: web, api, mcp", []),
     "I22": ("«сервисы»", "infrastructure", "", "Postgres через PgBouncer", []),
+    "I24": ("agent-runner", "icplan", "", "MCP-прокси Runner вызывает MCP-сервер itsaplan-core в api ICPlan (`POST /mcp`) с ключом агента из Secret (D19); дальше I9 — к Harness", ["McpToolCall"]),
     "I23": ("agent-runner", "sandbox", "infrastructure", "среды запусков через Kubernetes API (этап 4)", ["SandboxClaim"]),
 }
 # Кто пользуется общими стыками I22 (БД) и I20 (API ICPlan), кроме владельцев
@@ -48,6 +49,7 @@ INTEG_TYPES = {
     "I7": "Т6 (`RunBundle`), Т1, Т2, Т4, Т7, Т8",
     "I8": "Т1, Т2, Т8, Т7 (`metadata`), Т5 (virtual key)",
     "I9": "Т6 (вызов), Т8 (вывод), Т3",
+    "I24": "Т6 (вызов), Т8 (вывод), Т3",
     "I10": "Т6, Т4",
     "I11": "Т2",
     "I12": "Т2 (состояние цикла)",
@@ -395,6 +397,8 @@ TREES = {
 # «МЕТОД путь» (как в каталоге API) → (запрос, ответ, заметка). Модель — по имени (ссылка на поля), иначе — структура строкой.
 # Эндпоинты, которые есть в OpenAPI форка, показываются из снимка автоматически; для 🛠 — снимок + эта запись.
 ENDPOINT_IO = {
+    # MCP ICPlan: смонтирован вне OpenAPI — apps/api/src/mcp/mount.ts форка
+    "POST /mcp": ("JSON-RPC 2.0: `tools/list`, `tools/call` · `Authorization: Bearer <ключ агента>`", "200 · JSON-RPC result (MCP Streamable HTTP)", "путь вне OpenAPI форка: `app.ts` → `mountMcp` (`apps/api/src/mcp/mount.ts`); ключ — также `x-api-key`"),
     # Harness (API вызывает только Runner)
     "POST /run": ("RunBundle", "202 · {runId}", "запуск цикла; ответ сразу, ход — в `/run/events`"),
     "GET /run/events": ("query: seq — с какого события продолжить", "200 · NDJSON: RunEvent по строке", "переподключение без потерь по `seq`"),

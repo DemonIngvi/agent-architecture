@@ -31,11 +31,8 @@ SUB = {
         params=[("Опрос", "по API-ключу агента"), ("pollIntervalMs", "3000 (у раннера)"), ("Стрим", "ответ и вызовы тулов")],
         does=["Хранит запуски в статусе pending", "Отдаёт запуск внешнему раннеру (наш Agent Runner)", "Принимает стрим ответа и итог"],
         why="Протокол уже есть — Agent Runner подключается к нему, ICPlan почти не меняем.", rnd="runner-and-scheduling.md"),
-    ("icplan", "MCP itsaplan-core"): dict(
-        tech="MCP-сервер ICPlan (`/mcp`), весь REST API как тулы",
-        params=[("Включение", "на проект, по умолчанию выкл"), ("Ключ", "API-ключ агента"), ("Allowlist", "get_issue, add_comment, update_issue…")],
-        does=["Агент читает задачу, пишет комментарий, меняет статус", "Доступ к документам проекта (M6)"],
-        why="Стандарт MCP: тот же сервер используют и наши агенты, и внешние CLI.", rnd="mcp-vs-direct.md"),
+    ("icplan", "MCP itsaplan-core"): dict(  # встроенный: описание у владельца (mcp-tools, itsaplan-core), components.HOST
+        tech="→ mcp-tools", params=[], does=[], why="", rnd=""),
     # ---------- Platform module ----------
     ("platform-module", "API модуля"): dict(
         tech="Модуль форка ICPlan (TypeScript), схема `platform` в Postgres",
@@ -207,11 +204,12 @@ SUB = {
         params=[("R2", "шаг решает модель → тул"), ("R3", "нескольким агентам / секрет → MCP"), ("R7", "внутренности → прямой вызов")],
         does=["Определяет, как подключать новую интеграцию"],
         why="Экономит токены и задержку, не теряя переиспользование.", rnd="mcp-vs-direct.md"),
-    ("mcp-tools", "itsaplan-core"): dict(
-        tech="MCP-сервер ICPlan",
-        params=[("tools", "get_issue, add_comment, update_issue"), ("auth", "ключ агента")],
-        does=["Задачи, комментарии, статусы, документы"],
-        why="Уже есть в ICPlan.", rnd="mcp-vs-direct.md"),
+    ("mcp-tools", "itsaplan-core"): dict(  # работает внутри api ICPlan (components.HOST)
+        tech="MCP-сервер ICPlan (`POST /mcp` в api ICPlan), весь REST API как тулы",
+        params=[("Включение", "на проект, по умолчанию выкл"), ("Ключ", "API-ключ агента; подставляет MCP-прокси Runner"), ("Allowlist", "get_issue, add_comment, update_issue…")],
+        does=["Агент читает задачу, пишет комментарий, меняет поля задачи; колонку задачи в процессе меняет ICPlan по итогу запуска (D17)", "Доступ к документам проекта (M6)"],
+        why="Уже есть в ICPlan; стандарт MCP: тот же сервер используют и наши агенты, и внешние CLI.", rnd="mcp-vs-direct.md",
+        reqs=["R-MCP-13", "R-AP-16"], tasks=["2.4"], iface=["I9", "I24"]),
     ("mcp-tools", "git-провайдер"): dict(
         tech="MCP Gitea / GitHub",
         params=[("tools", "branch, commit, pr.create"), ("Токен", "короткоживущий от Runner")],

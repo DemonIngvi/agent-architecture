@@ -10,11 +10,11 @@ DAP = "openspec/changes/define-agent-platform"
 ICI = "openspec/changes/add-icplan-integration"
 AP = "openspec/changes/icplan-agent-autopickup"
 
-# slug, название, статус (done|part|todo), guardrails, описание, связи, спеки [(подпись, путь)], задачи
+# slug, название, статус (done|part|todo), guardrails, описание, связи (пусто: связи — из datamodel.INTEG и HOST), спеки [(подпись, путь)], задачи
 COMPONENTS = [
     ("icplan", "ICPlan", "part", "",
      "Таск-трекер It's a Plan: доска, процессы, настройка агентов, очередь запусков, UI задачи. Уже есть, дорабатываем.",
-     ["agent-runner", "platform-module", "observability"],
+     [],
      [("Registry — спека", f"{DAP}/specs/agent-registry/spec.md"),
       ("Registry — схема", f"{DAP}/specs/agent-registry/architecture.md"),
       ("Интеграция — proposal", f"{ICI}/proposal.md"),
@@ -26,59 +26,68 @@ COMPONENTS = [
      ["1.2", "2.3", "3.1", "3.2", "3.4", "3.5"]),
     ("platform-module", "Platform module", "todo", "",
      "Модуль ICPlan (своя схема в БД ICPlan): алиасы LLM, бюджеты, профили sandbox и памяти, данные guardrails, версии агентов.",
-     ["icplan", "agent-runner", "guardrails", "llm-gateway"],
+     [],
      [("Спека (control-plane)", f"{DAP}/specs/control-plane/spec.md"),
       ("Схема", f"{DAP}/specs/control-plane/architecture.md")],
      ["4.4"]),
     ("agent-runner", "Agent Runner", "todo", "G1",
      "Берёт запуск из очереди ICPlan, выдаёт sandbox из тёплого пула, следит за лимитами, возвращает итог.",
-     ["icplan", "sandbox", "platform-module"],
+     [],
      [("Спека", f"{DAP}/specs/agent-runner/spec.md"),
       ("Схема", f"{DAP}/specs/agent-runner/architecture.md")],
      ["2.1", "2.7", "2.6"]),
     ("sandbox", "Sandbox", "todo", "G3",
      "Одноразовый изолированный контейнер из тёплого пула; эфемерный /workspace, egress-прокси, доступ к репозиториям.",
-     ["agent-runner", "harness"],
+     [],
      [("Спека", f"{DAP}/specs/agent-sandbox/spec.md"),
       ("Схема", f"{DAP}/specs/agent-sandbox/architecture.md")],
      ["2.2", "4.1", "4.2"]),
     ("harness", "Harness", "todo", "G2",
      "Агентский цикл на LangGraph: контекст → LLM → тулы, hooks, пауза на approve, возобновление, стрим шагов.",
-     ["llm-gateway", "mcp-tools", "memory", "sandbox"],
+     [],
      [("Спека", f"{DAP}/specs/agent-harness/spec.md"),
       ("Схема", f"{DAP}/specs/agent-harness/architecture.md")],
      ["1.3", "1.4", "1.5", "1.6", "1.7"]),
     ("memory", "Memory", "part", "",
      "Память M0–M6: M1, M2, M5, M6 уже есть в ICPlan; M3 — первой; M4 — вместе с RAG.",
-     ["harness", "platform-module"],
+     [],
      [("Спека", f"{DAP}/specs/agent-memory/spec.md"),
       ("Схема", f"{DAP}/specs/agent-memory/architecture.md")],
      ["2.5"]),
     ("mcp-tools", "MCP / Tools", "part", "",
      "Тулы и MCP-серверы агента; правила R1–R7: MCP или прямой вызов.",
-     ["harness", "icplan"],
+     [],
      [("Спека", f"{DAP}/specs/tool-integration/spec.md"),
       ("Схема", f"{DAP}/specs/tool-integration/architecture.md")],
      ["2.4"]),
     ("guardrails", "Guardrails", "todo", "G1–G4",
      "Единая политика: Rego в git, данные в БД ICPlan, OPA для G1/G2; каждая точка включается в конфиге деплоя.",
-     ["agent-runner", "harness", "sandbox", "llm-gateway"],
+     [],
      [("Спека", f"{DAP}/specs/guardrails/spec.md"),
       ("Схема", f"{DAP}/specs/guardrails/architecture.md")],
      ["4.3"]),
     ("llm-gateway", "LiteLLM gateway", "part", "G4",
      "Единственный выход к моделям: алиасы, virtual key на агента, лимиты, fallback. Развёрнут, не подключён.",
-     ["harness", "observability"],
+     [],
      [("Спека", f"{DAP}/specs/llm-gateway/spec.md"),
       ("Схема", f"{DAP}/specs/llm-gateway/architecture.md")],
      ["1.1", "4.5"]),
     ("observability", "Observability", "part", "",
      "События запуска → чат запуска в задаче, затраты. Langfuse и метрики — в бэклоге.",
-     ["llm-gateway", "icplan"],
+     [],
      [("Спека", f"{DAP}/specs/observability/spec.md"),
       ("Схема", f"{DAP}/specs/observability/architecture.md")],
      ["3.3"]),
 ]
+
+# Встроенные: владелец (компонент или (компонент, блок)) → хост, внутри которого работает (процесс, образ, контейнер).
+# Источник фактов — «Что разворачивается» на страницах Deploy; правило — architecture-methodology.md#connectivity.
+HOST = {
+    "platform-module": "icplan",              # модуль внутри api форка ICPlan
+    "observability": "icplan",                # MVP: события в БД ICPlan, сводка в ICPlan
+    "harness": "sandbox",                     # процесс агентского цикла внутри контейнера sandbox
+    ("mcp-tools", "itsaplan-core"): "icplan",  # MCP-сервер в api ICPlan (`/mcp`)
+}
 
 STATUS = {"done": "✅ есть", "part": "⚠️ частично", "todo": "⬜ не начато"}
 BY_SLUG = {c[0]: c for c in COMPONENTS}
@@ -269,7 +278,7 @@ ABOUT = {
                 "Процесс задачи: шаг = колонка + агент + переход по итогу запуска (D17) — доработка",
                 "Очередь запусков и протокол внешнего раннера",
                 "Показ хода работы агента, approve и затрат в задаче"]),
-    "platform-module": ([("ICPlan", "icplan"), ("Platform module", "platform-module"), ("Agent Runner", "agent-runner"), ("LiteLLM gateway", "llm-gateway")],
+    "platform-module": ([("ICPlan", "icplan"), ("Platform module", "platform-module"), ("Agent Runner", "agent-runner")],
                "Хранит внутри ICPlan наши настройки, которых в ICPlan нет, и отдаёт их исполнителям.",
                ["Алиасы моделей и бюджеты агентов", "Профили sandbox и памяти",
                 "Данные правил guardrails (allowlist, лимиты)", "Версии определений агентов, экспорт и импорт YAML"]),
@@ -286,7 +295,7 @@ ABOUT = {
                ["Держит тёплый пул готовых контейнеров", "Ограничивает CPU, память, диск по профилю (G3)",
                 "Даёт эфемерный /workspace и клон нужных репозиториев", "Пускает трафик только через egress-прокси; реестры пакетов — только шагу подготовки",
                 "Секретов в среде нет: ключи подставляют egress-прокси и MCP-прокси Runner"]),
-    "harness": ([("Sandbox", "sandbox"), ("Harness", "harness"), ("LiteLLM gateway", "llm-gateway"), ("MCP / Tools", "mcp-tools")],
+    "harness": ([("Agent Runner", "agent-runner"), ("Harness", "harness"), ("LiteLLM gateway", "llm-gateway")],
                "Агентский цикл: делает из модели агента и заставляет его работать по правилам платформы.",
                ["Собирает агента из определения: промпт, навыки, тулы, лимиты",
                 "Крутит цикл контекст → модель → тулы", "Проверяет действия через hooks (G2)",
@@ -299,7 +308,7 @@ ABOUT = {
                "Руки агента: действия во внешних системах — задачи, документы, git.",
                ["MCP ICPlan: читать задачу, писать комментарий, менять статус", "MCP git-провайдера: ветки и PR",
                 "Тул памяти для записи M3", "Allowlist в MCP-прокси Runner вне sandbox (D19), таймауты", "Правила R1–R7: когда MCP, когда прямой вызов"]),
-    "guardrails": ([("Agent Runner", "agent-runner"), ("Harness", "harness"), ("Sandbox", "sandbox"), ("LiteLLM gateway", "llm-gateway")],
+    "guardrails": ([("Platform module", "platform-module"), ("Guardrails", "guardrails"), ("Agent Runner", "agent-runner")],
                "Ограничения: что агенту можно и что нельзя — в четырёх точках, каждая включается отдельно.",
                ["G1 — допуск и бюджет до запуска (Runner)", "G2 — проверка каждого действия и approve (Harness)",
                 "G3 — изоляция сети, файлов, ресурсов (Sandbox)", "G4 — проверка запросов к модели (LiteLLM)",
@@ -308,7 +317,7 @@ ABOUT = {
                "Единственная дверь к моделям: смена модели, лимиты и учёт затрат в одном месте.",
                ["Алиасы моделей: смена модели без изменения агентов", "Virtual key на агента, бюджеты и rate limit",
                 "Резервная модель при сбое", "Проверки G4 во входе и ответе", "Журнал токенов и стоимости"]),
-    "observability": ([("Harness", "harness"), ("Observability", "observability"), ("ICPlan", "icplan")],
+    "observability": ([("Agent Runner", "agent-runner"), ("Observability", "observability"), ("ICPlan", "icplan")],
                "Прозрачность: что агент делал по шагам и сколько это стоило.",
                ["Пишет события каждого запуска", "Строит чат запуска в задаче ICPlan",
                 "Считает затраты по запуску, задаче, агенту, модели", "Хранит аудит guardrails", "Удаляет старые события по сроку"]),
@@ -320,7 +329,7 @@ ABOUT = {
 # --- infrastructure ---
 COMPONENTS.append(("infrastructure", "Инфраструктура", "part", "G3",
     "Кластер k3s, Helm, Traefik ingress, PostgreSQL (CloudNativePG) с PgBouncer, RustFS, секреты, бэкапы, сетевые политики, профиль нагрузки.",
-    ["icplan", "agent-runner", "llm-gateway", "sandbox"],
+    [],
     [("Спека", f"{DAP}/specs/platform-infrastructure/spec.md"), ("Схема развёртывания", f"{DAP}/specs/platform-infrastructure/architecture.md")],
     ["4.6", "4.7", "4.8"]))
 BY_SLUG["infrastructure"] = COMPONENTS[-1]

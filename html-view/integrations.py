@@ -731,9 +731,79 @@ def flows_check() -> list:
     return issues
 
 
+def neighbours(slug, components) -> set:
+    """Связи компонента — из интерфейсов (INTEG, ALSO) и размещения (HOST); ручных списков нет."""
+    from components import HOST
+    slugs = {c[0] for c in components}
+    out = set()
+    for i, (a, b, via, *_rest) in DM.INTEG.items():
+        side = {x for x in (a, b, via) if x in slugs}
+        also = set(DM.ALSO.get(i, []))
+        if slug in side:  # стороны интерфейса связаны между собой и с участниками ALSO
+            out |= side | also
+        elif slug in also:  # участник ALSO связан со сторонами, но не с другими участниками
+            out |= side
+    for owner, host in HOST.items():
+        o = owner[0] if isinstance(owner, tuple) else owner
+        if slug == o:
+            out.add(host)
+        if slug == host:
+            out.add(o)
+    return out - {slug}
+
+
+def connectivity_check(components) -> list:
+    """Связность компонентов и документы встроенных (architecture-methodology.md#connectivity)."""
+    from components import ABOUT, HOST
+    from subcomponents import SUB
+    issues = []
+    slugs = {c[0] for c in components}
+    for c in components:
+        s = c[0]
+        if c[5]:
+            issues.append(f"{s}: ручной список связей в COMPONENTS — связи только из INTEG и HOST")
+        if not any(s in (a, b, via) or s in DM.ALSO.get(i, []) for i, (a, b, via, *_r) in DM.INTEG.items()):
+            issues.append(f"{s}: нет ни одного интерфейса (INTEG)")
+        chain = [x for _, x in ABOUT.get(s, ([],))[0] if x]
+        for x, y in zip(chain, chain[1:]):
+            if y not in neighbours(x, components):
+                issues.append(f"{s}: путь работы {x} → {y} — нет интерфейса или размещения между ними")
+        for kind, path in (("Архитектура: как работает", f"docs/how/{s}.md"), ("Deploy", f"docs/techspec/{s}.md"), ("Интеграции", f"docs/api/{s}.md")):
+            if not (ROOT / path).exists():
+                issues.append(f"{s}: нет документа «{kind}» ({path})")
+        if not any(p.endswith("/spec.md") for _, p in c[6]):
+            issues.append(f"{s}: нет спеки")
+        if not c[7]:
+            issues.append(f"{s}: нет задач")
+    for owner, host in HOST.items():
+        o = owner[0] if isinstance(owner, tuple) else owner
+        name = owner[1] if isinstance(owner, tuple) else next((c[1] for c in components if c[0] == o), o)
+        if o not in slugs or host not in slugs:
+            issues.append(f"HOST {owner} → {host}: нет такого компонента")
+            continue
+        deploy_host = (ROOT / f"docs/techspec/{host}.md").read_text(encoding="utf-8")
+        if name.lower() not in deploy_host.lower() and o not in deploy_host:
+            issues.append(f"Deploy {host}: не упомянут встроенный «{name}»")
+        if isinstance(owner, tuple):
+            b = SUB.get(owner, {})
+            for f in ("reqs", "tasks", "iface"):
+                if not b.get(f):
+                    issues.append(f"блок «{name}» ({o}): встроенный — нет поля {f} в subcomponents.py")
+            for i in b.get("iface", []):
+                if i not in DM.INTEG:
+                    issues.append(f"блок «{name}»: I-код {i} не найден в INTEG")
+            for t in b.get("tasks", []):
+                if not list((ROOT / "docs/tasks").glob(f"{t}-*.md")):
+                    issues.append(f"блок «{name}»: задача {t} не найдена")
+            dup = [k for k in SUB if k[0] == host and name.lower() in k[1].lower() and SUB[k].get("tech") != f"→ {o}"]
+            issues += [f"блок «{k[1]}» ({host}): второе описание встроенного «{name}» — у хоста блок-ссылка на {o}" for k in dup]
+    return issues
+
+
 def check(components) -> list:
     """Сверка: каждый I-код матрицы описан в INTEG; модели из INTEG описаны; I-коды есть в interfaces.md."""
     issues = []
+    issues += connectivity_check(components)
     issues += [f"{i}: нет типов данных в datamodel.INTEG_TYPES" for i in DM.INTEG if i not in DM.INTEG_TYPES]
     issues += [f"{i}: типы данных для неизвестного интерфейса" for i in DM.INTEG_TYPES if i not in DM.INTEG]
     issues += flows_check()

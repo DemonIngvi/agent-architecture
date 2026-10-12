@@ -60,6 +60,7 @@
 | I19 | Agent Runner / ICPlan → объектное хранилище (RustFS) | S3 API | файлы | ключи сервиса (Secret) | синхронно | 30 с | 3 раза | да, по ключу объекта |
 | I22 | Сервисы → PgBouncer → Postgres | протокол PostgreSQL | SQL | логин / пароль из Secret, роль на схему | синхронно | 5 с на запрос | 1 раз (только чтение) | — |
 | I23 | Agent Runner → Kubernetes API (этап 4) | HTTPS REST (client-go) | JSON манифесты Pod / Job | ServiceAccount с правами только на namespace `itsaplan-agents` | синхронно | 30 с | 1 раз | create — нет |
+| I24 | MCP-прокси Agent Runner → MCP itsaplan-core в api ICPlan (`POST /mcp`, D19) | MCP Streamable HTTP, JSON-RPC 2.0 | `tools/list`, `tools/call` — после фильтра по allowlist и G2 в прокси | `Authorization: Bearer <ключ агента>`, ключ подставляет Runner из Secret | синхронно | 30 с | чтение — 2 раза; запись — нет | запись — нет |
 
 ## Нагрузка и развёртывание
 

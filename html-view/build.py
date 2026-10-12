@@ -21,7 +21,7 @@ from subcomponents import SUB  # noqa: E402
 from stories import ARTIFACTS, BPMN, CHAINS, PERSONAS, ROLES, STORIES  # noqa: E402
 from diagrams import bpmn_svg, graph_svg  # noqa: E402
 import docgraph  # noqa: E402
-from components import ABOUT, AP, BLOCKS, BY_SLUG, COMPONENTS, STATUS  # noqa: E402
+from components import ABOUT, AP, BLOCKS, BY_SLUG, COMPONENTS, HOST, STATUS  # noqa: E402
 import integrations as IG  # noqa: E402
 import sitemap as SM  # noqa: E402
 
@@ -982,10 +982,25 @@ def write_component_pages():
         task_links = "".join(
             f'<li><a href="{href(page, tasks[t])}"><span class="tid">{t}</span> {esc(title_of(SRC / tasks[t], t).split(". ", 1)[-1])}</a></li>'
             for t in ts)
+        # встроенность (architecture-methodology#connectivity): у встроенного — хост, у хоста — встроенные
+        host_note = ""
+        if slug in HOST:
+            host_note += f'<div class="chain-note">работает внутри <a href="{href(page, f"components/{HOST[slug]}/index.md")}">{esc(BY_SLUG[HOST[slug]][1])}</a></div>'
+        inner = []
+        for k, h in HOST.items():
+            if h != slug:
+                continue
+            if isinstance(k, tuple):
+                inner.append(f'<a href="{href(page, sub_page(*k))}">{esc(k[1])}</a> ({esc(BY_SLUG[k[0]][1])})')
+            else:
+                inner.append(f'<a href="{href(page, f"components/{k}/index.md")}">{esc(BY_SLUG[k][1])}</a>')
+        if inner:
+            host_note += '<div class="chain-note">встроенные: ' + ", ".join(inner) + '</div>'
         about = (
             '<div class="about"><div class="about-main">'
             '<div class="about-label">Позиция в системе — путь работы</div>'
             f'<div class="chain-note">кому передаётся задача; кто кого вызывает — <a href="{href(page, f"docs/api/{slug}.md")}#c1">схема C1</a></div>'
+            + host_note +
             f'<div class="chain">{"<span class=ch-arrow>→</span>".join(ch)}</div>'
             '<div class="about-label">Для чего</div>'
             f'<p class="purpose">{esc(purpose)}</p>'
@@ -1062,12 +1077,33 @@ def write_component_pages():
         page = sub_page(slug, title)
         d = str(Path(page).parent).replace("\\", "/")
         name = BY_SLUG[slug][1]
+        if s["tech"].startswith("→ "):  # блок хоста: описание у владельца встроенного (architecture-methodology#connectivity)
+            o = s["tech"][2:].strip()
+            ob = next(k for k in HOST if isinstance(k, tuple) and k[0] == o and HOST[k] == slug)
+            L = [f"# {title}", "", f"Часть компонента [{name}]({rel(d, f'components/{slug}/index.md')}): работает внутри него.", "",
+                 f"Описание, требования и задачи — у владельца: блок [{ob[1]}]({rel(d, sub_page(*ob))}) компонента [{BY_SLUG[o][1]}]({rel(d, f'components/{o}/index.md')})."]
+            (SRC / d).mkdir(parents=True, exist_ok=True)
+            (SRC / page).write_text("\n".join(L) + "\n", encoding="utf-8")
+            continue
+        host = HOST.get((slug, title))
         L = [f"# {title}", "",
-             f"Часть компонента [{name}]({rel(d, f'components/{slug}/index.md')}).", "",
+             f"Часть компонента [{name}]({rel(d, f'components/{slug}/index.md')})"
+             + (f"; работает внутри [{BY_SLUG[host][1]}]({rel(d, f'components/{host}/index.md')})." if host else "."), "",
              "## Технология и ключевые параметры", "", f"**Технология:** {s['tech']}", "",
              "| Параметр | Значение |", "|---|---|"] + [f"| `{cell(a)}` | {cell(spec_value(a, slug, b))} |" for a, b in s["params"]]
         L += ["", "## Что делает", ""] + [f"- {x}" for x in s["does"]]
         L += ["", "## Почему так", "", s["why"]]
+        if s.get("reqs") or s.get("tasks") or s.get("iface"):  # документы встроенного блока
+            L += ["", "## Документы блока", ""]
+            if s.get("reqs"):
+                def _rq(r):
+                    f = next((x for x in ROOT.glob("openspec/changes/*/specs/*/spec.md") if f"`{r}`" in x.read_text(encoding="utf-8")), None)
+                    return f"[{r}]({rel(d, str(f.relative_to(ROOT)).replace(chr(92), '/'))}#{r.lower()})" if f else r
+                L.append("**Требования:** " + ", ".join(_rq(r) for r in s["reqs"]))
+            if s.get("tasks"):
+                L.append("**Задачи:** " + ", ".join(f"[{t}]({rel(d, str(next((ROOT / 'docs/tasks').glob(t + '-*.md')).relative_to(ROOT)).replace(chr(92), '/'))})" for t in s["tasks"]))
+            if s.get("iface"):
+                L.append("**Интерфейсы:** " + ", ".join(s["iface"]) + f" — [Интеграции]({rel(d, f'docs/api/{slug}.md')}#integrations)")
         if s["rnd"]:
             L += ["", f"**Исследование:** [R&D]({rel(d, 'docs/rnd/' + s['rnd'])})"]
         (SRC / d).mkdir(parents=True, exist_ok=True)

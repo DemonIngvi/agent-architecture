@@ -4,6 +4,8 @@
 
 **Что разворачивается:** web, api, worker, bot форка ICPlan с доработками платформы (модуль Platform, автоподхват, протокол раннера).
 
+**Встроенные компоненты** (работают в образе `itsaplan-api`): [Platform module](platform-module.md) — модуль api; [Observability](observability.md) — в MVP без своего сервиса, события и сводка в ICPlan; [MCP itsaplan-core](mcp-tools.md) — `POST /mcp` (I24).
+
 ## Образы
 
 | Образ | База | Что внутри | Как собирается | Откуда берём | Тег | Пользователь | Порты | Проверка готовности |
