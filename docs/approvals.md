@@ -334,6 +334,8 @@
 | `docs/rules/rnd-methodology.md` | А | — | — | — | ⏳ | a7a3ec0e | Методология |
 | `docs/rules/sdd-methodology.md` | В | — | — | — | ⏳ | 56577938 | Методология |
 | `docs/rules/sdd-methodology.md` | А | — | — | — | ⏳ | 56577938 | Методология |
+| `docs/rules/structure-methodology.md` | В | — | — | — | ⏳ | b4a48168 | Методология |
+| `docs/rules/structure-methodology.md` | А | — | — | — | ⏳ | b4a48168 | Методология |
 | `docs/rules/support-docs-methodology.md` | В | — | — | — | ⏳ | ebbf9293 | Методология |
 | `docs/rules/support-docs-methodology.md` | А | — | — | — | ⏳ | ebbf9293 | Методология |
 | `docs/rules/task-methodology.md` | В | — | — | — | ⏳ | df9e1912 | Методология |

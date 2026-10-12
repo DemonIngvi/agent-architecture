@@ -184,6 +184,14 @@ def tooling_check() -> list:
             name = _plain(t.get("Тип", ""))
             if got and f"Тип: {name}." not in got:
                 issues.append(f"doctool route {pats[0]}: выдаёт правила другого типа, ожидался «{name}»")
+    # вкладки сайта = таблица «Вкладки компонента» методологии структуры (structure-methodology.md)
+    sm = RULES / "structure-methodology.md"
+    if sm.exists():
+        tabs = [_plain(r.get("Вкладка", "")) for r in _rows(sm, "| Вкладка | Страница |")]
+        import pagebar as PB
+        site = [label for _, label, *_ in PB.TYPES]
+        issues += [f"structure-methodology.md: вкладки «{x}» нет в pagebar.TYPES" for x in tabs if x not in site]
+        issues += [f"pagebar.TYPES: вкладка «{x}» не описана в structure-methodology.md" for x in site if x not in tabs]
     sys.path.insert(0, str(HERE))
     import docgraph as G
     names = {n for _, ns in G.LAYERS for n in ns}
