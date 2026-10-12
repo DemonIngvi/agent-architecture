@@ -163,12 +163,14 @@ def integrations_md(slug, page, nm, href, model_href="") -> list:
         caller = _who(a, nm)
         if i in DM.DATA_IN_RESPONSE:  # стрелка — кто вызывает; данные идут в ответе
             a, b = b, a
-        if a == slug and b != slug:
+        if a == b == slug:
+            dirc, cls = "внутри компонента", "mid"
+        elif a == slug:
             dirc, cls = "отдаёт", "out"
         elif b == slug or (via == slug and a != slug and b != slug):
             dirc, cls = "получает", "in"
         else:
-            dirc, cls = "участвует", "mid"
+            dirc, cls = "общая инфраструктура", "mid"
         path = _who(a, nm) + (f" → {_who(via, nm)}" if via else "") + f" → {_who(b, nm)}"
         if i in DM.DATA_IN_RESPONSE:
             path += f" (вызывает {caller}, данные — в ответе)"
@@ -371,6 +373,7 @@ def api_structure_check() -> list:
     for f in sorted((ROOT / "docs/api").glob("*.md")):
         if f.name == "README.md":
             continue
+        seen = set()
         for l in f.read_text(encoding="utf-8").splitlines():
             if not l.startswith('| <span class="m '):
                 continue
@@ -380,6 +383,12 @@ def api_structure_check() -> list:
             path = (mm.group(1) if mm else _unlink(c[1])).split(" ")[0]
             if meth not in BADGE or "](" in c[1]:
                 continue  # строка-отсылка к другой странице каталога
+            raw = c[1].strip().strip("`")
+            if re.search(r"→|·\s*`[^/`]", raw):  # пометка поля в пути (api-methodology): доработка — статусом 🛠 на строке пути
+                issues.append(f"docs/api/{f.name}: «{raw}» — в колонке пути пометка поля; доработку пути — статусом 🛠 на его строке")
+                if (meth, path) in seen:
+                    issues.append(f"docs/api/{f.name}: {meth} {path} — вторая строка того же пути")
+            seen.add((meth, path))
             if not api_structure(meth, path):
                 issues.append(f"docs/api/{f.name}: {meth} {path} — нет структуры (OpenAPI форка или datamodel.ENDPOINT_IO)")
             elif "доработка" in c[2] and not any(k in DM.ENDPOINT_IO for k in (f"{meth} {path}", f"{meth} {path.split('?')[0]}")):
@@ -437,7 +446,7 @@ def policy_md(t, ind="") -> list:
     if t not in DM.TABLE_POLICY:
         return []
     idx, keep, clean, mig = DM.TABLE_POLICY[t]
-    L = ["", f"{ind}**Индексы:** " + ("; ".join(f"{k} ({c}) — {w}" for k, c, w in idx) if idx else "только первичный ключ"),
+    L = ["", f"{ind}**Индексы:** " + ("как в схеме форка (`packages/db`)" if idx is None else "; ".join(f"{k} ({c}) — {w}" for k, c, w in idx) if idx else "только первичный ключ"),
          "", f"{ind}**Срок:** {keep} · **очистка:** {clean} · **миграции:** {DM.MIGRATE[mig]}"]
     return L
 
@@ -478,7 +487,7 @@ def param_mirror_check() -> list:
 
 def policy_check() -> list:
     """У каждой таблицы проекта схемы — политика; каждый FK покрыт индексом (О-44)."""
-    issues = [f"{t}: нет политики хранения в datamodel.TABLE_POLICY" for t in DM.PLATFORM_TABLES if t not in DM.TABLE_POLICY]
+    issues = [f"{t}: нет политики хранения в datamodel.TABLE_POLICY" for t in [*DM.PLATFORM_TABLES, *DM.FORK_WRITTEN] if t not in DM.TABLE_POLICY]
     for t, (_, _, cols) in DM.PLATFORM_TABLES.items():
         if t not in DM.TABLE_POLICY:
             continue
@@ -529,7 +538,7 @@ def stores_md(slug, page, href) -> list:
     tables = er_tables(slug)
     stores = DM.STORES.get(slug, [])
     L = ["## Хранилища и модель данных {#stores}", "",
-         f"Хранилища компонента: {', '.join(stores) or '—'}. На диаграмме — ключи и основные поля; все поля, индексы, срок хранения и миграции — в таблицах ниже; правила — [методология данных](../../docs/rules/data-methodology.md).", ""]
+         f"Хранилища компонента: {', '.join(stores) or '—'}. На диаграмме — ключи и основные поля; таблицы другого домена, на которые только ссылаются, показаны одним ключом; все поля, индексы, срок хранения и миграции — в таблицах ниже; правила — [методология данных](../../docs/rules/data-methodology.md).", ""]
     if tables:
         L += mermaid_er(tables) + [""]
         for t, cols, src in tables:
@@ -713,6 +722,9 @@ def flows_check() -> list:
         how = f.read_text(encoding="utf-8")
         if re.search(r"^```(yaml|rego)", how, re.M):
             issues.append(f"docs/how/{f.name}: конфиг — место в Deploy («Пример конфигурации»)")
+        for m in re.findall(r"\]\(([^)]*data-model\.md(?:#[\w-]+)?)\)", how):
+            if "#model-" not in m:  # ссылка на модель relink переводит на контракт; на страницу целиком — некуда (страницы нет)
+                issues.append(f"docs/how/{f.name}: ссылка на удалённую «Модель данных» ({m}) — поля: «Интеграции» (контракты), таблицы: «Данные»")
         body = re.sub(r"```.*?```", "", how, flags=re.S)
         for n in sorted(set(re.findall(r"`([A-Z][a-z]+[A-Z][A-Za-z]*)`", body)) - set(DM.MODELS) - FLOW_NON_MODELS):
             issues.append(f"docs/how/{f.name}: `{n}` — нет такой модели в datamodel.MODELS")
@@ -726,6 +738,8 @@ def check(components) -> list:
     issues += [f"{i}: типы данных для неизвестного интерфейса" for i in DM.INTEG_TYPES if i not in DM.INTEG]
     issues += flows_check()
     issues += [f"{i}: модель {m} не описана в datamodel.MODELS" for i, v in DM.INTEG.items() for m in v[4] if m not in DM.MODELS]
+    in_integ = {m for c in components for m in models_of(c[0])}  # контракт показывается на «Интеграциях» через интерфейс (с вложенными)
+    issues += [f"модель {m}: нет ни в одном интерфейсе INTEG — контракт не попадёт на вкладку «Интеграции»" for m in DM.MODELS if m not in in_integ]
     rows = iface_rows()
     issues += [f"{i}: нет строки в «Интерфейсы обмена» спек" for i in DM.INTEG if i not in rows]
     slugs = {c[0] for c in components}

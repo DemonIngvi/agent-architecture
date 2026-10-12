@@ -1,6 +1,6 @@
-# Техспека: Observability
+# Deploy: Observability
 
-← [Все техспеки](README.md) · [компонент](../../components/observability/index.md) · [правило](../rules/tech-spec.md)
+← [компонент](../../components/observability/index.md) · [методология](../rules/tech-spec.md)
 
 **Что разворачивается:** в MVP — без своего сервиса: события в БД ICPlan, затраты из LiteLLM, сводка в ICPlan.
 

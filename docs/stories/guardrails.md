@@ -61,7 +61,7 @@
 - [ ] Выключение G2 в prod → предупреждение
 - [ ] Изменение → после перезапуска модуля
 
-**Требования:** [Включение и выключение точек](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md)
+**Требования:** [Включение и выключение точек](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-06)
 
 ### US-GRD-02 {#us-grd-02}
 
@@ -75,7 +75,7 @@
 - [ ] Отказ по бюджету → «бюджет исчерпан»
 - [ ] Отказ OPA недоступен → «проверка недоступна, действие запрещено»
 
-**Требования:** [Аудит срабатываний](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md) · [Движок решений для G1 и G2](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md)
+**Требования:** [Аудит срабатываний](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-16) · [Движок решений для G1 и G2](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-07)
 
 ### US-GRD-03 {#us-grd-03}
 
@@ -91,7 +91,7 @@
 - [ ] Бюджет проекта ограничивает агентов
 - [ ] Аномальный расход → стоп и уведомление
 
-**Требования:** [Иерархия бюджетов токенов и денег](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md) · [Аномальный расход](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md)
+**Требования:** [Иерархия бюджетов токенов и денег](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-11) · [Аномальный расход](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-12)
 
 ### US-GRD-04 {#us-grd-04}
 
@@ -105,7 +105,7 @@
 - [ ] Стоп всех → все запуски отменены
 - [ ] Снятие стопа → работа возобновляется
 
-**Требования:** [Аварийная остановка](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md)
+**Требования:** [Аварийная остановка](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-15)
 
 ### US-GRD-05 {#us-grd-05}
 
@@ -119,7 +119,7 @@
 - [ ] Фильтр по агенту, точке, периоду
 - [ ] Записи хранятся по политике хранения
 
-**Требования:** [Аудит срабатываний](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md)
+**Требования:** [Аудит срабатываний](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-16)
 
 ### US-GRD-06 {#us-grd-06}
 
@@ -133,5 +133,5 @@
 - [ ] Тул вне allowlist → отказ
 - [ ] Правило с ошибкой → не применяется, прежнее действует
 
-**Требования:** [G2 Action](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md) · [Единый источник правил](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md)
+**Требования:** [G2 Action](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-03) · [Единый источник правил](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-01)
 

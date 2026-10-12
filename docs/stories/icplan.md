@@ -141,47 +141,32 @@
 
 ### Термины
 
-| Термин | Что это | Где хранится |
+- **Процесс** — маршрут задачи одного типа: упорядоченные шаги, первый шаг, владелец.
+- **Шаг** — колонка проекта + агент (или пусто — ручной шаг) + переход при успехе + переход при ошибке + лимит запусков.
+- **Итог запуска** — успех, ошибка (в том числе лимит и непройденный quality gate), ждёт ответа, отменено человеком.
+- **Очередь агента** — запуски, ждущие агента; выдаются по приоритету задачи, затем по времени.
+- **Владелец процесса** — человек, которому уходит задача при ошибке шага.
+
+Где это хранится — вкладка [«Данные»](../../data-by-component/icplan/index.md).
+
+### Что пользователь видит при переходах
+
+Правила переходов — в требованиях спеки; здесь — что появляется в истории задачи.
+
+| Событие | Запись в истории задачи | Правило |
 |---|---|---|
-| **Процесс** | маршрут задачи одного типа: упорядоченные шаги, первый шаг, владелец | `process` (форк ICPlan), 1 тип задачи → не более 1 процесса |
-| **Шаг** | колонка проекта + агент (или пусто = ручной) + переход при успехе + переход при ошибке + лимит запусков | `process_step` |
-| **Переход при успехе** | следующий шаг этого процесса · другой процесс (смена типа задачи → его первый шаг) · «завершить» (колонка `completed`) | `process_step.on_success` |
-| **Переход при ошибке** | шаг этого процесса (например, «Нужна помощь») · «остаться» | `process_step.on_failure` |
-| **Итог запуска** | `success` · `failed` (ошибка, лимит, непройденный quality gate) · `waiting` (ждёт ответа, approve) · `canceled` (отменил человек) | `agent_run.status` + `RunResult` |
-| **Очередь агента** | запуски `pending` агента; выдаются по приоритету задачи, затем по времени; аренда на время работы | `agent_run` (`next_attempt_at` — аренда, есть в ICPlan) |
-| **Владелец процесса** | человек, которому уходит задача при ошибке шага | `process.owner_user_id` |
+| Задача создана с типом, у которого есть процесс | «процесс X, шаг Y» | [R-AP-02 «Тип задачи задаёт процесс»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-02) |
+| Задача вошла в шаг с агентом | «агент взял задачу: шаг Y» | [R-AP-01 «Агент шага процесса»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-01), [R-AP-05 «Защита от дублей»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-05), [R-AP-07 «Видимость подхвата»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-07) |
+| Итог: успех | «итог: успех → шаг Z» | [R-AP-16 «Переход по итогу запуска»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-16) |
+| Итог: ошибка или лимит запусков | «итог: ошибка (причина) → шаг E», «лимит шага» | [R-AP-16 «Переход по итогу запуска»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-16) |
+| Итог: ждёт ответа | «ждёт ответа» | [R-AP-16 «Переход по итогу запуска»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-16) |
+| Отменено пользователем | «отменено пользователем» | [R-AP-16 «Переход по итогу запуска»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-16) |
+| Агент пытается сменить колонку | «агент: смена колонки отклонена» | [R-AP-16 «Переход по итогу запуска»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-16) |
+| Смена типа задачи | «процесс X → процесс W» | [R-AP-02 «Тип задачи задаёт процесс»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-02) |
 
-### Правила переходов
+Чего процесс не делает (дочерние задачи вместо параллельных веток, агент не выбирает следующий шаг) — [R-AP-15 «Определение процесса»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-15), [R-AP-16 «Переход по итогу запуска»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-16).
 
-| Событие | Что делает ICPlan | Запуск | Запись в истории |
-|---|---|---|---|
-| Задача создана с типом, у которого есть процесс | ставит в колонку первого шага | если у шага агент — делегат + запуск | «процесс X, шаг Y» |
-| Задача вошла в шаг (перевод человеком или переходом) | шаг с агентом → делегат = агент; ручной → делегат снят, исполнитель по автоназначению колонки | один на задачу (защита от дублей) | «агент взял задачу: шаг Y» |
-| Итог `success` | переход при успехе | следующего шага | «итог: успех → шаг Z» |
-| Итог `failed` | переход при ошибке, исполнитель — владелец процесса, уведомление | нет | «итог: ошибка (причина) → шаг E» |
-| Итог `waiting` | задача остаётся в шаге, уведомление исполнителю | тот же, продолжится после ответа | «ждёт ответа» |
-| Итог `canceled` | без перехода, делегат снят | нет | «отменено пользователем» |
-| Вход в шаг сверх лимита запусков (по умолчанию 3) | переход при ошибке с причиной «лимит шага» | нет | «лимит шага» |
-| Смена типа задачи (вручную или переходом «другой процесс») | активный запуск отменяется, задача — на первый шаг нового процесса | первого шага | «процесс X → процесс W» |
-| Агент вызывает `update_issue` со сменой колонки | смена колонки отклоняется, остальные поля обновляются | — | «агент: смена колонки отклонена» |
-| Тип задачи без процесса | обычная доска, переходы вручную | только по делегату / упоминанию / Действию | — |
-
-### Чего процесс не делает
-
-- Не создаёт дочерние задачи: декомпозицию делает агент шага тулом `create_issue`; у дочерней задачи свой тип и свой процесс.
-- Не ветвится параллельно: у шага один переход при успехе. Параллельные работы — дочерние задачи.
-- Агент не выбирает следующий шаг: он возвращает итог, маршрут задан процессом.
-
-### Критерии приёмки шага (D20)
-
-| Источник | Кто | Пометка | Подтверждение |
-|---|---|---|---|
-| Готовность шага | администратор в процессе | `process` | не нужно |
-| Чек-лист задачи | человек | `user:<имя>` | не нужно |
-| Передача предыдущего шага | агент | `agent:<шаг>` | по `criteria_approval` шага: `auto` / `review` / `always` |
-| Возврат ревьюером | агент или человек | `reviewer:<кто>` | не нужно |
-
-Порядок при конфликте: человек > процесс > агент. Исполнитель не меняет критерии своего шага.
+Откуда у шага критерии приёмки и кто их подтверждает — [R-AP-15 «Определение процесса»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-15) (готовность шага), [R-AP-06 «Передача результата следующему этапу»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-06), [R-AP-18 «Проверка пользователем перед переходом»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-18); порядок при конфликте критериев — [design D20](../../openspec/changes/define-agent-platform/design.md).
 
 ## Как пользователь видит работу агента {#agent-feed}
 
@@ -270,7 +255,7 @@
 - [ ] Лимит запусков на шаге превышен → переход при ошибке
 - [ ] Повторный вход в шаг при активном запуске → второго запуска нет
 
-**Требования:** [Агент шага процесса](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Переход по итогу запуска](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Защита от дублей](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Поведение при отказах зависимостей](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Агент шага процесса](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-01) · [Переход по итогу запуска](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-16) · [Защита от дублей](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-05) · [Поведение при отказах зависимостей](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-12)
 
 ### US-ICP-08 {#us-icp-08}
 
@@ -284,7 +269,7 @@
 - [ ] Задача в процессе → явный делегат важнее агента шага, шаг не меняется
 - [ ] Агент выключен или не в проекте → делегат не ставится, причина в карточке
 
-**Требования:** [Приоритет правил](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Получение запуска из очереди (pull)](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Запуск из очереди ICPlan](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md) · [Триггеры запуска ICPlan](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Приоритет правил](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-04) · [Получение запуска из очереди (pull)](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-02) · [Запуск из очереди ICPlan](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-01) · [Триггеры запуска ICPlan](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-23)
 
 ### US-ICP-09 {#us-icp-09}
 
@@ -298,7 +283,7 @@
 - [ ] Упомянут агент без доступа к проекту → ответ «нет доступа», запуска нет
 - [ ] Упоминание при активном запуске этого агента по задаче → сообщение попадает в текущий запуск, второго нет
 
-**Требования:** [Получение запуска из очереди (pull)](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Стрим шагов и итог в задачу](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Один запуск на задачу](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md) · [Триггеры запуска ICPlan](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Получение запуска из очереди (pull)](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-02) · [Стрим шагов и итог в задачу](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-04) · [Один запуск на задачу](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-05) · [Триггеры запуска ICPlan](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-23)
 
 ### US-ICP-19 {#us-icp-19}
 
@@ -312,7 +297,7 @@
 - [ ] Предыдущий запуск ещё идёт → новый не создаётся, запись «пропущено»
 - [ ] Агент выключен → срабатывание пропущено с записью в истории
 
-**Требования:** [Получение запуска из очереди (pull)](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Один запуск на задачу](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md) · [Триггеры запуска ICPlan](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Получение запуска из очереди (pull)](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-02) · [Один запуск на задачу](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-05) · [Триггеры запуска ICPlan](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-23)
 
 ### US-ICP-02 {#us-icp-02}
 
@@ -328,7 +313,7 @@
 - [ ] Обрыв связи → пропущенные шаги досылаются без дублей
 - [ ] Итог — комментарием агента, файлы — вложениями
 
-**Требования:** [Стрим шагов и итог в задачу](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Чат запуска в задаче](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
+**Требования:** [Стрим шагов и итог в задачу](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-04) · [Чат запуска в задаче](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-02)
 
 ### US-ICP-10 {#us-icp-10}
 
@@ -343,7 +328,7 @@
 - [ ] Запуск уже завершён → сообщение начинает новый запуск с контекстом чата
 - [ ] Агент на паузе ожидания → сообщение считается ответом
 
-**Требования:** [Стрим шагов и итог в задачу](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Подтверждения и ответы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Указания пользователя во время запуска](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md)
+**Требования:** [Стрим шагов и итог в задачу](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-04) · [Подтверждения и ответы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-05) · [Указания пользователя во время запуска](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-16)
 
 ### US-ICP-11 {#us-icp-11}
 
@@ -357,7 +342,7 @@
 - [ ] Ответ в чате, комментарии или Telegram → агент продолжает с ответом
 - [ ] Нет ответа дольше таймаута → переход при ошибке с причиной «нет ответа»
 
-**Требования:** [Подтверждения и ответы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Уведомление о решении пользователя](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Пауза и возобновление](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md)
+**Требования:** [Подтверждения и ответы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-05) · [Уведомление о решении пользователя](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-06) · [Пауза и возобновление](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-05)
 
 ### US-ICP-03 {#us-icp-03}
 
@@ -373,7 +358,7 @@
 - [ ] Итог шага или ошибка → уведомление по настройкам пользователя (в ICPlan, Telegram)
 - [ ] Нет прав на подтверждение → кнопка недоступна, решение не принимается
 
-**Требования:** [Уведомление о решении пользователя](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Подтверждения и ответы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md)
+**Требования:** [Уведомление о решении пользователя](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-06) · [Подтверждения и ответы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-05)
 
 ### US-ICP-12 {#us-icp-12}
 
@@ -388,7 +373,7 @@
 - [ ] Нет запусков за период → пустая сводка с пояснением
 - [ ] Данные затрат недоступны (LiteLLM) → показываются без затрат с пометкой
 
-**Требования:** [Сводка и статистика агентов](../../openspec/changes/define-agent-platform/specs/observability/spec.md) · [Затраты](../../openspec/changes/define-agent-platform/specs/observability/spec.md) · [События запуска](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
+**Требования:** [Сводка и статистика агентов](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-13) · [Затраты](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-05) · [События запуска](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-01)
 
 ### US-ICP-13 {#us-icp-13}
 
@@ -405,7 +390,7 @@
 - [ ] Возвратов больше лимита шага → переход при ошибке, владельцу процесса
 - [ ] Оценка без прав (не исполнитель и не владелец) → недоступна
 
-**Требования:** [Вердикт по результату](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Проверка пользователем перед переходом](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Вердикт по результату](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-19) · [Проверка пользователем перед переходом](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-18)
 
 ### US-ICP-14 {#us-icp-14}
 
@@ -420,7 +405,7 @@
 - [ ] «Возобновить» → запуск агента текущего шага
 - [ ] Остановленная задача видна в сводке как «остановлена»
 
-**Требования:** [Отмена из ICPlan](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Остановка и возобновление процесса по задаче](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Отмена из ICPlan](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-07) · [Остановка и возобновление процесса по задаче](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-20)
 
 ### US-ICP-04 {#us-icp-04}
 
@@ -436,7 +421,7 @@
 - [ ] Отмена в очереди → запуск снят без среды
 - [ ] Отмена завершённого → без изменений
 
-**Требования:** [Отмена из ICPlan](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Отмена запуска](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
+**Требования:** [Отмена из ICPlan](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-07) · [Отмена запуска](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-09)
 
 ### US-ICP-15 {#us-icp-15}
 
@@ -450,7 +435,7 @@
 - [ ] «Не выполнено» → возврат на шаг с заметкой (как US-ICP-13)
 - [ ] Нет ответа дольше таймаута → напоминание, задача не двигается
 
-**Требования:** [Проверка пользователем перед переходом](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Вердикт по результату](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Проверка пользователем перед переходом](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-18) · [Вердикт по результату](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-19)
 
 ### US-ICP-16 {#us-icp-16}
 
@@ -464,7 +449,7 @@
 - [ ] «Начать с шага N» → задача в колонке шага N, запуск его агента
 - [ ] Лимит запусков шага исчерпан → повтор только владельцем процесса
 
-**Требования:** [Переход по итогу запуска](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Передача результата следующему этапу](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Повтор шага](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Переход по итогу запуска](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-16) · [Передача результата следующему этапу](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-06) · [Повтор шага](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-21)
 
 ### US-ICP-17 {#us-icp-17}
 
@@ -478,7 +463,7 @@
 - [ ] Выбрал человека → делегат снят, исполнитель — человек, шаг ручной для задачи
 - [ ] Процесс для других задач не меняется
 
-**Требования:** [Приоритет правил](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Приоритет правил](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-04)
 
 ### US-ICP-18 {#us-icp-18}
 
@@ -492,7 +477,7 @@
 - [ ] Runner не в сети → «платформа агентов не в сети»
 - [ ] Агент выключен, бюджет исчерпан или задача вне процесса → причина текстом
 
-**Требования:** [Очередь агента](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Видимость подхвата](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Каталог агентов платформы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [G1 Admission](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md)
+**Требования:** [Очередь агента](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-17) · [Видимость подхвата](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-07) · [Каталог агентов платформы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-08) · [G1 Admission](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-02)
 
 ### US-ICP-20 {#us-icp-20}
 
@@ -506,7 +491,7 @@
 - [ ] Ссылка на несуществующий тул или модель → сохранение отклонено с полем
 - [ ] Runner не в сети → агент создан, статус «не в сети»
 
-**Требования:** [Определение агента](../../openspec/changes/define-agent-platform/specs/agent-registry/spec.md) · [Валидация связей](../../openspec/changes/define-agent-platform/specs/agent-registry/spec.md) · [Каталог ресурсов](../../openspec/changes/define-agent-platform/specs/agent-registry/spec.md) · [Каталог агентов платформы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Агент платформы как внешний агент ICPlan](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md)
+**Требования:** [Определение агента](../../openspec/changes/define-agent-platform/specs/agent-registry/spec.md#r-reg-02) · [Валидация связей](../../openspec/changes/define-agent-platform/specs/agent-registry/spec.md#r-reg-05) · [Каталог ресурсов](../../openspec/changes/define-agent-platform/specs/agent-registry/spec.md#r-reg-01) · [Каталог агентов платформы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-08) · [Агент платформы как внешний агент ICPlan](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-01)
 
 ### US-ICP-21 {#us-icp-21}
 
@@ -520,7 +505,7 @@
 - [ ] Активные запуски доделываются на старой версии
 - [ ] Ошибка в настройке → версия не сохраняется, прежняя действует
 
-**Требования:** [Применение к следующему запуску](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md) · [Версионирование](../../openspec/changes/define-agent-platform/specs/agent-registry/spec.md)
+**Требования:** [Применение к следующему запуску](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md#r-cp-03) · [Версионирование](../../openspec/changes/define-agent-platform/specs/agent-registry/spec.md#r-reg-03)
 
 ### US-ICP-22 {#us-icp-22}
 
@@ -534,7 +519,7 @@
 - [ ] Активные запуски доделываются или отменяются — по выбору при выключении
 - [ ] Включён → ожидающие задачи встают в очередь
 
-**Требования:** [Выключение агента](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Запуск из очереди ICPlan](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
+**Требования:** [Выключение агента](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-17) · [Запуск из очереди ICPlan](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-01)
 
 ### US-ICP-23 {#us-icp-23}
 
@@ -548,7 +533,7 @@
 - [ ] Есть активные запуски → предупреждение, отмена при подтверждении
 - [ ] История задач с его результатами сохраняется
 
-**Требования:** [Очистка при выходе агента из проекта](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Очистка при выходе агента из проекта](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-08)
 
 ### US-ICP-24 {#us-icp-24}
 
@@ -564,7 +549,7 @@
 - [ ] Можно выбрать mock-модель → без затрат
 - [ ] Тест упал → видно на каком шаге и почему
 
-**Требования:** [Проверка агента в чате](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Mock-модель для разработки](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md) · [Стрим шагов](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md)
+**Требования:** [Проверка агента в чате](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-18) · [Mock-модель для разработки](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md#r-llm-04) · [Стрим шагов](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-06)
 
 ### US-ICP-28 {#us-icp-28}
 
@@ -578,7 +563,7 @@
 - [ ] Переход к задачам с возвратами
 - [ ] Агент без запусков → нули, не ошибка
 
-**Требования:** [Сводка и статистика агентов](../../openspec/changes/define-agent-platform/specs/observability/spec.md) · [Затраты](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
+**Требования:** [Сводка и статистика агентов](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-13) · [Затраты](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-05)
 
 ### US-ICP-05 {#us-icp-05}
 
@@ -593,7 +578,7 @@
 - [ ] Переход в другой процесс → тип задачи меняется, задача на первом шаге нового процесса
 - [ ] Конфликт правил → явный делегат → шаг процесса → Действие
 
-**Требования:** [Определение процесса](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Тип задачи задаёт процесс](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Приоритет правил](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Определение процесса](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-15) · [Тип задачи задаёт процесс](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-02) · [Приоритет правил](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-04)
 
 ### US-ICP-25 {#us-icp-25}
 
@@ -607,7 +592,7 @@
 - [ ] Задачи в работе доделывают текущий шаг, дальше идут по новой версии
 - [ ] Удалён шаг, на котором стоят задачи → сохранение требует выбрать, куда их перевести
 
-**Требования:** [Определение процесса](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Изменение процесса](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Определение процесса](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-15) · [Изменение процесса](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-22)
 
 ### US-ICP-26 {#us-icp-26}
 
@@ -623,7 +608,7 @@
 - [ ] Отключил → шаг ручной, активные запуски доделываются
 - [ ] Агент не участник проекта → подключение отклонено
 
-**Требования:** [Агент шага процесса](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Очистка при выходе агента из проекта](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Агент шага процесса](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-01) · [Очистка при выходе агента из проекта](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-08)
 
 ### US-ICP-27 {#us-icp-27}
 
@@ -639,7 +624,7 @@
 - [ ] Условие не выполнено → ничего
 - [ ] Агент выключен → запуска нет, ошибка в истории задачи
 
-**Требования:** [Эффект Действия «делегировать агенту»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md)
+**Требования:** [Эффект Действия «делегировать агенту»](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-03)
 
 ### US-ICP-07 {#us-icp-07}
 
@@ -655,7 +640,7 @@
 - [ ] У задачи не более одного активного запуска
 - [ ] Runner пропал → по истечении аренды запуск снова в голове очереди
 
-**Требования:** [Очередь агента](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [Однократная выдача запуска](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md)
+**Требования:** [Очередь агента](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-17) · [Однократная выдача запуска](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-03)
 
 ### US-ICP-29 {#us-icp-29}
 
@@ -669,7 +654,7 @@
 - [ ] Нет прошлых запусков → задание без них
 - [ ] Вложение недоступно → в задании пометка, работа продолжается
 
-**Требования:** [Передача результата следующему этапу](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md) · [История запусков в контексте](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · [MCP-сервер ICPlan](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md)
+**Требования:** [Передача результата следующему этапу](../../openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md#r-ap-06) · [История запусков в контексте](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-05) · [MCP-сервер ICPlan](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md#r-mcp-13)
 
 ### US-ICP-06 {#us-icp-06}
 
@@ -685,5 +670,5 @@
 - [ ] Несовместимая версия протокола → предупреждение
 - [ ] Runner вернулся → статус «в сети», очередь разбирается
 
-**Требования:** [Каталог агентов платформы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md) · [Версия протокола](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md)
+**Требования:** [Каталог агентов платформы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-08) · [Версия протокола](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-09)
 

@@ -1,6 +1,6 @@
-# Техспека: Guardrails
+# Deploy: Guardrails
 
-← [Все техспеки](README.md) · [компонент](../../components/guardrails/index.md) · [правило](../rules/tech-spec.md)
+← [компонент](../../components/guardrails/index.md) · [методология](../rules/tech-spec.md)
 
 **Что разворачивается:** OPA рядом с Runner и Harness; правила Rego из git; данные из Platform module.
 

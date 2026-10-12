@@ -62,7 +62,7 @@
 - [ ] Сервер недоступен при регистрации → ошибка
 - [ ] Отключение сервера → тулы пропадают со следующего запуска
 
-**Требования:** [Регистрация MCP-сервера](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md) · [Ограничение набора тулов](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md)
+**Требования:** [Регистрация MCP-сервера](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md#r-mcp-01) · [Ограничение набора тулов](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md#r-mcp-02)
 
 ### US-MCP-02 {#us-mcp-02}
 
@@ -78,7 +78,7 @@
 - [ ] Ошибка сервера → текст ошибки агенту
 - [ ] Тул не в наборе агента → отказ без вызова
 
-**Требования:** [Таймауты и ошибки тулов](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md) · [Ограничение набора тулов](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md)
+**Требования:** [Таймауты и ошибки тулов](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md#r-mcp-03) · [Ограничение набора тулов](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md#r-mcp-02)
 
 ### US-MCP-03 {#us-mcp-03}
 
@@ -92,7 +92,7 @@
 - [ ] Попытка вызова → отказ
 - [ ] Админ-агент — отдельная роль с аудитом
 
-**Требования:** [Административные тулы отделены](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md)
+**Требования:** [Административные тулы отделены](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md#r-mcp-05)
 
 ### US-MCP-04 {#us-mcp-04}
 
@@ -106,7 +106,7 @@
 - [ ] Навык изменён → со следующего запуска
 - [ ] Навык удалён → отвязан у всех агентов
 
-**Требования:** [Скиллы](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md)
+**Требования:** [Скиллы](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md#r-mcp-06)
 
 ### US-MCP-05 {#us-mcp-05}
 
@@ -120,5 +120,5 @@
 - [ ] Тул с записью во внешнюю систему помечен
 - [ ] Изменение набора → в журнале изменений
 
-**Требования:** [Ограничение набора тулов](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md)
+**Требования:** [Ограничение набора тулов](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md#r-mcp-02)
 

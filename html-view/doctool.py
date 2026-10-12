@@ -1,6 +1,7 @@
 """Инструмент правил документации: правило в момент правки вместо чтения всех правил (R&D doc-automation, О-51).
 
     python html-view/doctool.py route <файл>      тип документа, выжимка правил, методология (из doc-types.md, doc-work.md)
+    python html-view/doctool.py next <файл>       следующие документы по графу связности и их методологии
     python html-view/doctool.py generated <файл>  если файл генерируется — откуда и чем; иначе пусто
     python html-view/doctool.py check             все проверки сборки без сборки сайта (секунды)
     python html-view/doctool.py rnd <slug> <тема> заготовка R&D v3.1, проходящая проверку структуры
@@ -109,10 +110,57 @@ def route(path) -> str:
             L.append("- Методология: " + re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1 (docs/rules/\2)", hit["Методология"]) + ".")
         L.append(f"- Синхронизировать: {_plain(hit.get('Синхронизировать', ''))}.")
         key = name.split()[0].lower() if name else ""
-        w = next((x for x in work if key and key in _plain(x.get("Документ", "")).lower()), None)
+        # целым словом: «spec» не должен совпасть с «техспека» (О-58)
+        w = next((x for x in work if key and re.search(rf"(?<![\w-]){re.escape(key)}(?![\w-])", _plain(x.get("Документ", "")).lower())), None)
         if w:
             L.append(f"- Источник: {_plain(w.get('Что править (источник)', ''))}. Проверка: {_plain(w.get('Проверка', ''))}.")
-    L.append("- После правки: python html-view/doctool.py check")
+    L.append("- Перед правкой прочитай методологию; если она отстала от того, что меняешь, — сначала поправь её (и инструменты), потом документ.")
+    L.append("- После правки: python html-view/doctool.py check; следующий документ — python html-view/doctool.py next <файл>")
+    return "\n".join(L)
+
+
+def node_of(path):
+    """Узел графа связности (docgraph.PATHS), к которому относится файл."""
+    sys.path.insert(0, str(HERE))
+    import docgraph as G
+    r = rel(path)
+    gen = generated(path)
+    for name, pats in G.PATHS.items():
+        if any(fnmatch.fnmatch(r, p) for p in pats):
+            return name
+    if gen:  # генерируемый файл — узел его источника
+        for name, pats in G.PATHS.items():
+            if any(p in gen[1] or gen[1] in p for p in pats):
+                return name
+    return None
+
+
+def next_docs(path) -> str:
+    """Следующие документы по графу: по одному, у каждого — своя методология (О-58)."""
+    sys.path.insert(0, str(HERE))
+    import docgraph as G
+    node = node_of(path)
+    if not node:
+        return f"{rel(path)}: нет узла в графе связности (html-view/docgraph.py PATHS) — проверь doc-types.md «Синхронизировать»."
+    L = [f"Узел `{rel(path)}`: {node}. Дальше — по одному документу, в этом порядке:"]
+    for a, b, what in G.EDGES:
+        if a != node:
+            continue
+        sample = next((f for p in G.PATHS.get(b, []) for f in sorted(ROOT.glob(p))), None)
+        meth = ""
+        if sample:
+            m = re.search(r"- Методология: (.+)\.", route(sample))
+            meth = f" · методология: {m.group(1)}" if m else ""
+        L.append(f"- {b} — проверить: {what} · файлы: {', '.join(G.PATHS.get(b, [])) or '—'}{meth}")
+    name = Path(path).name
+    if node.startswith("Методология") and name.endswith(".md"):  # после инструментов — документы, которые ведутся по этой методологии
+        for t in _rows(RULES / "doc-types.md", "| Тип |"):
+            if f"]({name}" in t.get("Методология", ""):
+                L.append(f"- затем документы типа «{_plain(t.get('Тип', ''))}»: {', '.join(_patterns(t.get('Где', ''))) or '—'} — привести к новой методологии")
+    if len(L) == 1:
+        L.append("- исходящих связей нет: цепочка на этом узле заканчивается")
+    L.append("Для каждого: прочитай методологию → устарела — сначала поправь её → правка → doctool check → doctool next <файл>. "
+             "Документ не изменился по смыслу — дальше по его стрелкам не идёшь.")
     return "\n".join(L)
 
 
@@ -131,6 +179,11 @@ def tooling_check() -> list:
             name = _plain(t.get("Тип", ""))
             if got and f"Тип: {name}." not in got:
                 issues.append(f"doctool route {pats[0]}: выдаёт правила другого типа, ожидался «{name}»")
+    sys.path.insert(0, str(HERE))
+    import docgraph as G
+    names = {n for _, ns in G.LAYERS for n in ns}
+    issues += [f"docgraph.EDGES: узел «{x}» не в LAYERS" for e in G.EDGES for x in e[:2] if x not in names]
+    issues += [f"docgraph.PATHS: у узла «{n}» нет ни одного файла" for n, ps in G.PATHS.items() if not any(ROOT.glob(p) for p in ps)]
     for f in [ROOT / "AGENTS.md", *ROOT.glob(".claude/skills/doc-*/SKILL.md")]:
         for p in re.findall(r"`((?:html-view|docs|tools|\.claude|\.githooks)/[\w./-]+?)`", f.read_text(encoding="utf-8")):
             if "<" in p or "*" in p:
@@ -235,6 +288,8 @@ def main():
     cmd, args = (sys.argv[1] if len(sys.argv) > 1 else ""), sys.argv[2:]
     if cmd == "route":
         print(route(args[0]) or "нет правил для этого пути")
+    elif cmd == "next":
+        print(next_docs(args[0]))
     elif cmd == "generated":
         g = generated(args[0])
         print(f"генерируется: {g[0]}; править: {g[1]}" if g else "")
@@ -277,6 +332,8 @@ def main():
         if not f or not rel(f):
             return
         ctx = route(f)
+        if ctx and node_of(f):
+            ctx += "\n\n" + next_docs(f)
         issues = check() if re.search(r"\.(md|py)$", f) else []
         if issues:
             ctx += "\n\nЗамечания проверок после правки:\n" + "\n".join(f"- {i}" for i in issues[:15])

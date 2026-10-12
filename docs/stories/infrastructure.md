@@ -80,7 +80,7 @@
 - [ ] Порядок запуска по проверкам готовности
 - [ ] Не хватает ресурсов → ошибка до установки
 
-**Требования:** [Упаковка и развёртывание Helm](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md) · [Проверки готовности и порядок запуска](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md) · [Кластер Kubernetes](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md)
+**Требования:** [Упаковка и развёртывание Helm](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-03) · [Проверки готовности и порядок запуска](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-11) · [Кластер Kubernetes](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-02)
 
 ### US-INF-02 {#us-inf-02}
 
@@ -94,7 +94,7 @@
 - [ ] HTTP → перенаправление на HTTPS
 - [ ] Админки сервисов снаружи недоступны
 
-**Требования:** [Ingress и TLS](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md)
+**Требования:** [Ingress и TLS](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-04)
 
 ### US-INF-03 {#us-inf-03}
 
@@ -110,7 +110,7 @@
 - [ ] Превышение → очередь, а не падение
 - [ ] Нехватка ёмкости → предупреждение заранее
 
-**Требования:** [Профиль нагрузки и ёмкость](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md) · [Балансировка между репликами](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md)
+**Требования:** [Профиль нагрузки и ёмкость](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-01) · [Балансировка между репликами](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-05)
 
 ### US-INF-04 {#us-inf-04}
 
@@ -124,7 +124,7 @@
 - [ ] Восстановление по инструкции на новый сервер
 - [ ] Бэкап не прошёл → уведомление
 
-**Требования:** [Резервное копирование](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md) · [СУБД и пул соединений](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md) · [Объектное хранилище](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md)
+**Требования:** [Резервное копирование](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-08) · [СУБД и пул соединений](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-06) · [Объектное хранилище](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-07)
 
 ### US-INF-05 {#us-inf-05}
 
@@ -138,7 +138,7 @@
 - [ ] Неудачное обновление → откат
 - [ ] Миграции БД до запуска новой версии
 
-**Требования:** [Упаковка и развёртывание Helm](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md) · [Проверки готовности и порядок запуска](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md)
+**Требования:** [Упаковка и развёртывание Helm](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-03) · [Проверки готовности и порядок запуска](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-11)
 
 ### US-INF-06 {#us-inf-06}
 
@@ -152,7 +152,7 @@
 - [ ] Те же чарты и версии
 - [ ] Сброс среды к исходному состоянию одной командой
 
-**Требования:** [Локальная среда](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md)
+**Требования:** [Локальная среда](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-12)
 
 ### US-INF-07 {#us-inf-07}
 
@@ -166,5 +166,5 @@
 - [ ] Старый отзывается
 - [ ] Секрет не в git и не в БД
 
-**Требования:** [Секреты](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md)
+**Требования:** [Секреты](../../openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md#r-inf-09)
 

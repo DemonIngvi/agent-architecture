@@ -1,6 +1,6 @@
-# Техспека: Инфраструктура
+# Deploy: Инфраструктура
 
-← [Все техспеки](README.md) · [компонент](../../components/infrastructure/index.md) · [правило](../rules/tech-spec.md)
+← [компонент](../../components/infrastructure/index.md) · [методология](../rules/tech-spec.md)
 
 **Что разворачивается:** k3s на одном узле, Helm-чарты, Traefik, CloudNativePG + PgBouncer, RustFS, бэкапы вне площадки.
 

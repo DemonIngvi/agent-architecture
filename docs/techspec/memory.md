@@ -1,6 +1,6 @@
-# Техспека: Memory
+# Deploy: Memory
 
-← [Все техспеки](README.md) · [компонент](../../components/memory/index.md) · [правило](../rules/tech-spec.md)
+← [компонент](../../components/memory/index.md) · [методология](../rules/tech-spec.md)
 
 **Что разворачивается:** Memory API: чтение M1–M3, запись M3 с проверками, очистка по срокам.
 

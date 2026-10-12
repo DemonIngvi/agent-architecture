@@ -66,7 +66,7 @@
 - [ ] Неверное значение → ошибка с полем
 - [ ] Выше потолка платформы → применяется потолок
 
-**Требования:** [Настройки агента](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md) · [Конфигурация модуля](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md)
+**Требования:** [Настройки агента](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md#r-cp-01) · [Конфигурация модуля](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md#r-cp-08)
 
 ### US-PM-02 {#us-pm-02}
 
@@ -82,7 +82,7 @@
 - [ ] Активный запуск — на старых настройках
 - [ ] Откат на прежнюю версию → тоже со следующего запуска
 
-**Требования:** [Применение к следующему запуску](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md)
+**Требования:** [Применение к следующему запуску](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md#r-cp-03)
 
 ### US-PM-03 {#us-pm-03}
 
@@ -96,7 +96,7 @@
 - [ ] Ссылка на несуществующий тул → импорт с ошибкой по полю
 - [ ] Импорт поверх существующего → новая версия, не замена
 
-**Требования:** [Экспорт и импорт YAML](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md) · [Источник правды и экспорт](../../openspec/changes/define-agent-platform/specs/agent-registry/spec.md)
+**Требования:** [Экспорт и импорт YAML](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md#r-cp-05) · [Источник правды и экспорт](../../openspec/changes/define-agent-platform/specs/agent-registry/spec.md#r-reg-04)
 
 ### US-PM-04 {#us-pm-04}
 
@@ -110,7 +110,7 @@
 - [ ] LiteLLM или OPA недоступен → предупреждение, повтор, прежнее значение действует
 - [ ] Расхождение найдено сверкой → предупреждение администратору
 
-**Требования:** [Раздача настроек исполнителям](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md) · [Поведение при отказах зависимостей](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md)
+**Требования:** [Раздача настроек исполнителям](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md#r-cp-06) · [Поведение при отказах зависимостей](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md#r-cp-11)
 
 ### US-PM-05 {#us-pm-05}
 
@@ -126,7 +126,7 @@
 - [ ] R0 → агент только предлагает, действий нет
 - [ ] Уровень выше разрешённого для проекта → отклонено
 
-**Требования:** [Уровень автономии агента](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md) · [Настройки агента](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md)
+**Требования:** [Уровень автономии агента](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-08) · [Настройки агента](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md#r-cp-01)
 
 ### US-PM-06 {#us-pm-06}
 
@@ -140,7 +140,7 @@
 - [ ] Достигнуто 80% → уведомление администратору
 - [ ] Исчерпан → новые запуски отклоняются G1 с причиной
 
-**Требования:** [Иерархия бюджетов токенов и денег](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md) · [G1 Admission](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md)
+**Требования:** [Иерархия бюджетов токенов и денег](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-11) · [G1 Admission](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-02)
 
 ### US-PM-08 {#us-pm-08}
 
@@ -154,7 +154,7 @@
 - [ ] Длиннее предела → сохранение отклонено с границей
 - [ ] Руководство пустое → слой пропускается
 
-**Требования:** [Руководство проекта для агентов](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md) · [Сборка запроса к модели](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md)
+**Требования:** [Руководство проекта для агентов](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md#r-cp-14) · [Сборка запроса к модели](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-18)
 
 ### US-PM-07 {#us-pm-07}
 
@@ -168,5 +168,5 @@
 - [ ] Фильтр по агенту и периоду
 - [ ] Изменение через импорт YAML → тоже в журнале
 
-**Требования:** [Версии настроек агента](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md) · [Права на настройки](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md)
+**Требования:** [Версии настроек агента](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md#r-cp-04) · [Права на настройки](../../openspec/changes/define-agent-platform/specs/control-plane/spec.md#r-cp-07)
 

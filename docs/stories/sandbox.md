@@ -69,7 +69,7 @@
 - [ ] Пул пуст → холодный старт, событие
 - [ ] Контейнер после запуска уничтожается, не переиспользуется
 
-**Требования:** [Тёплый пул](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md) · [Среда на каждый запуск](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md)
+**Требования:** [Тёплый пул](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md#r-sbx-02) · [Среда на каждый запуск](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md#r-sbx-01)
 
 ### US-SBX-02 {#us-sbx-02}
 
@@ -83,7 +83,7 @@
 - [ ] Не в allowlist → отказ, событие
 - [ ] Push в защищённую ветку → отклонён, работа через PR
 
-**Требования:** [Доступ к репозиториям](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md) · [Секреты](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md)
+**Требования:** [Доступ к репозиториям](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md#r-sbx-04) · [Секреты](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md#r-sbx-07)
 
 ### US-SBX-03 {#us-sbx-03}
 
@@ -97,7 +97,7 @@
 - [ ] Разрешённый домен → через egress-прокси с журналом
 - [ ] Прямой выход мимо прокси → заблокирован сетевой политикой
 
-**Требования:** [Сетевая изоляция](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md) · [G3 Isolation](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md)
+**Требования:** [Сетевая изоляция](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md#r-sbx-06) · [G3 Isolation](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-04)
 
 ### US-SBX-04 {#us-sbx-04}
 
@@ -111,7 +111,7 @@
 - [ ] Код → PR со ссылкой в задаче
 - [ ] Файл больше лимита или с секретом → не прикладывается, пометка в итоге
 
-**Требования:** [Эфемерный workspace](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md)
+**Требования:** [Эфемерный workspace](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md#r-sbx-03)
 
 ### US-SBX-05 {#us-sbx-05}
 
@@ -127,7 +127,7 @@
 - [ ] Своя подпапка шага — запись
 - [ ] Нет доступа к workspace по политике → отказ с причиной
 
-**Требования:** [Подключение рабочего пространства по манифесту](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md) · [Рабочее пространство в контексте агента](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md)
+**Требования:** [Подключение рабочего пространства по манифесту](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md#r-sbx-14) · [Рабочее пространство в контексте агента](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-17)
 
 ### US-SBX-06 {#us-sbx-06}
 
@@ -141,7 +141,7 @@
 - [ ] Изменение → со следующего запуска
 - [ ] Ресурс удалён из каталога проекта → права на него сняты
 
-**Требования:** [Манифест рабочего пространства](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
+**Требования:** [Манифест рабочего пространства](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-17)
 
 ### US-SBX-07 {#us-sbx-07}
 
@@ -155,5 +155,5 @@
 - [ ] Замечания — в свою подпапку и комментарий
 - [ ] Попытка записи в чужую подпапку → отказ
 
-**Требования:** [Подключение рабочего пространства по манифесту](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md)
+**Требования:** [Подключение рабочего пространства по манифесту](../../openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md#r-sbx-14)
 

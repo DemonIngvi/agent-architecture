@@ -14,7 +14,7 @@
 INTEG = {
     "I1": ("agent-runner", "icplan", "", "Runner забирает запуск из очереди (`POST /agent-runs/claim`, pull, аренда 300 с); в ответе — `Run`", ["Run"]),
     "I2": ("agent-runner", "icplan", "", "шаги запуска и итог", ["RunEvent", "RunResult"]),
-    "I3": ("agent-runner", "icplan", "", "Runner продлевает аренду (`POST /agent-runs/:runId/heartbeat`); в ответе — отмена, решения и указания пользователя", ["Heartbeat", "ApprovalDecision", "UserMessage"]),
+    "I3": ("agent-runner", "icplan", "", "Runner продлевает аренду (`POST /agent-runs/:runId/heartbeat`); сейчас ответ 204 без тела, отмена — ответом 404; после доработки (R-ICP-16) в ответе — отмена, решения по approve и указания пользователя", ["Heartbeat", "ApprovalDecision", "UserMessage"]),
     "I4": ("agent-runner", "platform-module", "", "настройки агента и манифест рабочего пространства", ["AgentSettings", "WorkspaceSource"]),
     "I5": ("agent-runner", "guardrails", "", "допуск запуска G1", ["PolicyInput", "PolicyDecision"]),
     "I6": ("agent-runner", "sandbox", "", "Runner создаёт и уничтожает среду (Docker API) по `SandboxClaim`; `RepoGrant` задаёт правила git-прокси этой среды (какие репозитории и ветки), сам токен в среду не попадает", ["SandboxClaim", "RepoGrant"]),
@@ -31,7 +31,7 @@ INTEG = {
     "I17": ("sandbox", "«внешние хосты»", "", "исходящий трафик через egress-прокси (allowlist)", []),
     "I18": ("agent-runner", "«git-провайдер»", "", "короткоживущие токены репозиториев", ["RepoGrant"]),
     "I19": ("agent-runner", "infrastructure", "", "файлы задачи и артефакты в RustFS (S3 API)", []),
-    "I20": ("icplan", "icplan", "", "интерфейс ICPlan ↔ API (в том числе экраны Platform module, чат запуска, сводка)", ["Process", "Verdict", "CostAggregate"]),
+    "I20": ("icplan", "icplan", "", "интерфейс ICPlan ↔ API (в том числе экраны Platform module, чат запуска, сводка)", ["Process", "Verdict", "CostAggregate", "AgentDefinition"]),
     "I21": ("«пользователи»", "icplan", "infrastructure", "вход по HTTPS через Traefik: web, api, mcp", []),
     "I22": ("«сервисы»", "infrastructure", "", "Postgres через PgBouncer", []),
     "I23": ("agent-runner", "sandbox", "infrastructure", "среды запусков через Kubernetes API (этап 4)", ["SandboxClaim"]),
@@ -335,7 +335,14 @@ MIGRATE = {
     "runner": "миграции Agent Runner при старте, своя таблица версий",
     "memory": "миграции Memory API при старте (Alembic), своя таблица версий",
 }
+# таблицы форка, в которые пишет платформа (запуски, чат, история задачи): им тоже нужна политика (data-methodology)
+FORK_WRITTEN = ["agent_run", "agent_chat_message", "issue_activity"]
+
 TABLE_POLICY = {
+    # таблицы форка: индексы — как в схеме форка (None); срок и очистка — по коду форка (packages/db, apps/worker)
+    "agent_run": (None, "пока живы агент, проект и задача", "каскадно с агентом, проектом, задачей; по времени форк не чистит — срок открыт (icplan-integration, открытые вопросы)", "fork"),
+    "agent_chat_message": (None, "пока живы тред и агент", "каскадно с тредом и агентом; по времени форк не чистит — срок открыт (icplan-integration, открытые вопросы)", "fork"),
+    "issue_activity": (None, "пока жива задача", "каскадно с задачей; комментарий удаляется по одному; по времени форк не чистит — срок открыт (icplan-integration, открытые вопросы)", "fork"),
     "process": ([("unique", "project_id, issue_type_id", "один процесс на тип задачи"), ("index", "issue_type_id", "FK; процесс по типу задачи"), ("index", "first_step_id", "FK")],
                 "пока жив проект", "каскадно с проектом; версия процесса растёт при правке", "fork"),
     "process_step": ([("unique", "process_id, column_id", "одна колонка — один шаг"), ("index", "column_id", "FK; переход по колонке"), ("index", "agent_id", "FK; шаги агента")],

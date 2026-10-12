@@ -1,6 +1,6 @@
-# Техспека: MCP / Tools
+# Deploy: MCP / Tools
 
-← [Все техспеки](README.md) · [компонент](../../components/mcp-tools/index.md) · [правило](../rules/tech-spec.md)
+← [компонент](../../components/mcp-tools/index.md) · [методология](../rules/tech-spec.md)
 
 **Что разворачивается:** MCP-серверы: `itsaplan-core` в api ICPlan; внешние — отдельные образы; клиент MCP — в Harness.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Инструмент правил документации для любого агента и человека: ./tools/doc route|pre|post|check|staged|generated|rnd …
+# Инструмент правил документации для любого агента и человека: ./tools/doc route|next|pre|post|check|staged|generated|rnd …
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PY="python3"; command -v python3 >/dev/null 2>&1 || PY="python"
 [ -x "$ROOT/html-view/.venv/bin/python" ] && PY="$ROOT/html-view/.venv/bin/python"

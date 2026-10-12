@@ -61,7 +61,7 @@
 - [ ] Длинный вывод свёрнут
 - [ ] Событий нет → «запуск не начался» с причиной
 
-**Требования:** [Чат запуска в задаче](../../openspec/changes/define-agent-platform/specs/observability/spec.md) · [События запуска](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
+**Требования:** [Чат запуска в задаче](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-02) · [События запуска](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-01)
 
 ### US-OBS-02 {#us-obs-02}
 
@@ -75,7 +75,7 @@
 - [ ] Переход к событиям запуска
 - [ ] События старше срока хранения → только итог
 
-**Требования:** [События запуска](../../openspec/changes/define-agent-platform/specs/observability/spec.md) · [Политика хранения](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
+**Требования:** [События запуска](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-01) · [Политика хранения](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-06)
 
 ### US-OBS-03 {#us-obs-03}
 
@@ -91,7 +91,7 @@
 - [ ] Новый шаблон секрета → применяется к новым событиям
 - [ ] Маскирование не сработало → событие помечается и скрывается
 
-**Требования:** [Маскирование чувствительных данных](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
+**Требования:** [Маскирование чувствительных данных](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-04)
 
 ### US-OBS-04 {#us-obs-04}
 
@@ -105,7 +105,7 @@
 - [ ] Переход из задачи к трассе
 - [ ] Трасса неполная → видно, на каком компоненте оборвалась
 
-**Требования:** [Трассировка](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
+**Требования:** [Трассировка](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-03)
 
 ### US-OBS-05 {#us-obs-05}
 
@@ -121,5 +121,5 @@
 - [ ] Разбивка по проектам и агентам
 - [ ] Нет данных → нули
 
-**Требования:** [Сводка и статистика агентов](../../openspec/changes/define-agent-platform/specs/observability/spec.md) · [Затраты](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
+**Требования:** [Сводка и статистика агентов](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-13) · [Затраты](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-05)
 

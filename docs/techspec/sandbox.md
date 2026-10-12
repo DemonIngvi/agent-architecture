@@ -1,6 +1,6 @@
-# Техспека: Sandbox
+# Deploy: Sandbox
 
-← [Все техспеки](README.md) · [компонент](../../components/sandbox/index.md) · [правило](../rules/tech-spec.md)
+← [компонент](../../components/sandbox/index.md) · [методология](../rules/tech-spec.md)
 
 **Что разворачивается:** одноразовый контейнер запуска на образе Harness; тёплый пул; сеть только через egress-прокси.
 

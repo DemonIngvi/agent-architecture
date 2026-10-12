@@ -67,7 +67,7 @@
 - [ ] Тул вернул ошибку → агент учитывает и продолжает
 - [ ] Модель недоступна → fallback или завершение `error` с причиной
 
-**Требования:** [Агентский цикл](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md) · [Инициализация из определения агента](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md) · [MCP-сервер ICPlan](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md)
+**Требования:** [Агентский цикл](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-02) · [Инициализация из определения агента](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-01) · [MCP-сервер ICPlan](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md#r-mcp-13)
 
 ### US-HAR-02 {#us-har-02}
 
@@ -83,7 +83,7 @@
 - [ ] Одобрено → выполняется
 - [ ] Отклонено или таймаут → не выполняется, агент продолжает без него
 
-**Требования:** [Пауза и возобновление](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md) · [G2 Action](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md)
+**Требования:** [Пауза и возобновление](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-05) · [G2 Action](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-03)
 
 ### US-HAR-03 {#us-har-03}
 
@@ -97,7 +97,7 @@
 - [ ] Не прошёл → агент дорабатывает в пределах лимита
 - [ ] Лимит исчерпан → `failed` с отчётом проверки
 
-**Требования:** [Quality gate результата](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md)
+**Требования:** [Quality gate результата](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-08)
 
 ### US-HAR-04 {#us-har-04}
 
@@ -111,7 +111,7 @@
 - [ ] Лимит шагов или времени → `limit`
 - [ ] Резкий рост расхода → стоп и уведомление
 
-**Требования:** [Защита от зацикливания](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md) · [Лимит шагов и времени](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md) · [Аномальный расход](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md)
+**Требования:** [Защита от зацикливания](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-09) · [Лимит шагов и времени](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-10) · [Аномальный расход](../../openspec/changes/define-agent-platform/specs/guardrails/spec.md#r-grd-12)
 
 ### US-HAR-05 {#us-har-05}
 
@@ -125,7 +125,7 @@
 - [ ] Перезапуск → продолжение с последнего checkpoint
 - [ ] Checkpoint недоступен → опасные действия отклоняются, событие
 
-**Требования:** [Пауза и возобновление](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md) · [Поведение при отказах зависимостей](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md)
+**Требования:** [Пауза и возобновление](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-05) · [Поведение при отказах зависимостей](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-13)
 
 ### US-HAR-06 {#us-har-06}
 
@@ -141,7 +141,7 @@
 - [ ] Сообщение «стоп» → завершение с итогом сделанного
 - [ ] Сообщение во время вызова тула → после его завершения
 
-**Требования:** [Указания пользователя в цикле](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md) · [Указания пользователя во время запуска](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md)
+**Требования:** [Указания пользователя в цикле](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-16) · [Указания пользователя во время запуска](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-16)
 
 ### US-HAR-07 {#us-har-07}
 
@@ -157,5 +157,5 @@
 - [ ] Ответ → продолжение с ответом в контексте
 - [ ] Таймаут → завершение с причиной «нет ответа»
 
-**Требования:** [Пауза и возобновление](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md) · [Подтверждения и ответы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md)
+**Требования:** [Пауза и возобновление](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-05) · [Подтверждения и ответы](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-05)
 

@@ -55,7 +55,7 @@
 - [ ] Заполнение 80% окна → сжатие истории, итог сжатия в M0
 - [ ] Запуск завершён → M0 уничтожается вместе со средой, не сохраняется
 
-**Требования:** [Уровни памяти M0–M6](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · [Управление контекстом](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md)
+**Требования:** [Уровни памяти M0–M6](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-01) · [Управление контекстом](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-07)
 
 ### US-MEM-06 {#us-mem-06}
 
@@ -71,7 +71,7 @@
 - [ ] Новый запуск по задаче получает переписку, если M1 в профиле чтения
 - [ ] Переписка старше срока хранения удаляется
 
-**Требования:** [Автоматическая запись M1 и M2](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · [Срок хранения](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · [Проверки записи в память](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md)
+**Требования:** [Автоматическая запись M1 и M2](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-03) · [Срок хранения](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-08) · [Проверки записи в память](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-15)
 
 ### US-MEM-01 {#us-mem-01}
 
@@ -87,7 +87,7 @@
 - [ ] M3 пусто → работа с нуля
 - [ ] Конфликт записи M3 → последняя версия, прежняя в истории
 
-**Требования:** [Состояние задачи M3](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · [Проверки записи в память](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md)
+**Требования:** [Состояние задачи M3](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-04) · [Проверки записи в память](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-15)
 
 ### US-MEM-02 {#us-mem-02}
 
@@ -103,7 +103,7 @@
 - [ ] Возврат пользователем → заметка возврата в контексте
 - [ ] Память недоступна → пустой контекст с предупреждением
 
-**Требования:** [История запусков в контексте](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · [Автоматическая запись M1 и M2](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md)
+**Требования:** [История запусков в контексте](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-05) · [Автоматическая запись M1 и M2](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-03)
 
 ### US-MEM-03 {#us-mem-03}
 
@@ -117,7 +117,7 @@
 - [ ] Исправление → новая версия
 - [ ] Удаление по сроку хранения → автоматически
 
-**Требования:** [Управление памятью](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · [Срок хранения](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md)
+**Требования:** [Управление памятью](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-07) · [Срок хранения](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-08)
 
 ### US-MEM-04 {#us-mem-04}
 
@@ -131,7 +131,7 @@
 - [ ] Чужой проект → недоступно
 - [ ] Профиль не задан → по умолчанию из L0
 
-**Требования:** [Область видимости как атрибут](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md)
+**Требования:** [Область видимости как атрибут](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-02)
 
 ### US-MEM-07 {#us-mem-07}
 
@@ -147,7 +147,7 @@
 - [ ] Администратор изменил инструкцию → новый запуск получает новую версию
 - [ ] Навык удалён из каталога → запуск без него, предупреждение в событиях
 
-**Требования:** [Уровни памяти M0–M6](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · [Инициализация из определения агента](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md)
+**Требования:** [Уровни памяти M0–M6](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-01) · [Инициализация из определения агента](../../openspec/changes/define-agent-platform/specs/agent-harness/spec.md#r-hrn-01)
 
 ### US-MEM-08 {#us-mem-08}
 
@@ -163,7 +163,7 @@
 - [ ] Записать в документ проекта агент не может
 - [ ] Документ недоступен по правам → агент сообщает и продолжает без него
 
-**Требования:** [Уровни памяти M0–M6](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · [MCP-сервер ICPlan](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md)
+**Требования:** [Уровни памяти M0–M6](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-01) · [MCP-сервер ICPlan](../../openspec/changes/define-agent-platform/specs/tool-integration/spec.md#r-mcp-13)
 
 ### US-MEM-09 {#us-mem-09}
 
@@ -177,7 +177,7 @@
 - [ ] До MVP: уровень M4 недоступен, профиль с M4 не сохраняется
 - [ ] Факт из чужого проекта не возвращается
 
-**Требования:** [Семантическая память M4 — после MVP](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · [Область видимости как атрибут](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md)
+**Требования:** [Семантическая память M4 — после MVP](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-06) · [Область видимости как атрибут](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-02)
 
 ### US-MEM-10 {#us-mem-10}
 
@@ -191,5 +191,5 @@
 - [ ] Удаление попадает в журнал
 - [ ] Очистка не прошла → повтор и уведомление эксплуатации
 
-**Требования:** [Срок хранения](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md) · [Управление памятью](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md)
+**Требования:** [Срок хранения](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-08) · [Управление памятью](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-07)
 

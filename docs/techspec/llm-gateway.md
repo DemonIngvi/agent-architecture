@@ -1,6 +1,6 @@
-# Техспека: LiteLLM gateway
+# Deploy: LiteLLM gateway
 
-← [Все техспеки](README.md) · [компонент](../../components/llm-gateway/index.md) · [правило](../rules/tech-spec.md)
+← [компонент](../../components/llm-gateway/index.md) · [методология](../rules/tech-spec.md)
 
 **Что разворачивается:** LiteLLM Proxy: алиасы, бюджеты, учёт; mock-LLM для разработки.
 

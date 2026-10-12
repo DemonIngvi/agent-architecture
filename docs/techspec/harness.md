@@ -1,6 +1,6 @@
-# Техспека: Harness
+# Deploy: Harness
 
-← [Все техспеки](README.md) · [компонент](../../components/harness/index.md) · [правило](../rules/tech-spec.md)
+← [компонент](../../components/harness/index.md) · [методология](../rules/tech-spec.md)
 
 **Что разворачивается:** Python-процесс агентского цикла (LangGraph) внутри sandbox.
 

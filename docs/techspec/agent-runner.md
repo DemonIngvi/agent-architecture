@@ -1,6 +1,6 @@
-# Техспека: Agent Runner
+# Deploy: Agent Runner
 
-← [Все техспеки](README.md) · [компонент](../../components/agent-runner/index.md) · [правило](../rules/tech-spec.md)
+← [компонент](../../components/agent-runner/index.md) · [методология](../rules/tech-spec.md)
 
 **Что разворачивается:** Go-сервис: забирает запуски из ICPlan, планирует слоты, поднимает sandbox, связывает с Harness.
 

@@ -59,7 +59,7 @@
 - [ ] Новая модель недоступна → fallback
 - [ ] Откат алиаса → со следующего вызова
 
-**Требования:** [Алиасы моделей](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md) · [Смена модели агента](../../openspec/changes/define-agent-platform/specs/agent-registry/spec.md)
+**Требования:** [Алиасы моделей](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md#r-llm-01) · [Смена модели агента](../../openspec/changes/define-agent-platform/specs/agent-registry/spec.md#r-reg-06)
 
 ### US-LLM-02 {#us-llm-02}
 
@@ -75,7 +75,7 @@
 - [ ] Сценарий закончился → ответ по умолчанию
 - [ ] Тот же агент на реальной модели — сменой алиаса
 
-**Требования:** [Mock-модель для разработки](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md)
+**Требования:** [Mock-модель для разработки](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md#r-llm-04)
 
 ### US-LLM-03 {#us-llm-03}
 
@@ -91,7 +91,7 @@
 - [ ] По запускам задачи
 - [ ] Затраты недоступны → пометка, без ошибки
 
-**Требования:** [Атрибуция затрат](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md) · [Затраты](../../openspec/changes/define-agent-platform/specs/observability/spec.md)
+**Требования:** [Атрибуция затрат](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md#r-llm-03) · [Затраты](../../openspec/changes/define-agent-platform/specs/observability/spec.md#r-obs-05)
 
 ### US-LLM-04 {#us-llm-04}
 
@@ -105,7 +105,7 @@
 - [ ] Fallback тоже недоступен → `failed` с причиной
 - [ ] Rate limit → повтор с задержкой
 
-**Требования:** [Fallback](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md) · [Несколько провайдеров](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md)
+**Требования:** [Fallback](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md#r-llm-06) · [Несколько провайдеров](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md#r-llm-07)
 
 ### US-LLM-05 {#us-llm-05}
 
@@ -121,5 +121,5 @@
 - [ ] Экспорт в CSV
 - [ ] Нет данных за период → пустой отчёт
 
-**Требования:** [Атрибуция затрат](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md) · [Учёт токенов](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md)
+**Требования:** [Атрибуция затрат](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md#r-llm-03) · [Учёт токенов](../../openspec/changes/define-agent-platform/specs/llm-gateway/spec.md#r-llm-02)
 

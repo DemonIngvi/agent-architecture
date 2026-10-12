@@ -66,7 +66,7 @@
 - [ ] Агент выключен или нет настроек → `agent_unavailable`, sandbox не создаётся
 - [ ] Нет свободного слота → запуск ждёт в `queued`
 
-**Требования:** [Запуск из очереди ICPlan](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md) · [Статусы запуска](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md) · [Возврат результата](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
+**Требования:** [Запуск из очереди ICPlan](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-01) · [Статусы запуска](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-07) · [Возврат результата](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-08)
 
 ### US-RUN-02 {#us-run-02}
 
@@ -80,7 +80,7 @@
 - [ ] Обратно `parallel` → параллельно по слотам
 - [ ] Переключение при активных запусках → они доделываются, новые по новому режиму
 
-**Требования:** [Режим последовательно или параллельно](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
+**Требования:** [Режим последовательно или параллельно](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-03)
 
 ### US-RUN-03 {#us-run-03}
 
@@ -96,7 +96,7 @@
 - [ ] Освободился слот → следующий по порядку стартует
 - [ ] Лимит модели изменён → действует для новых стартов
 
-**Требования:** [Планирование по слотам](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
+**Требования:** [Планирование по слотам](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-02)
 
 ### US-RUN-04 {#us-run-04}
 
@@ -110,7 +110,7 @@
 - [ ] Слот задачи держится — второго запуска по задаче нет
 - [ ] Подтверждение пришло → запуск занимает слот заново
 
-**Требования:** [Слоты при ожидании подтверждения](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
+**Требования:** [Слоты при ожидании подтверждения](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-04)
 
 ### US-RUN-05 {#us-run-05}
 
@@ -126,7 +126,7 @@
 - [ ] Второй Runner → слоты общие, лимиты не превышаются
 - [ ] Досылка событий после восстановления без дублей
 
-**Требования:** [Общие слоты для нескольких Runner](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md) · [Поведение при отказах зависимостей](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
+**Требования:** [Общие слоты для нескольких Runner](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-06) · [Поведение при отказах зависимостей](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-14)
 
 ### US-RUN-06 {#us-run-06}
 
@@ -140,5 +140,5 @@
 - [ ] Все активные завершены → Runner можно остановить
 - [ ] Таймаут вывода → оставшиеся запуски возвращаются в очередь
 
-**Требования:** [Развёртывание](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md)
+**Требования:** [Развёртывание](../../openspec/changes/define-agent-platform/specs/agent-runner/spec.md#r-run-16)
 

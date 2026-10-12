@@ -83,6 +83,36 @@ def spec_path_of(cap: str) -> str:
     return SPEC_PATH.get(cap, "")
 
 
+REQ_IDS = {}
+
+
+def req_id(cap: str, name: str) -> str:
+    """ID требования по названию (`### Requirement: <name>` → `**ID:** `R-…``) — для якоря ссылки из истории (us-methodology 8)."""
+    if cap not in REQ_IDS:
+        REQ_IDS[cap] = {}
+        p = spec_path_of(cap)
+        if p:
+            cur = None
+            for l in (ROOT / p).read_text(encoding="utf-8").splitlines():
+                m = re.match(r"### Requirement: (.+)", l)
+                if m:
+                    cur = m.group(1).strip()
+                m = re.search(r"\*\*ID:\*\* `(R-[A-Z]+-\d+)`", l)
+                if m and cur:
+                    REQ_IDS[cap][cur] = m.group(1)
+                    cur = None
+    return REQ_IDS[cap].get(name.strip(), "")
+
+
+def _req_link(r: str) -> str:
+    cap, _, name = r.partition(": ")
+    p = spec_path_of(cap)
+    if not p:
+        return r
+    rid = req_id(cap, name)
+    return f"[{name}](../../{p}" + (f"#{rid.lower()}" if rid else "") + ")"
+
+
 def _write_if_changed(path: Path, text: str):
     if not path.exists() or path.read_text(encoding="utf-8") != text:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -139,8 +169,7 @@ def sync_stories():
                 L += ["**Участвует в цепочках ICPlan:** " + ", ".join(f"[{k}](icplan.md#{k.lower()})" for k in used_in), ""]
             L += ["**Критерии приёмки:**", ""]
             L += [f"- [ ] {c}" for c in crit]
-            L += ["", "**Требования:** " + ("⚠️ нет — открытый вопрос, см. open-questions спек" if not reqs else "") + " · ".join(
-                f"[{r.split(': ', 1)[1]}](../../{spec_path_of(r.split(': ', 1)[0])})" if spec_path_of(r.split(": ", 1)[0]) else r for r in reqs), ""]
+            L += ["", "**Требования:** " + ("⚠️ нет — открытый вопрос, см. open-questions спек" if not reqs else "") + " · ".join(_req_link(r) for r in reqs), ""]
         _write_if_changed(d / f"{slug}.md", "\n".join(L) + "\n")
     _write_if_changed(d / "README.md", "\n".join(idx + ["", "Персоны для отыгрыша: [personas.md](personas.md)."]) + "\n")
     _write_if_changed(d / "coverage.md", stories_coverage())
@@ -339,6 +368,13 @@ def check_docs() -> list:
     issues += [f"интерфейс {c} не отнесён к типам данных (datamodel.INTEG_TYPES)" for c in sorted(codes) if c not in DM.INTEG_TYPES]  # О-16
     ids = {s[0] for l in STORIES.values() for s in l}  # О-20: сквозная трассировка историй ICPlan
     issues += [f"история {s[0]} без цепочки сквозной трассировки" for s in STORIES.get("icplan", []) if s[0] not in CHAINS]
+    # ссылка истории на требование — на само требование (us-methodology 8)
+    issues += [f"история {s[0]}: требование «{r}» не найдено в спеке — ссылка без якоря"
+               for lst in STORIES.values() for s in lst for r in s[5]
+               if ": " in r and spec_path_of(r.split(": ", 1)[0]) and not req_id(*r.split(": ", 1))]
+    # дополнительный раздел вкладки — процесс глазами пользователя, без мест хранения (us-methodology 8а)
+    issues += [f"stories_extra/{f.name}: колонка «Где хранится» — хранение на вкладке «Данные»"
+               for f in sorted((HERE / "stories_extra").glob("*.md")) if "| Где хранится |" in f.read_text(encoding="utf-8")]
     issues += [f"цепочка {k}: нет истории {x}" for k, (ch, _) in CHAINS.items() for x in ch if x not in ids]
     issues += [f"цепочка {k} без логической конечной точки" for k, (_, end) in CHAINS.items() if not end.strip()]
     for sp in ROOT.glob("openspec/changes/*/specs/*/spec.md"):  # О-30: строка RTM на каждое требование
@@ -369,9 +405,12 @@ def check_docs() -> list:
         if not ts.exists():
             issues.append(f"{c[0]}: нет техспеки (docs/rules/tech-spec.md)")
             continue
-        miss = [h for h in ("## Образы", "## Запуск", "## Переменные и секреты", "## Сборка и поставка", "## Проверка после развёртывания") if h not in ts.read_text(encoding="utf-8")]
+        tst = ts.read_text(encoding="utf-8")
+        miss = [h for h in ("## Образы", "## Запуск", "## Переменные и секреты", "## Сборка и поставка", "## Проверка после развёртывания") if h not in tst]
         if miss:
-            issues.append(f"{c[0]}: в техспеке нет разделов {miss}")
+            issues.append(f"{c[0]}: в Deploy нет разделов {miss}")
+        if not tst.startswith("# Deploy: "):
+            issues.append(f"docs/techspec/{c[0]}.md: заголовок — «# Deploy: <компонент>» (tech-spec.md)")
     for i in issues:
         print("⚠️ правила:", i)
     return issues
@@ -488,7 +527,7 @@ def copy_sources():
         dst.parent.mkdir(parents=True, exist_ok=True)
         txt = f.read_text(encoding="utf-8")
         txt = re.sub(r"<!-- bpmn:([a-z-]+):(\d+) -->", lambda m: bpmn_svg(BPMN[m.group(1)][int(m.group(2))]) if m.group(1) in BPMN else "", txt)
-        txt = txt.replace("<!-- docgraph -->", graph_svg(docgraph.LAYERS, docgraph.EDGES))
+        txt = txt.replace("<!-- docgraph -->", graph_svg(docgraph.LAYERS, docgraph.EDGES)).replace("<!-- docgraph-table -->", docgraph.table_md())
         if rel.as_posix().startswith("docs/rnd/") or rel.as_posix() == "docs/rules/rnd-methodology.md":
             txt = rnd_highlight(txt)
         if rel.as_posix() == "docs/rules/data-methodology.md":
@@ -945,7 +984,8 @@ def write_component_pages():
             for t in ts)
         about = (
             '<div class="about"><div class="about-main">'
-            '<div class="about-label">Позиция в системе</div>'
+            '<div class="about-label">Позиция в системе — путь работы</div>'
+            f'<div class="chain-note">кому передаётся задача; кто кого вызывает — <a href="{href(page, f"docs/api/{slug}.md")}#c1">схема C1</a></div>'
             f'<div class="chain">{"<span class=ch-arrow>→</span>".join(ch)}</div>'
             '<div class="about-label">Для чего</div>'
             f'<p class="purpose">{esc(purpose)}</p>'

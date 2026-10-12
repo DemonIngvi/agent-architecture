@@ -146,6 +146,7 @@
 .md-typeset ul.does { margin: 0.3rem 0 0 1rem; }
 .md-typeset ul.does li { margin: 0.15rem 0; }
 .chain { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; margin-top: 0.3rem; }
+.chain-note { font-size: 0.72rem; color: var(--md-default-fg-color--light); margin-top: 0.1rem; }
 .md-typeset .ch-item { font-size: 0.68rem; padding: 0.15rem 0.6rem; border-radius: 1rem;
   border: 1px dashed var(--md-primary-fg-color--light); color: var(--md-default-fg-color); }
 .md-typeset a.ch-item:hover { border-color: var(--md-accent-fg-color); color: var(--md-accent-fg-color); }

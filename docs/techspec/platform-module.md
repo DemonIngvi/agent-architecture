@@ -1,6 +1,6 @@
-# Техспека: Platform module
+# Deploy: Platform module
 
-← [Все техспеки](README.md) · [компонент](../../components/platform-module/index.md) · [правило](../rules/tech-spec.md)
+← [компонент](../../components/platform-module/index.md) · [методология](../rules/tech-spec.md)
 
 **Что разворачивается:** модуль внутри api форка ICPlan: настройки агентов, бюджеты, профили, политики.
 
