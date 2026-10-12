@@ -23,7 +23,7 @@ COMPONENTS = [
       ("Автоподхват — proposal", f"{AP}/proposal.md"),
       ("Автоподхват — спека", f"{AP}/specs/icplan-agent-autopickup/spec.md"),
       ("Автоподхват — схема", f"{AP}/specs/icplan-agent-autopickup/architecture.md")],
-     ["1.2", "2.3", "3.1", "3.2", "3.4", "3.5"]),
+     ["1.2", "2.3", "3.1", "3.2", "3.4", "3.5", "3.6", "3.7", "3.8", "3.9"]),
     ("platform-module", "Platform module", "todo", "",
      "Модуль ICPlan (своя схема в БД ICPlan): алиасы LLM, бюджеты, профили sandbox и памяти, данные guardrails, версии агентов.",
      [],

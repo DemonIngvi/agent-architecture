@@ -398,6 +398,11 @@ def api_structure_check() -> list:
                 issues.append(f"docs/api/{f.name}: {meth} {path} — нет структуры (OpenAPI форка или datamodel.ENDPOINT_IO)")
             elif "доработка" in c[2] and not any(k in DM.ENDPOINT_IO for k in (f"{meth} {path}", f"{meth} {path.split('?')[0]}")):
                 issues.append(f"docs/api/{f.name}: {meth} {path} — доработка без записи в ENDPOINT_IO")
+            if f.name == "icplan.md" and "доработка" in c[2]:  # 🛠 = путь есть в форке (api-methodology, Z-ICP-79)
+                oa = f"{meth} " + re.sub(r":(\w+)", r"{\1}", path.split("?")[0])
+                note = (DM.ENDPOINT_IO.get(f"{meth} {path}") or ("", "", ""))[2]
+                if oa not in OPENAPI["operations"] and "вне OpenAPI" not in note:
+                    issues.append(f"docs/api/icplan.md: {meth} {path} — «🛠 доработка», но пути нет в OpenAPI форка: «🆕 новое» или «вне OpenAPI» с файлом кода")
     return issues
 
 

@@ -18,6 +18,9 @@ stack C. API Platform module: 4 ok, 2 part, 0 no
 stack A. Снимок в ответе claim: 2 ok, 3 part, 1 no
 stack B. Эндпоинт ICPlan по ключу агента: 2 ok, 3 part, 1 no
 stack 0. Как сейчас (claim + I4): 3 ok, 1 part, 2 no
+# Объём доработки
+> выбранный вариант — одна подзадача минимального Platform module на этапе 2; claim форка не меняется
+bar Определение через Platform module: 6/6 2.3.7 — 6 ч (I4, сервисный токен, версия запуска) ok
 # Позиции ролей
 side API Platform module | Снимок в claim
 pos Архитектор: -2 | версией и снимком уже владеет Platform module

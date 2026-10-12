@@ -83,6 +83,24 @@ def lint() -> dict:
                             yield b
         if not list(zone_refs(BLOCKS.get(host, []))):
             add(host, f"карта: встроенный «{owner}» не внутри зоны хоста")
+    # задачи: новые таблицы и колонки компонента названы хотя бы в одной его задаче — иначе миграцию никто не делает (task-methodology.md)
+    tasks_text = {c[0]: " ".join((p.read_text(encoding="utf-8") for t in c[7] for p in (ROOT / "docs/tasks").glob(f"{t}-*.md"))) for c in COMPONENTS}
+    for t, (store, owner, cols) in DM.PLATFORM_TABLES.items():
+        if owner in tasks_text and t not in tasks_text[owner]:
+            add(owner, f"таблица `{t}`: не названа ни в одной задаче компонента (миграция)")
+    for t, cols in DM.FORK_COLUMNS.items():
+        for col, *_ in cols:
+            if f"{t}.{col}" not in tasks_text.get("icplan", "") and f"`{col}`" not in tasks_text.get("icplan", ""):
+                add("icplan", f"колонка `{t}.{col}`: не названа ни в одной задаче ICPlan (миграция форка)")
+    # R&D: в микропрезентации есть слайд объёма доработки (rnd-methodology.md#deck)
+    from rationale import REFS
+    for slug, refs in REFS.items():
+        for _, p in refs:
+            f = ROOT / p
+            if p.startswith("docs/rnd/") and f.exists():
+                txt = f.read_text(encoding="utf-8")
+                if "## Э10." in txt and "```deck" in txt and not re.search(r"^# Объём", txt.split("```deck", 1)[1].split("```", 1)[0], re.M):
+                    add(slug, f"R&D {f.name}: в deck нет слайда «Объём доработки»")
     # Deploy: у компонента с данными — «Обновление и откат» (tech-spec.md)
     for c in COMPONENTS:
         f = ROOT / f"docs/techspec/{c[0]}.md"
