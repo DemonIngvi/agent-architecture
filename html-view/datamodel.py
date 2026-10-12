@@ -330,12 +330,49 @@ S1_DOMAINS = [
 # Политика хранения таблиц проекта схемы (О-44): индексы, уникальность, срок, очистка, кто мигрирует.
 # Индекс: (вид, колонки, зачем); вид — unique / index / hnsw. Сборка проверяет: у каждой таблицы есть политика,
 # каждый FK покрыт индексом (первая колонка индекса или PK), срок ссылается на параметр спеки.
+# Базы данных (D18, D22; data-methodology.md): кластер → база → схема. Таблица → «база.схема» — SCHEMA_OF.
+DB_CLUSTER = dict(engine="PostgreSQL 17 + pgvector", operator="CloudNativePG", namespace="itsaplan-data", instances="1 (MVP, D18)",
+                  pooler="PgBouncer (`Pooler` CloudNativePG), режим transaction", backup="WAL и базовые копии в S3 вне площадки (`postgres.backup`)",
+                  roles="managed roles CloudNativePG (D22)")
+DATABASES = {
+    "itsaplan": dict(owner="icplan", schemas={
+        "public": dict(owner="icplan", role="itsaplan", stores="S1", migrate="fork", what="таблицы форка, процесс задачи"),
+        "platform": dict(owner="platform-module", role="itsaplan", stores="S2, S3", migrate="cp, obs",
+                         what="настройки агентов, профили, доступы (Platform module); события запуска (Observability)"),
+        "runner": dict(owner="agent-runner", role="runner", stores="S3", migrate="runner", what="слоты планировщика, кэш подготовки"),
+        "harness_ckpt": dict(owner="agent-runner", role="runner", stores="S5", migrate="runner", what="checkpoint агентского цикла"),
+        "memory": dict(owner="memory", role="memory", stores="S4", migrate="memory", what="M3, позже M4"),
+    }),
+    "litellm": dict(owner="llm-gateway", schemas={
+        "public": dict(owner="llm-gateway", role="litellm", stores="S6", migrate="litellm", what="virtual keys, бюджеты, журнал затрат"),
+    }),
+}
+# Чтение и ссылки на чужие таблицы — только явным GRANT (D22)
+DB_GRANTS = [
+    ("memory", "SELECT", "itsaplan.public.agent_run", "M2: итоги запусков"),
+    ("memory", "SELECT", "itsaplan.public.agent_chat_message", "M1: переписка"),
+    ("memory", "REFERENCES", "itsaplan.public.issue", "FK memory_m3.issue_id"),
+    ("runner", "REFERENCES", "itsaplan.public.agent_run", "FK run_checkpoint.run_id, scheduler_slot"),
+    ("litellm_read (api ICPlan)", "SELECT", "litellm.public.LiteLLM_SpendLogs", "Observability: затраты задачи"),
+]
+# Таблица платформы → «база.схема»; таблицы форка — itsaplan.public, LiteLLM — litellm.public
+SCHEMA_OF = {
+    "process": "itsaplan.public", "process_step": "itsaplan.public", "issue_process_state": "itsaplan.public",
+    "agent_settings": "itsaplan.platform", "agent_settings_version": "itsaplan.platform", "sandbox_profile": "itsaplan.platform",
+    "memory_profile": "itsaplan.platform", "project_resource": "itsaplan.platform", "access_policy": "itsaplan.platform",
+    "project_platform": "itsaplan.platform", "kill_switch": "itsaplan.platform", "run_event": "itsaplan.platform",
+    "scheduler_slot": "itsaplan.runner", "setup_cache": "itsaplan.runner",
+    "memory_m3": "itsaplan.memory", "m4_fact": "itsaplan.memory",
+    "run_checkpoint": "itsaplan.harness_ckpt",
+}
+
 MIGRATE = {
     "fork": "Drizzle в форке (`packages/db`), применяются до старта `api`",
     "cp": "миграции Platform module в `api` форка, своя таблица версий, только схема `platform`",
     "obs": "миграции Observability в `api` форка, своя таблица версий",
     "runner": "миграции Agent Runner при старте, своя таблица версий",
     "memory": "миграции Memory API при старте (Alembic), своя таблица версий",
+    "litellm": "миграции LiteLLM (Prisma) прямым подключением, минуя PgBouncer",
 }
 # таблицы форка, в которые пишет платформа (запуски, чат, история задачи): им тоже нужна политика (data-methodology)
 FORK_WRITTEN = ["agent_run", "agent_chat_message", "issue_activity"]

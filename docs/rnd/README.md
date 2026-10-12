@@ -24,6 +24,7 @@
 | [Ingress и балансировка](ingress-and-balancing.md) | Инфраструктура | Traefik из k3s, TLS по ACME, маршруты на Gateway API; Service и PgBouncer; ingress-nginx архивирован | D15, D18 | v3.1 |
 | [Kubernetes и развёртывание](kubernetes-runtime.md) | Инфраструктура | k3s + Helm на одном узле, k3d локально; CIS-проверка узла; провайдер сред в K8s добавлен (4.6.8), кандидат — agent-sandbox | D15, D16, D18 | v3.1 |
 | [СУБД и хранилища](data-stores.md) | Инфраструктура | PostgreSQL 17 под CloudNativePG (WAL в S3 вне узла, Pooler, pgvector) + RustFS как в ICPlan; MinIO архивирован; Trial до проверки PITR | D4, D15, D18 | v3.1 |
+| [Базы, схемы и роли БД сервисов](db-roles-schemas.md) | Инфраструктура | схема на сервис-владельца в базе `itsaplan` (`platform` — api ICPlan, `runner` и `harness_ckpt` — Runner, `memory` — Memory API), роль = владелец схемы, чужое — `GRANT`; LiteLLM — база `litellm` | D22 | v3.1 |
 | [Рабочее пространство агентов и доступы](agent-workspace.md) | Sandbox, MCP, Platform module | Вариант B: каталог проекта + workspace задачи + политика, права токенами Runner (D18); зависимости проекта — вопрос Q-SBX-01 | D11, D18 | v3.1 |
 | [Наблюдаемость](observability.md) | Observability | Таблица событий в ICPlan и таймлайн в задаче; RunEvent сопоставлен с OTel GenAI; Langfuse / Phoenix — после MVP экспортом | D12 | v3.1 |
 

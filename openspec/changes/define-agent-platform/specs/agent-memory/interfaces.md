@@ -45,7 +45,7 @@
 | ID | Хранилище | Что хранит | Владелец | Резервирование / срок |
 |---|---|---|---|---|
 | S1 | PostgreSQL 17 (CloudNativePG), БД `itsaplan`, схема `public` | задачи, агенты, `agent_run`, `issue_activity`, статусы, документы | ICPlan | базовые копии + WAL в S3 вне узла |
-| S4 | Postgres ICPlan, схема `platform`, таблица `memory_m3`; позже pgvector для M4 | состояние задач (M3); факты (M4) | Memory | M3 — до закрытия задачи |
+| S4 | Postgres ICPlan (база `itsaplan`), схема `memory` (роль `memory`, D22), таблица `memory_m3`; позже pgvector для M4 | состояние задач (M3); факты (M4) | Memory | M3 — до закрытия задачи |
 
 ## Интерфейсы обмена
 

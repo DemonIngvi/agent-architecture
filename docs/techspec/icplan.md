@@ -30,7 +30,8 @@
 
 | Переменная | Зачем | Откуда |
 |---|---|---|
-| `DATABASE_URL` | Postgres через PgBouncer (`prepare: false`) | Secret `itsaplan-db` |
+| `DATABASE_URL` | база `itsaplan`, роль `itsaplan` — схемы `public` и `platform` (Platform module, Observability), через PgBouncer (`prepare: false`); D22 | Secret `itsaplan-db` |
+| `LITELLM_READ_URL` | база `litellm`, роль `litellm_read` — чтение журнала затрат (Observability); D22 | Secret `litellm-read` |
 | `S3_*` | RustFS | Secret `itsaplan-s3` |
 | `AGENT_RUN_LEASE_SECONDS` | аренда запуска; значение — [interfaces.md интеграции](../../openspec/changes/add-icplan-integration/specs/icplan-integration/interfaces.md) | values |
 | `TELEGRAM_BOT_TOKEN` | бот | Secret |

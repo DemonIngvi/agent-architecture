@@ -102,7 +102,7 @@ flowchart LR
       AG["Runner · LiteLLM ×2 · OPA ×2 · Memory · egress · запуски"]
     end
     subgraph ND["itsaplan-data"]
-      PB["PgBouncer"] --> PG[("PostgreSQL 17 + pgvector<br/>CloudNativePG")]
+      %% databases — генерируется из datamodel.DATABASES (D22)
       RF[("RustFS (S3)")]
     end
     T --> W

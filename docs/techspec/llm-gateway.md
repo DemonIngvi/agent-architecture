@@ -25,7 +25,7 @@
 |---|---|---|
 | `LITELLM_MASTER_KEY` | админ-ключ | Secret |
 | ключи провайдеров | провайдеры | Secret `llm-providers` |
-| `DATABASE_URL`, `DIRECT_URL` | БД и миграции | Secret |
+| `DATABASE_URL`, `DIRECT_URL` | база `litellm`, роль `litellm`: работа через PgBouncer и миграции напрямую (D22) | Secret |
 
 ## Сборка и поставка
 

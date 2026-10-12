@@ -204,14 +204,14 @@ M4 SHALL вводиться вместе с RAG: запись фактов аг�
 
 <a id="r-mem-10"></a>
 ### Requirement: Хранилища данных
-Модуль SHALL хранить свои данные только в S4 (Postgres ICPlan, схема `platform`) (`interfaces.md`); данные S1 — доступ только через API или конфигурацию владельца. Секреты MUST NOT храниться в БД и git.
+Модуль SHALL хранить свои данные только в S4 (Postgres ICPlan, схема `memory`) (`interfaces.md`); данные S1 — доступ только через API или конфигурацию владельца. Секреты MUST NOT храниться в БД и git.
 
 #### Scenario: Запись в своё хранилище
 - **WHEN** модуль сохраняет состояние задач (M3); факты (M4)
-- **THEN** запись попадает в S4 (Postgres ICPlan, схема `platform`)
+- **THEN** запись попадает в S4 (Postgres ICPlan, схема `memory`)
 
 #### Scenario: S4 недоступно
-- **WHEN** S4 (Postgres ICPlan, схема `platform`) не отвечает
+- **WHEN** S4 (Postgres ICPlan, схема `memory`) не отвечает
 - **THEN** чтение — пустой контекст с предупреждением; запись — повтор
 
 #### Scenario: Доступ вне своих хранилищ

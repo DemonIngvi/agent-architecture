@@ -43,7 +43,7 @@
 
 | ID | Хранилище | Что хранит | Владелец | Резервирование / срок |
 |---|---|---|---|---|
-| S3 | Postgres ICPlan, схема `platform`, таблицы `run_event`, `scheduler_slot` | события запусков (`run_event`) | Agent Runner / Observability | события — 90 дней; слоты — оперативные |
+| S3 | Postgres ICPlan (база `itsaplan`): `run_event` — схема `platform`; `scheduler_slot`, `setup_cache` — схема `runner` (D22) | события запусков (`run_event`) | Agent Runner / Observability | события — 90 дней; слоты — оперативные |
 | S6 | PostgreSQL 17 (тот же кластер), БД `litellm` | virtual keys, бюджеты, журнал затрат | LiteLLM | журнал затрат — по политике LiteLLM |
 
 ## Интерфейсы обмена

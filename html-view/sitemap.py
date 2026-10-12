@@ -96,5 +96,11 @@ def home_page(home_md: str, flow_page) -> str:
     arch = (ROOT / "architecture.md").read_text(encoding="utf-8")
     arch = re.sub(r"^# .*\n", "", arch, count=1)
     arch = relink(arch, "architecture.md", "index.md")
+    import datamodel as DM  # базы на схеме развёртывания — из DATABASES (D22)
+    c = DM.DB_CLUSTER
+    dbs = ['      PB["PgBouncer"] --> PG', f'      subgraph PG["{c["engine"]} · {c["operator"]}"]']
+    dbs += [f'        DB_{db}[("{db}<br/>{" · ".join(d["schemas"])}")]' for db, d in DM.DATABASES.items()]
+    dbs += ["      end"]
+    arch = arch.replace("      %% databases — генерируется из datamodel.DATABASES (D22)", "\n".join(dbs), 1)
     body = "\n\n# Обзор архитектуры\n" + arch
     return home_md.rstrip("\n") + "\n" + flow_page(body, "index", IG.names(__import__("components").COMPONENTS), "")

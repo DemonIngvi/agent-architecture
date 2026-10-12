@@ -25,6 +25,7 @@
 |---|---|---|
 | `ITSAPLAN_URL`, `ITSAPLAN_AGENT_KEYS` | очередь и ключи агентов | Secret `runner-agents` |
 | `PLATFORM_API_URL`, `PLATFORM_TOKEN` | настройки агентов | Secret |
+| `DATABASE_URL` | база `itsaplan`, роль `runner` — владелец схем `runner` (слоты, кэш подготовки) и `harness_ckpt` (checkpoint), через PgBouncer (D22) | Secret `runner-db` |
 | `DOCKER_HOST` | rootless Docker | values |
 | `HARNESS_IMAGE` | образ sandbox | values |
 | секреты MCP-серверов (`auth.secret_ref`) | MCP-прокси подставляет учётные данные (D19) | Secret в `itsaplan-agents`, чтение — ServiceAccount Runner |

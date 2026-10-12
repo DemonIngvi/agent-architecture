@@ -22,7 +22,7 @@
 
 | Переменная | Зачем | Откуда |
 |---|---|---|
-| `DATABASE_URL` | БД ICPlan, роль только на свои таблицы | Secret `memory-db` |
+| `DATABASE_URL` | база `itsaplan`, роль `memory` — владелец схемы `memory`; чтение `agent_run`, `agent_chat_message` по `GRANT` (D22) | Secret `memory-db` |
 | `MASK_PATTERNS` | шаблоны маскирования | ConfigMap (из observability) |
 
 ## Сборка и поставка

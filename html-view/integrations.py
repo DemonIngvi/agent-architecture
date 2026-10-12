@@ -534,11 +534,72 @@ def _pk_of(table):
     return ("text", "id")
 
 
+def schema_of(table: str) -> str:
+    """«база.схема» таблицы (D22): платформа — SCHEMA_OF, LiteLLM — litellm.public, остальное — форк ICPlan."""
+    if table in DM.SCHEMA_OF:
+        return DM.SCHEMA_OF[table]
+    return "litellm.public" if table in DM.LITELLM_TABLES else "itsaplan.public"
+
+
+def databases_md() -> list:
+    """Раздел «Базы данных» вкладки «Данные» Инфраструктуры — из DATABASES (data-methodology.md)."""
+    c = DM.DB_CLUSTER
+    nm = {x[0]: x[1] for x in __import__("components").COMPONENTS}
+    L = ["## Базы данных {#databases}", "",
+         f"Кластер: {c['engine']} под {c['operator']}, namespace `{c['namespace']}`, экземпляров: {c['instances']}; пул — {c['pooler']}; бэкап — {c['backup']}; роли — {c['roles']}. "
+         "Решения: [D18, D22](../../openspec/changes/define-agent-platform/design.md), [R&D](../../docs/rnd/db-roles-schemas.md).", "",
+         "| База | Схема | Владелец | Роль БД | Миграции | Хранилище | Что хранит |", "|---|---|---|---|---|---|---|"]
+    for db, d in DM.DATABASES.items():
+        for sc, s in d["schemas"].items():
+            mig = "; ".join(DM.MIGRATE.get(m.strip(), m) for m in s["migrate"].split(","))
+            L.append(f"| `{db}` | `{sc}` | [{nm.get(s['owner'], s['owner'])}](../{s['owner']}/index.md) | `{s['role']}` | {mig} | {s['stores']} | {s['what']} |")
+    L += ["", "**Доступ к чужим таблицам** — только явным `GRANT`:", "", "| Роль | Право | Таблица | Зачем |", "|---|---|---|---|"]
+    L += [f"| `{r}` | {g} | `{tb}` | {w} |" for r, g, tb, w in DM.DB_GRANTS]
+    return L + [""]
+
+
+def where_md(slug) -> list:
+    """Строка «Где лежит» на «Данных» компонента: базы и схемы его таблиц, роль владельца."""
+    tables = [t for t, _, _ in er_tables(slug)]
+    places = sorted({schema_of(t) for t in tables})
+    if not places:
+        return []
+    parts = []
+    for pl in places:
+        db, sc = pl.split(".")
+        s = DM.DATABASES.get(db, {}).get("schemas", {}).get(sc)
+        parts.append(f"база `{db}`, схема `{sc}`" + (f" (роль `{s['role']}`)" if s else ""))
+    return ["**Где лежит:** " + "; ".join(parts) + " — [все базы и роли](../infrastructure/index.md#databases).", ""]
+
+
+def db_check(components) -> list:
+    """Каждая таблица — в схеме из DATABASES; у схемы владелец-компонент; его Deploy (или хоста) называет роль (data-methodology.md)."""
+    from components import HOST
+    issues = []
+    slugs = {c[0] for c in components}
+    known = {f"{db}.{sc}" for db, d in DM.DATABASES.items() for sc in d["schemas"]}
+    issues += [f"{t}: схема {s} нет в DATABASES" for t, s in DM.SCHEMA_OF.items() if s not in known]
+    issues += [f"{t}: нет в SCHEMA_OF — в какой схеме лежит?" for t in DM.PLATFORM_TABLES if t not in DM.SCHEMA_OF]
+    for db, d in DM.DATABASES.items():
+        for sc, s in d["schemas"].items():
+            o = s["owner"]
+            if o not in slugs:
+                issues.append(f"DATABASES {db}.{sc}: владелец {o} — не компонент")
+                continue
+            dep = [ROOT / f"docs/techspec/{o}.md", ROOT / f"docs/techspec/{HOST.get(o, o)}.md"]
+            if not any(f.exists() and f"`{s['role']}`" in f.read_text(encoding="utf-8") for f in dep):
+                issues.append(f"Deploy {o}: не названа роль БД `{s['role']}` (база `{db}`, схема `{sc}`)")
+    return issues
+
+
 def stores_md(slug, page, href) -> list:
     tables = er_tables(slug)
     stores = DM.STORES.get(slug, [])
     L = ["## Хранилища и модель данных {#stores}", "",
          f"Хранилища компонента: {', '.join(stores) or '—'}. На диаграмме — ключи и основные поля; таблицы другого домена, на которые только ссылаются, показаны одним ключом; все поля, индексы, срок хранения и миграции — в таблицах ниже; правила — [методология данных](../../docs/rules/data-methodology.md).", ""]
+    L += where_md(slug)
+    if slug == "infrastructure":
+        L += databases_md()
     if tables:
         L += mermaid_er(tables) + [""]
         for t, cols, src in tables:
@@ -820,6 +881,7 @@ def check(components) -> list:
     """Сверка: каждый I-код матрицы описан в INTEG; модели из INTEG описаны; I-коды есть в interfaces.md."""
     issues = []
     issues += connectivity_check(components)
+    issues += db_check(components)
     issues += [f"{i}: нет типов данных в datamodel.INTEG_TYPES" for i in DM.INTEG if i not in DM.INTEG_TYPES]
     issues += [f"{i}: типы данных для неизвестного интерфейса" for i in DM.INTEG_TYPES if i not in DM.INTEG]
     issues += flows_check()
