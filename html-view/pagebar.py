@@ -6,6 +6,7 @@
 """
 import json
 import os
+import re
 from pathlib import Path
 
 MAP_FILE = Path(__file__).resolve().parent / ".build" / "pagebar.json"
@@ -90,11 +91,14 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     nav = []
     if page.url != "":
         nav.append('<a class="tb-btn" href="#" onclick="history.back();return false;" title="Предыдущая просмотренная страница">← Назад</a>')
-    if up is not None:
+    is_block = re.match(r"components/([^/]+)/[^/]+/index\.md$", src)  # у блока нет своих вкладок — только «↑ компонент»
+    if is_block:
+        nav.append(f'<a class="tb-btn" href="{_rel(page.url, f"components/{is_block.group(1)}/")}" title="Компонент блока">↑ {DATA["names"].get(is_block.group(1), is_block.group(1))}</a>')
+    elif up is not None:
         nav.append(f'<a class="tb-btn" href="{_rel(page.url, up.url)}" title="Уровень выше в дереве">↑ {up.title}</a>')
 
     types = []
-    for key, label, section, comp_url, plain_url in TYPES:
+    for key, label, section, comp_url, plain_url in ([] if is_block else TYPES):
         target = comp_url.format(slug) if (slug and comp_url) else plain_url
         if target is None:
             continue  # у вкладки нет общей страницы (О-54)
