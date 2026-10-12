@@ -75,12 +75,12 @@
 | `components/harness/tool-executor/index.md` | А | — | — | — | ⏳ | 5d447140 | Блок |
 | `components/harness/tool-executor/index.md` | Р | — | — | — | ⏳ | 5d447140 | Блок |
 | `components/harness/tool-executor/index.md` | Т | — | — | — | ⏳ | 5d447140 | Блок |
-| `components/icplan/avtopodhvat/index.md` | А | — | — | — | ⏳ | 865c03d4 | текст изменён после решения «❌» от Claude, роль Архитектор |
-| `components/icplan/avtopodhvat/index.md` | Р | — | — | — | ⏳ | 865c03d4 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `components/icplan/avtopodhvat/index.md` | Т | — | — | — | ⏳ | 865c03d4 | текст изменён после решения «❌» от Claude, роль Тестировщик |
-| `components/icplan/control-plane-ui/index.md` | А | — | — | — | ⏳ | 3535755d | текст изменён после решения «❌» от Claude, роль Архитектор |
-| `components/icplan/control-plane-ui/index.md` | Р | — | — | — | ⏳ | 3535755d | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `components/icplan/control-plane-ui/index.md` | Т | — | — | — | ⏳ | 3535755d | текст изменён после решения «❌» от Claude, роль Тестировщик |
+| `components/icplan/avtopodhvat/index.md` | А | — | — | — | ⏳ | 8d8b041e | текст изменён после решения «❌» от Claude, роль Архитектор |
+| `components/icplan/avtopodhvat/index.md` | Р | — | — | — | ⏳ | 8d8b041e | текст изменён после решения «✅» от Claude, роль Разработчик |
+| `components/icplan/avtopodhvat/index.md` | Т | — | — | — | ⏳ | 8d8b041e | текст изменён после решения «❌» от Claude, роль Тестировщик |
+| `components/icplan/control-plane-ui/index.md` | А | — | — | — | ⏳ | bf609cee | текст изменён после решения «❌» от Claude, роль Архитектор |
+| `components/icplan/control-plane-ui/index.md` | Р | — | — | — | ⏳ | bf609cee | текст изменён после решения «✅» от Claude, роль Разработчик |
+| `components/icplan/control-plane-ui/index.md` | Т | — | — | — | ⏳ | bf609cee | текст изменён после решения «❌» от Claude, роль Тестировщик |
 | `components/icplan/index.md` | А | — | — | — | ⏳ | 59fd3e8c | текст изменён после решения «✅» от Claude, роль Архитектор |
 | `components/icplan/index.md` | Р | — | — | — | ⏳ | 59fd3e8c | текст изменён после решения «✅» от Claude, роль Разработчик |
 | `components/icplan/registry/index.md` | А | — | — | — | ⏳ | b8c5641d | текст изменён после решения «❌» от Claude, роль Архитектор |
@@ -344,39 +344,39 @@
 | `docs/rules/tech-spec.md` | А | — | — | — | ⏳ | edfbcf80 | Методология |
 | `docs/rules/us-methodology.md` | В | — | — | — | ⏳ | 0c4e3715 | Методология |
 | `docs/rules/us-methodology.md` | А | — | — | — | ⏳ | 0c4e3715 | Методология |
-| `docs/stories/agent-runner.md` | В | — | — | — | ⏳ | ea2ef887 | User Stories |
-| `docs/stories/agent-runner.md` | И | — | — | — | ⏳ | ea2ef887 | User Stories |
-| `docs/stories/agent-runner.md` | П | — | — | — | ⏳ | ea2ef887 | User Stories |
-| `docs/stories/guardrails.md` | В | — | — | — | ⏳ | 632eff7f | User Stories |
-| `docs/stories/guardrails.md` | И | — | — | — | ⏳ | 632eff7f | User Stories |
-| `docs/stories/guardrails.md` | П | — | — | — | ⏳ | 632eff7f | User Stories |
-| `docs/stories/harness.md` | В | — | — | — | ⏳ | f84a0ae0 | User Stories |
-| `docs/stories/harness.md` | И | — | — | — | ⏳ | f84a0ae0 | User Stories |
-| `docs/stories/harness.md` | П | — | — | — | ⏳ | f84a0ae0 | User Stories |
-| `docs/stories/icplan.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-12 | ❌ | 6a3e5267 | нет MVP и этапа у историй, нет связи история → задача → Z-ICP |
-| `docs/stories/icplan.md` | И | Claude, роль Аналитик историй | 🤖 | 2026-10-12 | ❌ | 6a3e5267 | процесс 2 без веток ошибок; пробелы CRUD (процесс, Действие, расписание); US-ICP-08 и US-ICP-23 неполны → Z-ICP |
-| `docs/stories/icplan.md` | П | Claude, роль Пользователь | 🤖 | 2026-10-12 | ✅ | 6a3e5267 | мои работы закрыты; правка расписания и судьба процесса после ручного делегата — Z-ICP |
-| `docs/stories/infrastructure.md` | В | — | — | — | ⏳ | 8a820655 | User Stories |
-| `docs/stories/infrastructure.md` | И | — | — | — | ⏳ | 8a820655 | User Stories |
-| `docs/stories/infrastructure.md` | П | — | — | — | ⏳ | 8a820655 | User Stories |
-| `docs/stories/llm-gateway.md` | В | — | — | — | ⏳ | 8d457aa7 | User Stories |
-| `docs/stories/llm-gateway.md` | И | — | — | — | ⏳ | 8d457aa7 | User Stories |
-| `docs/stories/llm-gateway.md` | П | — | — | — | ⏳ | 8d457aa7 | User Stories |
-| `docs/stories/mcp-tools.md` | В | — | — | — | ⏳ | f5ab6bfe | User Stories |
-| `docs/stories/mcp-tools.md` | И | — | — | — | ⏳ | f5ab6bfe | User Stories |
-| `docs/stories/mcp-tools.md` | П | — | — | — | ⏳ | f5ab6bfe | User Stories |
-| `docs/stories/memory.md` | В | — | — | — | ⏳ | 2702e494 | User Stories |
-| `docs/stories/memory.md` | И | — | — | — | ⏳ | 2702e494 | User Stories |
-| `docs/stories/memory.md` | П | — | — | — | ⏳ | 2702e494 | User Stories |
-| `docs/stories/observability.md` | В | — | — | — | ⏳ | 042f1b51 | User Stories |
-| `docs/stories/observability.md` | И | — | — | — | ⏳ | 042f1b51 | User Stories |
-| `docs/stories/observability.md` | П | — | — | — | ⏳ | 042f1b51 | User Stories |
-| `docs/stories/platform-module.md` | В | — | — | — | ⏳ | a9a8ae23 | User Stories |
-| `docs/stories/platform-module.md` | И | — | — | — | ⏳ | a9a8ae23 | User Stories |
-| `docs/stories/platform-module.md` | П | — | — | — | ⏳ | a9a8ae23 | User Stories |
-| `docs/stories/sandbox.md` | В | — | — | — | ⏳ | 2cd2a992 | User Stories |
-| `docs/stories/sandbox.md` | И | — | — | — | ⏳ | 2cd2a992 | User Stories |
-| `docs/stories/sandbox.md` | П | — | — | — | ⏳ | 2cd2a992 | User Stories |
+| `docs/stories/agent-runner.md` | В | — | — | — | ⏳ | fe4fbcef | User Stories |
+| `docs/stories/agent-runner.md` | И | — | — | — | ⏳ | fe4fbcef | User Stories |
+| `docs/stories/agent-runner.md` | П | — | — | — | ⏳ | fe4fbcef | User Stories |
+| `docs/stories/guardrails.md` | В | — | — | — | ⏳ | 052419fb | User Stories |
+| `docs/stories/guardrails.md` | И | — | — | — | ⏳ | 052419fb | User Stories |
+| `docs/stories/guardrails.md` | П | — | — | — | ⏳ | 052419fb | User Stories |
+| `docs/stories/harness.md` | В | — | — | — | ⏳ | 51c3ca9e | User Stories |
+| `docs/stories/harness.md` | И | — | — | — | ⏳ | 51c3ca9e | User Stories |
+| `docs/stories/harness.md` | П | — | — | — | ⏳ | 51c3ca9e | User Stories |
+| `docs/stories/icplan.md` | В | — | — | — | ⏳ | db33b5bb | текст изменён после решения «❌» от Claude, роль Владелец продукта |
+| `docs/stories/icplan.md` | И | — | — | — | ⏳ | db33b5bb | текст изменён после решения «❌» от Claude, роль Аналитик историй |
+| `docs/stories/icplan.md` | П | — | — | — | ⏳ | db33b5bb | текст изменён после решения «✅» от Claude, роль Пользователь |
+| `docs/stories/infrastructure.md` | В | — | — | — | ⏳ | a7095c7f | User Stories |
+| `docs/stories/infrastructure.md` | И | — | — | — | ⏳ | a7095c7f | User Stories |
+| `docs/stories/infrastructure.md` | П | — | — | — | ⏳ | a7095c7f | User Stories |
+| `docs/stories/llm-gateway.md` | В | — | — | — | ⏳ | 49128009 | User Stories |
+| `docs/stories/llm-gateway.md` | И | — | — | — | ⏳ | 49128009 | User Stories |
+| `docs/stories/llm-gateway.md` | П | — | — | — | ⏳ | 49128009 | User Stories |
+| `docs/stories/mcp-tools.md` | В | — | — | — | ⏳ | fe344816 | User Stories |
+| `docs/stories/mcp-tools.md` | И | — | — | — | ⏳ | fe344816 | User Stories |
+| `docs/stories/mcp-tools.md` | П | — | — | — | ⏳ | fe344816 | User Stories |
+| `docs/stories/memory.md` | В | — | — | — | ⏳ | 4ccbc3c4 | User Stories |
+| `docs/stories/memory.md` | И | — | — | — | ⏳ | 4ccbc3c4 | User Stories |
+| `docs/stories/memory.md` | П | — | — | — | ⏳ | 4ccbc3c4 | User Stories |
+| `docs/stories/observability.md` | В | — | — | — | ⏳ | b398ddc2 | User Stories |
+| `docs/stories/observability.md` | И | — | — | — | ⏳ | b398ddc2 | User Stories |
+| `docs/stories/observability.md` | П | — | — | — | ⏳ | b398ddc2 | User Stories |
+| `docs/stories/platform-module.md` | В | — | — | — | ⏳ | a18d1f9c | User Stories |
+| `docs/stories/platform-module.md` | И | — | — | — | ⏳ | a18d1f9c | User Stories |
+| `docs/stories/platform-module.md` | П | — | — | — | ⏳ | a18d1f9c | User Stories |
+| `docs/stories/sandbox.md` | В | — | — | — | ⏳ | 6c9950b9 | User Stories |
+| `docs/stories/sandbox.md` | И | — | — | — | ⏳ | 6c9950b9 | User Stories |
+| `docs/stories/sandbox.md` | П | — | — | — | ⏳ | 6c9950b9 | User Stories |
 | `docs/tasks/1.1-mock-llm-litellm.md` | В | — | — | — | ⏳ | 024accb2 | Задача |
 | `docs/tasks/1.1-mock-llm-litellm.md` | Р | — | — | — | ⏳ | 024accb2 | Задача |
 | `docs/tasks/1.1-mock-llm-litellm.md` | Т | — | — | — | ⏳ | 024accb2 | Задача |

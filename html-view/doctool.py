@@ -371,6 +371,22 @@ def main():
         print(f"ждёт решения: {len(q)}")
         for p, r in q[:200]:
             print(f"- {p} × {r}")
+    elif cmd == "finding":  # статус замечания на вкладке «Замечания» (review-methodology.md#findings)
+        comp, fid, st = args[0], args[1], args[2]
+        note = " ".join(args[3:])
+        f = ROOT / f"docs/reviews/findings/{comp}.md"
+        lines = f.read_text(encoding="utf-8").split(chr(10))
+        mark = {"ok": "✅", "wait": "⏳", "owner": "📌"}[st]
+        n = 0
+        for i, l in enumerate(lines):
+            for one in fid.split(","):
+                if l.startswith(f"| {one.strip()} |"):
+                    cells = l.rstrip().rstrip("|").split(" | ")
+                    cells[-1] = mark + (f" {note}" if note else "")
+                    lines[i] = " | ".join(cells) + " |"
+                    n += 1
+        f.write_text(chr(10).join(lines), encoding="utf-8", newline=chr(10))
+        print(f"{comp}: обновлено {n}")
     elif cmd == "blocks":  # заполненность карточек блоков (block-methodology.md)
         sys.path.insert(0, str(HERE))
         with contextlib.redirect_stdout(io.StringIO()):

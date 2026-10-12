@@ -106,6 +106,23 @@ def req_id(cap: str, name: str) -> str:
     return REQ_IDS[cap].get(name.strip(), "")
 
 
+def story_stage(reqs) -> str:
+    """Этап и задачи истории из трассировки (us-methodology): требования → «Реализует задача»."""
+    tasks = set()
+    for r in reqs:
+        cap, _, name = r.partition(": ")
+        rid, p = req_id(cap, name), spec_path_of(cap)
+        if not rid or not p:
+            continue
+        m = re.search(rf"`{rid}` · \*\*Реализует задача:\*\* ([^\n]*)", (ROOT / p).read_text(encoding="utf-8"))
+        if m:
+            tasks |= set(re.findall(r"tasks/(\d\.\d+)-", m.group(1)))
+    if not tasks:
+        return "—"
+    ts = sorted(tasks, key=lambda x: [int(n) for n in x.split(".")])
+    return f"этап {min(int(x.split('.')[0]) for x in ts)} · " + ", ".join(ts)
+
+
 def _req_link(r: str) -> str:
     cap, _, name = r.partition(": ")
     p = spec_path_of(cap)
@@ -158,8 +175,9 @@ def sync_stories():
         extra = HERE / "stories_extra" / f"{slug}.md"  # процесс и правила пользователя вне BPMN (О-52)
         if extra.exists():
             L += [extra.read_text(encoding="utf-8").strip(), ""]
-        L += ["## Сводка", "", "| История | Персона | Хочу | Точка входа | Требований |", "|---|---|---|---|---|"]
-        L += [f"| [{s[0]}](#{s[0].lower()}) | {PERSONAS.get(s[1], (ROLES.get(s[1], s[1]),))[0]} | {s[2]} | {s[6] if len(s) > 6 else '—'} | {len(s[5]) or '⚠️ 0'} |" for s in lst]
+        L += ["## Сводка", "", "Этап и задачи — из трассировки: история → требования → «Реализует задача» (этап — первая цифра задачи, [Roadmap](../ROADMAP.md)).", "",
+              "| История | Персона | Хочу | Точка входа | Требований | Этап · задачи |", "|---|---|---|---|---|---|"]
+        L += [f"| [{s[0]}](#{s[0].lower()}) | {PERSONAS.get(s[1], (ROLES.get(s[1], s[1]),))[0]} | {s[2]} | {s[6] if len(s) > 6 else '—'} | {len(s[5]) or '⚠️ 0'} | {story_stage(s[5])} |" for s in lst]
         L += ["", "## Истории", ""]
         for sid, role, want, so, crit, reqs, *rest in lst:
             pname = PERSONAS.get(role, (ROLES.get(role, role),))[0]
