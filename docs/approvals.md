@@ -75,20 +75,20 @@
 | `components/harness/tool-executor/index.md` | А | — | — | — | ⏳ | 5d447140 | Блок |
 | `components/harness/tool-executor/index.md` | Р | — | — | — | ⏳ | 5d447140 | Блок |
 | `components/harness/tool-executor/index.md` | Т | — | — | — | ⏳ | 5d447140 | Блок |
-| `components/icplan/avtopodhvat/index.md` | А | — | — | — | ⏳ | 56a6d389 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `components/icplan/avtopodhvat/index.md` | Р | — | — | — | ⏳ | 56a6d389 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `components/icplan/avtopodhvat/index.md` | Т | — | — | — | ⏳ | 56a6d389 | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `components/icplan/control-plane-ui/index.md` | А | — | — | — | ⏳ | 76bdaaea | текст изменён после решения «❌» от Claude, роль Архитектор |
-| `components/icplan/control-plane-ui/index.md` | Р | — | — | — | ⏳ | 76bdaaea | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `components/icplan/control-plane-ui/index.md` | Т | — | — | — | ⏳ | 76bdaaea | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `components/icplan/index.md` | А | — | — | — | ⏳ | dc437139 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `components/icplan/index.md` | Р | — | — | — | ⏳ | dc437139 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `components/icplan/registry/index.md` | А | — | — | — | ⏳ | bf904abc | текст изменён после решения «❌» от Claude, роль Архитектор |
-| `components/icplan/registry/index.md` | Р | — | — | — | ⏳ | bf904abc | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `components/icplan/registry/index.md` | Т | — | — | — | ⏳ | bf904abc | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `components/icplan/run-queue-runner-api/index.md` | А | — | — | — | ⏳ | cec509f3 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `components/icplan/run-queue-runner-api/index.md` | Р | — | — | — | ⏳ | cec509f3 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `components/icplan/run-queue-runner-api/index.md` | Т | — | — | — | ⏳ | cec509f3 | текст изменён после решения «✅» от Claude, роль Тестировщик |
+| `components/icplan/avtopodhvat/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 56a6d389 | Повтор: Z-ICP-64/72/84 закрыты в тексте (process_version в Данных, при сбое: лимит max_runs → on_failure, 5 попыток); операции, данные, сбои определены |
+| `components/icplan/avtopodhvat/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 56a6d389 | Повтор: Z-ICP-64/72/84 закрыты в тексте (process_version в Данных, при сбое: лимит max_runs → on_failure, 5 попыток); операции, данные, сбои определены |
+| `components/icplan/avtopodhvat/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 56a6d389 | Повтор: Z-ICP-64/72/84 закрыты в тексте (process_version в Данных, при сбое: лимит max_runs → on_failure, 5 попыток); операции, данные, сбои определены |
+| `components/icplan/control-plane-ui/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 76bdaaea | Повтор: Z-ICP-65/73/74/75/85 закрыты в тексте (экраны с эндпоинтами, DELETE профилей 409, сбой LiteLLM 503) |
+| `components/icplan/control-plane-ui/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 76bdaaea | Повтор: Z-ICP-65/73/74/75/85 закрыты в тексте (экраны с эндпоинтами, DELETE профилей 409, сбой LiteLLM 503) |
+| `components/icplan/control-plane-ui/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 76bdaaea | Повтор: Z-ICP-65/73/74/75/85 закрыты в тексте (экраны с эндпоинтами, DELETE профилей 409, сбой LiteLLM 503) |
+| `components/icplan/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | dc437139 | Повтор: Z-ICP-34/63 закрыты (встроенные в зоне, I4 и decisions в С1), порядок работы с данными и I-кодами |
+| `components/icplan/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | dc437139 | Повтор: Z-ICP-1/71 закрыты (С1 с I4, decisions); потоки, данные, I-коды определены |
+| `components/icplan/registry/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | bf904abc | Повтор: Z-ICP-66/76 закрыты (apikey, integration_credential в Данных; версии по D26) |
+| `components/icplan/registry/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | bf904abc | Повтор: Z-ICP-66/76 закрыты (apikey, integration_credential в Данных; версии по D26) |
+| `components/icplan/registry/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | bf904abc | Повтор: сценарии R-REG-01..06 проверяемы; Z-ICP-86 ждёт владельца, не блокирует |
+| `components/icplan/run-queue-runner-api/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | cec509f3 | Повтор: Z-ICP-77/87 закрыты (отмена только 404 на heartbeat, MAX_ATTEMPTS=3 → failed); операции, данные, сбои определены |
+| `components/icplan/run-queue-runner-api/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | cec509f3 | Повтор: Z-ICP-77/87 закрыты (отмена только 404 на heartbeat, MAX_ATTEMPTS=3 → failed); операции, данные, сбои определены |
+| `components/icplan/run-queue-runner-api/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | cec509f3 | Повтор: Z-ICP-77/87 закрыты (отмена только 404 на heartbeat, MAX_ATTEMPTS=3 → failed); операции, данные, сбои определены |
 | `components/icplan/task-ui/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-12 | ✅ | 681818b3 | повторная проверка: вердикт в issue_process_state, затраты — LiteLLM_SpendLogs ролью litellm_read, эндпоинты I20 |
 | `components/icplan/task-ui/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-12 | ✅ | 681818b3 | повторная проверка: 9 экранов с эндпоинтами, источники вердикта и затрат, сбои |
 | `components/icplan/task-ui/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-12 | ✅ | 681818b3 | повторная проверка: экраны с эндпоинтами и ошибками; SSE, цена неизвестна; Z-ICP-31/32 закрыты |
@@ -211,9 +211,9 @@
 | `data-by-component/harness/index.md` | А | — | — | — | ⏳ | 69b3bd65 | Данные |
 | `data-by-component/harness/index.md` | Р | — | — | — | ⏳ | 69b3bd65 | Данные |
 | `data-by-component/harness/index.md` | Д | — | — | — | ⏳ | 69b3bd65 | Данные |
-| `data-by-component/icplan/index.md` | А | — | — | — | ⏳ | 2b0e1e7d | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `data-by-component/icplan/index.md` | Р | — | — | — | ⏳ | 2b0e1e7d | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `data-by-component/icplan/index.md` | Д | — | — | — | ⏳ | 2b0e1e7d | текст изменён после решения «✅» от Claude, роль DevOps-инженер |
+| `data-by-component/icplan/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 2b0e1e7d | повторно: хранилища S1/S7, база и роль, срок и очистка agent_run/agent_chat_thread по D25/R-ICP-19, process_version, связи в ER согласованы |
+| `data-by-component/icplan/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 2b0e1e7d | повторно: таблицы, колонки, индексы, миграции и сроки определены; Z-ICP-67/78 закрыты в тексте |
+| `data-by-component/icplan/index.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | 2b0e1e7d | повторно: STORES S1+S7, бэкапы backups/postgres, база itsaplan и роль указаны, срок и очистка заданы; Z-ICP-97 закрыт |
 | `data-by-component/infrastructure/index.md` | А | — | — | — | ⏳ | f1f26a81 | Данные |
 | `data-by-component/infrastructure/index.md` | Р | — | — | — | ⏳ | f1f26a81 | Данные |
 | `data-by-component/infrastructure/index.md` | Д | — | — | — | ⏳ | f1f26a81 | Данные |
@@ -244,9 +244,9 @@
 | `docs/api/harness.md` | А | — | — | — | ⏳ | 7f2621b0 | Интеграции |
 | `docs/api/harness.md` | Р | — | — | — | ⏳ | 7f2621b0 | Интеграции |
 | `docs/api/harness.md` | Т | — | — | — | ⏳ | 7f2621b0 | Интеграции |
-| `docs/api/icplan.md` | А | — | — | — | ⏳ | a4f06bb6 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `docs/api/icplan.md` | Р | — | — | — | ⏳ | a4f06bb6 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/api/icplan.md` | Т | — | — | — | ⏳ | a4f06bb6 | текст изменён после решения «❌» от Claude, роль Тестировщик |
+| `docs/api/icplan.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | a4f06bb6 | повторно: источник правды ai_agent.enabled, I4/I20 на C1, версии и граница с Platform module определены; Z-ICP-68 закрыт |
+| `docs/api/icplan.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | a4f06bb6 | повторно: пути помечены 🆕/🛠, тела и ошибки заданы (decisions, messages, cancel, costs, PATCH ai-agents); Z-ICP-79..81 закрыты |
+| `docs/api/icplan.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | a4f06bb6 | повторно: у изменяющих эндпоинтов 403/409/404, /costs при недоступном журнале 200 с null, повтор итога 404; Z-ICP-87..89 закрыты, Z-ICP-86 ждёт владельца |
 | `docs/api/infrastructure.md` | А | — | — | — | ⏳ | e5b694e2 | Интеграции |
 | `docs/api/infrastructure.md` | Р | — | — | — | ⏳ | e5b694e2 | Интеграции |
 | `docs/api/infrastructure.md` | Т | — | — | — | ⏳ | e5b694e2 | Интеграции |
@@ -270,8 +270,8 @@
 | `docs/api/sandbox.md` | Т | — | — | — | ⏳ | 5a07f788 | Интеграции |
 | `docs/rnd/agent-workspace.md` | В | — | — | — | ⏳ | 30a7763d | R&D |
 | `docs/rnd/agent-workspace.md` | А | — | — | — | ⏳ | 30a7763d | R&D |
-| `docs/rnd/autopickup-rules.md` | В | — | — | — | ⏳ | e0349a00 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/rnd/autopickup-rules.md` | А | — | — | — | ⏳ | e0349a00 | текст изменён после решения «✅» от Claude, роль Архитектор |
+| `docs/rnd/autopickup-rules.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | e0349a00 | цена 7.5-12 дн (3.1+3.6), выбор D17 с опровержением, бэклог зависимостей |
+| `docs/rnd/autopickup-rules.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | e0349a00 | стыки I1/I2/I20, переход делает ICPlan, Runner/Harness не меняются, порядок ICPlan vs слоты Runner разведён; ОВ-2 не блокирует |
 | `docs/rnd/config-storage.md` | В | — | — | — | ⏳ | 141a8126 | R&D |
 | `docs/rnd/config-storage.md` | А | — | — | — | ⏳ | 141a8126 | R&D |
 | `docs/rnd/data-stores.md` | В | — | — | — | ⏳ | 7d75af89 | R&D |
@@ -280,8 +280,8 @@
 | `docs/rnd/db-roles-schemas.md` | А | — | — | — | ⏳ | b08f9299 | R&D |
 | `docs/rnd/doc-automation.md` | В | — | — | — | ⏳ | 75904ffa | R&D |
 | `docs/rnd/doc-automation.md` | А | — | — | — | ⏳ | 75904ffa | R&D |
-| `docs/rnd/fork-run-retention.md` | В | — | — | — | ⏳ | 865e8bf3 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/rnd/fork-run-retention.md` | А | — | — | — | ⏳ | 865e8bf3 | текст изменён после решения «✅» от Claude, роль Архитектор |
+| `docs/rnd/fork-run-retention.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 865e8bf3 | цена 7 ч (4.7.7 + 2.5.9), срок хранения и история/статистика сохранены, риск по ПДн с условием пересмотра |
+| `docs/rnd/fork-run-retention.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 865e8bf3 | удаляет владелец таблицы (D22), Memory только SELECT и фильтр, M3 через retention/run, границы сроков и FK к run_event учтены |
 | `docs/rnd/guardrails-engine.md` | В | — | — | — | ⏳ | 5a6c297f | R&D |
 | `docs/rnd/guardrails-engine.md` | А | — | — | — | ⏳ | 5a6c297f | R&D |
 | `docs/rnd/harness-framework.md` | В | — | — | — | ⏳ | 400557a6 | R&D |
@@ -300,8 +300,8 @@
 | `docs/rnd/memory-model.md` | А | — | — | — | ⏳ | 3faf1e51 | R&D |
 | `docs/rnd/observability.md` | В | — | — | — | ⏳ | 0bafd2b1 | R&D |
 | `docs/rnd/observability.md` | А | — | — | — | ⏳ | 0bafd2b1 | R&D |
-| `docs/rnd/platform-module-screens.md` | В | — | — | — | ⏳ | 16d43b38 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/rnd/platform-module-screens.md` | А | — | — | — | ⏳ | 16d43b38 | текст изменён после решения «✅» от Claude, роль Архитектор |
+| `docs/rnd/platform-module-screens.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 16d43b38 | 30 ч подзадач 4.4, раскладка по уровням, риск God mode и условия пересмотра названы |
+| `docs/rnd/platform-module-screens.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 16d43b38 | таблицы и эндпоинты по уровням, права ai_agents, @/cloud без правок, правки двух файлов форка и PR в upstream; ОВ-agent-registry-2 не блокирует |
 | `docs/rnd/rag.md` | В | — | — | — | ⏳ | f226775c | R&D |
 | `docs/rnd/rag.md` | А | — | — | — | ⏳ | f226775c | R&D |
 | `docs/rnd/rnd-methodology-choice.md` | В | — | — | — | ⏳ | 1ad6d93e | R&D |
@@ -310,8 +310,8 @@
 | `docs/rnd/run-view.md` | А | — | — | — | ⏳ | b4da9c90 | R&D |
 | `docs/rnd/runaway-protection.md` | В | — | — | — | ⏳ | ef1e1487 | R&D |
 | `docs/rnd/runaway-protection.md` | А | — | — | — | ⏳ | ef1e1487 | R&D |
-| `docs/rnd/runner-agent-definition.md` | В | — | — | — | ⏳ | ee5ca14e | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/rnd/runner-agent-definition.md` | А | — | — | — | ⏳ | ee5ca14e | текст изменён после решения «✅» от Claude, роль Архитектор |
+| `docs/rnd/runner-agent-definition.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | ee5ca14e | объём 6 ч (2.3.7), перенос Platform module в этап 2 как риск назван, выбор и пересмотр есть |
+| `docs/rnd/runner-agent-definition.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | ee5ca14e | I4 GET /platform/runs/:runId/agent, версия закрепляется в agent_run.agent_version, claim не меняется, доступ только через API, 404/409 определены |
 | `docs/rnd/runner-and-scheduling.md` | В | — | — | — | ⏳ | 70abd101 | R&D |
 | `docs/rnd/runner-and-scheduling.md` | А | — | — | — | ⏳ | 70abd101 | R&D |
 | `docs/rnd/sandbox-isolation.md` | В | — | — | — | ⏳ | 6aea0218 | R&D |
@@ -359,9 +359,9 @@
 | `docs/stories/harness.md` | В | — | — | — | ⏳ | 51c3ca9e | User Stories |
 | `docs/stories/harness.md` | И | — | — | — | ⏳ | 51c3ca9e | User Stories |
 | `docs/stories/harness.md` | П | — | — | — | ⏳ | 51c3ca9e | User Stories |
-| `docs/stories/icplan.md` | В | — | — | — | ⏳ | 1618a917 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/stories/icplan.md` | И | — | — | — | ⏳ | 1618a917 | текст изменён после решения «✅» от Claude, роль Аналитик историй |
-| `docs/stories/icplan.md` | П | — | — | — | ⏳ | 1618a917 | текст изменён после решения «✅» от Claude, роль Пользователь |
+| `docs/stories/icplan.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 1618a917 | повтор: Z-ICP-46/47/49/104/105 закрыты в тексте (ветки ошибок процессов 1-3, развилка Действия в 4); Z-ICP-106 ждёт владельца |
+| `docs/stories/icplan.md` | И | Claude, роль Аналитик историй | 🤖 | 2026-10-13 | ✅ | 1618a917 | повтор: ветки отмены, повторной выдачи, таймаута, 403/409, активных запусков при удалении агента есть в BPMN процессов 1-3 |
+| `docs/stories/icplan.md` | П | Claude, роль Пользователь | 🤖 | 2026-10-13 | ✅ | 1618a917 | повтор: ход задачи, указания, вердикт, повтор, отмена и удаление агента описаны для пользователя; ошибки видны |
 | `docs/stories/infrastructure.md` | В | — | — | — | ⏳ | a7095c7f | User Stories |
 | `docs/stories/infrastructure.md` | И | — | — | — | ⏳ | a7095c7f | User Stories |
 | `docs/stories/infrastructure.md` | П | — | — | — | ⏳ | a7095c7f | User Stories |
@@ -386,9 +386,9 @@
 | `docs/tasks/1.1-mock-llm-litellm.md` | В | — | — | — | ⏳ | 024accb2 | Задача |
 | `docs/tasks/1.1-mock-llm-litellm.md` | Р | — | — | — | ⏳ | 024accb2 | Задача |
 | `docs/tasks/1.1-mock-llm-litellm.md` | Т | — | — | — | ⏳ | 024accb2 | Задача |
-| `docs/tasks/1.2-agent-definition-yaml.md` | В | — | — | — | ⏳ | d6f47d29 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/1.2-agent-definition-yaml.md` | Р | — | — | — | ⏳ | d6f47d29 | текст изменён после решения «❌» от Claude, роль Разработчик |
-| `docs/tasks/1.2-agent-definition-yaml.md` | Т | — | — | — | ⏳ | d6f47d29 | текст изменён после решения «✅» от Claude, роль Тестировщик |
+| `docs/tasks/1.2-agent-definition-yaml.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | d6f47d29 | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/1.2-agent-definition-yaml.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | d6f47d29 | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/1.2-agent-definition-yaml.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | d6f47d29 | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
 | `docs/tasks/1.3-harness-core.md` | В | — | — | — | ⏳ | 5f2db77f | Задача |
 | `docs/tasks/1.3-harness-core.md` | Р | — | — | — | ⏳ | 5f2db77f | Задача |
 | `docs/tasks/1.3-harness-core.md` | Т | — | — | — | ⏳ | 5f2db77f | Задача |
@@ -410,51 +410,51 @@
 | `docs/tasks/2.2-sandbox-docker-oneshot.md` | В | — | — | — | ⏳ | 3d18761c | Задача |
 | `docs/tasks/2.2-sandbox-docker-oneshot.md` | Р | — | — | — | ⏳ | 3d18761c | Задача |
 | `docs/tasks/2.2-sandbox-docker-oneshot.md` | Т | — | — | — | ⏳ | 3d18761c | Задача |
-| `docs/tasks/2.3-config-from-icplan.md` | В | — | — | — | ⏳ | 9a602cc4 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/2.3-config-from-icplan.md` | Р | — | — | — | ⏳ | 9a602cc4 | текст изменён после решения «❌» от Claude, роль Разработчик |
-| `docs/tasks/2.3-config-from-icplan.md` | Т | — | — | — | ⏳ | 9a602cc4 | текст изменён после решения «✅» от Claude, роль Тестировщик |
+| `docs/tasks/2.3-config-from-icplan.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 9a602cc4 | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/2.3-config-from-icplan.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 9a602cc4 | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/2.3-config-from-icplan.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 9a602cc4 | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
 | `docs/tasks/2.4-mcp-itsaplan-core.md` | В | — | — | — | ⏳ | ef77b663 | Задача |
 | `docs/tasks/2.4-mcp-itsaplan-core.md` | Р | — | — | — | ⏳ | ef77b663 | Задача |
 | `docs/tasks/2.4-mcp-itsaplan-core.md` | Т | — | — | — | ⏳ | ef77b663 | Задача |
 | `docs/tasks/2.5-memory-m2-m3.md` | В | — | — | — | ⏳ | 2d41cd01 | Задача |
 | `docs/tasks/2.5-memory-m2-m3.md` | Р | — | — | — | ⏳ | 2d41cd01 | Задача |
 | `docs/tasks/2.5-memory-m2-m3.md` | Т | — | — | — | ⏳ | 2d41cd01 | Задача |
-| `docs/tasks/2.6-e2e-icplan.md` | В | — | — | — | ⏳ | 9c1e4a9c | Задача |
-| `docs/tasks/2.6-e2e-icplan.md` | Р | — | — | — | ⏳ | 9c1e4a9c | Задача |
-| `docs/tasks/2.6-e2e-icplan.md` | Т | — | — | — | ⏳ | 9c1e4a9c | Задача |
+| `docs/tasks/2.6-e2e-icplan.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 9c1e4a9c | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/2.6-e2e-icplan.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 9c1e4a9c | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/2.6-e2e-icplan.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ❌ | 9c1e4a9c | Приёмка («автотест проходит», «ручной сценарий проходит») не проверяет сценарии закрываемых требований R-ICP-13, R-RUN-08, R-RUN-14 (Runner не в сети, gate_failed/частичный итог, ICPlan/Platform module/Docker недоступны, Runner упал) → docs/tasks/2.6-e2e-icplan.md, «Приёмка»: добавить пункты «сценарий → ожидаемый результат» по этим требованиям, как в Z-ICP-56 |
 | `docs/tasks/2.7-runner-scheduler.md` | В | — | — | — | ⏳ | 1cc58db3 | Задача |
 | `docs/tasks/2.7-runner-scheduler.md` | Р | — | — | — | ⏳ | 1cc58db3 | Задача |
 | `docs/tasks/2.7-runner-scheduler.md` | Т | — | — | — | ⏳ | 1cc58db3 | Задача |
 | `docs/tasks/2.8-config-storage-interfaces-fmea.md` | В | — | — | — | ⏳ | 5a41f0e0 | Задача |
 | `docs/tasks/2.8-config-storage-interfaces-fmea.md` | Р | — | — | — | ⏳ | 5a41f0e0 | Задача |
 | `docs/tasks/2.8-config-storage-interfaces-fmea.md` | Т | — | — | — | ⏳ | 5a41f0e0 | Задача |
-| `docs/tasks/3.1-icplan-process-step-agent.md` | В | — | — | — | ⏳ | 396f3149 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/3.1-icplan-process-step-agent.md` | Р | — | — | — | ⏳ | 396f3149 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/tasks/3.1-icplan-process-step-agent.md` | Т | — | — | — | ⏳ | 396f3149 | текст изменён после решения «❌» от Claude, роль Тестировщик |
-| `docs/tasks/3.2-icplan-handoff.md` | В | — | — | — | ⏳ | 353ac49e | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/3.2-icplan-handoff.md` | Р | — | — | — | ⏳ | 353ac49e | текст изменён после решения «❌» от Claude, роль Разработчик |
-| `docs/tasks/3.2-icplan-handoff.md` | Т | — | — | — | ⏳ | 353ac49e | текст изменён после решения «✅» от Claude, роль Тестировщик |
+| `docs/tasks/3.1-icplan-process-step-agent.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 396f3149 | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/3.1-icplan-process-step-agent.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 396f3149 | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/3.1-icplan-process-step-agent.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 396f3149 | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/3.2-icplan-handoff.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 353ac49e | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/3.2-icplan-handoff.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 353ac49e | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/3.2-icplan-handoff.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 353ac49e | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
 | `docs/tasks/3.3-run-events-timeline.md` | В | — | — | — | ⏳ | b3748f47 | Задача |
 | `docs/tasks/3.3-run-events-timeline.md` | Р | — | — | — | ⏳ | b3748f47 | Задача |
 | `docs/tasks/3.3-run-events-timeline.md` | Т | — | — | — | ⏳ | b3748f47 | Задача |
-| `docs/tasks/3.4-icplan-approve-ui.md` | В | — | — | — | ⏳ | 7e4acf6b | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/3.4-icplan-approve-ui.md` | Р | — | — | — | ⏳ | 7e4acf6b | текст изменён после решения «❌» от Claude, роль Разработчик |
-| `docs/tasks/3.4-icplan-approve-ui.md` | Т | — | — | — | ⏳ | 7e4acf6b | текст изменён после решения «❌» от Claude, роль Тестировщик |
-| `docs/tasks/3.5-icplan-type-actions-cost.md` | В | — | — | — | ⏳ | e47aae72 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/3.5-icplan-type-actions-cost.md` | Р | — | — | — | ⏳ | e47aae72 | текст изменён после решения «❌» от Claude, роль Разработчик |
-| `docs/tasks/3.5-icplan-type-actions-cost.md` | Т | — | — | — | ⏳ | e47aae72 | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `docs/tasks/3.6-icplan-process-engine.md` | В | — | — | — | ⏳ | cfebc0c2 | Задача |
-| `docs/tasks/3.6-icplan-process-engine.md` | Р | — | — | — | ⏳ | cfebc0c2 | Задача |
-| `docs/tasks/3.6-icplan-process-engine.md` | Т | — | — | — | ⏳ | cfebc0c2 | Задача |
-| `docs/tasks/3.7-icplan-task-control.md` | В | — | — | — | ⏳ | 9e659fe2 | Задача |
-| `docs/tasks/3.7-icplan-task-control.md` | Р | — | — | — | ⏳ | 9e659fe2 | Задача |
-| `docs/tasks/3.7-icplan-task-control.md` | Т | — | — | — | ⏳ | 9e659fe2 | Задача |
-| `docs/tasks/3.8-agent-chat-control.md` | В | — | — | — | ⏳ | 2af148f7 | Задача |
-| `docs/tasks/3.8-agent-chat-control.md` | Р | — | — | — | ⏳ | 2af148f7 | Задача |
-| `docs/tasks/3.8-agent-chat-control.md` | Т | — | — | — | ⏳ | 2af148f7 | Задача |
-| `docs/tasks/3.9-agent-summary-stats.md` | В | — | — | — | ⏳ | a39f3839 | Задача |
-| `docs/tasks/3.9-agent-summary-stats.md` | Р | — | — | — | ⏳ | a39f3839 | Задача |
-| `docs/tasks/3.9-agent-summary-stats.md` | Т | — | — | — | ⏳ | a39f3839 | Задача |
+| `docs/tasks/3.4-icplan-approve-ui.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 7e4acf6b | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/3.4-icplan-approve-ui.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 7e4acf6b | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/3.4-icplan-approve-ui.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 7e4acf6b | повторная проверка: закрытие прежних замечаний на месте, приёмка/требования/декомпозиция согласованы |
+| `docs/tasks/3.5-icplan-type-actions-cost.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | e47aae72 | повторно: замечания Z-ICP-5/60/83/96 закрыты в тексте (3.5.1–3.5.5, приёмка по сценариям R-AP-03/R-LLM-02/R-OBS-05) |
+| `docs/tasks/3.5-icplan-type-actions-cost.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | e47aae72 | повторно: замечания Z-ICP-5/60/83/96 закрыты в тексте (3.5.1–3.5.5, приёмка по сценариям R-AP-03/R-LLM-02/R-OBS-05) |
+| `docs/tasks/3.5-icplan-type-actions-cost.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | e47aae72 | повторно: замечания Z-ICP-5/60/83/96 закрыты в тексте (3.5.1–3.5.5, приёмка по сценариям R-AP-03/R-LLM-02/R-OBS-05) |
+| `docs/tasks/3.6-icplan-process-engine.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | cfebc0c2 | ценность и объём понятны, 3-5 дн |
+| `docs/tasks/3.6-icplan-process-engine.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ❌ | cfebc0c2 | R-AP-17 «Задача уже в работе» и «Runner пропал с арендой» не закрыты подзадачей → добавить в 3.6.5 (или отдельную) уникальность активного запуска по задаче и возврат по аренде, раздел «Декомпозиция» |
+| `docs/tasks/3.6-icplan-process-engine.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ❌ | cfebc0c2 | приёмка 3.6 не проверяет R-AP-17 «Задача уже в работе» и «Runner пропал с арендой» → добавить пункты приёмки и 'готово, когда' в 3.6.5 |
+| `docs/tasks/3.7-icplan-task-control.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 9e659fe2 | требования R-AP-18..22 покрыты подзадачами 3.7.1–3.7.8 и приёмкой |
+| `docs/tasks/3.7-icplan-task-control.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 9e659fe2 | требования R-AP-18..22 покрыты подзадачами 3.7.1–3.7.8 и приёмкой |
+| `docs/tasks/3.7-icplan-task-control.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 9e659fe2 | требования R-AP-18..22 покрыты подзадачами 3.7.1–3.7.8 и приёмкой |
+| `docs/tasks/3.8-agent-chat-control.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 2af148f7 | повторная проверка: приёмка по сценариям, D25 и enabled — один источник (восстановлено после гонки записи реестра) |
+| `docs/tasks/3.8-agent-chat-control.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 2af148f7 | R-ICP-16..18, R-HRN-16 покрыты подзадачами 3.8.1–3.8.5 и приёмкой |
+| `docs/tasks/3.8-agent-chat-control.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 2af148f7 | R-ICP-16..18, R-HRN-16 покрыты подзадачами 3.8.1–3.8.5 и приёмкой |
+| `docs/tasks/3.9-agent-summary-stats.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | a39f3839 | R-OBS-13: подзадачи 3.9.1–3.9.5, приёмка с отказом LiteLLM |
+| `docs/tasks/3.9-agent-summary-stats.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | a39f3839 | R-OBS-13: подзадачи 3.9.1–3.9.5, приёмка с отказом LiteLLM |
+| `docs/tasks/3.9-agent-summary-stats.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | a39f3839 | повторная проверка: приёмка по сценариям (восстановлено после гонки записи реестра) |
 | `docs/tasks/4.1-sandbox-warm-pool.md` | В | — | — | — | ⏳ | 661b9211 | Задача |
 | `docs/tasks/4.1-sandbox-warm-pool.md` | Р | — | — | — | ⏳ | 661b9211 | Задача |
 | `docs/tasks/4.1-sandbox-warm-pool.md` | Т | — | — | — | ⏳ | 661b9211 | Задача |
@@ -488,9 +488,9 @@
 | `docs/techspec/harness.md` | Д | — | — | — | ⏳ | 15e8087d | Deploy |
 | `docs/techspec/harness.md` | Б | — | — | — | ⏳ | 15e8087d | Deploy |
 | `docs/techspec/harness.md` | С | — | — | — | ⏳ | 15e8087d | Deploy |
-| `docs/techspec/icplan.md` | Д | — | — | — | ⏳ | c8b90db6 | текст изменён после решения «❌» от Claude, роль DevOps-инженер |
-| `docs/techspec/icplan.md` | Б | — | — | — | ⏳ | c8b90db6 | текст изменён после решения «✅» от Claude, роль Безопасность |
-| `docs/techspec/icplan.md` | С | — | — | — | ⏳ | c8b90db6 | текст изменён после решения «❌» от Claude, роль Инженер сборки и поставки |
+| `docs/techspec/icplan.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | c8b90db6 | повторно: emptyDir /tmp, MIGRATION_DATABASE_URL, переменные AGENT_RUN_*/RUNNER_OFFLINE_AFTER_S/REVIEW_REMINDER_HOURS/retention, откат через PITR в отдельный кластер; Z-ICP-98..100 закрыты |
+| `docs/techspec/icplan.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-13 | ✅ | c8b90db6 | повторно: secrets.existingSecret, шифротекст с APP_ENCRYPTION_KEY вне БД, non-root, readOnlyRootFilesystem; Z-ICP-102/103 закрыты |
+| `docs/techspec/icplan.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-13 | ✅ | c8b90db6 | повторно: сборка web с CLOUD_UI_ENTRY (4.6.10), теги X.Y.Z-sha, SBOM/trivy, проверка после развёртывания; Z-ICP-101 закрыт |
 | `docs/techspec/infrastructure.md` | Д | — | — | — | ⏳ | 0b43fe33 | Deploy |
 | `docs/techspec/infrastructure.md` | Б | — | — | — | ⏳ | 0b43fe33 | Deploy |
 | `docs/techspec/infrastructure.md` | С | — | — | — | ⏳ | 0b43fe33 | Deploy |

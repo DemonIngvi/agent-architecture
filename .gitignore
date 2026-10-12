@@ -39,3 +39,4 @@ html-view/.review/
 html-view/site/
 html-view/.venv/
 __pycache__/
+docs/approvals.lock

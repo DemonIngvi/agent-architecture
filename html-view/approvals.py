@@ -151,7 +151,26 @@ def summary_md(status: dict) -> str:
 
 
 def set_decision(page: str, letter: str, ok: bool, comment: str, who: str = "", human: bool = False) -> str:
-    """Решение роли по документу (`doctool approve`)."""
+    """Решение роли по документу (`doctool approve`). Под блокировкой: проверяющие пишут реестр параллельно."""
+    import os
+    import time
+    lock = REGISTRY.with_suffix(".lock")
+    for _ in range(300):
+        try:
+            fd = os.open(lock, os.O_CREAT | os.O_EXCL)
+            break
+        except FileExistsError:
+            time.sleep(0.1)
+    else:
+        raise SystemExit(f"реестр занят: удалите {lock}, если запись не идёт")
+    try:
+        return _set_decision(page, letter, ok, comment, who, human)
+    finally:
+        os.close(fd)
+        os.remove(lock)
+
+
+def _set_decision(page, letter, ok, comment, who, human):
     rows = read_registry()
     letter = BY_NAME.get(letter, letter)
     key = (page, letter)
