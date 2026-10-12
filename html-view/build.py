@@ -910,7 +910,8 @@ def block_card(slug: str, title: str, s: dict):
         "вид и экраны / операции / схема": bool(s.get("kind")) and bool(s.get({"ui": "screens", "service": "ops", "store": "schema"}.get(s.get("kind"), "-"))),
         "входы и выходы": bool(s.get("io")),
         "данные": bool(s.get("data")),
-        "параметры с именами из interfaces.md": bool(s.get("params")) and all(a in names for a, _ in s["params"]),
+        "параметры с именами из interfaces.md": (isinstance(s.get("params"), str) and s["params"].startswith("нет: "))
+        or (bool(s.get("params")) and not isinstance(s["params"], str) and all(a in names for a, _ in s["params"])),
         "требования": bool(s.get("reqs")),
         "задачи": bool(s.get("tasks")),
         "при сбое": bool(s.get("failures")),
@@ -1271,7 +1272,9 @@ def write_component_pages():
             L += ["", "## Входы и выходы", "", "| | С кем | Что |", "|---|---|---|"] + [f"| {cell(w)} | {cell(x)} | {cell(y)} |" for w, x, y in s["io"]]
         if s.get("data"):
             L += ["", "## Данные", "", "| Таблица или хранилище | Как |", "|---|---|"] + [f"| `{cell(x)}` | {cell(y)} |" for x, y in s["data"]]
-        if s["params"]:
+        if isinstance(s["params"], str):
+            L += ["", "## Параметры", "", "Параметров " + s["params"]]
+        elif s["params"]:
             L += ["", "## Параметры", "", "| Параметр | Значение |", "|---|---|"] + [f"| `{cell(a)}` | {cell(spec_value(a, slug, b))} |" for a, b in s["params"]]
         if s.get("reqs") or s.get("tasks") or s.get("iface"):
             L += ["", "## Требования и задачи", ""]

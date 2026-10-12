@@ -32,6 +32,20 @@
 | `scheduling.order` | fifo или priority | L0 | S9 | fifo | предсказуемо, без голодания | fifo | priority | priority — если есть срочные задачи; следить за голоданием |
 | `scheduling.agents.<id>.parallel / max` | Может ли агент идти в несколько потоков | L1 | S2 | нет / 1 | как `concurrency` | 1 | `concurrency` | независимость задач агента |
 | `scheduling.models.<alias>.max` | Запусков на модель | L0 | S9 | 3 | rate limit типового ключа провайдера при ~1 RPS к LiteLLM | 1 | `scheduling.global_max` | rpm / tpm ключа провайдера модели |
+| `pool.size` | Готовых контейнеров на профиль: Sandbox claim берёт из пула, Finalizer доливает | L1 | S2 | 2 | см. agent-sandbox | 0 | `scheduling.global_max` | см. agent-sandbox |
+| `provider` | Реализация `SandboxProvider`: Docker или K8s | L0 | S9 | docker | см. agent-sandbox | docker | k8s | см. agent-sandbox |
+| `workspace.sources` | Источники рабочего пространства запуска: из них манифест и токены репозиториев | L1 | S2 | нет | см. agent-sandbox | нет | все ресурсы каталога проекта | см. agent-sandbox |
+| `setup.script` | Скрипт шага подготовки проекта | L1 | S2 | нет | см. agent-sandbox | нет | — | см. agent-sandbox |
+| `setup.cache_ttl_h` | Срок кэша подготовки по хешу lock-файлов (`setup_cache`) | L0 | S9 | 168 | см. agent-sandbox | 0 | 720 | см. agent-sandbox |
+| `setup.timeout_s` | Таймаут шага подготовки | L1 | S2 | 600 | см. agent-sandbox | 60 | 3600 | см. agent-sandbox |
+| `servers` | MCP-серверы агента, к которым пускает MCP-прокси | L2 | S1 | itsaplan-core | см. tool-integration | itsaplan-core | каталог серверов | см. tool-integration |
+| `tools` | Allowlist тулов сервера, по которому MCP-прокси фильтрует `tools/list` и проверяет `tools/call` | L2 | S1 | минимальный (чтение задачи, комментарий) | см. tool-integration | пусто | все тулы сервера | см. tool-integration |
+| `auth.secret_ref` | Secret с учётными данными MCP-сервера, которые подставляет MCP-прокси | L2 | S1 | — (обязательный) | см. tool-integration | ссылка на Secret | ссылка на Secret | см. tool-integration |
+| `on_engine_error` | Решение G1 и G2, если OPA не ответила | L0 | S9 | deny | см. guardrails | deny | allow | см. guardrails |
+| `kill_switch` | Аварийная остановка агента или платформы: Admission не пускает новые запуски | L1 | S2 | выкл | см. guardrails | выкл | вкл | см. guardrails |
+| `budget.run / agent_day / project_month` | Бюджеты, которые проверяет G1 до старта | L1 | S2 | 1 $ / 5 $ / задаётся | см. guardrails | 0,1 $ / 0 $ / 0 $ | run ≤ agent_day ≤ project_month / 20 | см. guardrails |
+| `limits.idle_s` | Простой без событий, после которого Run supervisor останавливает запуск | L1 | S2 | 300 | см. guardrails | 60 | `timeout_s` | см. guardrails |
+| `events.level` | Детализация событий, которые Event relay передаёт в ICPlan | L0 | S9 | всё | см. observability | итоги | всё | см. observability |
 
 ## Хранилища данных
 

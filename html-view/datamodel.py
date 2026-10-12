@@ -449,17 +449,17 @@ ENDPOINT_IO = {
     # MCP ICPlan: смонтирован вне OpenAPI — apps/api/src/mcp/mount.ts форка
     "POST /mcp": ("JSON-RPC 2.0: `tools/list`, `tools/call` · `Authorization: Bearer <ключ агента>`", "200 · JSON-RPC result (MCP Streamable HTTP)", "путь вне OpenAPI форка: `app.ts` → `mountMcp` (`apps/api/src/mcp/mount.ts`); ключ — также `x-api-key`"),
     # Harness (API вызывает только Runner)
-    "POST /run": ("RunBundle", "202 · {runId}", "запуск цикла; ответ сразу, ход — в `/run/events`"),
+    "POST /run": ("RunBundle", "202 · {runId}", "запуск цикла; ответ сразу, ход — в `/run/events`; ошибки: 401 — токен не этого запуска, без повтора (R-RUN-13 «Аутентификация»); 400 — `RunBundle` не проходит схему: цикл не стартует, `invalid_definition` (R-HRN-01)"),
     "GET /run/events": ("query: seq — с какого события продолжить", "200 · NDJSON: RunEvent по строке", "переподключение без потерь по `seq`"),
-    "POST /run/approval": ("ApprovalDecision", "204", ""),
-    "POST /run/message": ("UserMessage", "204", ""),
-    "POST /run/cancel": ("{reason}", "204", "Harness завершает шаг и отдаёт `RUN_FINISHED`"),
+    "POST /run/approval": ("ApprovalDecision", "204", "ошибки: 401 — токен не этого запуска; 409 — запуск не ждёт подтверждения по этому `seq`: решение уже применено или истёк `approval_timeout` (R-HRN-05)"),
+    "POST /run/message": ("UserMessage", "204", "во время тула — учитывается после него (R-HRN-16); ошибки: 401 — токен не этого запуска; 409 — цикл уже завершён"),
+    "POST /run/cancel": ("{reason}", "204", "Harness завершает шаг и отдаёт `RUN_FINISHED`; повторная отмена — 204, не ошибка (R-RUN-09); ошибки: 401 — токен не этого запуска"),
     "GET /ready": ("—", "200 · {ready, version}", "Runner ждёт готовности перед `POST /run`"),
     # Agent Runner
-    "PUT /runs/:runId/checkpoint": ("Checkpoint", "204", "одноразовый токен запуска"),
+    "PUT /runs/:runId/checkpoint": ("Checkpoint", "204", "одноразовый токен запуска; идемпотентно по (run_id, step), Harness повторяет 3 раза (I12); ошибки: 401 — токен не этого запуска; 503 — схема `harness_ckpt` недоступна, Harness повторяет"),
     "GET /runs/:runId/checkpoint": ("query: iteration (нет — последняя)", "200 · Checkpoint", "при повторной выдаче запуска Harness продолжает с последней итерации"),
-    "POST /runs/:runId/mcp/:server": ("McpToolCall", "200 · McpToolCall (result)", "allowlist запуска и G2 проверяются до вызова сервера"),
-    "POST /runs/:runId/deps": ("{lockFiles?: string[]}", "200 · {status: ok · failed, log}", "повтор шага подготовки (D19)"),
+    "POST /runs/:runId/mcp/:server": ("McpToolCall", "200 · McpToolCall (result)", "allowlist запуска и G2 проверяются до вызова сервера; ошибки: 401 — токен не этого запуска; 403 — тул вне allowlist или отказ G2, сервер не вызывается, решение в событиях (R-RUN-13 «MCP-прокси запуска», R-MCP-02); 404 — сервера нет среди MCP-серверов агента; 502 — MCP-сервер недоступен: агент получает ошибку тула, чтение повторяется 2 раза (FMEA «MCP-сервер недоступен»)"),
+    "POST /runs/:runId/deps": ("{lockFiles?: string[]}", "200 · {status: ok · failed, log}", "повтор шага подготовки (D19); ошибки: 401 — токен не этого запуска; скрипт упал или превысил `setup.timeout_s` — 200 `{status: failed, log}`, агент получает ошибку тула, цикл продолжается (R-HRN-17, FMEA «Шаг подготовки упал»)"),
     "GET /healthz": ("—", "200 · {status}", ""),
     # Guardrails (REST API OPA)
     "POST /v1/data/agent/g1": ("PolicyInput", "200 · PolicyDecision", "конверт `{input}` → `{result}` — REST API OPA"),
