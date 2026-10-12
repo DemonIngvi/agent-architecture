@@ -101,6 +101,16 @@ def lint() -> dict:
                 txt = f.read_text(encoding="utf-8")
                 if "## Э10." in txt and "```deck" in txt and not re.search(r"^# Объём", txt.split("```deck", 1)[1].split("```", 1)[0], re.M):
                     add(slug, f"R&D {f.name}: в deck нет слайда «Объём доработки»")
+    # блоки: карточка заполнена полностью — иначе роли Р и Т отказывают (block-methodology.md#ready)
+    import contextlib
+    import io as _io
+    with contextlib.redirect_stdout(_io.StringIO()):
+        import build as B
+    for (slug, title), s in SUB.items():
+        if not s["tech"].startswith("→ "):
+            _, miss = B.block_card(slug, title, s)
+            if miss:
+                add(slug, f"блок «{title}»: карточка не заполнена — {', '.join(miss)}")
     # Deploy: у компонента с данными — «Обновление и откат» (tech-spec.md)
     for c in COMPONENTS:
         f = ROOT / f"docs/techspec/{c[0]}.md"

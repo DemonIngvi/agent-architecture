@@ -6,38 +6,38 @@
 
 | Документ | Роль | Кто | 👤 / 🤖 | Дата | Решение | Версия | Комментарий |
 |---|---|---|---|---|---|---|---|
-| `components/agent-runner/admission/index.md` | А | — | — | — | ⏳ | ad86770a | Блок |
-| `components/agent-runner/admission/index.md` | Р | — | — | — | ⏳ | ad86770a | Блок |
-| `components/agent-runner/admission/index.md` | Т | — | — | — | ⏳ | ad86770a | Блок |
-| `components/agent-runner/event-relay/index.md` | А | — | — | — | ⏳ | ef1e1663 | Блок |
-| `components/agent-runner/event-relay/index.md` | Р | — | — | — | ⏳ | ef1e1663 | Блок |
-| `components/agent-runner/event-relay/index.md` | Т | — | — | — | ⏳ | ef1e1663 | Блок |
-| `components/agent-runner/finalizer/index.md` | А | — | — | — | ⏳ | 0bc476df | Блок |
-| `components/agent-runner/finalizer/index.md` | Р | — | — | — | ⏳ | 0bc476df | Блок |
-| `components/agent-runner/finalizer/index.md` | Т | — | — | — | ⏳ | 0bc476df | Блок |
-| `components/agent-runner/index.md` | А | — | — | — | ⏳ | 7222f959 | Архитектура компонента |
-| `components/agent-runner/index.md` | Р | — | — | — | ⏳ | 7222f959 | Архитектура компонента |
-| `components/agent-runner/mcp-proksi/index.md` | А | — | — | — | ⏳ | a83d7e34 | Блок |
-| `components/agent-runner/mcp-proksi/index.md` | Р | — | — | — | ⏳ | a83d7e34 | Блок |
-| `components/agent-runner/mcp-proksi/index.md` | Т | — | — | — | ⏳ | a83d7e34 | Блок |
-| `components/agent-runner/poller/index.md` | А | — | — | — | ⏳ | fe47a476 | Блок |
-| `components/agent-runner/poller/index.md` | Р | — | — | — | ⏳ | fe47a476 | Блок |
-| `components/agent-runner/poller/index.md` | Т | — | — | — | ⏳ | fe47a476 | Блок |
-| `components/agent-runner/run-supervisor/index.md` | А | — | — | — | ⏳ | 8eb8105d | Блок |
-| `components/agent-runner/run-supervisor/index.md` | Р | — | — | — | ⏳ | 8eb8105d | Блок |
-| `components/agent-runner/run-supervisor/index.md` | Т | — | — | — | ⏳ | 8eb8105d | Блок |
-| `components/agent-runner/sandbox-claim/index.md` | А | — | — | — | ⏳ | 061c4b00 | Блок |
-| `components/agent-runner/sandbox-claim/index.md` | Р | — | — | — | ⏳ | 061c4b00 | Блок |
-| `components/agent-runner/sandbox-claim/index.md` | Т | — | — | — | ⏳ | 061c4b00 | Блок |
-| `components/agent-runner/scheduler/index.md` | А | — | — | — | ⏳ | 516f3475 | Блок |
-| `components/agent-runner/scheduler/index.md` | Р | — | — | — | ⏳ | 516f3475 | Блок |
-| `components/agent-runner/scheduler/index.md` | Т | — | — | — | ⏳ | 516f3475 | Блок |
-| `components/agent-runner/shag-podgotovki/index.md` | А | — | — | — | ⏳ | d937012d | Блок |
-| `components/agent-runner/shag-podgotovki/index.md` | Р | — | — | — | ⏳ | d937012d | Блок |
-| `components/agent-runner/shag-podgotovki/index.md` | Т | — | — | — | ⏳ | d937012d | Блок |
-| `components/agent-runner/tokeny-repozitoriev/index.md` | А | — | — | — | ⏳ | 4e40d169 | Блок |
-| `components/agent-runner/tokeny-repozitoriev/index.md` | Р | — | — | — | ⏳ | 4e40d169 | Блок |
-| `components/agent-runner/tokeny-repozitoriev/index.md` | Т | — | — | — | ⏳ | 4e40d169 | Блок |
+| `components/agent-runner/admission/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | ad86770a | место в компоненте и связи заданы на странице компонента (I5/I2/I6/I9, D19); граница с соседом не размыта |
+| `components/agent-runner/admission/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ❌ | ad86770a | карточка заполнена на 3 из 11: нет входов/выходов (типы и I-код), данных, имён параметров из interfaces.md, требований и задач → дополнить блок по block-methodology.md |
+| `components/agent-runner/admission/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ❌ | ad86770a | нет сценария, ожидаемого результата и поведения при сбое (отказ G1/обрыв стрима/ошибка записи итога/отказ MCP) и требований блока → добавить требования со сценариями и раздел «При сбое» |
+| `components/agent-runner/event-relay/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | ef1e1663 | место в компоненте и связи заданы на странице компонента (I5/I2/I6/I9, D19); граница с соседом не размыта |
+| `components/agent-runner/event-relay/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ❌ | ef1e1663 | карточка заполнена на 3 из 11: нет входов/выходов (типы и I-код), данных, имён параметров из interfaces.md, требований и задач → дополнить блок по block-methodology.md |
+| `components/agent-runner/event-relay/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ❌ | ef1e1663 | нет сценария, ожидаемого результата и поведения при сбое (отказ G1/обрыв стрима/ошибка записи итога/отказ MCP) и требований блока → добавить требования со сценариями и раздел «При сбое» |
+| `components/agent-runner/finalizer/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 0bc476df | место в компоненте и связи заданы на странице компонента (I5/I2/I6/I9, D19); граница с соседом не размыта |
+| `components/agent-runner/finalizer/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ❌ | 0bc476df | карточка заполнена на 3 из 11: нет входов/выходов (типы и I-код), данных, имён параметров из interfaces.md, требований и задач → дополнить блок по block-methodology.md |
+| `components/agent-runner/finalizer/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ❌ | 0bc476df | нет сценария, ожидаемого результата и поведения при сбое (отказ G1/обрыв стрима/ошибка записи итога/отказ MCP) и требований блока → добавить требования со сценариями и раздел «При сбое» |
+| `components/agent-runner/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 7222f959 | C1/sequence, I-коды, D23/D19, таблица статусов R-HRN-09→R-RUN-07→agent_run, +/- есть; границы с ICPlan/Platform/Sandbox определены |
+| `components/agent-runner/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 7222f959 | порядок работы с I-кодами и моделями, статусы и переходы, ссылки на Deploy/интеграции — реализуемо |
+| `components/agent-runner/mcp-proksi/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | a83d7e34 | место в компоненте и связи заданы на странице компонента (I5/I2/I6/I9, D19); граница с соседом не размыта |
+| `components/agent-runner/mcp-proksi/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ❌ | a83d7e34 | карточка заполнена на 3 из 11: нет входов/выходов (типы и I-код), данных, имён параметров из interfaces.md, требований и задач → дополнить блок по block-methodology.md |
+| `components/agent-runner/mcp-proksi/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ❌ | a83d7e34 | нет сценария, ожидаемого результата и поведения при сбое (отказ G1/обрыв стрима/ошибка записи итога/отказ MCP) и требований блока → добавить требования со сценариями и раздел «При сбое» |
+| `components/agent-runner/poller/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | fe47a476 | Граница с соседями и место в Runner читаются (D-решения/R&D названы); пробелы данных закрываются остальными полями карточки |
+| `components/agent-runner/poller/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ❌ | fe47a476 | Карточка заполнена на 3–4 из 11: нет входов/выходов, данных, задач → заполнить поля «Входы и выходы», «Данные», «Задачи» на странице блока |
+| `components/agent-runner/poller/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ❌ | fe47a476 | Нет сценариев и результатов проверки, нет поведения «при сбое» → добавить поля «Требования» (проверяемые) и «При сбое» на странице блока |
+| `components/agent-runner/run-supervisor/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 8eb8105d | Граница с соседями и место в Runner читаются (D-решения/R&D названы); пробелы данных закрываются остальными полями карточки |
+| `components/agent-runner/run-supervisor/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ❌ | 8eb8105d | Карточка заполнена на 3–4 из 11: нет входов/выходов, данных, задач → заполнить поля «Входы и выходы», «Данные», «Задачи» на странице блока |
+| `components/agent-runner/run-supervisor/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ❌ | 8eb8105d | Нет сценариев и результатов проверки, нет поведения «при сбое» → добавить поля «Требования» (проверяемые) и «При сбое» на странице блока |
+| `components/agent-runner/sandbox-claim/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ❌ | 061c4b00 | Не определено, кто владеет тёплым пулом и где он живёт (граница с SandboxProvider и scheduler), нет связи со слотами → добавить в карточку блока данные/владельца пула и входы-выходы (sandbox-isolation.md) |
+| `components/agent-runner/sandbox-claim/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ❌ | 061c4b00 | Карточка заполнена на 3–4 из 11: нет входов/выходов, данных, задач → заполнить поля «Входы и выходы», «Данные», «Задачи» на странице блока |
+| `components/agent-runner/sandbox-claim/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ❌ | 061c4b00 | Нет сценариев и результатов проверки, нет поведения «при сбое» → добавить поля «Требования» (проверяемые) и «При сбое» на странице блока |
+| `components/agent-runner/scheduler/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 516f3475 | Граница с соседями и место в Runner читаются (D-решения/R&D названы); пробелы данных закрываются остальными полями карточки |
+| `components/agent-runner/scheduler/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ❌ | 516f3475 | Карточка заполнена на 3–4 из 11: нет входов/выходов, данных, задач → заполнить поля «Входы и выходы», «Данные», «Задачи» на странице блока |
+| `components/agent-runner/scheduler/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ❌ | 516f3475 | Нет сценариев и результатов проверки, нет поведения «при сбое» → добавить поля «Требования» (проверяемые) и «При сбое» на странице блока |
+| `components/agent-runner/shag-podgotovki/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | d937012d | Граница с соседями и место в Runner читаются (D-решения/R&D названы); пробелы данных закрываются остальными полями карточки |
+| `components/agent-runner/shag-podgotovki/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ❌ | d937012d | Карточка заполнена на 3–4 из 11: нет входов/выходов, данных, задач → заполнить поля «Входы и выходы», «Данные», «Задачи» на странице блока |
+| `components/agent-runner/shag-podgotovki/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ❌ | d937012d | Нет сценариев и результатов проверки, нет поведения «при сбое» → добавить поля «Требования» (проверяемые) и «При сбое» на странице блока |
+| `components/agent-runner/tokeny-repozitoriev/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 4e40d169 | Граница с соседями и место в Runner читаются (D-решения/R&D названы); пробелы данных закрываются остальными полями карточки |
+| `components/agent-runner/tokeny-repozitoriev/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ❌ | 4e40d169 | Карточка заполнена на 3–4 из 11: нет входов/выходов, данных, задач → заполнить поля «Входы и выходы», «Данные», «Задачи» на странице блока |
+| `components/agent-runner/tokeny-repozitoriev/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ❌ | 4e40d169 | Нет сценариев и результатов проверки, нет поведения «при сбое» → добавить поля «Требования» (проверяемые) и «При сбое» на странице блока |
 | `components/guardrails/index.md` | А | — | — | — | ⏳ | 1efcfc82 | Архитектура компонента |
 | `components/guardrails/index.md` | Р | — | — | — | ⏳ | 1efcfc82 | Архитектура компонента |
 | `components/guardrails/konfig-deploya/index.md` | А | — | — | — | ⏳ | 022750c1 | Блок |
@@ -202,9 +202,9 @@
 | `components/sandbox/teplyy-pul/index.md` | А | — | — | — | ⏳ | e4238985 | Блок |
 | `components/sandbox/teplyy-pul/index.md` | Р | — | — | — | ⏳ | e4238985 | Блок |
 | `components/sandbox/teplyy-pul/index.md` | Т | — | — | — | ⏳ | e4238985 | Блок |
-| `data-by-component/agent-runner/index.md` | А | — | — | — | ⏳ | 23678591 | Данные |
-| `data-by-component/agent-runner/index.md` | Р | — | — | — | ⏳ | 23678591 | Данные |
-| `data-by-component/agent-runner/index.md` | Д | — | — | — | ⏳ | 23678591 | Данные |
+| `data-by-component/agent-runner/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 23678591 | Схемы runner/harness_ckpt/platform с владельцем и ролью; связи ER с agent_run/issue/project; срок и очистка у всех таблиц |
+| `data-by-component/agent-runner/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 23678591 | Колонки, типы, ключи, индексы, TTL и очистка достаточны для миграций; параметры названы |
+| `data-by-component/agent-runner/index.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | 23678591 | База/роль/схемы названы и совпадают с Deploy (DATABASE_URL); очистка по expires_at, миграции при старте |
 | `data-by-component/guardrails/index.md` | А | — | — | — | ⏳ | da428d85 | Данные |
 | `data-by-component/guardrails/index.md` | Р | — | — | — | ⏳ | da428d85 | Данные |
 | `data-by-component/guardrails/index.md` | Д | — | — | — | ⏳ | da428d85 | Данные |
@@ -235,9 +235,9 @@
 | `data-by-component/sandbox/index.md` | А | — | — | — | ⏳ | dbcbfc2f | Данные |
 | `data-by-component/sandbox/index.md` | Р | — | — | — | ⏳ | dbcbfc2f | Данные |
 | `data-by-component/sandbox/index.md` | Д | — | — | — | ⏳ | dbcbfc2f | Данные |
-| `docs/api/agent-runner.md` | А | — | — | — | ⏳ | dfd3a45b | Интеграции |
-| `docs/api/agent-runner.md` | Р | — | — | — | ⏳ | dfd3a45b | Интеграции |
-| `docs/api/agent-runner.md` | Т | — | — | — | ⏳ | dfd3a45b | Интеграции |
+| `docs/api/agent-runner.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | dfd3a45b | C1 со стрелками и I-кодами, интеграции I1-I24, направление вызовов и данные в ответе отмечены |
+| `docs/api/agent-runner.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | dfd3a45b | Эндпоинты Harness/Runner с запросом, ответом, моделями и требованиями; реализуемо |
+| `docs/api/agent-runner.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | dfd3a45b | Для эндпоинтов есть структура, статусы ответов, поведение переподключения по seq, отмены и повторной выдачи checkpoint |
 | `docs/api/guardrails.md` | А | — | — | — | ⏳ | 3c56d741 | Интеграции |
 | `docs/api/guardrails.md` | Р | — | — | — | ⏳ | 3c56d741 | Интеграции |
 | `docs/api/guardrails.md` | Т | — | — | — | ⏳ | 3c56d741 | Интеграции |
@@ -328,8 +328,8 @@
 | `docs/rules/approval-methodology.md` | А | — | — | — | ⏳ | 7367c015 | Методология |
 | `docs/rules/architecture-methodology.md` | В | — | — | — | ⏳ | 03347175 | Методология |
 | `docs/rules/architecture-methodology.md` | А | — | — | — | ⏳ | 03347175 | Методология |
-| `docs/rules/block-methodology.md` | В | — | — | — | ⏳ | 66c6825b | Методология |
-| `docs/rules/block-methodology.md` | А | — | — | — | ⏳ | 66c6825b | Методология |
+| `docs/rules/block-methodology.md` | В | — | — | — | ⏳ | 58e7936d | Методология |
+| `docs/rules/block-methodology.md` | А | — | — | — | ⏳ | 58e7936d | Методология |
 | `docs/rules/data-methodology.md` | В | — | — | — | ⏳ | 9b5795c0 | Методология |
 | `docs/rules/data-methodology.md` | А | — | — | — | ⏳ | 9b5795c0 | Методология |
 | `docs/rules/decision-methodology.md` | В | — | — | — | ⏳ | 0af1d5d9 | Методология |
@@ -350,9 +350,9 @@
 | `docs/rules/tech-spec.md` | А | — | — | — | ⏳ | ed1fbe4c | Методология |
 | `docs/rules/us-methodology.md` | В | — | — | — | ⏳ | 2ab78054 | Методология |
 | `docs/rules/us-methodology.md` | А | — | — | — | ⏳ | 2ab78054 | Методология |
-| `docs/stories/agent-runner.md` | В | — | — | — | ⏳ | fe4fbcef | User Stories |
-| `docs/stories/agent-runner.md` | И | — | — | — | ⏳ | fe4fbcef | User Stories |
-| `docs/stories/agent-runner.md` | П | — | — | — | ⏳ | fe4fbcef | User Stories |
+| `docs/stories/agent-runner.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | fe4fbcef | Истории покрывают значимые сценарии и эксплуатацию, приёмка проверяема |
+| `docs/stories/agent-runner.md` | И | Claude, роль Аналитик историй | 🤖 | 2026-10-13 | ✅ | fe4fbcef | Акторы, ветки отказа/ожидания/падения/вывода покрыты критериями |
+| `docs/stories/agent-runner.md` | П | Claude, роль Пользователь | 🤖 | 2026-10-13 | ✅ | fe4fbcef | Истории решают задачу исполнения и эксплуатации, критерии наблюдаемы |
 | `docs/stories/guardrails.md` | В | — | — | — | ⏳ | 8a854a19 | User Stories |
 | `docs/stories/guardrails.md` | И | — | — | — | ⏳ | 8a854a19 | User Stories |
 | `docs/stories/guardrails.md` | П | — | — | — | ⏳ | 8a854a19 | User Stories |
@@ -404,9 +404,9 @@
 | `docs/tasks/1.7-dev-ui.md` | В | — | — | — | ⏳ | 2d8becba | Задача |
 | `docs/tasks/1.7-dev-ui.md` | Р | — | — | — | ⏳ | 2d8becba | Задача |
 | `docs/tasks/1.7-dev-ui.md` | Т | — | — | — | ⏳ | 2d8becba | Задача |
-| `docs/tasks/2.1-runner-external.md` | В | — | — | — | ⏳ | 301d7ed8 | Задача |
-| `docs/tasks/2.1-runner-external.md` | Р | — | — | — | ⏳ | 301d7ed8 | Задача |
-| `docs/tasks/2.1-runner-external.md` | Т | — | — | — | ⏳ | 301d7ed8 | Задача |
+| `docs/tasks/2.1-runner-external.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 301d7ed8 | Ценность — сквозное делегирование из ICPlan, оценка и состав ясны |
+| `docs/tasks/2.1-runner-external.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 301d7ed8 | Состав, подзадачи с готовностью, зависимость 1.3, спеки названы |
+| `docs/tasks/2.1-runner-external.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 301d7ed8 | Приёмка: ответ в комментарии, отмена, таймаут failed; интеграционный тест и проверка MCP allowlist |
 | `docs/tasks/2.2-sandbox-docker-oneshot.md` | В | — | — | — | ⏳ | 3d18761c | Задача |
 | `docs/tasks/2.2-sandbox-docker-oneshot.md` | Р | — | — | — | ⏳ | 3d18761c | Задача |
 | `docs/tasks/2.2-sandbox-docker-oneshot.md` | Т | — | — | — | ⏳ | 3d18761c | Задача |
@@ -422,9 +422,9 @@
 | `docs/tasks/2.6-e2e-icplan.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | d3f3b496 | Z-ICP-122 закрыто: приёмка по сценариям, 2.6.6-2.6.7, оценка 28 ч в 3-4 дн |
 | `docs/tasks/2.6-e2e-icplan.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | d3f3b496 | сценарии отказов разложены по подзадачам 2.6.6-2.6.7 с готовностью |
 | `docs/tasks/2.6-e2e-icplan.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | d3f3b496 | приёмка: сценарий -> результат по R-ICP-13, R-RUN-08, R-RUN-14 |
-| `docs/tasks/2.7-runner-scheduler.md` | В | — | — | — | ⏳ | 1cc58db3 | Задача |
-| `docs/tasks/2.7-runner-scheduler.md` | Р | — | — | — | ⏳ | 1cc58db3 | Задача |
-| `docs/tasks/2.7-runner-scheduler.md` | Т | — | — | — | ⏳ | 1cc58db3 | Задача |
+| `docs/tasks/2.7-runner-scheduler.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 1cc58db3 | Ценность и оценка ясны, ссылка на D14 |
+| `docs/tasks/2.7-runner-scheduler.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 1cc58db3 | Конфиг scheduling с именами параметров, слоты, Postgres, подзадачи |
+| `docs/tasks/2.7-runner-scheduler.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 1cc58db3 | Шесть проверяемых сценариев приёмки и конкурентный тест 2.7.7 |
 | `docs/tasks/2.8-config-storage-interfaces-fmea.md` | В | — | — | — | ⏳ | 5a41f0e0 | Задача |
 | `docs/tasks/2.8-config-storage-interfaces-fmea.md` | Р | — | — | — | ⏳ | 5a41f0e0 | Задача |
 | `docs/tasks/2.8-config-storage-interfaces-fmea.md` | Т | — | — | — | ⏳ | 5a41f0e0 | Задача |
@@ -479,9 +479,9 @@
 | `docs/tasks/4.8-load-test.md` | В | — | — | — | ⏳ | 15f1b712 | Задача |
 | `docs/tasks/4.8-load-test.md` | Р | — | — | — | ⏳ | 15f1b712 | Задача |
 | `docs/tasks/4.8-load-test.md` | Т | — | — | — | ⏳ | 15f1b712 | Задача |
-| `docs/techspec/agent-runner.md` | Д | — | — | — | ⏳ | be0f37f5 | Deploy |
-| `docs/techspec/agent-runner.md` | Б | — | — | — | ⏳ | be0f37f5 | Deploy |
-| `docs/techspec/agent-runner.md` | С | — | — | — | ⏳ | be0f37f5 | Deploy |
+| `docs/techspec/agent-runner.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | be0f37f5 | Образ, namespace, реплики, ресурсы, переменные/секреты, проверка после развёртывания заданы |
+| `docs/techspec/agent-runner.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-13 | ✅ | be0f37f5 | distroless nonroot, секреты в Secret, токен репозитория не в sandbox, ServiceAccount только на namespace агентов, latest нет |
+| `docs/techspec/agent-runner.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-13 | ✅ | be0f37f5 | Сборка по тегу, digest баз, SBOM+trivy блокирует critical, публикация ghcr с semver и sha, pull-секрет |
 | `docs/techspec/guardrails.md` | Д | — | — | — | ⏳ | fed08892 | Deploy |
 | `docs/techspec/guardrails.md` | Б | — | — | — | ⏳ | fed08892 | Deploy |
 | `docs/techspec/guardrails.md` | С | — | — | — | ⏳ | fed08892 | Deploy |
