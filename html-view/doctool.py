@@ -5,6 +5,8 @@
     python html-view/doctool.py diagram <файл>    mermaid-схемы файла → HTML-страница (посмотреть отрисованной)
     python html-view/doctool.py move <старый> <новый>  переименовать документ и сразу обновить все ссылки на него
     python html-view/doctool.py blocks             заполненность карточек блоков: чего не хватает для реализации
+    python html-view/doctool.py approve <страница> <буква> ok|no <комментарий> [--human]  решение роли по документу
+    python html-view/doctool.py review-queue [буква]  что ждёт решения роли
     python html-view/doctool.py generated <файл>  если файл генерируется — откуда и чем; иначе пусто
     python html-view/doctool.py check             все проверки сборки без сборки сайта (секунды)
     python html-view/doctool.py rnd <slug> <тема> заготовка R&D v3.1, проходящая проверку структуры
@@ -187,7 +189,7 @@ def tooling_check() -> list:
     names = {n for _, ns in G.LAYERS for n in ns}
     issues += [f"docgraph.EDGES: узел «{x}» не в LAYERS" for e in G.EDGES for x in e[:2] if x not in names]
     issues += [f"docgraph.PATHS: у узла «{n}» нет ни одного файла" for n, ps in G.PATHS.items() if not any(ROOT.glob(p) for p in ps)]
-    for f in [ROOT / "AGENTS.md", *ROOT.glob(".claude/skills/doc-*/SKILL.md")]:
+    for f in [ROOT / "AGENTS.md", *ROOT.glob(".claude/skills/doc-*/SKILL.md"), *ROOT.glob(".claude/agents/*.md")]:
         for p in re.findall(r"`((?:html-view|docs|tools|\.claude|\.githooks)/[\w./-]+?)`", f.read_text(encoding="utf-8")):
             if "<" in p or "*" in p:
                 continue
@@ -348,7 +350,20 @@ def main():
     cmd, args = (sys.argv[1] if len(sys.argv) > 1 else ""), sys.argv[2:]
     if cmd == "route":
         print(route(args[0]) or "нет правил для этого пути")
-    elif cmd == "blocks":  # заполненность карточек блоков (architecture-methodology.md#block)
+    elif cmd == "approve":  # решение роли по документу (approval-methodology.md)
+        sys.path.insert(0, str(HERE))
+        import approvals as AP
+        human = "--human" in args
+        rest = [x for x in args if x != "--human"]
+        print(AP.set_decision(rest[0], rest[1], rest[2] in ("ok", "✅", "да"), " ".join(rest[3:]), human=human))
+    elif cmd == "review-queue":  # что ждёт решения роли
+        sys.path.insert(0, str(HERE))
+        import approvals as AP
+        q = AP.queue(args[0] if args else "")
+        print(f"ждёт решения: {len(q)}")
+        for p, r in q[:200]:
+            print(f"- {p} × {r}")
+    elif cmd == "blocks":  # заполненность карточек блоков (block-methodology.md)
         sys.path.insert(0, str(HERE))
         with contextlib.redirect_stdout(io.StringIO()):
             import build as B

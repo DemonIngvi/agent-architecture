@@ -21,6 +21,8 @@ from subcomponents import SUB  # noqa: E402
 from stories import ARTIFACTS, BPMN, CHAINS, PERSONAS, ROLES, STORIES  # noqa: E402
 from diagrams import bpmn_svg, graph_svg  # noqa: E402
 import docgraph  # noqa: E402
+import approvals as APPR  # noqa: E402
+APPROVAL_STATUS = {}
 from components import ABOUT, AP, BLOCKS, BY_SLUG, COMPONENTS, HOST, STATUS  # noqa: E402
 import integrations as IG  # noqa: E402
 import sitemap as SM  # noqa: E402
@@ -387,7 +389,7 @@ def check_docs() -> list:
     issues += tasksmd.check()
     issues += IG.check(COMPONENTS)  # О-41: интеграции и модели
     issues += config_check()  # tech-spec.md: имя параметра — как в конфиге
-    issues += block_check()  # architecture-methodology.md#block: ссылки карточек блоков
+    issues += block_check()  # block-methodology.md: ссылки карточек блоков
     rd = (ROOT / "docs/rnd/README.md").read_text(encoding="utf-8")  # О-34: структура R&D v3
     for f in sorted((ROOT / "docs/rnd").glob("*.md")):
         if f.name == "README.md":
@@ -560,6 +562,10 @@ def copy_sources():
         nt = SM.relink(t, r)
         if nt != t:
             p.write_text(nt, encoding="utf-8")
+    global APPROVAL_STATUS  # подтверждения документов ролями (approval-methodology.md)
+    APPROVAL_STATUS = APPR.sync(SRC)
+    (SRC / "docs/approvals-summary.md").write_text(APPR.summary_md(APPROVAL_STATUS), encoding="utf-8")
+    (SRC / "docs/approvals.md").write_text(APPR.REGISTRY.read_text(encoding="utf-8"), encoding="utf-8")
     write_pagebar_map()
     check_links()
 
@@ -672,7 +678,7 @@ def write_pagebar_map():
         rd[sp] = ('<div class="rd-head"><span class="about-label">Готовность спеки</span>' + rd_bar(r, True)
                   + "".join((f'<span class="rd-part">{k} <b>{v}</b>/{m}</span>' if m else f'<span class="rd-part rd-neg">{k} <b>{v}</b></span>') for k, (v, m) in r["parts"].items() if m or v) + qhtml
                   + f'<a class="side-all" href="{{rules}}">критерии →</a></div>')
-    data = {"pages": pages, "names": {c[0]: c[1] for c in COMPONENTS}, "readiness": rd}
+    data = {"pages": pages, "names": {c[0]: c[1] for c in COMPONENTS}, "readiness": rd, "approvals": APPROVAL_STATUS}
     (BUILD / "pagebar.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
 
@@ -866,11 +872,13 @@ def _param_names(slug: str) -> set:
 
 
 def block_card(slug: str, title: str, s: dict):
-    """Поля карточки блока (architecture-methodology.md#block): (заполнены, не хватает)."""
+    """Поля карточки блока (block-methodology.md): (заполнены, не хватает)."""
     names = _param_names(slug)
     checks = {
         "что делает": bool(s.get("does")),
         "технология": bool(s.get("tech")),
+        "истории": bool(s.get("stories")),
+        "вид и экраны / операции / схема": bool(s.get("kind")) and bool(s.get({"ui": "screens", "service": "ops", "store": "schema"}.get(s.get("kind"), "-"))),
         "входы и выходы": bool(s.get("io")),
         "данные": bool(s.get("data")),
         "параметры с именами из interfaces.md": bool(s.get("params")) and all(a in names for a, _ in s["params"]),
@@ -898,6 +906,10 @@ def block_check() -> list:
                 issues.append(f"{where}: таблицы `{tname}` нет в модели данных")
         issues += [f"{where}: требования {r} нет" for r in s.get("reqs", []) if f"`{r}`" not in allspec]
         issues += [f"{where}: задачи {k} нет" for k in s.get("tasks", []) if not list((ROOT / "docs/tasks").glob(f"{k}-*.md"))]
+        us = {x[0] for lst in STORIES.values() for x in lst}
+        issues += [f"{where}: истории {u} нет" for u in s.get("stories", []) if u not in us]
+        if s.get("kind") and s["kind"] not in ("ui", "service", "store"):
+            issues.append(f"{where}: вид блока {s['kind']} — ui, service или store")
     return issues
 
 
@@ -1209,13 +1221,23 @@ def write_component_pages():
         host = HOST.get((slug, title))
         filled, missing = block_card(slug, title, s)
         L = [f"# {title}", "",
-             f"**Тип:** {'встроенный блок' if host else 'блок'} компонента [{name}]({rel(d, f'components/{slug}/index.md')})"
+             f"**Тип:** {'встроенный блок' if host else 'блок'}{' · вид: ' + {'ui': 'интерфейс', 'service': 'сервис', 'store': 'хранилище'}[s['kind']] if s.get('kind') else ''} компонента [{name}]({rel(d, f'components/{slug}/index.md')})"
              + (f", работает внутри [{BY_SLUG[host][1]}]({rel(d, f'components/{host}/index.md')})" if host else "")
              + f" · карточка заполнена на {len(filled)} из {len(filled) + len(missing)}"
              + (f" — не хватает: {', '.join(missing)}" if missing else "")
-             + f" ([правило]({rel(d, 'docs/rules/architecture-methodology.md')}#block))", "",
+             + f" ([правило]({rel(d, 'docs/rules/block-methodology.md')}))", "",
              "## Что делает", ""] + [f"- {x}" for x in s["does"]]
         L += ["", "## Технология", "", s["tech"]]
+        if s.get("stories"):
+            where_us = {x[0]: sl for sl, lst in STORIES.items() for x in lst}
+            L += ["", "## Истории", "", " · ".join(f"[{u}]({rel(d, f'docs/stories/{where_us[u]}.md')}#{u.lower()})" for u in s["stories"] if u in where_us)]
+        if s.get("screens"):
+            L += ["", "## Экраны", "", "| Экран | Где в интерфейсе | Что на нём | Статус | Код форка | История |", "|---|---|---|---|---|---|"]
+            L += [f"| {cell(a)} | {cell(b)} | {cell(c)} | {cell(e)} | `{cell(f)}` | {cell(g)} |" for a, b, c, e, f, g in s["screens"]]
+        if s.get("ops"):
+            L += ["", "## Операции", "", "| Операция | Кто вызывает | I |", "|---|---|---|"] + [f"| {cell(a)} | {cell(b)} | {cell(c)} |" for a, b, c in s["ops"]]
+        if s.get("schema"):
+            L += ["", "## Схема", "", s["schema"]]
         if s.get("io"):
             L += ["", "## Входы и выходы", "", "| | С кем | Что |", "|---|---|---|"] + [f"| {cell(w)} | {cell(x)} | {cell(y)} |" for w, x, y in s["io"]]
         if s.get("data"):
@@ -1333,7 +1355,7 @@ def nav_yaml() -> str:
         if rest:
             L.append(f"      - {q(ch.name)}:")
             L += [item(8, title_of(SRC / x, Path(x).parent.name), x) for x in rest]
-    L += ["  - План и задачи:", item(4, "Roadmap MVP", "docs/ROADMAP.md"), item(4, "Сводная таблица задач", "docs/TASKS.md"),
+    L += ["  - План и задачи:", item(4, "Подтверждения документов", "docs/approvals-summary.md"), item(4, "Roadmap MVP", "docs/ROADMAP.md"), item(4, "Сводная таблица задач", "docs/TASKS.md"),
           item(4, "Задачи по компонентам", "tasks-by-component/index.md"), item(4, "Бэклог", "docs/BACKLOG.md"), item(4, "Технологии", "docs/TECHNOLOGIES.md"), item(4, "План документации", "docs/PLAN.md")]
     chtasks = [f"openspec/changes/{ch.name}/tasks.md" for ch in sorted((SRC / "openspec/changes").iterdir()) if ch.is_dir() and (SRC / f"openspec/changes/{ch.name}/tasks.md").exists() and f"openspec/changes/{ch.name}/tasks.md" not in used]
     if chtasks:
@@ -1350,7 +1372,7 @@ def nav_yaml() -> str:
     L += ["  - Справка:", item(4, "Правила документации", "docs/rules/README.md"), item(4, "Путь изменения документа", "docs/rules/agent-workflow.md"), item(4, "Формат схем", "FORMAT.md"), item(4, "Термины и коды", "docs/rules/terms.md"), item(4, "Типы данных", "docs/data-types.md"),
           item(4, "Персоны", "docs/stories/personas.md"),
           "    - Методологии:",
-          item(6, "Методология архитектуры", "docs/rules/architecture-methodology.md"), item(6, "Методология данных и интеграций", "docs/rules/data-methodology.md"),
+          item(6, "Методология архитектуры", "docs/rules/architecture-methodology.md"), item(6, "Методология блоков", "docs/rules/block-methodology.md"), item(6, "Методология подтверждений", "docs/rules/approval-methodology.md"), item(6, "Методология данных и интеграций", "docs/rules/data-methodology.md"),
           item(6, "Методология API", "docs/rules/api-methodology.md"), item(6, "Методология решений", "docs/rules/decision-methodology.md"),
           item(6, "Методология задач и плана", "docs/rules/task-methodology.md"), item(6, "Методология ревью и отклонений", "docs/rules/review-methodology.md"),
           item(6, "Методология сопровождающих документов", "docs/rules/support-docs-methodology.md"), item(6, "Методология SDD", "docs/rules/sdd-methodology.md"),

@@ -109,6 +109,12 @@ def on_page_markdown(markdown, page, config, files, **kwargs):
     nav.append(f'<a class="tb-help" href="{_rel(page.url, "docs/rules/")}" title="Правила работы с документацией">правила</a>')
     bar = (f'<div class="topbar"><span class="tb-nav">{"".join(nav)}</span>'
            f'<span class="tb-types">{ctx}{"".join(types)}</span></div>')
+    ap = DATA.get("approvals", {}).get(src)  # значки ролей, подтвердивших документ (approval-methodology.md)
+    if ap:
+        cls = {"✅": "ok", "❌": "no"}
+        dots = "".join(f'<span class="ap-dot ap-{cls.get(s, "wait")}" title="{name}: {dict(ok="подтвердил", no="отказ").get(cls.get(s, ""), "ждёт")}{" (" + who + ")" if who and who != "—" else ""}">{letter}</span>'
+                       for letter, name, s, who in ap)
+        bar = bar.replace('<div class="topbar">', f'<div class="topbar"><a class="ap-badges" href="{_rel(page.url, "docs/approvals-summary/")}" title="Подтверждения ролей">{dots}</a>', 1)
     rd = DATA.get("readiness", {}).get(src)
     if rd:
         oq_url = _rel(page.url, page.file.src_uri.rsplit("/", 1)[0] + "/open-questions")

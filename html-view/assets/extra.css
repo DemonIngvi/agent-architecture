@@ -392,3 +392,13 @@
 .md-typeset .tb-type.t-tech.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #455a64; }
 .t-data { background: #2e7d32; }
 .md-typeset .tb-type.t-data.active { box-shadow: 0 0 0 2px var(--md-default-bg-color), 0 0 0 4px #2e7d32; }
+
+/* Подтверждения ролей — значки в углу страницы (approval-methodology.md) */
+.ap-badges { float: right; display: inline-flex; gap: 3px; margin: 2px 0 0 8px; text-decoration: none; }
+.ap-dot { position: relative; width: 20px; height: 20px; border-radius: 50%; font-size: 0.62rem; font-weight: 700; line-height: 20px; text-align: center; color: #fff; }
+.ap-dot.ap-ok { background: #2e7d32; }
+.ap-dot.ap-no { background: #c62828; }
+.ap-dot.ap-wait { background: #bdbdbd; color: #424242; }
+.ap-dot.ap-ok::after, .ap-dot.ap-no::after { position: absolute; right: -3px; bottom: -3px; width: 10px; height: 10px; border-radius: 50%; background: #fff; font-size: 0.5rem; line-height: 10px; }
+.ap-dot.ap-ok::after { content: "✓"; color: #2e7d32; }
+.ap-dot.ap-no::after { content: "✕"; color: #c62828; }
