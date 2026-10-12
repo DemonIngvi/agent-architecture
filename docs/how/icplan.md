@@ -10,8 +10,9 @@
 | 2 | Автоподхват: агент шага становится делегатом | ICPlan → ICPlan | `delegateUserId` задачи | — | С1 |
 | 3 | Запуск в очередь | ICPlan → БД ICPlan | `Run` (pending) | — | С1 |
 | 4 | Runner забирает запуск | Agent Runner → ICPlan | `Run` | I1 | С1 |
+| 4а | Runner берёт определение и настройки версии запуска (D23) | Agent Runner → Platform module (в api ICPlan) | `{version, definition: AgentDefinition, settings: AgentSettings}` | I4 | С1 |
 | 5 | Ход работы агента в чат задачи | Agent Runner → ICPlan → Task UI | `RunEvent` → [чат запуска](#agent-feed) | I2 | С1 |
-| 6 | Подтверждение действия | Пользователь → Task UI → ICPlan → Agent Runner | `ApprovalDecision` | I3 | С1 |
+| 6 | Подтверждение действия | Пользователь → Task UI → ICPlan → Agent Runner (ответ heartbeat) | `ApprovalDecision` | I20, I3 | С1 |
 | 7 | Итог в задачу | Agent Runner → ICPlan | `RunResult` | I2 | С1 |
 | 8 | Переход задачи по итогу запуска | ICPlan → ICPlan | `process_step.on_success / on_failure` | — | С1 |
 | 9 | Администратор настраивает агента | Администратор → Control Plane UI → ICPlan | `AgentDefinition` | I20 | — |
@@ -25,6 +26,7 @@ sequenceDiagram
   actor U as Пользователь
   participant UI as Task UI
   participant IC as ICPlan (api)
+  participant PM as Platform module (в api ICPlan)
   participant DB as БД ICPlan
   participant R as Agent Runner
   Note over R,IC: Runner — Bearer API-ключ агента
@@ -34,6 +36,9 @@ sequenceDiagram
   IC->>DB: запуск в очередь — Run (pending)
   R->>IC: POST /agent-runs/claim (I1)
   IC-->>R: Run ↩
+  R->>PM: GET /platform/runs/:runId/agent (I4, D23)
+  PM->>DB: agent_run.agent_version при первом вызове
+  PM-->>R: version, definition, settings ↩
   loop пока агент работает
     R->>IC: POST /agent-runs/:runId/events — RunEvent (I2)
     IC-->>UI: SSE: шаги в чат запуска
@@ -41,6 +46,8 @@ sequenceDiagram
   end
   opt нужно подтверждение
     U->>UI: approve / отклонить
+    UI->>IC: POST /agent-runs/:runId/decisions — ApprovalDecision
+    IC->>DB: agent_run_delivery
     IC-->>R: ApprovalDecision в ответе heartbeat ↩ (после доработки, R-ICP-16)
   end
   R->>IC: POST /agent-runs/:runId/result — RunResult (I2)

@@ -29,6 +29,7 @@
 | `limits.max_steps` | Шагов цикла на запуск | L1 | S2 | 30 | см. agent-harness | 5 | 200 | см. agent-harness |
 | `limits.timeout_s` | Время запуска | L1 | S2 | 1800 | см. `timeout_s` (agent-runner) | 60 | 14400 | см. agent-runner |
 | `concurrency` | Параллельных запусков агента | L1 | S2 | 1 | см. agent-runner | 1 | `global_max` | см. agent-runner |
+| `autonomy_level` | Уровень автономии R0–R5 (политика подтверждений) | L1 | S2 | R2 | см. `autonomy_level` (guardrails) | R0 | R5 | см. guardrails |
 | `sandbox_profile` | Профиль среды: образ, CPU, RAM, диск | L1 | S2 | light | light = 1 CPU, 1 ГБ, 2 ГБ (agent-sandbox) | light | heavy | standard / heavy — для сборки кода |
 | `sandbox.egress_allow` | Разрешённые хосты | L1 | S2 | только платформа | см. agent-sandbox | только платформа | список доменов | см. agent-sandbox |
 | `sandbox.pool.size` | Готовых контейнеров | L1 | S2 | 2 | см. agent-sandbox | 0 | `global_max` | см. agent-sandbox |

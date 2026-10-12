@@ -234,9 +234,25 @@ ICPlan SHALL удалять задачей worker форка завершённ�
 - **WHEN** запуск старше `runs.retention_days`, но у него ещё есть `run_event`
 - **THEN** запуск пропускается до следующей очистки
 
+#### Scenario: Очистка переписки
+- **WHEN** тред чата агента не обновлялся дольше `chat.retention_days`
+- **THEN** worker удаляет `agent_chat_thread` вместе с его сообщениями и событиями
+
 #### Scenario: История задачи остаётся
 - **WHEN** worker удалил треды чата старше `chat.retention_days`
 - **THEN** комментарии и записи «агент взял / закончил» в `issue_activity` остаются, пока жива задача
+
+#### Scenario: Очистка отключена
+- **WHEN** `runs.retention_days` или `chat.retention_days` равен 0
+- **THEN** worker не удаляет запуски или треды соответственно, сколько бы им ни было
+
+#### Scenario: Удаление в журнале
+- **WHEN** цикл очистки удалил запуски или треды
+- **THEN** в журнал worker записано, сколько строк `agent_run` и `agent_chat_thread` удалено и по какому сроку
+
+#### Scenario: Сбой очистки
+- **WHEN** удаление не прошло (ошибка БД, внешний ключ)
+- **THEN** строки остаются, ошибка записана в журнал worker и поднимает уведомление эксплуатации; следующий цикл очистки повторяет удаление
 
 **ID:** `R-ICP-19` · **Реализует задача:** [4.7](../../../../../docs/tasks/4.7-postgres-storage-backup.md)
 
@@ -260,7 +276,7 @@ ICPlan SHALL удалять задачей worker форка завершённ�
 
 <a id="r-icp-11"></a>
 ### Requirement: Хранилища данных
-Модуль SHALL хранить свои данные только в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`), S7 (RustFS (S3 API), бакет `planner-attachments`) (`interfaces.md`). Секреты MUST NOT храниться в БД и git.
+Модуль SHALL хранить свои данные только в S1 (PostgreSQL 17 (CloudNativePG), БД `itsaplan`), S7 (RustFS (S3 API), бакет `planner-attachments`) (`interfaces.md`). Секреты MUST NOT храниться в git и в БД открытым текстом: в БД допускается только шифротекст (ключи агентов `ai_agent.api_key_ciphertext`, учётные данные тулов), ключ шифрования `APP_ENCRYPTION_KEY` MUST храниться вне БД и её бэкапов (Secret кластера).
 
 #### Scenario: Запись в своё хранилище
 - **WHEN** модуль сохраняет агенты (вид, ключ, `enabled`), `agent_run` (очередь, аренда, итоги),…
@@ -273,6 +289,10 @@ ICPlan SHALL удалять задачей worker форка завершённ�
 #### Scenario: Доступ вне своих хранилищ
 - **WHEN** код icplan-integration обращается к таблицам вне S1, S7
 - **THEN** доступа нет: роль БД icplan-integration ограничена S1, S7
+
+#### Scenario: Секрет в БД
+- **WHEN** модуль сохраняет API-ключ агента
+- **THEN** в S1 попадает только шифротекст; из дампа БД без `APP_ENCRYPTION_KEY` ключ не прочитать
 
 **ID:** `R-ICP-11` · **Реализует задача:** [2.1](../../../../../docs/tasks/2.1-runner-external.md)
 

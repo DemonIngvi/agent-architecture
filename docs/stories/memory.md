@@ -41,7 +41,7 @@
 | [US-MEM-07](#us-mem-07) | Агент-исполнитель | получить свою инструкцию и навыки (M5) нужной версии при старте | определение агента (Registry) | 2 | этап 1 · 1.3, 2.5 |
 | [US-MEM-08](#us-mem-08) | Пользователь ICPlan | чтобы агент опирался на документы проекта (M6), а не просил пересказать | документы проекта ICPlan | 2 | этап 2 · 2.4, 2.5 |
 | [US-MEM-09](#us-mem-09) | Агент-исполнитель | находить факты по смыслу из прошлых работ (M4) | тул поиска (после MVP) | 2 | этап 2 · 2.5 |
-| [US-MEM-10](#us-mem-10) | Безопасность | чтобы переписка, итоги и состояния удалялись по срокам хранения | расписание очистки | 2 | этап 2 · 2.5 |
+| [US-MEM-10](#us-mem-10) | Безопасность | чтобы переписка, итоги и состояния удалялись по срокам хранения | расписание очистки | 3 | этап 2 · 2.5, 4.7 |
 
 ## Истории
 
@@ -71,7 +71,7 @@
 
 - [ ] Каждое сообщение пользователя и агента ICPlan пишет в M1 автоматически
 - [ ] Новый запуск по задаче получает переписку, если M1 в профиле чтения
-- [ ] Переписка старше срока хранения удаляется
+- [ ] Переписка старше срока M1 не отдаётся агенту; треды удаляет ICPlan по `chat.retention_days` (D25)
 
 **Требования:** [Автоматическая запись M1 и M2](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-03) · [Срок хранения](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-08) · [Проверки записи в память](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-15)
 
@@ -193,5 +193,5 @@
 - [ ] Удаление попадает в журнал
 - [ ] Очистка не прошла → повтор и уведомление эксплуатации
 
-**Требования:** [Срок хранения](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-08) · [Управление памятью](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-07)
+**Требования:** [Срок хранения](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-08) · [Управление памятью](../../openspec/changes/define-agent-platform/specs/agent-memory/spec.md#r-mem-07) · [Очистка запусков и переписки по сроку](../../openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md#r-icp-19)
 

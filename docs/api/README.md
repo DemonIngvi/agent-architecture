@@ -176,10 +176,10 @@ sandbox: { profile: light }
 
 ### Heartbeat
 
-_ответ на продление аренды (доработка: сейчас форк отвечает 204 без тела) — отмена, подтверждения и указания (I3)_
+_ответ на продление аренды (доработка: сейчас форк отвечает 204 без тела) — подтверждения и указания (I3); отмена — ответ 404, как в форке_
 
 ```json
-{ "canceled": false, "approvals": [ { "runId": 1042, "seq": 8, "decision": "approve", "scope": "once", "by": "anna" } ],
+{ "approvals": [ { "runId": 1042, "seq": 8, "decision": "approve", "scope": "once", "by": "anna" } ],
   "messages": [ { "id": "m-91", "text": "используй pytest", "by": "anna", "at": "2026-10-10T12:03:00Z" } ] }
 ```
 
@@ -191,7 +191,7 @@ _настройки агента в Platform module (I4)_
 { "agentId": 7, "version": 5, "autonomy": "R2", "budget": { "runUsd": 1, "dayUsd": 5 },
   "sandboxProfile": "light", "memoryProfile": "default",
   "toolsAllow": ["itsaplan_get_issue", "itsaplan_add_comment", "git_push"], "approvalTools": ["git_push"],
-  "scheduling": { "parallel": 1, "max": 3 }, "enabled": true }
+  "scheduling": { "parallel": 1, "max": 3 } }
 ```
 
 ### SandboxClaim

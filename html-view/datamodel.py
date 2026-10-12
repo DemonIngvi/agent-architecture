@@ -72,7 +72,8 @@ DATA_IN_RESPONSE = {"I1", "I3", "I4"}
 ALSO = {"I22": ["icplan", "platform-module", "agent-runner", "memory", "observability", "llm-gateway"],
         "I20": ["platform-module", "observability"], "I2": ["observability", "memory"], "I14": ["observability"],
         "I19": ["sandbox", "icplan"], "I17": ["sandbox", "mcp-tools"],
-        "I8": ["guardrails"], "I7": ["sandbox"], "I18": ["sandbox"]}
+        "I8": ["guardrails"], "I7": ["sandbox"], "I18": ["sandbox"],
+        "I4": ["icplan"]}  # I4 — Platform module встроен в api ICPlan (HOST): виден на C1 ICPlan
 
 # ---------- модели обмена ----------
 # имя → (назначение, [(поле, тип, обязательное, описание)])
@@ -81,25 +82,24 @@ MODELS = {
         ("id", "int", True, "`agent_run.id`"),
         ("trigger", "enum: mention · delegation · field · schedule · manual · process_step", True, "что создало запуск: упоминание агента в комментарии, назначение делегатом, изменение поля задачи, расписание, ручной запуск; `process_step` — шаг процесса (D17)"),
         ("prompt", "string", True, "задание, собранное ICPlan"), ("systemPrompt", "string", True, "правила самого запуска от ICPlan"),
-        ("attempts", "int", True, "сколько раз запуск уже выдавался: аренда `AGENT_RUN_LEASE_SECONDS` = 300 с, Runner продлевает её heartbeat-ом (I3); не продлил — запуск выдаётся снова"),
+        ("attempts", "int", True, "сколько раз запуск уже выдавался: аренда `AGENT_RUN_LEASE_SECONDS` = 300 с, Runner продлевает её heartbeat-ом (I3); не продлил — запуск выдаётся снова; после `AGENT_RUN_MAX_ATTEMPTS` = 3 выдач без итога следующий claim завершает его `failed` с `lastError` «Runner did not report a result» (`expireExhaustedRuns` форка)"),
         ("issueId", "int | null", True, "задача; `null` — запуск без задачи (расписание)"), ("issueIdentifier", "string | null", True, "читаемый ключ задачи, `MKT-42`"),
         ("rule", "{process, stepId}", False, "шаг процесса, создавший запуск, при `trigger = process_step` (D17): `process` — название типа задачи (= процесса), `stepId` — `ProcessStep.id`; иначе поля нет")]),
     "AgentDefinition": ("определение агента в YAML `agent/v1` — экспорт и импорт (R-REG-04, R-CP-05)", [
         ("apiVersion", "const: agent/v1", True, "версия формата"), ("id", "string", True, "имя агента (`username` в ICPlan)"),
         ("version", "int", True, "версия определения"), ("model", "string", True, "алиас LiteLLM"),
         ("instructions", "string", True, "инструкция агента"), ("skills", "string[]", False, "навыки"),
-        ("mcp", "{server, tools[]}[]", False, "MCP-серверы и разрешённые тулы; источник — `project_resource` (`mcp`) и `access_policy` Platform module: MCP-серверов агента в форке нет (D23, подтвердить в 2.3)"),
+        ("mcp", "{server, tools[]}[]", False, "MCP-серверы и разрешённые тулы; источник — `project_resource` (`mcp`) и `access_policy` Platform module: MCP-серверов агента в форке нет (D23)"),
         ("limits", "{max_steps, timeout_s, max_tokens}", False, "параметры `limits.*`"), ("approval", "{tools[]}", False, "тулы с подтверждением"),
         ("memory", "{profile, read[], write[]}", False, "профиль памяти"), ("sandbox", "{profile}", False, "профиль среды")]),
     "RunSummary": ("итог прошлого запуска для памяти M2 — строка `agent_run` форка", [
         ("id", "int", True, "`agent_run.id`, как в API аналитики ICPlan"), ("agentId", "int", True, "агент"), ("status", "enum: pending · success · failed · canceled", True, "`agent_run.status`"),
         ("output", "string | null", False, "итог; в контекст попадает в пределах окна модели (управление контекстом, R-HRN-07)"), ("lastError", "string | null", False, "причина неудачи (`agent_run.last_error`)"),
         ("inputTokens / outputTokens", "int | null", False, "токены запуска"), ("finishedAt", "timestamp | null", False, "время завершения")]),
-    "Heartbeat": ("ответ на продление аренды (`POST /agent-runs/:runId/heartbeat`) — обратный канал к раннеру", [
-        ("canceled", "bool", True, "запуск остановлен пользователем — Runner останавливает Harness"),
+    "Heartbeat": ("ответ на продление аренды (`POST /agent-runs/:runId/heartbeat`) — обратный канал к раннеру; отмены в теле нет: отменённый запуск не `pending`, heartbeat отвечает 404 (как в форке) — Runner останавливает Harness", [
         ("approvals", "ApprovalDecision[]", False, "решения, ещё не доставленные; ICPlan повторяет их в каждом ответе, пока в событиях запуска не придёт `CUSTOM` `decision_applied` с этим `seq`; Runner отбрасывает повтор по `runId` + `seq`"), ("messages", "UserMessage[]", False, "указания, ещё не доставленные; повторяются, пока не придёт `CUSTOM` `message_received` с этим `id` (в ленте — «получено агентом»); повтор отбрасывается по `id`")]),
     "RunBundle": ("задание Harness от Runner (`POST /run`)", [
-        ("runId", "int", True, "= `Run.id`"), ("agent", "{agentId, model, version, instructions, skills[]}", True, "определение агента той версии, что была при выдаче (`instructions` — как поле `ai_agent.instructions` ICPlan)"),
+        ("runId", "int", True, "= `Run.id`"), ("agent", "{agentId, model, version, instructions, skills[]}", True, "определение агента версии запуска: `agent_run.agent_version`, закреплённой при первом вызове I4 `GET /platform/runs/:runId/agent` (D23); повторная выдача получает ту же версию (`instructions` — как поле `ai_agent.instructions` ICPlan)"),
         ("prompt / systemPrompt", "string", True, "задание и системные правила из `Run` без изменений"), ("guidance", "string", False, "руководство проекта для агентов (`project_platform.guidance`, Platform module)"), ("params", "map<string, any>", True, "итоговые параметры после слияния уровней L0 (развёртывание) → L1 (проект) → L2 (агент) → L3 (запуск); ключи — имена параметров конфигурации (`model.temperature`, `limits.max_steps`)"),
         ("workspace", "WorkspaceSource[]", False, "манифест рабочего пространства (R-RUN-17)"),
         ("memory", "{m3: M3Record, m2: RunSummary[]}", False, "память на старте: M3 этой задачи; M2 — итоги последних запусков (параметр `m2_last_runs`, по умолчанию 3); во время работы Harness пишет M3 в Memory API (I11)"),
@@ -130,7 +130,8 @@ MODELS = {
         ("usage", "{inputTokens, outputTokens, reasoningTokens, costUsd, iterations}", False, "расход; `reasoningTokens`, `costUsd`, `iterations` (итерации цикла) — добавляем (D18)"),
         ("reason", "enum: done · limit · gate_failed · error", False, "причина Harness (R-RUN-07): `done` → `status = success`; `limit`, `gate_failed`, `error` → `failed`"),
         ("artifacts", "{name, url}[]", False, "опубликованное для человека: файл в RustFS (`s3://…`), ветка или PR (D20); в M3 — рабочие ссылки `{path, ref}`"),
-        ("gate", "{passed: bool, failed: Criterion[]}", False, "проверка по критериям (R-HRN-08, D20): не выполненные критерии")]),
+        ("gate", "{passed: bool, failed: Criterion[]}", False, "проверка по критериям (R-HRN-08, D20): не выполненные критерии"),
+        ("criteriaNext", "Criterion[]", False, "критерии, предложенные следующему шагу (D20, D26): Runner берёт их из итога Harness; ICPlan при приёме итога создаёт пункты чек-листа задачи с `origin = agent:<username>` и `status` по `criteriaApproval` шага")]),
     "ApprovalDecision": ("решение пользователя по вопросу или подтверждению", [
         ("runId", "int", True, ""), ("seq", "int", True, "`seq` события `CUSTOM` `approval_request` или `question`"), ("decision", "enum: approve · reject · answer", True, "на `approval_request` — `approve` или `reject`; на `question` — `answer`"),
         ("scope", "enum: once · run", False, "только для `approve`: этот вызов или такие же вызовы до конца запуска (R-GRD-03)"), ("by", "string", True, "`username` того, кто решил"), ("comment", "string | null", False, "при `answer` — ответ на вопрос; иначе пояснение")]),
@@ -160,7 +161,7 @@ MODELS = {
     "AgentSettings": ("настройки агента из Platform module (I4)", [
         ("agentId", "int", True, "агент"), ("version", "int", True, "единая версия агента: растёт при любой правке определения или настроек (R-CP-04); та же в `AgentDefinition.version` и `RunBundle.agent.version`"), ("autonomy", "enum: R0–R5", True, "уровень автономии: R0 — каждое действие с подтверждением … R5 — без подтверждений"),
         ("budget", "{runUsd, dayUsd}", True, "лимиты агента в $: на запуск и на день"), ("sandboxProfile", "string", True, "имя профиля среды (`sandbox_profile.name`)"), ("memoryProfile", "string", True, "имя профиля памяти"),
-        ("toolsAllow / approvalTools", "string[]", True, "разрешённые тулы и тулы с подтверждением; в бандл OPA уходят как `tools_allow` и `approval`"), ("scheduling", "{parallel, max}", False, "`parallel` — сколько запусков агента идёт одновременно; `max` — сколько запусков агента может ждать в очереди"), ("enabled", "bool", True, "выключение агента")]),
+        ("toolsAllow / approvalTools", "string[]", True, "разрешённые тулы и тулы с подтверждением; в бандл OPA уходят как `tools_allow` и `approval`"), ("scheduling", "{parallel, max}", False, "`parallel` — сколько запусков агента идёт одновременно; `max` — сколько запусков агента может ждать в очереди")]),
     "SandboxClaim": ("заявка Runner на среду запуска", [
         ("profile", "string", True, "имя профиля среды"), ("sandboxId", "string", False, "в ответе: идентификатор среды, назначает провайдер"), ("image", "string", True, "образ Harness из профиля"),
         ("runtime", "enum: runc · runsc", True, "runc — обычный контейнер; runsc — gVisor, изоляция ядра для недоверенного кода (R-SBX-05)"), ("cpu / memoryMb / diskGb", "number", True, "ядра, МБ памяти, ГБ диска из профиля"), ("readyMs", "int", False, "в ответе: время до готовности среды")]),
@@ -182,7 +183,7 @@ MODELS = {
         ("budget_duration", "string", True, "всегда `1d`: бюджет ключа = дневной лимит агента; лимит на запуск проверяет G1"), ("rpm_limit / tpm_limit", "int", False, ""), ("metadata", "object", False, "наши ключи в стиле LiteLLM: `agent_id`")]),
     "CostAggregate": ("сводка затрат по задаче и агенту (экран «Затраты», R-OBS-05)", [
         ("issueId", "int", True, "задача: `run_id` из журнала LiteLLM → `agent_run.issue_id`"), ("agentId", "int", True, "агент: `agent_run.agent_id`"), ("runs", "int", True, "число запусков за всё время задачи; запуски без задачи — в сводке агента (задача 3.9)"),
-        ("inputTokens / outputTokens", "int", True, "токены из журнала LiteLLM"), ("costUsd", "float | null", True, "затраты; `null` — цена модели не задана, стоимость неизвестна (R-OBS-05)")]),
+        ("inputTokens / outputTokens", "int | null", True, "токены из журнала LiteLLM; `null` — журнал недоступен, «неизвестно» (R-OBS-05)"), ("costUsd", "float | null", True, "затраты; `null` — цена модели не задана или журнал недоступен, стоимость неизвестна (R-OBS-05)")]),
     "OpaBundleData": ("данные бандла OPA (`data.json`)", [
         ("agents.<id>.tools_allow", "string[]", True, "`<id>` — `agentId`"), ("agents.<id>.approval", "string[]", True, "тулы с паузой"),
         ("agents.<id>.autonomy", "enum: R0–R5", True, ""), ("agents.<id>.budget", "{run_usd, day_usd}", True, "лимиты $ = `AgentSettings.budget`"), ("projects.<id>.budget.month_usd", "number", False, "лимит проекта на месяц = `project_platform.budget_month_usd`"), ("platform.kill_switch", "bool", True, "аварийная остановка всех агентов")]),
@@ -204,7 +205,7 @@ MODEL_META = {
     "RunSummary": ("ours", "R-MEM-03, R-MEM-05",
                    "M2 (эпизодическая память: итоги прошлых запусков) не хранится отдельно: это строки `agent_run` форка: ICPlan пишет их сам при выдаче и завершении запуска (`POST …/result`). Модель наша, данные и имена — форка (`GET /projects/:projectKey/analytics/agent-runs`: `id`, `agentId`, `lastError`)."),
     "Heartbeat": ("ours", "D17, R-ICP-16",
-                  "Сейчас heartbeat в форке отвечает 204 без тела. Ответ с телом — доработка: так раннер узнаёт об отмене, ответах и указаниях без отдельного канала (раннер ходит наружу сам, входящих соединений нет). Имя `canceled` — как в ответе форка на события чата (`POST /agent-chats/:id/events` → `{canceled}`)."),
+                  "Сейчас heartbeat в форке отвечает 204 без тела, а на отменённый или завершённый запуск — 404. Ответ с телом — доработка: так раннер узнаёт об ответах и указаниях без отдельного канала (раннер ходит наружу сам, входящих соединений нет). Отмена остаётся одним способом — 404, как в форке: поля `canceled` в ответе нет."),
     "RunBundle": ("ours", "D18, D19, D20",
                   "Всё, что нужно Harness на один запуск, одним документом: Harness не ходит в ICPlan сам (нет учётных данных в sandbox). Группы `agent`, `task`, `memory`, `workspace`, `mcp` — по источнику данных, чтобы было видно, кто за что отвечает."),
     "WorkspaceSource": ("ours", "D18", "Рабочее пространство собирается из источников проекта; `right` — право агента на источник по политике, его проверяет Runner при монтировании."),
@@ -222,7 +223,7 @@ MODEL_META = {
     "M3Record": ("ours", "R-MEM-04, D20", "M3 — память состояния задачи и передача между шагами: «сделано / дальше / блокеры» и ссылки на артефакты вместо содержимого. Harness пишет её в Memory API (отдельный сервис платформы) по токену запуска, а не в БД; Memory API хранит её в `memory_m3` по ключу (задача, область), `version` защищает от одновременной записи."),
     "PolicyInput": ("ours", "D6, R-GRD-01", "Содержимое наше: точка G1 или G2, агент, запуск, тул и потраченный бюджет; конверт `{input: …}` задаёт REST API OPA. Вместо аргументов тула — их хеш, чтобы в аудите не было данных. Лимиты сюда не передаются: правило берёт их из данных бандла по `agentId`."),
     "PolicyDecision": ("ours", "D6, R-GRD-03", "Ответ нашего правила Rego, OPA кладёт его в `{result: …}`. Три исхода: выполнить сразу (`allow`), после подтверждения (`approval`), запрещено."),
-    "AgentSettings": ("ours", "D9, R-CP-04", "Наши настройки агента, которых нет в ICPlan; источник правды для автономии, бюджета, тулов и профилей. Из них собираются бандл OPA (`OpaBundleData`, имена конфигурации) и файл экспорта (`AgentDefinition`). Версия нужна для отката и для того, чтобы запуск видел настройки на момент выдачи."),
+    "AgentSettings": ("ours", "D9, R-CP-04", "Наши настройки агента, которых нет в ICPlan; источник правды для автономии, бюджета, тулов и профилей. Включён ли агент — не здесь: источник правды один, `ai_agent.enabled` ICPlan (D17, R-ICP-17); аварийная остановка — `kill_switch` (`agent:<id>`). Из них собираются бандл OPA (`OpaBundleData`, имена конфигурации) и файл экспорта (`AgentDefinition`). Версия нужна для отката и для того, чтобы запуск видел настройки версии, закреплённой при первом вызове I4 (D23)."),
     "SandboxClaim": ("ours", "D1, R-SBX-05", "Заявка Runner провайдеру среды (Docker, позже Kubernetes): профиль, образ и ресурсы."),
     "RepoGrant": ("ours", "D18, R-SBX-04", "Короткоживущий доступ к репозиторию на запуск: только ветки с префиксом агента, защищённые ветки без записи."),
     "Checkpoint": ("ours", "D2, D18, R-HRN-05", "Состояние графа LangGraph между шагами; Harness пишет его через Runner, потому что в sandbox нет учётных данных БД."),
@@ -247,7 +248,7 @@ FIELD_SRC = {
 # Поля моделей «fork», которых в форке ещё нет: поле → решение
 PLANNED = {
     "Run": {"rule": "D17", "trigger": "D17 (значение `process_step`)"},
-    "RunResult": {"usage": "D18 (`reasoningTokens`, `costUsd`, `iterations`)", "reason": "R-RUN-07", "artifacts": "D20", "gate": "D20"},
+    "RunResult": {"usage": "D18 (`reasoningTokens`, `costUsd`, `iterations`)", "reason": "R-RUN-07", "artifacts": "D20", "gate": "D20", "criteriaNext": "D26"},
 }
 
 # ---------- хранилища ----------
@@ -255,7 +256,7 @@ PLANNED = {
 ICPLAN_TABLES = {
     "icplan": [("project", ""), ("projectColumn", ""), ("issueType", ""), ("issue", "+ `review_with_me` (D17)"), ("issueChecklist", ""),
                ("issueChecklistItem", "+ `origin`, `status` (D20)"), ("issueActivity", ""), ("aiAgent", "+ `enabled` (D17)"), ("agentRun", ""),
-               ("agentSchedule", ""), ("agentChatThread", ""), ("agentChatMessage", ""), ("projectAction", "+ эффект `delegate_agent`"),
+               ("agentSchedule", ""), ("agentChatThread", ""), ("agentChatMessage", ""), ("projectAction", "+ ключ `delegateUserId` в `effect` (R-AP-03)"),
                ("projectDocument", ""), ("issueAttachment", ""),
                ("user", "Better Auth; у агента — бот-пользователь"), ("apikey", "ключ агента: Bearer для I1–I3; `reference_id` → `user.id`")],
     "mcp-tools": [("aiAgent", ""), ("agentTool", ""), ("agentToolLink", ""), ("agentSkill", ""), ("agentSkillLink", ""),
@@ -272,14 +273,14 @@ PLATFORM_TABLES = {
                                       ("agent_id", "int", "FK ai_agent", "нет — ручной шаг"), ("on_success", "jsonb", "", "шаг / процесс / завершить"), ("on_failure", "jsonb", "", ""),
                                       ("max_runs", "int", "", "3"), ("require_review", "bool", "", ""), ("deliverable", "text", "", "результат шага (D20)"),
                                       ("done_criteria", "jsonb", "", "готовность шага (D20)"), ("criteria_approval", "text", "", "auto / review / always")]),
-    "issue_process_state": ("S1", "icplan", [("issue_id", "int", "PK, FK issue", ""), ("process_id", "int", "FK process", ""), ("step_id", "int", "FK process_step", "текущий шаг"),
+    "issue_process_state": ("S1", "icplan", [("issue_id", "int", "PK, FK issue", ""), ("process_id", "int", "FK process", ""), ("process_version", "int", "", "составной FK (`process_id`, `process_version`) → `process_version`, индекс по этой паре; версия процесса, с которой задача вошла в текущий шаг: шаг дорабатывается по снимку этой версии (R-AP-22)"), ("step_id", "int", "FK process_step", "текущий шаг"),
                                              ("runs_on_step", "int", "", "счётчик для `max_runs`"), ("state", "text", "", "running / waiting_review / paused / done"),
                                              ("last_verdict", "text", "", "accepted / rejected"), ("updated_at", "timestamptz", "", "")]),
     "agent_settings": ("S2", "platform-module", [("agent_id", "int", "PK, FK ai_agent", ""), ("version", "int", "", "текущая версия"), ("autonomy_level", "text", "", "R0–R5"),
                                                  ("budget_run_usd", "numeric", "", ""), ("budget_day_usd", "numeric", "", ""), ("sandbox_profile_id", "int", "FK sandbox_profile", ""),
                                                  ("memory_profile_id", "int", "FK memory_profile", ""), ("tools_allow", "jsonb", "", ""), ("approval_tools", "jsonb", "", ""),
                                                  ("scheduling", "jsonb", "", "parallel, max"), ("updated_by", "text", "", ""), ("updated_at", "timestamptz", "", "")]),
-    "agent_settings_version": ("S2", "platform-module", [("agent_id", "int", "PK, FK agent_settings", ""), ("version", "int", "PK", ""), ("data", "jsonb", "", "снимок настроек"),
+    "agent_settings_version": ("S2", "platform-module", [("agent_id", "int", "PK, FK agent_settings", ""), ("version", "int", "PK", ""), ("data", "jsonb", "", "снимок определения агента и настроек (D26)"), ("definition_hash", "text", "", "хеш определения ICPlan: при вызове I4 отличие от последней версии создаёт новую (D26)"),
                                                          ("created_by", "text", "", ""), ("created_at", "timestamptz", "", "")]),
     "sandbox_profile": ("S2", "platform-module", [("id", "serial", "PK", ""), ("name", "text", "", "light, coder…"), ("image", "text", "", ""), ("runtime", "text", "", "runc / runsc"),
                                                   ("cpu", "numeric", "", ""), ("memory_mb", "int", "", ""), ("disk_gb", "int", "", ""), ("egress_allow", "jsonb", "", ""), ("pool_size", "int", "", "")]),
@@ -382,18 +383,19 @@ MIGRATE = {
     "litellm": "миграции LiteLLM (Prisma) прямым подключением, минуя PgBouncer",
 }
 # таблицы форка, в которые пишет платформа (запуски, чат, история задачи): им тоже нужна политика (data-methodology)
-FORK_WRITTEN = ["agent_run", "agent_chat_message", "issue_activity"]
+FORK_WRITTEN = ["agent_run", "agent_chat_thread", "agent_chat_message", "issue_activity"]  # agent_chat_thread — удаляет worker по сроку D25
 
 TABLE_POLICY = {
     # таблицы форка: индексы — как в схеме форка (None); срок и очистка — по коду форка (packages/db, apps/worker)
     "agent_run": (None, "завершённые — `runs.retention_days` = 365 по `finished_at` (icplan-integration, D25)", "каскадно с агентом, проектом, задачей; задача worker форка удаляет завершённые старше срока, запуски с `run_event` пропускает (R-ICP-19); для памяти M2 — фильтр чтения по `retention`, Memory не удаляет", "fork"),
     "agent_chat_message": (None, "тред — `chat.retention_days` = 90 по `updated_at` (icplan-integration, D25)", "каскадно с тредом и агентом; задача worker форка удаляет треды старше срока, сообщения и события — каскадом (R-ICP-19); для памяти M1 — фильтр чтения по `retention`", "fork"),
+    "agent_chat_thread": (None, "`chat.retention_days` = 90 по `updated_at` (icplan-integration, D25)", "задача worker форка удаляет тред старше срока, сообщения и события (`agent_chat_message`, `agent_chat_event`) — каскадом (R-ICP-19); 0 — не чистить", "fork"),
     "issue_activity": (None, "пока жива задача (D25)", "каскадно с задачей; комментарий удаляется по одному; по времени не чистится — журнал задачи живёт с задачей (D25)", "fork"),
     "process": ([("unique", "project_id, issue_type_id", "один процесс на тип задачи"), ("index", "issue_type_id", "FK; процесс по типу задачи"), ("index", "first_step_id", "FK")],
                 "пока жив проект", "каскадно с проектом; версия процесса растёт при правке", "fork"),
     "process_step": ([("unique", "process_id, key", "ключ шага уникален в процессе"), ("unique", "process_id, column_id", "одна колонка — один шаг"), ("index", "column_id", "FK; переход по колонке"), ("index", "agent_id", "FK; шаги агента")],
                      "пока жив процесс", "каскадно с процессом", "fork"),
-    "issue_process_state": ([("index", "process_id", "FK"), ("index", "step_id, state", "задачи на шаге — доска и подхват")],
+    "issue_process_state": ([("index", "process_id, process_version", "FK; задачи на версии процесса"), ("index", "step_id, state", "задачи на шаге — доска и подхват")],
                             "пока жива задача", "каскадно с задачей", "fork"),
     "agent_settings": ([("index", "sandbox_profile_id", "FK"), ("index", "memory_profile_id", "FK")],
                        "пока жив агент", "каскадно с агентом", "cp"),
@@ -421,7 +423,7 @@ TABLE_POLICY = {
 }
 
 STORES = {
-    "icplan": ["S1"], "platform-module": ["S2"], "agent-runner": ["S3", "S5"], "memory": ["S4", "S1"], "observability": ["S3", "S6", "S1"],
+    "icplan": ["S1", "S7"], "platform-module": ["S2"], "agent-runner": ["S3", "S5"], "memory": ["S4", "S1"], "observability": ["S3", "S6", "S1"],
     "llm-gateway": ["S6"], "mcp-tools": ["S1"], "guardrails": ["S11", "S8", "S2"], "sandbox": ["S10", "S7"], "harness": ["S10", "S5"],
     "infrastructure": ["S1", "S2", "S3", "S4", "S5", "S6", "S7", "S9"],
 }
@@ -464,9 +466,10 @@ ENDPOINT_IO = {
     "POST /v1/data/agent/g2": ("PolicyInput", "200 · PolicyDecision", ""),
     "GET /health?bundles": ("—", "200 · {}", "200 — бандл загружен (OPA)"),
     # ICPlan: доработки форка
-    "PATCH /teams/:teamId/ai-agents/:agentId": ("+ {enabled: bool, onDisable: finish · cancel}", "как в форке", "к телу форка добавляем выключение агента (D17); ошибки: 403 — не администратор команды; 404 — агента нет"),
-    "POST /agent-runs/:runId/heartbeat": ("—", "200 · Heartbeat (сейчас 204)", "тело ответа — доработка (D17, R-ICP-16); ошибки: 404 — запуск не найден, завершён или отменён (как в форке)"),
-    "POST /agent-runs/:runId/events": ("{events: RunEvent[]}", "200 · {canceled: bool}", "как `POST /agent-chats/:messageId/events` форка (D21); ошибки: 404 — запуск не найден или не выдан этому ключу"),
+    "PATCH /teams/:teamId/ai-agents/:agentId": ("+ {enabled: bool, onDisable: finish · cancel}", "как в форке", "к телу форка добавляем выключение агента (D17) и проверку модели у агента платформы (`kind = external`, R-REG-06): Platform module внутри api спрашивает LiteLLM `GET /model/info` (master key, I15), алиас `model` должен быть в `model_list`; ошибки: 400 — модель не настроена в LiteLLM `{field: model, reason}` (R-REG-06 «Модель без доступа»); 503 — LiteLLM недоступен, проверить модель нельзя: агент не сохраняется, прочие поля без смены модели сохраняются (R-REG-06 «Шлюз недоступен»); 403 — не администратор команды; 404 — агента нет"),
+    "POST /agent-runs/:runId/heartbeat": ("—", "200 · Heartbeat (сейчас 204)", "тело ответа — доработка (D17, R-ICP-16); ошибки: 404 — запуск не найден, завершён или отменён (как в форке): это единственный сигнал отмены, Runner останавливает Harness и итог не шлёт (R-ICP-07)"),
+    "POST /agent-runs/:runId/events": ("{events: RunEvent[]}", "204", "по образцу `POST /agent-chats/:messageId/events` форка (D21), но без `{canceled}`: отмену Runner узнаёт по 404 на heartbeat; ошибки: 404 — запуск не найден, не выдан этому ключу или уже завершён (отменён)"),
+    "POST /agent-runs/:runId/result": ("RunResult (форк + `reason`, `artifacts`, `gate`, `criteriaNext`, `usage.reasoningTokens`, `usage.costUsd`, `usage.iterations`)", "204 (как в форке)", "ошибки (как в форке): 404 — запуск не найден, выдан другому агенту или уже завершён: `finishRun` обновляет только `pending`, поэтому повторная отправка итога и итог отменённого запуска — 404; Runner считает 404 на повтор доставленным итогом и не повторяет (R-ICP-13); 400 — тело не по схеме"),
     "GET /agent-runs/:runId/stream": ("—", "200 · SSE: `data: AgUiEvent`", "как `…/chat/:messageId/stream` форка (D21)"),
     "GET /issues/:issueId/agent-feed": ("—", "200 · {runs: {run: RunSummary, step, events: RunEvent[], result: RunResult}[]}", "история ленты по шагам процесса (D21)"),
     "POST /issues/:issueId/agent-verdict": ("Verdict", "204", "ошибки: 403 — нет права на задачу; 409 — нет итога, ждущего вердикта (R-AP-19)"),
@@ -475,15 +478,19 @@ ENDPOINT_IO = {
     "POST /issues/:issueId/process/retry": ("{fromStep?: string}", "204", "ошибки: 403 — нет права; 409 — превышен `step.max_runs` или процесс остановлен (R-AP-21)"),
     "GET /issues/:issueId/agent-status": ("—", "200 · {state, queuePosition, waitReason}", "`state`: queued · running · waiting · paused · idle; `waitReason`: slot · approval · answer · runner_offline · agent_disabled (R-AP-07, R-AP-17)"),
     "GET /projects/:projectKey/processes": ("—", "200 · Process[]", ""),
+    "POST /projects/:projectKey/actions": ("как в форке: {name, icon?, condition?, effect?}; `effect` — частичная правка задачи (`columnId`, `assigneeUserId`, `priority`, `typeId`, `startDate`, `dueDate`, `labelIds`) + {delegateUserId: string}",
+                                           "201 · Action (как в форке)",
+                                           "«делегировать агенту» (R-AP-03) — ключ `delegateUserId` = `user.id` бот-пользователя агента; API хранит `effect` как есть (`apps/api/src/modules/actions`), применяет его web одним `PATCH /issues/:issueId` (`apps/web/src/utils/actions.ts`), а делегат по коду форка ставит запуск `delegation`; доработка — ключ в `EFFECT_FIELD_KEYS` и редакторе эффекта, проверка агента при сохранении; ошибки: 400 — `delegateUserId` не агент проекта; 403 — нет права `actions.create`; при применении к выключенному агенту запуск не создаётся, запись в истории задачи (R-AP-03)"),
     "PUT /projects/:projectKey/processes/:issueTypeId": ("Process", "200 · Process (новая версия)", "ошибки: 400 — ошибка структуры `{step, reason}` (R-AP-15); 403 — не администратор проекта"),
-    "POST /agent-runs/:runId/decisions": ("ApprovalDecision", "204", "решение пользователя по `seq` события; доставляется Runner в ответе heartbeat (R-ICP-05, R-ICP-16); ошибки: 403 — нет права на задачу; 409 — запуск завершён или решение уже есть"),
+    "POST /agent-runs/:runId/decisions": ("ApprovalDecision", "204", "решение пользователя по `seq` события; доставляется Runner в ответе heartbeat (R-ICP-05, R-ICP-16); ошибки: 403 — нет права `work_items.edit` в проекте задачи (D26); 409 — запуск завершён или решение уже есть"),
     "POST /agent-runs/:runId/messages": ("UserMessage", "204", "указание пользователя активному запуску; доставка — через heartbeat (R-ICP-16); ошибки: 403; 409 — запуск завершён"),
     "POST /agent-runs/:runId/cancel": ("—", "204", "отмена запуска по задаче; Runner узнаёт по 404 на heartbeat (R-ICP-07); ошибки: 403; 409 — запуск уже завершён; для запусков по расписанию в форке есть `…/agent-schedules/:scheduleId/runs/:runId/cancel`"),
-    "GET /issues/:issueId/costs": ("—", "200 · CostAggregate[] (по агентам задачи)", "журнал затрат LiteLLM по `run_id` (I14, роль `litellm_read`); `costUsd = null`, если цена не задана (R-OBS-05)"),
+    "GET /issues/:issueId/costs": ("—", "200 · CostAggregate[] (по агентам задачи)", "журнал затрат LiteLLM по `run_id` (I14, роль `litellm_read`); `costUsd = null`, если цена не задана; журнал недоступен — тоже 200: `runs` из `agent_run`, токены и `costUsd` = `null`, экран показывает «неизвестно» (R-OBS-05)"),
     "GET /me/agent-summary": ("—", "200 · {working, queued, waitingMe: {issueId, issueIdentifier, agentId, since}[], costUsd}", ""),
     "POST /mcp": ("McpToolCall", "200 · McpToolCall (result)", "MCP-сервер ICPlan, не в OpenAPI"),
     # LiteLLM
     "POST /v1/chat/completions": ("ChatCompletionRequest", "200 · ответ OpenAI Chat Completions (`choices`, `usage`)", "mock — тот же формат"),
+    "GET /model/info": ("—", "200 · {data: {model_name, litellm_params, model_info}[]}", "проверка алиаса модели при сохранении агента (R-REG-06); вызывает Platform module master key (I15)"),
     "POST /key/generate": ("VirtualKey", "200 · {key, key_alias, expires}", "также `/key/update`"),
     "GET /spend/logs": ("query: request_id или start_date / end_date", "200 · LiteLLM_SpendLogs[]", "отбор по `metadata.run_id`"),
     # MCP
@@ -508,9 +515,12 @@ ENDPOINT_IO = {
     "GET /platform/kill-switch": ("—", "200 · {scope, enabled, reason, by, at}[]", "`scope`: `platform` · `agent:<id>` (`kill_switch`)"),
     "PUT /platform/kill-switch/:scope": ("{enabled: bool, reason}", "204", "действует сразу (R-CP-03, R-GRD-15); `agent:<id>` — право `ai_agents`, `platform` — владелец экземпляра; API — и для эксплуатации (D24); ошибки: 403 — нет права на эту область"),
     "GET /platform/sandbox-profiles": ("—", "200 · {id, name, image, runtime, cpu, memoryMb, diskGb, egressAllow, poolSize}[]", "`sandbox_profile`"),
-    "PUT /platform/sandbox-profiles/:name": ("{image, runtime, cpu, memoryMb, diskGb, egressAllow, poolSize}", "204", "владелец экземпляра (D24); удаление запрещено, пока профиль используется; ошибки: 400 — недопустимое значение с указанием поля (R-CP-01); 403 — не владелец экземпляра"),
+    "PUT /platform/sandbox-profiles/:name": ("{image, runtime, cpu, memoryMb, diskGb, egressAllow, poolSize}", "204", "владелец экземпляра (D24); удаление — `DELETE`, запрещено, пока профиль используется; ошибки: 400 — недопустимое значение с указанием поля (R-CP-01); 403 — не владелец экземпляра"),
+    "DELETE /platform/sandbox-profiles/:name": ("—", "204", "ошибки: 403 — не владелец экземпляра; 404 — профиля нет; 409 — профиль используется: в ответе агенты с этим профилем (`agent_settings.sandbox_profile_id`)"),
     "GET /platform/memory-profiles": ("—", "200 · {id, name, read, write, m2LastRuns, retention, scope}[]", "`memory_profile`"),
-    "PUT /platform/memory-profiles/:name": ("{read, write, m2LastRuns, retention, scope}", "204", "владелец экземпляра (D24); удаление запрещено, пока профиль используется; ошибки: 400 — недопустимое значение с указанием поля (R-CP-01); 403 — не владелец экземпляра"),
+    "PUT /platform/memory-profiles/:name": ("{read, write, m2LastRuns, retention, scope}", "204", "владелец экземпляра (D24); удаление — `DELETE`, запрещено, пока профиль используется; ошибки: 400 — недопустимое значение с указанием поля (R-CP-01); 403 — не владелец экземпляра"),
+    "DELETE /platform/memory-profiles/:name": ("—", "204", "ошибки: 403 — не владелец экземпляра; 404 — профиля нет; 409 — профиль используется: в ответе агенты с этим профилем (`agent_settings.memory_profile_id`)"),
+    "GET /platform/projects/:projectKey": ("—", "200 · {guidance, budgetMonthUsd, setupScript, lockFiles}", "`project_platform`; строки нет — пустые значения; ошибки: 403 — нет права `ai_agents` в проекте; 404 — проекта нет"),
     "GET /platform/projects/:projectKey/resources": ("—", "200 · {id, kind, ref, name}[]", "`project_resource`: `kind` — git · folder · document · mcp"),
     "PUT /platform/projects/:projectKey/resources": ("{kind, ref, name}[]", "204", "право `ai_agents` в разделе проекта (D24); ошибки: 403 — нет права (R-CP-07)"),
     "PUT /platform/projects/:projectKey/setup": ("{setupScript: string, lockFiles: string[]}", "204", "шаг подготовки (D19), `project_platform`; ошибки: 403 — нет права `ai_agents` (R-CP-07)"),

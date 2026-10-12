@@ -57,7 +57,7 @@ stack Документы: 9 ok, 0 part, 0 mute
 <div class="adapt" markdown>
 **Адаптируем**
 
-- карточка внешнего агента показывает поля Registry: модель (алиас LiteLLM), навыки, тулы, MCP — сейчас их видно только у внутреннего агента;
+- карточка внешнего агента показывает поля Registry: модель (алиас LiteLLM), навыки, тулы — сейчас их видно только у внутреннего агента; MCP-серверы агента — не поле Registry, а ресурсы проекта Platform module (`project_resource` с `kind = mcp` и `access_policy`, D23);
 - точки расширения для карточки агента и настроек проекта — PR в upstream (D18), после него правок файлов форка нет.
 </div>
 <div class="drop" markdown>
@@ -244,7 +244,8 @@ API описан ([Platform module](../api/platform-module.md)). Экран «Н
 | Решение D24: экраны Platform module по уровням, права `ai_agents` и владелец экземпляра | [design](../../openspec/changes/define-agent-platform/design.md) | ✅ внесено |
 | ОВ-control-plane-1 закрыт ссылкой на D24 | `control-plane/open-questions.md` | ✅ внесено |
 | Экран «Настройки платформы для агента»: место «не решено» → три экрана C с путями кода | `html-view/subcomponents.py`, Control Plane UI `screens` | ✅ внесено |
-| Карточка внешнего агента: поля Registry (модель-алиас, навыки, тулы, MCP) — доработка форка | `subcomponents.py` «Карточка агента»; R-REG-02 | ✅ внесено |
+| Карточка внешнего агента: поля Registry (модель-алиас, навыки, тулы) — доработка форка; MCP — ресурсы проекта Platform module (D23) | `subcomponents.py` «Карточка агента»; R-REG-02 | ✅ внесено |
+| Таблицы экранов из Э7 (`agent_settings_version`, `kill_switch`, `project_platform`, `project_resource`, `access_policy`, `sandbox_profile`, `memory_profile`) — в «Данные» Control Plane UI | `subcomponents.py` Control Plane UI `data` | ✅ внесено |
 | Эндпоинты: профили среды и памяти, kill switch (`agent:<id>`, `platform`), ресурсы проекта и шаг подготовки, история и откат настроек (R-CP-04) | [API Platform module](../api/platform-module.md), `datamodel.ENDPOINT_IO` | ✅ внесено |
 | `GET /platform/audit`: право чтения для Безопасности (US-PM-07) | [API Platform module](../api/platform-module.md) | ✅ внесено |
 | Где в интерфейсе: US-PM-01, US-PM-06, US-PM-07, US-GRD-04 — по D24 | [истории Platform module](../stories/platform-module.md), [истории guardrails](../stories/guardrails.md) | ✅ внесено |
