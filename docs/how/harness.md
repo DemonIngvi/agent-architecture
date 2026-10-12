@@ -1,51 +1,99 @@
 Порядок работы компонента: что за чем происходит внутри и с соседями (источник — `docs/how/harness.md`, на сайте — вкладка «Архитектура» компонента). Поля данных — в контрактах на вкладке «Интеграции» компонента, таблицы — на вкладке «Данные», стороны и протоколы — в карточках «Интеграций», сквозной сценарий — в [архитектуре](../../architecture.md#interaction).
 
+### Порядок работы и сценарии
+
+#### Порядок работы
+
+| # | Поток | Участники | Данные | I | Сценарий |
+|---|---|---|---|---|---|
+| 1 | Задание | Agent Runner → Harness | `RunBundle` | I7 | С1 |
+| 2 | Сборка контекста: инструкция, навыки, M3, M2 | Harness → Memory | `M3Record`, итоги запусков | I11 | С1 |
+| 3 | Вызов модели | Harness → LLM Gateway | `ChatCompletionRequest` | I8 | С1 |
+| 4 | Проверка действия (G2) | Harness → Guardrails | `PolicyInput` → `PolicyDecision` | I10 | С1 |
+| 5 | Вызов тула | Harness → MCP-прокси Agent Runner → MCP-сервер | `McpToolCall` | I9 | С1 |
+| 6 | Пауза на подтверждение | Harness → Agent Runner → ICPlan | `RunEvent` (`CUSTOM` `approval_request`) | I7, I2 | С1 |
+| 7 | Сохранение шага | Harness → Agent Runner (checkpointer) | `Checkpoint` | I12 | С1 |
+| 8 | Шаги работы | Harness → Agent Runner | `RunEvent` | I7 | С1 |
+| 9 | Итог | Harness → Agent Runner | `RunResult` | I7 | С1 |
+
+#### С1. Шаг цикла с вызовом тула
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant R as Agent Runner
+  participant H as Harness
+  participant M as Memory
+  participant L as LLM Gateway
+  participant G as Guardrails (OPA)
+  R->>H: RunBundle (I7)
+  H->>M: контекст задачи (I11)
+  M-->>H: M3Record, итоги запусков ↩
+  loop пока модель просит тулы
+    H->>L: ChatCompletionRequest (I8)
+    L-->>H: ответ модели, tool_calls ↩
+    H->>G: PolicyInput G2 (I10)
+    G-->>H: PolicyDecision ↩
+    alt allow
+      H->>R: tools/call через MCP-прокси (I9)
+      R-->>H: результат тула ↩
+    else confirm
+      H-->>R: RunEvent approval_request (I7)
+      R-->>H: ApprovalDecision ↩ (I7)
+    else deny
+      H->>H: отказ в контекст
+    end
+    H->>R: Checkpoint (I12)
+    H-->>R: RunEvent (I7)
+  end
+  H-->>R: RunResult (I7)
+```
+
 ### Цикл
 
 
+```mermaid
+flowchart TD
+  A[RunBundle] --> B[Bootstrap] --> C[Context Manager] --> D[LLM client]
+  D --> E{tool_calls?}
+  E -- нет --> F[RunResult]
+  E -- да --> G{hook before_tool G2}
+  G -- allow --> T[Tool Executor MCP]
+  G -- confirm --> P[пауза interrupt] --> Q[ApprovalDecision] --> T
+  G -- deny --> X[отказ в контекст] --> C
+  T -- результат --> C
 ```
-RunBundle ─▶ Bootstrap ─▶ Context Manager ─▶ LLM client ──▶ ответ модели
-                               ▲                              │
-                               │                    tool_calls?│ нет ─▶ RunResult
-                               │                              ▼ да
-                               │                   hook before_tool (G2)
-                               │                     │allow   │confirm ─▶ пауза (interrupt) ─▶ ApprovalDecision
-                               │                     ▼        │deny ──▶ отказ в контекст
-                               └──── результат ◀── Tool Executor (MCP)
-```
-
-### Порядок работы
-
-
-| # | Поток | От → к | Данные |
-|---|---|---|---|
-| 1 | Задание | Runner → Harness | `RunBundle` |
-| 2 | Сборка контекста: инструкция, навыки, M3, M2 | Harness → Memory | `M3Record`, итоги запусков |
-| 3 | Вызов модели | Harness → LiteLLM | `chat.completions` |
-| 4 | Проверка действия (G2) | Harness → OPA | `PolicyInput` G2 |
-| 5 | Вызов тула | Harness → MCP | `tools/call` |
-| 6 | Пауза на подтверждение | Harness → Runner → ICPlan | `RunEvent` (`CUSTOM` `approval_request`) |
-| 7 | Сохранение шага | Harness → checkpointer | состояние графа |
-| 8 | Шаги работы | Harness → Runner | `RunEvent` |
-| 9 | Итог | Harness → Runner | `RunResult` |
 
 ### Сборка запроса к модели {#llm-request}
 
 
 Что уходит в модель на каждом шаге, откуда это берётся и кто это меняет. Требование — R-HRN «Сборка запроса к модели»; параметры — [таблица параметров Harness](../../openspec/changes/define-agent-platform/specs/agent-harness/interfaces.md).
 
-```
- ┌──────────────────────── messages ─────────────────────────┐   ┌──── параметры ────┐   ┌──── служебное ────┐
- │ 1 системный промпт платформы  (образ Harness, L0)          │   │ model (алиас)     │   │ metadata: run_id, │
- │ 2 руководство проекта         (Platform module, L1)        │   │ temperature       │   │  issue, agent,    │
- │ 3 инструкция + навыки агента  (Registry ICPlan, L2, M5)    │   │ top_p             │   │  project          │
- │ 4 тулы и рабочее пространство (RunBundle, L2 + политика)   │   │ max_output_tokens │   │ virtual key       │
- │ 5 контекст памяти M1, M2, M3  (Memory API)                 │   │ reasoning_*       │   │ stream, timeout   │
- │ 6 задание запуска              (задача ICPlan, L3)          │   │ tool_choice       │   │ cache префикса    │
- │ 7 указания пользователя        (чат / комментарий, L3)      │   │ response_format   │   └───────────────────┘
- │ 8 рабочий контекст M0          (шаги цикла, вывод тулов)    │   └───────────────────┘
- └────────────────────────────────────────────────────────────┘
-        Harness ──I8──▶ LiteLLM (бюджет, лимиты, G4, учёт) ──I13──▶ провайдер / mock
+```mermaid
+flowchart LR
+  classDef box fill:#f5f5f5,stroke:#9e9e9e,color:#212121
+  subgraph MS["messages"]
+    direction TB
+    m1["1 системный промпт платформы — образ Harness, L0"]:::box
+    m2["2 руководство проекта — Platform module, L1"]:::box
+    m3["3 инструкция + навыки агента — Registry ICPlan, L2, M5"]:::box
+    m4["4 тулы и рабочее пространство — RunBundle, L2 + политика"]:::box
+    m5["5 контекст памяти M1, M2, M3 — Memory API"]:::box
+    m6["6 задание запуска — задача ICPlan, L3"]:::box
+    m7["7 указания пользователя — чат / комментарий, L3"]:::box
+    m8["8 рабочий контекст M0 — шаги цикла, вывод тулов"]:::box
+    m1 ~~~ m2 ~~~ m3 ~~~ m4 ~~~ m5 ~~~ m6 ~~~ m7 ~~~ m8
+  end
+  subgraph PR["параметры"]
+    p1["model (алиас) · temperature · top_p<br/>max_output_tokens · reasoning_*<br/>tool_choice · response_format"]:::box
+  end
+  subgraph SV["служебное"]
+    s1["metadata: run_id, issue, agent, project<br/>virtual key · stream, timeout<br/>cache префикса"]:::box
+  end
+  H[Harness] -->|I8| L["LiteLLM: бюджет, лимиты, G4, учёт"] -->|I13| P["провайдер / mock"]
+  MS --> H
+  PR --> H
+  SV --> H
 ```
 
 ### Слои промпта

@@ -722,6 +722,22 @@ def flows_check() -> list:
         how = f.read_text(encoding="utf-8")
         if re.search(r"^```(yaml|rego)", how, re.M):
             issues.append(f"docs/how/{f.name}: конфиг — место в Deploy («Пример конфигурации»)")
+        # «Порядок работы и сценарии» (architecture-methodology#how): таблица-каталог + sequence-сценарии
+        if "### Порядок работы и сценарии" not in how:
+            issues.append(f"docs/how/{f.name}: нет подраздела «Порядок работы и сценарии»")
+        if not re.search(r"```mermaid\s*\nsequenceDiagram", how):
+            issues.append(f"docs/how/{f.name}: нет ни одного сценария (sequenceDiagram)")
+        scen = set(re.findall(r"^#### (С\d+)\.", how, re.M))
+        seg = how.split("#### Порядок работы", 1)[1].split("\n#### ", 1)[0] if "#### Порядок работы" in how else ""
+        rows = [l for l in seg.splitlines() if l.startswith("| ") and not l.startswith("| #")]
+        head = next((l for l in seg.splitlines() if l.startswith("| #")), "")
+        if seg and ("| I |" not in head or "| Сценарий |" not in head):
+            issues.append(f"docs/how/{f.name}: в таблице порядка работы нет колонок «I» и «Сценарий»")
+        for l in rows:
+            if re.search(r"\b(GET|POST|PATCH|PUT|DELETE) /", l):
+                issues.append(f"docs/how/{f.name}: эндпоинт в таблице порядка работы — место в сценарии: {l[:60]}")
+            issues += [f"docs/how/{f.name}: I-код {i} нет в INTEG" for i in re.findall(r"\bI\d+\b", l) if i not in DM.INTEG]
+            issues += [f"docs/how/{f.name}: сценария {s} нет" for s in re.findall(r"\bС\d+\b", l) if s not in scen]
         for m in re.findall(r"\]\(([^)]*data-model\.md(?:#[\w-]+)?)\)", how):
             if "#model-" not in m:  # ссылка на модель relink переводит на контракт; на страницу целиком — некуда (страницы нет)
                 issues.append(f"docs/how/{f.name}: ссылка на удалённую «Модель данных» ({m}) — поля: «Интеграции» (контракты), таблицы: «Данные»")

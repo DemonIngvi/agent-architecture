@@ -962,8 +962,9 @@ def _spec_readiness(spec: str) -> dict:
     fail += 2 if any(r.startswith("Нагрузка и производительность") for r in reqs) and any(r.startswith("Развёртывание") for r in reqs) else 0
     slug = next((c[0] for c in COMPONENTS for _, pth in c[6] if pth == spec), None)
     conn = 5 if (folder / "architecture.md").exists() else 0
-    conn += 5 if f"specs/{cap}/spec.md" in (ROOT / "architecture.md").read_text(encoding="utf-8") else 0
-    conn += 5 if slug and "## Как работает" in ((SRC / f"docs/techspec/{slug}.md").read_text(encoding="utf-8") if (SRC / f"docs/techspec/{slug}.md").exists() else "") else 0
+    conn += 5 if slug else 0  # спека привязана к компоненту (components.py) — spec-criteria.md, «Связность»
+    how = ROOT / f"docs/how/{slug}.md" if slug else None
+    conn += 5 if how and how.exists() and "### Порядок работы и сценарии" in how.read_text(encoding="utf-8") else 0
     for h in ("## Нагрузка и развёртывание",):
         fail += 2 if h in it else 0
     fail = min(fail, 15)
