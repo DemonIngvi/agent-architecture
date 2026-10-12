@@ -464,9 +464,9 @@
 | `docs/tasks/4.5-litellm-budgets-fallback-g4.md` | В | — | — | — | ⏳ | 2046d6ed | Задача |
 | `docs/tasks/4.5-litellm-budgets-fallback-g4.md` | Р | — | — | — | ⏳ | 2046d6ed | Задача |
 | `docs/tasks/4.5-litellm-budgets-fallback-g4.md` | Т | — | — | — | ⏳ | 2046d6ed | Задача |
-| `docs/tasks/4.6-k8s-helm-ingress.md` | В | — | — | — | ⏳ | 9b4e819b | Задача |
-| `docs/tasks/4.6-k8s-helm-ingress.md` | Р | — | — | — | ⏳ | 9b4e819b | Задача |
-| `docs/tasks/4.6-k8s-helm-ingress.md` | Т | — | — | — | ⏳ | 9b4e819b | Задача |
+| `docs/tasks/4.6-k8s-helm-ingress.md` | В | — | — | — | ⏳ | 2b9fbe87 | Задача |
+| `docs/tasks/4.6-k8s-helm-ingress.md` | Р | — | — | — | ⏳ | 2b9fbe87 | Задача |
+| `docs/tasks/4.6-k8s-helm-ingress.md` | Т | — | — | — | ⏳ | 2b9fbe87 | Задача |
 | `docs/tasks/4.7-postgres-storage-backup.md` | В | — | — | — | ⏳ | 0295ef6c | Задача |
 | `docs/tasks/4.7-postgres-storage-backup.md` | Р | — | — | — | ⏳ | 0295ef6c | Задача |
 | `docs/tasks/4.7-postgres-storage-backup.md` | Т | — | — | — | ⏳ | 0295ef6c | Задача |
@@ -482,9 +482,9 @@
 | `docs/techspec/harness.md` | Д | — | — | — | ⏳ | 15e8087d | Deploy |
 | `docs/techspec/harness.md` | Б | — | — | — | ⏳ | 15e8087d | Deploy |
 | `docs/techspec/harness.md` | С | — | — | — | ⏳ | 15e8087d | Deploy |
-| `docs/techspec/icplan.md` | Д | — | — | — | ⏳ | 546bb2b6 | текст изменён после решения «❌» от Claude, роль DevOps-инженер |
-| `docs/techspec/icplan.md` | Б | — | — | — | ⏳ | 546bb2b6 | текст изменён после решения «❌» от Claude, роль Безопасность |
-| `docs/techspec/icplan.md` | С | — | — | — | ⏳ | 546bb2b6 | текст изменён после решения «❌» от Claude, роль Инженер сборки и поставки |
+| `docs/techspec/icplan.md` | Д | — | — | — | ⏳ | f2c8bbd3 | текст изменён после решения «❌» от Claude, роль DevOps-инженер |
+| `docs/techspec/icplan.md` | Б | — | — | — | ⏳ | f2c8bbd3 | текст изменён после решения «❌» от Claude, роль Безопасность |
+| `docs/techspec/icplan.md` | С | — | — | — | ⏳ | f2c8bbd3 | текст изменён после решения «❌» от Claude, роль Инженер сборки и поставки |
 | `docs/techspec/infrastructure.md` | Д | — | — | — | ⏳ | d054872d | Deploy |
 | `docs/techspec/infrastructure.md` | Б | — | — | — | ⏳ | d054872d | Deploy |
 | `docs/techspec/infrastructure.md` | С | — | — | — | ⏳ | d054872d | Deploy |
