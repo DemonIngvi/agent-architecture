@@ -9,7 +9,8 @@
     python html-view/doctool.py review-queue [буква]  что ждёт решения роли
     python html-view/doctool.py generated <файл>  если файл генерируется — откуда и чем; иначе пусто
     python html-view/doctool.py check             все проверки сборки без сборки сайта (секунды)
-    python html-view/doctool.py rnd <slug> <тема> заготовка R&D v3.1, проходящая проверку структуры
+    python html-view/doctool.py rnd <slug|путь.md> <тема>  заготовка R&D v3.2 (docs/rnd/<slug>.md или указанный путь)
+    python html-view/doctool.py rnd-check <файл.md>...  структура R&D v3.2: Э1–Э10, «Вывод этапа», ворота G1–G10, источники
     python html-view/doctool.py pre <файл>         до правки: код 2 и источник, если файл генерируется (любой агент)
     python html-view/doctool.py post <файл>        после правки: выжимка правил и замечания проверок (любой агент)
     python html-view/doctool.py staged             проверки для git pre-commit (код 1 при замечаниях)
@@ -217,7 +218,7 @@ def check() -> list:
 
 RND = """# R&D: {title}
 
-← [Все R&D](README.md) · [методология R&D v3.1](../rules/rnd-methodology.md)
+← [Все R&D](README.md) · [методология R&D v3.2](../rules/rnd-methodology.md)
 
 <div class="rnd-hero" markdown>
 <div class="rnd-q">Вопрос</div>
@@ -266,25 +267,72 @@ stack A. …: 0 ok, 0 part, 0 no
 </div>
 
 {stages}
+<details markdown>
+<summary>Приложение: карточки кандидатов</summary>
+
+Только то, чего нет в Э4 (функции не повторять): лицензия, размещение, издания и цена, здоровье проекта, клетки 📌 «не проверено».
+
+| Кандидат | Лицензия | Размещение | Издания и цена | Здоровье | 📌 не проверено |
+|---|---|---|---|---|---|
+| … | … | … | … | … | … |
+
+</details>
+
 ## Источники
 
-- …
+<!-- одна строка: [название](ссылка) — ГГГГ-ММ-ДД, уровень А–Г, что взято (3–5 слов) -->
+- [Ссылка](https://…) — ГГГГ-ММ-ДД, Б, …
 """
 
 
 def rnd(slug: str, title: str) -> Path:
+    """Заготовка R&D v3.2 (rnd-methodology.md): Э1–Э10 с «Выводом этапа» и воротами, приложение, источники.
+    slug — имя в docs/rnd/ или путь к .md (другой проект)."""
     names = ["Вопрос", "Потребности", "Опорное решение: как сейчас", "Аналоги и их ключевые функции", "Ценность функций",
              "Перенос и критерии", "Отсев и встраивание", "Спор ролей", "Выбор", "Последствия"]
     st = ""
     for n, name in enumerate(names, 1):
         body = "- **Утверждение.** …\n- **Когда неверно.** …\n" if n == 9 else \
-            "| Изменение | Документ | Статус |\n|---|---|---|\n| … | … | 📌 предложено |\n" if n == 10 else "…\n"
-        st += f"## Э{n}. {name} {{#e{n}}}\n\n{body}\n<span class=\"gate\">G{n}</span> ✅ …\n\n"
-    p = ROOT / f"docs/rnd/{slug}.md"
+            "| Изменение | Документ | Статус |\n|---|---|---|\n| … | … | 📌 предложено: следующий шаг … |\n" if n == 10 else "…\n"
+        st += f"## Э{n}. {name} {{#e{n}}}\n\n{body}\n**Вывод этапа.** …\n\n<span class=\"gate\">G{n}</span> ✅ …\n\n"
+    p = Path(slug) if slug.endswith(".md") else ROOT / f"docs/rnd/{slug}.md"
     if p.exists():
         raise SystemExit(f"{p} уже есть")
+    p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(RND.format(title=title, stages=st), encoding="utf-8")
     return p
+
+
+def rnd_check(path) -> list:
+    """Структура R&D v3.2 (rnd-methodology.md#gates, #gate-status, #layout): у каждого этапа Э1–Э10 — раздел,
+    «Вывод этапа» и ворота ✅ или ⚠️ (у ⚠️ — 📌 и следующий шаг); раздел «Источники»: ссылка, дата, уровень."""
+    t = Path(path).read_text(encoding="utf-8")
+    issues = []
+    for n in range(1, 11):
+        m = re.search(rf"^## Э{n}\.(.*?)(?=^## |\Z)", t, flags=re.M | re.S)
+        if not m:
+            issues.append(f"нет раздела «## Э{n}.»")
+            continue
+        sec = m.group(0)
+        if "**Вывод этапа.**" not in sec:
+            issues.append(f"Э{n}: нет строки «**Вывод этапа.**»")
+        g = re.search(rf'gate">G{n}</span>\s*(✅|⚠️)([^\n]*)', sec) or re.search(rf"\bG{n}\s*(✅|⚠️)([^\n]*)", sec)
+        if not g:
+            issues.append(f"Э{n}: нет ворот G{n} со статусом ✅ или ⚠️")
+        elif g.group(1) == "⚠️" and "📌" not in g.group(2):
+            issues.append(f"Э{n}: G{n} ⚠️ без 📌 владельцу и следующего шага (#gate-status)")
+    src = re.search(r"^## Источники\s*\n(.*?)(?=^## |\Z)", t, flags=re.M | re.S)
+    if not src:
+        issues.append("нет раздела «## Источники»")
+    else:
+        items = [l for l in src.group(1).splitlines() if l.startswith(("- ", "* ")) or re.match(r"^\d+\. ", l)]
+        common = any(re.search(r"\d{4}-\d{2}-\d{2}", l) for l in src.group(1).splitlines() if l not in items and not l.startswith("<!--"))
+        for line in items:  # дата — у строки или одна на раздел («обращение 2026-10-13»)
+            miss = [k for k, rx in (("ссылка", r"\]\(|https?://"), ("дата", r"\d{4}-\d{2}(-\d{2})?" if not common else ""),
+                                    ("уровень", r"(^|[\s(,;])[АБВГ]([\s),;.]|$)")) if not re.search(rx, line)]
+            if miss:
+                issues.append(f"источник без: {', '.join(miss)} — {line[:60]}")
+    return issues
 
 
 def diagram(path) -> Path:
@@ -431,6 +479,13 @@ def main():
         sys.exit(1 if issues else 0)
     elif cmd == "rnd":
         print(rnd(args[0], " ".join(args[1:]) or args[0]))
+    elif cmd == "rnd-check":  # структура одного или нескольких R&D (в том числе в другом проекте)
+        bad = 0
+        for f in args:
+            iss = rnd_check(f)
+            bad += len(iss)
+            print(f"{f}: " + ("структура v3.2 в порядке" if not iss else f"{len(iss)}" + "".join(f"\n  - {i}" for i in iss)))
+        sys.exit(1 if bad else 0)
     elif cmd == "pre":
         g = generated(args[0])
         if g:

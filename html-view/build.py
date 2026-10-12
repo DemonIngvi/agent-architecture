@@ -419,7 +419,8 @@ def check_docs() -> list:
             t = f.read_text(encoding="utf-8")
             miss = [k for k in ('class="rnd-hero"', 'class="rnd-grid"', "```deck", "## Э10.", "**Утверждение", "Когда неверно" if "Когда неверно" in t else "Опровержение", "## Источники")
                     if k not in t]
-            miss += [f"Э{n} / G{n}" for n in range(1, 11) if f"## Э{n}." not in t or f'gate">G{n}</span> ✅' not in t]
+            # ворота: ✅ или ⚠️ «пройдено условно» с 📌 (rnd-methodology.md#gate-status); полная проверка — doctool rnd-check
+            miss += [f"Э{n} / G{n}" for n in range(1, 11) if f"## Э{n}." not in t or not re.search(rf'gate">G{n}</span> (✅|⚠️[^\n]*📌)', t)]
             if miss:
                 issues.append(f"R&D {f.name} (v3): нет {', '.join(miss)}")
     for c in COMPONENTS:  # О-17: техспека у каждого компонента

@@ -336,12 +336,12 @@
 | `docs/rules/decision-methodology.md` | А | — | — | — | ⏳ | 0af1d5d9 | Методология |
 | `docs/rules/review-methodology.md` | В | — | — | — | ⏳ | 00fb603f | Методология |
 | `docs/rules/review-methodology.md` | А | — | — | — | ⏳ | 00fb603f | Методология |
-| `docs/rules/rnd-methodology.md` | В | — | — | — | ⏳ | 6d287943 | Методология |
-| `docs/rules/rnd-methodology.md` | А | — | — | — | ⏳ | 6d287943 | Методология |
+| `docs/rules/rnd-methodology.md` | В | — | — | — | ⏳ | d2ff1c00 | Методология |
+| `docs/rules/rnd-methodology.md` | А | — | — | — | ⏳ | d2ff1c00 | Методология |
 | `docs/rules/sdd-methodology.md` | В | — | — | — | ⏳ | 56577938 | Методология |
 | `docs/rules/sdd-methodology.md` | А | — | — | — | ⏳ | 56577938 | Методология |
-| `docs/rules/structure-methodology.md` | В | — | — | — | ⏳ | b4a48168 | Методология |
-| `docs/rules/structure-methodology.md` | А | — | — | — | ⏳ | b4a48168 | Методология |
+| `docs/rules/structure-methodology.md` | В | — | — | — | ⏳ | 67cb2cfa | Методология |
+| `docs/rules/structure-methodology.md` | А | — | — | — | ⏳ | 67cb2cfa | Методология |
 | `docs/rules/support-docs-methodology.md` | В | — | — | — | ⏳ | ebbf9293 | Методология |
 | `docs/rules/support-docs-methodology.md` | А | — | — | — | ⏳ | ebbf9293 | Методология |
 | `docs/rules/task-methodology.md` | В | — | — | — | ⏳ | 9da93e83 | Методология |

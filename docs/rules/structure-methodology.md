@@ -55,7 +55,7 @@ flowchart TD
 
 | Страница | Формируется из | Методология |
 |---|---|---|
-| Все R&D | `docs/rnd/README.md` — реестр, ведётся руками при новом R&D | [R&D](rnd-methodology.md) |
+| Все R&D | `docs/rnd/README.md` — реестр, ведётся руками при новом R&D; в новом проекте реестр R&D — в README корня | [R&D](rnd-methodology.md#greenfield) |
 | R&D по компонентам | `rationale.REFS` | [R&D](rnd-methodology.md) |
 | Последствия R&D | раздел Э10 каждого R&D (генерируется) | [R&D](rnd-methodology.md#consequences) |
 | Решения (OpenSpec) | `openspec/changes/*/design.md`, `proposal.md` | [решения](decision-methodology.md) |
