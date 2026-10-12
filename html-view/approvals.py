@@ -83,7 +83,10 @@ def sync(src: Path) -> dict:
         r = rule_of(page)
         if not r:
             continue
-        ver = version(f.read_text(encoding="utf-8"))
+        text = f.read_text(encoding="utf-8")
+        if "у владельца: блок [" in text:  # страница-ссылка хоста на встроенный блок: описания нет, подтверждать нечего
+            continue
+        ver = version(text)
         for letter in r[1]:
             key = (page, letter)
             seen.add(key)

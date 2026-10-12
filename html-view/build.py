@@ -562,9 +562,19 @@ def copy_sources():
         nt = SM.relink(t, r)
         if nt != t:
             p.write_text(nt, encoding="utf-8")
+    for c in COMPONENTS:
+        fp = SRC / f"docs/reviews/findings/{c[0]}.md"
+        if not fp.exists():
+            fp.parent.mkdir(parents=True, exist_ok=True)
+            nl = chr(10)
+            fp.write_text(f"# Замечания: {c[1]}{nl}{nl}← [компонент](../../../components/{c[0]}/index.md) · "
+                          f"[правило](../../rules/review-methodology.md#findings){nl}{nl}Проверка документов компонента ролями ещё не проводилась.{nl}",
+                          encoding="utf-8")
     global APPROVAL_STATUS  # подтверждения документов ролями (approval-methodology.md)
     APPROVAL_STATUS = APPR.sync(SRC)
-    (SRC / "docs/approvals-summary.md").write_text(APPR.summary_md(APPROVAL_STATUS), encoding="utf-8")
+    nl = chr(10)
+    findings = nl.join(f"- [{c[1]}](reviews/findings/{c[0]}.md)" for c in COMPONENTS)  # вкладка «Замечания» компонентов
+    (SRC / "docs/approvals-summary.md").write_text(APPR.summary_md(APPROVAL_STATUS) + f"{nl}## Замечания по компонентам{nl}{nl}{findings}{nl}", encoding="utf-8")
     (SRC / "docs/approvals.md").write_text(APPR.REGISTRY.read_text(encoding="utf-8"), encoding="utf-8")
     write_pagebar_map()
     check_links()
@@ -650,6 +660,7 @@ def write_pagebar_map():
         pages[f"docs/api/{slug}.md"] = slug
         pages[f"data-by-component/{slug}/index.md"] = slug
         pages[f"docs/techspec/{slug}.md"] = slug
+        pages[f"docs/reviews/findings/{slug}.md"] = slug
     for slug, name, st, g, desc, links, docs, tids in COMPONENTS:
         for _, p in docs:
             for fp in spec_family(p):
