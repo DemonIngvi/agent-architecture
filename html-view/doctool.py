@@ -3,6 +3,7 @@
     python html-view/doctool.py route <файл>      тип документа, выжимка правил, методология (из doc-types.md, doc-work.md)
     python html-view/doctool.py next <файл>       следующие документы по графу связности и их методологии
     python html-view/doctool.py diagram <файл>    mermaid-схемы файла → HTML-страница (посмотреть отрисованной)
+    python html-view/doctool.py move <старый> <новый>  переименовать документ и сразу обновить все ссылки на него
     python html-view/doctool.py generated <файл>  если файл генерируется — откуда и чем; иначе пусто
     python html-view/doctool.py check             все проверки сборки без сборки сайта (секунды)
     python html-view/doctool.py rnd <slug> <тема> заготовка R&D v3.1, проходящая проверку структуры
@@ -296,6 +297,42 @@ def diagram(path) -> Path:
     return out
 
 
+def move(old, new) -> list:
+    """Переименование или перенос документа одним шагом (change-process.md#links): файл + все ссылки и упоминания пути."""
+    import os
+    import subprocess
+    o, n = (ROOT / old).resolve(), (ROOT / new).resolve()
+    if not o.exists():
+        raise SystemExit(f"{old}: нет такого файла")
+    n.parent.mkdir(parents=True, exist_ok=True)
+    if subprocess.run(["git", "mv", str(o), str(n)], cwd=ROOT, capture_output=True).returncode:
+        o.rename(n)
+    ro, rn = o.relative_to(ROOT).as_posix(), n.relative_to(ROOT).as_posix()
+    changed = []
+    for f in [*ROOT.rglob("*.md"), *ROOT.glob("html-view/*.py"), *ROOT.glob(".claude/skills/*/SKILL.md")]:
+        if any(p in f.parts for p in (".build", "site", ".venv", "node_modules", ".git")):
+            continue
+        t0 = t = f.read_text(encoding="utf-8")
+
+        def fix(m):  # относительная ссылка, указывающая на старый путь
+            u, anchor = (m.group(2).split("#", 1) + [""])[:2]
+            if not u or re.match(r"^(https?:|mailto:)", u):
+                return m.group(0)
+            base = (n.parent if f.resolve() == n else f.parent)
+            src_dir = (o.parent if f.resolve() == n else f.parent)
+            if (src_dir / u).resolve() != o:
+                return m.group(0)
+            r = os.path.relpath(n, base).replace("\\", "/")
+            return f"{m.group(1)}({r}{'#' + anchor if anchor else ''})"
+        if f.suffix == ".md":
+            t = re.sub(r"(\]|\]\s?)\(([^)\s]+)\)", fix, t)
+        t = t.replace(f"`{ro}`", f"`{rn}`").replace(f'"{ro}"', f'"{rn}"')
+        if t != t0:
+            f.write_text(t, encoding="utf-8", newline=chr(10))  # LF, как в репозитории
+            changed.append(f.relative_to(ROOT).as_posix())
+    return changed
+
+
 def _hook_input():
     try:
         d = json.loads(sys.stdin.buffer.read().decode("utf-8"))
@@ -310,6 +347,10 @@ def main():
     cmd, args = (sys.argv[1] if len(sys.argv) > 1 else ""), sys.argv[2:]
     if cmd == "route":
         print(route(args[0]) or "нет правил для этого пути")
+    elif cmd == "move":
+        ch = move(args[0], args[1])
+        print(f"перенесено: {args[0]} → {args[1]}; ссылки обновлены в {len(ch)} файлах" + ("".join(f"\n- {c}" for c in ch)))
+        print("Проверь: python html-view/build.py (битые ссылки и «сироты»)")
     elif cmd == "diagram":
         print(diagram(args[0]).as_uri())
     elif cmd == "next":

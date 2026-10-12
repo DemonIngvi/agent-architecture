@@ -575,6 +575,20 @@ def check_links() -> list:
             tgt = f.parent / u
             if not tgt.exists():
                 bad.append(f"{f.relative_to(SRC).as_posix()} → {m.group(1)}")
+    # новый документ без входящей ссылки и вне навигации — «сирота» (change-process.md#links)
+    nav = set(re.findall(r":\s*([^\s'\"]+\.md)", nav_yaml()))
+    linked = set()
+    for f in SRC.rglob("*.md"):
+        t = re.sub(r"```.*?```|`[^`\n]*`", "", f.read_text(encoding="utf-8"), flags=re.S)
+        for m in re.finditer(r"\]\(([^)\s]+)\)|href=\"([^\"#]+)", t):
+            u = (m.group(1) or m.group(2) or "").split("#")[0]
+            if u and not re.match(r"^(https?:|mailto:)", u):
+                tgt = (f.parent / u).resolve()
+                tgt = tgt / "index.md" if tgt.is_dir() else tgt
+                if tgt != f.resolve():
+                    linked.add(tgt)
+    orph = [f.relative_to(SRC).as_posix() for f in SRC.rglob("*.md") if f.relative_to(SRC).as_posix() not in nav and f.resolve() not in linked]
+    bad += [f"{o} → нет ни входящей ссылки, ни места в навигации" for o in orph]
     for b in bad:
         print("⚠️ ссылка:", b)
     print(f"ссылки: битых {len(bad)}")
