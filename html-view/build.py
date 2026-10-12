@@ -386,6 +386,7 @@ def check_docs() -> list:
     import tasksmd  # О-39: tasks.md изменений = ROADMAP
     issues += tasksmd.check()
     issues += IG.check(COMPONENTS)  # О-41: интеграции и модели
+    issues += config_check()  # tech-spec.md: имя параметра — как в конфиге
     rd = (ROOT / "docs/rnd/README.md").read_text(encoding="utf-8")  # О-34: структура R&D v3
     for f in sorted((ROOT / "docs/rnd").glob("*.md")):
         if f.name == "README.md":
@@ -535,6 +536,8 @@ def copy_sources():
         if rel.as_posix().startswith("docs/techspec/"):
             base = "../" * (len(rel.parts) - 1)
             txt = IG.flow_page(txt, rel.stem, IG.names(COMPONENTS), base)  # О-46, О-52: модели — ссылками, матрица интерфейсов — из datamodel
+            if rel.stem in BY_SLUG and "## Сборка и поставка" in txt:  # «Конфигурация» — из interfaces.md (tech-spec.md)
+                txt = txt.replace("## Сборка и поставка", "\n".join(config_md(rel.stem, rel.as_posix())) + "\n## Сборка и поставка", 1)
         if rel.as_posix().startswith("docs/api/") and rel.name != "README.md":
             head, _, rest = txt.partition("\n## ")
             head = re.sub(r"^# API: ", "# Интеграции: ", head)
@@ -754,10 +757,7 @@ def rationale_md(slug: str) -> list:
     L += ["", "**Что даёт**", ""] + [f"- {x}" for x in r["gain"]]
     L += ["", "**Отвергнутые альтернативы**", "", "| Вариант | Почему нет |", "|---|---|"]
     L += [f"| {cell(a)} | {cell(b)} |" for a, b in r["alts"]]
-    L += ["", "## Конфигурация", "",
-          "Что можно настроить и как это влияет на результат работы агента.", "",
-          "| Параметр | Что задаёт | Как влияет на результат | По умолчанию | Где задаётся |", "|---|---|---|---|---|"]
-    L += [f"| `{cell(n)}` | {cell(w)} | {cell(e)} | {cell(spec_value(n, slug, d))} | {cell(where)} |" for n, w, e, d, where in r["config"]]
+    L += ["", f"Настраиваемые параметры — на вкладке [Deploy]({rel(d, f'docs/techspec/{slug}.md')}#config)."]
     return L + [""]
 
 
@@ -775,6 +775,65 @@ def spec_params() -> dict:
                     if len(c) > 3:
                         _SPEC_PARAMS.setdefault(m.group(1), []).append((f.parent.name, c[3]))
     return _SPEC_PARAMS
+
+
+STORE_WHERE = {"S9": "конфиг деплоя (values, переменные)", "S2": "Platform module (схема `platform`)", "S1": "настройки в ICPlan (БД `itsaplan`)", "S8": "git", "S6": "LiteLLM (БД `litellm`)"}
+
+
+def component_params(slug: str) -> list:
+    """[(спека, {колонка: значение})] — таблицы «Параметры модуля» interfaces.md спек компонента (tech-spec.md, «Конфигурация»)."""
+    out, seen = [], set()
+    for _, p in BY_SLUG[slug][6]:
+        if not p.endswith("/spec.md"):
+            continue
+        f = ROOT / p.replace("/spec.md", "/interfaces.md")
+        if not f.exists():
+            continue
+        lines = f.read_text(encoding="utf-8").splitlines()
+        for i, l in enumerate(lines):
+            if not l.startswith("| Параметр | Что задаёт |"):
+                continue
+            cols = [c.strip() for c in l.strip("|").split("|")]
+            for row in lines[i + 2:]:
+                if not row.startswith("|"):
+                    break
+                cells = [c.strip() for c in re.split(r"(?<!\\)\|", row.strip())[1:-1]]
+                d = dict(zip(cols, cells))
+                name = d.get("Параметр", "").strip("`")
+                if name and name not in seen:
+                    seen.add(name)
+                    out.append((f.relative_to(ROOT).as_posix(), d))
+    return out
+
+
+def config_md(slug: str, page: str) -> list:
+    """Раздел «Конфигурация» вкладки Deploy — генерируется из interfaces.md (значения — только там)."""
+    ps = component_params(slug)
+    if not ps:
+        return []
+    L = ["## Конфигурация {#config}", "",
+         "Все настраиваемые параметры компонента. Генерируется из таблиц «Параметры модуля» `interfaces.md` спек — там же обоснование значений и последствия выбора; "
+         "уровень — L0 платформа, L1 агент (Platform module), L2 определение агента или настройка проекта, L3 запуск; где задаётся — по хранилищу параметра ([методология](../rules/tech-spec.md)).", "",
+         "| Параметр | Что задаёт | Где задаётся | По умолчанию | Мин – макс | Источник |", "|---|---|---|---|---|---|"]
+    for f, d in ps:
+        lvl = d.get("Уровень", "")
+        st = (re.search(r"S\d+", d.get("Хранилище", "")) or [""])[0]
+        mn, mx = d.get("Мин", "—"), d.get("Макс", "—")
+        L.append(f"| {d.get('Параметр', '')} | {d.get('Что задаёт', '')} | {lvl} · {STORE_WHERE.get(st, d.get('Хранилище', '—'))} | {d.get('По умолчанию', '—')} | "
+                 f"{mn} – {mx} | [{Path(f).parent.name}]({rel(str(Path(page).parent).replace(chr(92), '/'), f)}) |")
+    return L + [""]
+
+
+def config_check() -> list:
+    """Имя параметра — как в конфиге: латиница, цифры, `.`, `_` (tech-spec.md)."""
+    issues = []
+    for f in ROOT.glob("openspec/changes/*/specs/*/interfaces.md"):
+        for l in f.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"^\| `([^`]+)` \| ", l)
+            part = r"(?:[A-Za-z0-9_.\-]|<[^>]+>)+"  # заполнитель <id> допустим; несколько параметров — через « / »
+            if m and not re.fullmatch(rf"{part}(?: / {part})*", m.group(1)):
+                issues.append(f"{f.relative_to(ROOT).as_posix()}: параметр «{m.group(1)}» — имя не как в конфиге (латиница, цифры, . _)")
+    return issues
 
 
 def spec_value(name: str, slug: str, fallback: str) -> str:
@@ -1023,12 +1082,7 @@ def write_component_pages():
             f'<div class="side-card"><div class="side-head"><span class="dtype dtype-task">ЗАДАЧИ</span>'
             f'<a class="side-all" href="{href(page, task_page)}">все →</a></div><ul>{task_links}</ul></div>'
             '</aside></div>')
-        cfg = RATIONALE.get(slug, {}).get("config", [])[:6]
-        keyp = ""
-        if cfg:
-            keyp = ('<div class="keyparams"><span class="about-label">Ключевые параметры</span>'
-                    + "".join(f'<span class="kp"><code>{esc(n)}</code> {esc(spec_value(n, slug, d))}</span>' for n, _, _, d, _ in cfg)
-                    + '<a class="side-all" href="#_5">все параметры ↓</a></div>')
+        keyp = ""  # параметры — на вкладке Deploy («Конфигурация», из interfaces.md)
         body = [f"# {name}", "", head, "", keyp, "", about, "",
                 "## Устройство", "",
                 f'<div class="map">{render_rows(BLOCKS.get(slug, []), page, slug)}</div>', ""]

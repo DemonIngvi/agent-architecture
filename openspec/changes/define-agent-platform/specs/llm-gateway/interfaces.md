@@ -24,7 +24,7 @@
 | `fallbacks` | Резервные модели | L0 | S9 (`litellm config.yaml`) | нет | резервная модель может быть дороже или хуже — включать осознанно | нет | список алиасов | доступность провайдера и сопоставимое качество |
 | `key.max_budget` | Бюджет virtual key | L1 | S6 | из Platform module | единый источник — `budget.daily_usd` | 0 $ | `budget.daily_usd` | см. control-plane |
 | `key.rpm / tpm` | Запросы и токены в минуту | L1 | S6 | 60 / не ограничено | rpm = `rate_limit` агента; токены ограничивает бюджет | 10 / 10 000 | лимиты аккаунта провайдера | лимиты провайдера / число агентов |
-| `guardrails (G4)` | PII, injection, модерация | L0 | S9 (`litellm config.yaml`) | выкл | см. `g4.enabled` (guardrails) | выкл | вкл | см. guardrails |
+| `guardrails` | G4: PII, injection, модерация (ключ `guardrails` в `config.yaml` LiteLLM) | L0 | S9 (`litellm config.yaml`) | выкл | см. `g4.enabled` (guardrails) | выкл | вкл | см. guardrails |
 
 ## Хранилища данных
 

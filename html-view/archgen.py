@@ -119,10 +119,7 @@ for cap, slug in CAP.items():
         seen.add(b["title"])
         st = "бэклог" if b["kind"] == "back" else ST.get(b["st"], "—")
         L.append(f"| {b['title']} | {b['desc'] or '—'} | {st} |")
-    cfg = RATIONALE.get(slug, {}).get("config", [])
-    if cfg:
-        L += ["", "## Расширения и настройка", "", "| Что настраивается | На что влияет |", "|---|---|"]
-        L += [f"| `{n}` | {e} |" for n, _, e, _, _ in cfg[:8]]
+    L += ["", "## Настройка", "", "Параметры модуля — [interfaces.md](interfaces.md) (раздел «Параметры модуля»); на сайте — вкладка «Deploy» компонента, раздел «Конфигурация»."]
     minus, p = rnd_minus(slug)
     plus = RATIONALE.get(slug, {}).get("gain", [])
     if plus or minus:
