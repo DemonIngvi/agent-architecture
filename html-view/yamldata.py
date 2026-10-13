@@ -901,7 +901,8 @@ SCHEMAS = {
     "costs": Rec(("costs", Lst(Rec(
         ("date", Str(pattern=r"\d{4}-\d{2}-\d{2}", hint="ГГГГ-ММ-ДД")), ("process", Str(pattern=r"[a-z0-9-]+", hint="код процесса латиницей")),
         ("methodology", S), ("units", Int()), ("unit", S), ("tokens", Int()), ("model", S, "opt"), ("minutes", Int(), "opt"),
-        ("expected", Lst(Int(), flow=True), "opt"), ("note", S, "opt"))))),
+        ("expected", Lst(Int(), flow=True), "opt"), ("agents", Lst(S, flow=True), "opt"), ("calls", Int(), "opt"),
+        ("context", Int(), "opt"), ("note", S, "opt"))))),
     "personas": Rec(
         ("roles", Map(S, S)),
         ("personas", Map(S, TRec(("name", S), ("can", S), ("wants", S), ("conflict", S), ("prompt", S))))),

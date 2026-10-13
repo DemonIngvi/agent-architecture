@@ -324,8 +324,8 @@
 | `docs/rnd/us-analogs-agent-tracker.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-12 | ✅ | f6b5a75d | повторная проверка: Z-ICP-53 закрыт |
 | `docs/rules/api-methodology.md` | В | — | — | — | ⏳ | 7fcc3990 | Методология |
 | `docs/rules/api-methodology.md` | А | — | — | — | ⏳ | 7fcc3990 | Методология |
-| `docs/rules/approval-methodology.md` | В | — | — | — | ⏳ | d3b239c8 | Методология |
-| `docs/rules/approval-methodology.md` | А | — | — | — | ⏳ | d3b239c8 | Методология |
+| `docs/rules/approval-methodology.md` | В | — | — | — | ⏳ | 34d33a9c | Методология |
+| `docs/rules/approval-methodology.md` | А | — | — | — | ⏳ | 34d33a9c | Методология |
 | `docs/rules/architecture-methodology.md` | В | — | — | — | ⏳ | 03347175 | Методология |
 | `docs/rules/architecture-methodology.md` | А | — | — | — | ⏳ | 03347175 | Методология |
 | `docs/rules/block-methodology.md` | В | — | — | — | ⏳ | c89c4621 | Методология |
