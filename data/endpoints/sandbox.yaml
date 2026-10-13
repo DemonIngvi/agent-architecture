@@ -1,12 +1,12 @@
 POST Docker:
   request: Docker Engine API `POST /containers/create` (образ, ресурсы профиля, сеть)
   response: 201 · {Id}
-  note: через docker-socket-proxy
+  note: 'через docker-socket-proxy; ошибки Docker Engine API: 404 — образа нет; 409 — имя контейнера занято; 500 — ошибка демона; таймаут 30 с — запуск не стартует, повтор create не делается (I6)'
 DELETE Docker:
   request: Docker Engine API `DELETE /containers/:id`
   response: '204'
-  note: ''
+  note: 'ошибки Docker Engine API: 404 — контейнера уже нет (повтор безопасен, destroy идемпотентен); 409 — контейнер ещё работает без `force`; 500 — ошибка демона'
 POST Kubernetes:
   request: 'Kubernetes API: Pod из `SandboxClaim`'
   response: 201 · Pod
-  note: этап 4
+  note: 'этап 4; ошибки Kubernetes API: 403 — ServiceAccount без прав в namespace `itsaplan-agents`; 409 — Pod с таким именем есть; 422 — манифест не прошёл валидацию; create не повторяется (I23)'

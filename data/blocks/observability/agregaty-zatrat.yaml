@@ -4,10 +4,10 @@ kind: service
 stories: [US-OBS-05, US-ICP-12]
 params:
 - {name: cost.source, value: LiteLLM spend log}
-- {name: retention_days, value: '90'}
 does:
 - Считает токены и $ по запуску, задаче, агенту, модели и периоду из журнала LiteLLM по `metadata.run_id`
 - Отдаёт затраты задачи (`CostAggregate`) для карточки задачи и сводки
+- 'Историю берёт из журнала LiteLLM, а не из событий запуска: удаление событий по `retention_days` агрегаты не затрагивает (R-OBS-06)'
 - Не получает цену модели — помечает стоимость «неизвестна», токены учитывает
 io:
 - {dir: ←, label: LiteLLM (spend log), what: записи журнала с `metadata.run_id`, via: [I14]}

@@ -1,7 +1,7 @@
 POST /mcp:
   request: McpToolCall
   response: 200 · McpToolCall (result)
-  note: MCP-сервер ICPlan, не в OpenAPI
+  note: 'MCP-сервер ICPlan, не в OpenAPI; ошибки: 401 — токен запуска неверен; БД ICPlan недоступна — тул возвращает ошибку типа «недоступно», запись агент сам не повторяет'
 PATCH /teams/:teamId/ai-agents/:agentId:
   request: '+ {enabled: bool, onDisable: finish · cancel}'
   response: как в форке

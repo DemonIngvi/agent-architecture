@@ -1,16 +1,16 @@
 POST /v1/chat/completions:
   request: ChatCompletionRequest
   response: 200 · ответ OpenAI Chat Completions (`choices`, `usage`)
-  note: 'mock — тот же формат; ошибки: ошибка алиаса — несуществующий алиас; ошибка лимита — бюджет ключа исчерпан или превышен RPM / TPM; `all_providers_failed` — основная и резервная модели недоступны; вызов без `metadata.run_id` отклонён (R-LLM-03)'
+  note: 'mock — тот же формат; ошибки в формате OpenAI `{error: {message, type, code}}`: 401 — ключ неверен или просрочен; 400 — ошибка алиаса (несуществующий алиас, R-LLM-01); 400 — вызов без `metadata.run_id` отклонён pre-call хуком, затраты не теряются без привязки (R-LLM-03, D26); 400 — бюджет ключа исчерпан, отказ до обращения к провайдеру (R-LLM-05, `budget_exceeded`); 429 — превышен RPM / TPM, `Retry-After` в заголовке (R-LLM-05); 5xx `all_providers_failed` — основная и резервная модели недоступны'
 GET /model/info:
   request: —
   response: '200 · {data: {model_name, litellm_params, model_info}[]}'
-  note: проверка алиаса модели при сохранении агента (R-REG-06); вызывает Platform module master key (I15)
+  note: 'проверка алиаса модели при сохранении агента (R-REG-06); вызывает Platform module master key (I15)'
 POST /key/generate:
   request: VirtualKey
   response: 200 · {key, key_alias, expires}
-  note: также `/key/update`
+  note: 'также `/key/update`; ошибки (поведение LiteLLM admin API): 401 — master key неверен или не передан; 400 — недопустимое значение лимита или бюджета (`max_budget`, `rpm_limit`, `tpm_limit`), в ответе поле; 404 — при `/key/update` ключа нет; вызов повторяют по `key_alias` (I15, идемпотентно)'
 GET /spend/logs:
   request: 'query: request_id или start_date / end_date'
   response: 200 · LiteLLM_SpendLogs[]
-  note: отбор по `metadata.run_id`
+  note: 'отбор по `metadata.run_id`'

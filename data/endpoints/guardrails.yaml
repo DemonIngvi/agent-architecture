@@ -1,11 +1,11 @@
 POST /v1/data/agent/g1:
   request: PolicyInput
   response: 200 · PolicyDecision
-  note: конверт `{input}` → `{result}` — REST API OPA
+  note: 'конверт `{input}` → `{result}` — REST API OPA; ошибки: 400 — неверный вход (`PolicyInput`); 500 — ошибка движка; таймаут 200 мс или OPA недоступен — действует `on_engine_error` (по умолчанию deny, fail-closed); бандла нет — тоже `on_engine_error`'
 POST /v1/data/agent/g2:
   request: PolicyInput
   response: 200 · PolicyDecision
-  note: ''
+  note: 'ошибки — как у g1: 400 — неверный вход; 500 и таймаут — по `on_engine_error`'
 GET /health?bundles:
   request: —
   response: 200 · {}

@@ -1,8 +1,8 @@
 POST tools/list:
   request: McpToolCall (method tools/list)
   response: '200 · {tools: {name, description, inputSchema}[]}'
-  note: JSON-RPC 2.0
+  note: 'JSON-RPC 2.0; ошибки: -32600 / -32601 — неверный запрос или метод; недоступен MCP-сервер или нет токена запуска — ошибка тула агенту, тулы вне allowlist запуска не возвращаются'
 POST tools/call:
   request: McpToolCall
   response: 200 · McpToolCall (result)
-  note: ''
+  note: 'ошибки JSON-RPC: -32602 — тула нет в allowlist запуска или неверные параметры; отказ G2 — ошибка тула с причиной (аудит); MCP-сервер недоступен (таймаут 30 с) или секрет MCP не задан — ошибка тула агенту; запись не повторяется'

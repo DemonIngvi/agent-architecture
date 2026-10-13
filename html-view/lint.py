@@ -216,12 +216,13 @@ def lint() -> dict:
         for d, _ in ([] if isinstance(s.get("data"), str) else s.get("data", [])):
             if re.match(r"S\d+\b", d):
                 add(slug, f"блок «{title}»: в «Данных» S-код «{d[:30]}» вместо имён таблиц")
-    # API: изменяющие эндпоинты 🆕 / 🛠 без кодов ошибок (api-methodology.md)
+    # API: изменяющие эндпоинты (любой статус) без кодов ошибок (api-methodology.md)
     for key, (page, st) in _api_status().items():
-        if st in ("new", "fork") and WRITE.match(key):
+        if WRITE.match(key):
             io = DM.ENDPOINT_IO.get(key)
-            if io and "ошибк" not in io[2]:
-                add(page, f"{key} ({'🆕' if st == 'new' else '🛠'}): нет кодов ошибок в ENDPOINT_IO")
+            if io and ("ошибк" not in io[2] or re.search(r"ошибки:\s*—", io[2])):
+                mark = {"new": "🆕", "fork": "🛠"}.get(st, "✅")
+                add(page, f"{key} ({mark}): нет кодов ошибок в ENDPOINT_IO → коды и условия в data/endpoints/{page}.yaml")
     # задачи: нумерация с N.M.1 и подзадачи 2–8 ч (task-methodology.md)
     tid_owner = {t: c[0] for c in COMPONENTS for t in c[7]}
     for f in sorted((ROOT / "docs/tasks").glob("*.md")):
