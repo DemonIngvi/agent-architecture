@@ -337,3 +337,15 @@ costs:
   calls: 14
   context: 53430
   note: 'Z-SBX-1: тип resources (cpu, memory_mb, disk_gb) в interfaces.md и профиле sandbox; исследование + правка'
+- date: '2026-10-13'
+  process: finding-fix
+  methodology: review-methodology.md#findings
+  units: 2
+  unit: замечание
+  tokens: 647278
+  model: sonnet-5-5
+  expected: [250000, 500000]
+  agents: [a390982efba87e0d4]
+  calls: 13
+  context: 60685
+  note: 'Z-ICP-86 ✅ / Z-ICP-106 📌: версии агента не в MVP (закрепление в 2.3.7, выбор — 4.4); R&D runner-agent-definition Э8/Э10'
