@@ -150,8 +150,8 @@ def summary_md(status: dict) -> str:
     return "\n".join(L) + "\n"
 
 
-def set_decision(page: str, letter: str, ok: bool, comment: str, who: str = "", human: bool = False) -> str:
-    """Решение роли по документу (`doctool approve`). Под блокировкой: проверяющие пишут реестр параллельно."""
+def _locked(fn):
+    """Вызов под блокировкой реестра: проверяющие пишут его параллельно."""
     import os
     import time
     lock = REGISTRY.with_suffix(".lock")
@@ -164,25 +164,48 @@ def set_decision(page: str, letter: str, ok: bool, comment: str, who: str = "", 
     else:
         raise SystemExit(f"реестр занят: удалите {lock}, если запись не идёт")
     try:
-        return _set_decision(page, letter, ok, comment, who, human)
+        return fn()
     finally:
         os.close(fd)
         os.remove(lock)
 
 
-def _set_decision(page, letter, ok, comment, who, human):
-    rows = read_registry()
+def set_decision(page: str, letter: str, ok: bool, comment: str, who: str = "", human: bool = False) -> str:
+    """Решение роли по документу (`doctool approve`)."""
+    def one():
+        rows = read_registry()
+        res = _apply(rows, page, letter, ok, comment, who, human)
+        if res.startswith("нет строки"):
+            raise SystemExit(res)
+        write_registry(rows)
+        return res
+    return _locked(one)
+
+
+def set_decisions(items: list, who: str = "", human: bool = False) -> tuple:
+    """Пачка решений (`doctool approve-batch`) одним захватом блокировки: [{page, role, ok, comment}] → (применено, ошибки)."""
+    def run():
+        rows, done, errs = read_registry(), [], []
+        for d in items:
+            res = _apply(rows, str(d.get("page", "")), str(d.get("role", "")), bool(d.get("ok")), str(d.get("comment", "")), who, human)
+            (errs if res.startswith("нет строки") else done).append(res)
+        if done:
+            write_registry(rows)
+        return done, errs
+    return _locked(run)
+
+
+def _apply(rows, page, letter, ok, comment, who, human) -> str:
     letter = BY_NAME.get(letter, letter)
     key = (page, letter)
-    if key not in rows:
-        raise SystemExit(f"нет строки «{page} × {letter}»: соберите сайт (python html-view/build.py) или проверьте путь страницы")
+    if key not in rows or letter not in ROLES:
+        return f"нет строки «{page} × {letter}»: соберите сайт (python html-view/build.py) или проверьте путь страницы"
     c = rows[key]
     c[2] = who or (f"Claude, роль {ROLES[letter]}" if not human else ROLES[letter])
     c[3] = "👤" if human else "🤖"
     c[4] = datetime.date.today().isoformat()
     c[5] = "✅" if ok else "❌"
-    c[7] = comment.replace("|", "/") or "—"
-    write_registry(rows)
+    c[7] = " ".join(comment.replace("|", "/").split()) or "—"
     return f"{page} × {letter} ({ROLES[letter]}): {c[5]}"
 
 

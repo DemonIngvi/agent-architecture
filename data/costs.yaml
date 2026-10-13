@@ -1,0 +1,132 @@
+costs:
+- date: '2026-10-13'
+  process: review-pack
+  methodology: approval-methodology.md#economy
+  units: 64
+  unit: пара документ×роль
+  tokens: 409000
+  model: Sonnet
+  expected: [2000, 4000]
+  note: 'ICPlan раунд 3: 5 агентов (84,9+68,6+123+74,3+59,2 тыс.)'
+- date: '2026-10-13'
+  process: review-pack
+  methodology: approval-methodology.md#economy
+  units: 6
+  unit: пара документ×роль
+  tokens: 44700
+  model: Sonnet
+  expected: [2000, 4000]
+  note: ICPlan, перепроверка 6 пар
+- date: '2026-10-13'
+  process: review-pack
+  methodology: approval-methodology.md#economy
+  units: 50
+  unit: пара документ×роль
+  tokens: 209000
+  model: Sonnet
+  expected: [2000, 4000]
+  note: 'Agent Runner раунд 1: 4 агента (53,2+48,1+56,2+51,8 тыс.)'
+- date: '2026-10-13'
+  process: bulk-edit
+  methodology: change-process.md#bulk
+  units: 1
+  unit: компонент
+  tokens: 228000
+  model: Opus
+  expected: [150000, 250000]
+  note: 'ICPlan раунд 2, партия J: 27 замечаний'
+- date: '2026-10-13'
+  process: bulk-edit
+  methodology: change-process.md#bulk
+  units: 1
+  unit: компонент
+  tokens: 158000
+  model: Opus
+  expected: [150000, 250000]
+  note: 'ICPlan раунд 2, партия K: 13 замечаний'
+- date: '2026-10-13'
+  process: bulk-edit
+  methodology: change-process.md#bulk
+  units: 1
+  unit: компонент
+  tokens: 188000
+  model: Opus
+  expected: [150000, 250000]
+  note: Agent Runner
+- date: '2026-10-13'
+  process: bulk-edit
+  methodology: change-process.md#bulk
+  units: 2
+  unit: компонент
+  tokens: 160000
+  model: Opus
+  expected: [150000, 250000]
+  note: Harness + Sandbox
+- date: '2026-10-13'
+  process: lint-conversion
+  methodology: approval-methodology.md#economy
+  units: 128
+  unit: замечание
+  tokens: 197000
+  model: Opus
+  expected: [1200, 1600]
+  note: ожидание 150-200 тыс. на весь прогон ≈ 1,2-1,6 тыс. на замечание (128 замечаний)
+- date: '2026-10-13'
+  process: yaml-migration
+  methodology: data-methodology.md#yaml
+  units: 273
+  unit: файл
+  tokens: 313000
+  model: Opus
+  minutes: 24
+  expected: [900, 1300]
+  note: ожидание 250-350 тыс. на перенос ≈ 0,9-1,3 тыс. на файл (273 файла)
+- date: '2026-10-13'
+  process: rules-transfer
+  methodology: change-process.md#rules-change
+  units: 1
+  unit: документ
+  tokens: 124000
+  model: Opus
+  note: R&D v3.2 в «Справку»
+- date: '2026-10-13'
+  process: rules-transfer
+  methodology: change-process.md#rules-change
+  units: 1
+  unit: документ
+  tokens: 125000
+  model: Opus
+  note: R&D v3.2 в methodology
+- date: '2026-10-13'
+  process: rules-transfer
+  methodology: change-process.md#rules-change
+  units: 1
+  unit: документ
+  tokens: 282000
+  model: Opus
+  note: перенос doctool в methodology; прерванный запуск не учтён (расход неизвестен)
+- date: '2026-10-13'
+  process: unit-read
+  methodology: data-methodology.md#yaml
+  units: 1
+  unit: блок
+  tokens: 240
+  note: doctool unit, без агента; для сравнения subcomponents.py целиком ~24 600 токенов
+- date: '2026-10-13'
+  process: tooling
+  methodology: token-costs.md#costs
+  units: 1
+  unit: инструмент
+  tokens: 92500
+  model: sonnet
+  minutes: 3
+  note: учёт расхода токенов (cost.py, data/costs.yaml, страница)
+- date: '2026-10-13'
+  process: tooling
+  methodology: approval-methodology.md#economy
+  units: 1
+  unit: инструмент
+  tokens: 119400
+  model: opus
+  minutes: 5
+  note: пакетная проверка review-batch / approve-batch

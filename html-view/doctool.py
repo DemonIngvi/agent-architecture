@@ -7,6 +7,8 @@
     python html-view/doctool.py blocks             заполненность карточек блоков: чего не хватает для реализации
     python html-view/doctool.py approve <страница> <буква> ok|no <комментарий> [--human]  решение роли по документу
     python html-view/doctool.py review-queue [буква]  что ждёт решения роли
+    python html-view/doctool.py review-batch <компонент> [--max 30]  пачка ⏳-страниц: карточки для всех ролей в одном файле
+    python html-view/doctool.py approve-batch <файл.json>  решения пачки [{page, role, ok, comment}] одним захватом реестра
     python html-view/doctool.py generated <файл>  если файл генерируется — откуда и чем; иначе пусто
     python html-view/doctool.py check             все проверки сборки без сборки сайта (секунды), включая yaml-check
     python html-view/doctool.py unit <ID|путь>    карточка единицы данных (блок, история US-…, I-код, модель, таблица, «МЕТОД путь»)
@@ -36,6 +38,7 @@ RULES = ROOT / "docs/rules"
 
 # Генерируемые файлы: шаблон пути → (чем генерируется, что править)
 GENERATED = [
+    ("docs/rules/token-costs.md", "python html-view/doctool.py cost md (и build.py)", "data/costs.yaml (python html-view/doctool.py cost add …)"),
     ("docs/stories/*.md", "html-view/build.py (sync_stories)", "data/stories/<компонент>/<US-ID>.yaml, data/processes/*.yaml, data/personas.yaml"),
     ("openspec/changes/*/tasks.md", "python html-view/tasksmd.py", "docs/ROADMAP.md и docs/tasks/*.md"),
     ("openspec/changes/define-agent-platform/specs/*/architecture.md", "python html-view/archgen.py", "data/components/*.yaml, data/blocks/*/*.yaml, R&D «Риски и пересмотр»"),
@@ -428,11 +431,34 @@ def main():
         print(f"ждёт решения: {len(q)}")
         for p, r in q[:200]:
             print(f"- {p} × {r}")
+    elif cmd == "review-batch":  # пачка ⏳-страниц компонента: карточки для всех ролей в одном файле (approval-methodology.md#economy)
+        sys.path.insert(0, str(HERE))
+        import lint as LN
+        import review as RV
+        mx = int(args[args.index("--max") + 1]) if "--max" in args else 30
+        comp = next(x for x in args if not x.startswith("--") and not x.isdigit())
+        res = RV.batch(comp, mx)
+        print("\n".join(f"{p.relative_to(ROOT).as_posix()}: страниц {n}, пар {k}, символов {c}, ≈{c // 3} ток. всего, ≈{c // 3 // max(n, 1)} на страницу"
+                        for p, n, k, c, _ in res) or f"{comp}: ⏳ нет")
+        gaps = len(LN.lint().get(comp, []))
+        if gaps:
+            print(f"⚠️ lint {comp}: пробелов {gaps} — роли их не повторяют (python html-view/doctool.py lint {comp})")
+    elif cmd == "approve-batch":  # решения пачки из JSON одним захватом блокировки реестра
+        sys.path.insert(0, str(HERE))
+        import approvals as AP
+        done, errs = AP.set_decisions(json.loads(Path(args[0]).read_text(encoding="utf-8")), human="--human" in args)
+        print("\n".join(done + [f"⚠️ {e}" for e in errs]))
+        print(f"применено {len(done)}: ✅ {sum(d.endswith('✅') for d in done)}, ❌ {sum(d.endswith('❌') for d in done)}; ошибок {len(errs)}")
+        sys.exit(1 if errs else 0)
     elif cmd == "review-pack":  # пакет проверки: весь контекст роли в одном файле (approval-methodology.md)
         sys.path.insert(0, str(HERE))
         import review as RV
         p = RV.pack(args[0], args[1])
         print(f"{p} — {len(p.read_text(encoding='utf-8')) // 4} ток. (примерно)")
+    elif cmd == "cost":  # учёт расхода токенов по процессам (html-view/cost.py, docs/rules/token-costs.md)
+        sys.path.insert(0, str(HERE))
+        import cost as CO
+        print(CO.main(args))
     elif cmd == "lint":  # нестрогие проверки методологий по компонентам (не блокируют коммит)
         sys.path.insert(0, str(HERE))
         import lint as LN
@@ -529,7 +555,7 @@ def main():
     elif cmd == "staged":
         import subprocess
         files = subprocess.run(["git", "diff", "--cached", "--name-only"], capture_output=True, text=True, encoding="utf-8").stdout.split()
-        bad = [f for f in files if generated(ROOT / f) and not f.startswith("html-view/") and not f.startswith("docs/stories/") and not f.endswith("tasks.md") and not f.endswith("architecture.md")]
+        bad = [f for f in files if generated(ROOT / f) and not f.startswith("html-view/") and not f.startswith("docs/stories/") and not f.endswith("tasks.md") and not f.endswith("architecture.md") and f != "docs/rules/token-costs.md"]
         issues = check()
         for f in bad:
             print(f"⚠️ {f}: генерируемый файл изменён — правь источник ({generated(ROOT / f)[1]})")

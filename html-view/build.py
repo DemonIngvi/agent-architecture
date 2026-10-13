@@ -536,6 +536,8 @@ def copy_sources():
     sync_approvals()
     check_docs()
     check_req_tasks()
+    import cost as CO
+    CO.write_md()  # docs/rules/token-costs.md из data/costs.yaml
     shutil.rmtree(SRC, ignore_errors=True)
     files = []
     for item in SOURCES:
@@ -1405,7 +1407,7 @@ def nav_yaml() -> str:
     L += ["  - Справка:", item(4, "Правила документации", "docs/rules/README.md"), item(4, "Структура документации", "docs/rules/structure-methodology.md"), item(4, "Путь изменения документа", "docs/rules/agent-workflow.md"), item(4, "Формат схем", "FORMAT.md"), item(4, "Термины и коды", "docs/rules/terms.md"), item(4, "Типы данных", "docs/data-types.md"),
           item(4, "Персоны", "docs/stories/personas.md"),
           "    - Методологии:",
-          item(6, "Методология архитектуры", "docs/rules/architecture-methodology.md"), item(6, "Методология блоков", "docs/rules/block-methodology.md"), item(6, "Методология подтверждений", "docs/rules/approval-methodology.md"), item(6, "Методология данных и интеграций", "docs/rules/data-methodology.md"),
+          item(6, "Методология архитектуры", "docs/rules/architecture-methodology.md"), item(6, "Методология блоков", "docs/rules/block-methodology.md"), item(6, "Методология подтверждений", "docs/rules/approval-methodology.md"), item(6, "Расход токенов", "docs/rules/token-costs.md"), item(6, "Методология данных и интеграций", "docs/rules/data-methodology.md"),
           item(6, "Методология API", "docs/rules/api-methodology.md"), item(6, "Методология решений", "docs/rules/decision-methodology.md"),
           item(6, "Методология задач и плана", "docs/rules/task-methodology.md"), item(6, "Методология ревью и отклонений", "docs/rules/review-methodology.md"),
           item(6, "Методология сопровождающих документов", "docs/rules/support-docs-methodology.md"), item(6, "Методология SDD", "docs/rules/sdd-methodology.md"),

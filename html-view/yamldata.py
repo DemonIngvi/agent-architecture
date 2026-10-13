@@ -17,6 +17,7 @@
     data/stories/<компонент>/<US-ID>.yaml  STORIES (история), CHAINS (chain)
     data/processes/<компонент>.yaml    BPMN, ARTIFACTS
     data/personas.yaml                 ROLES, PERSONAS
+    data/costs.yaml                    журнал расхода токенов (html-view/cost.py, docs/rules/token-costs.md)
 """
 import json
 import re
@@ -428,6 +429,10 @@ SCHEMAS = {
                               Lst(Tup(S, S)), names=("id", "дорожка", "тип", "подпись", "[[куда, подпись]]")))),
             ("artifacts", Map(S, Lst(S, flow=True)), ("def", dict))))),
         ("artifacts", Map(S, Lst(S, flow=True)), "opt")),
+    "costs": Rec(("costs", Lst(Rec(
+        ("date", Str(pattern=r"\d{4}-\d{2}-\d{2}", hint="ГГГГ-ММ-ДД")), ("process", Str(pattern=r"[a-z0-9-]+", hint="код процесса латиницей")),
+        ("methodology", S), ("units", Int()), ("unit", S), ("tokens", Int()), ("model", S, "opt"), ("minutes", Int(), "opt"),
+        ("expected", Lst(Int(), flow=True), "opt"), ("note", S, "opt"))))),
     "personas": Rec(
         ("roles", Map(S, S)),
         ("personas", Map(S, TRec(("name", S), ("can", S), ("wants", S), ("conflict", S), ("prompt", S))))),
@@ -437,7 +442,8 @@ SCHEMAS = {
 KIND_OF = [("components/*.yaml", "component"), ("blocks/*/*.yaml", "block"), ("hosts.yaml", "hosts"), ("models/*.yaml", "model"),
            ("tables/*.yaml", "table"), ("endpoints/*.yaml", "endpoints"), ("integrations.yaml", "integrations"),
            ("databases.yaml", "databases"), ("datamodel.yaml", "datamodel"), ("stories/*/*.yaml", "story"),
-           ("processes/*.yaml", "processes"), ("personas.yaml", "personas")]
+           ("processes/*.yaml", "processes"), ("personas.yaml", "personas"),
+           ("costs.yaml", "costs")]
 
 
 def kind_of(path) -> str:
@@ -822,6 +828,18 @@ def _extra(f: Path, kind: str, v) -> list:
                     out.append(f"processes[{n}].steps[{k}][1] → дорожка {s[1]}: номер от 0 до {len(pr['lanes']) - 1}")
                 out += [f"processes[{n}].steps[{k}] → переход в шаг {to}, которого нет" for to, _ in s[4] if to not in ids]
             out += [f"processes[{n}].artifacts.{a} → шага {a} нет" for a in pr["artifacts"] if a not in ids]
+    if kind == "costs":
+        for n, r in enumerate(v["costs"]):
+            m, _, anchor = r["methodology"].partition("#")
+            doc = ROOT / "docs/rules" / m
+            if not doc.exists():
+                out.append(f"costs[{n}].methodology → файла docs/rules/{m} нет")
+            elif anchor and "{#" + anchor + "}" not in doc.read_text(encoding="utf-8"):
+                out.append(f"costs[{n}].methodology → в {m} нет якоря #{anchor}")
+            if "expected" in r and (len(r["expected"]) != 2 or r["expected"][0] > r["expected"][1]):
+                out.append(f"costs[{n}].expected → [минимум, максимум] токенов на единицу")
+            if r["units"] <= 0:
+                out.append(f"costs[{n}].units → больше нуля")
     if kind == "story":
         if not re.fullmatch(r"US-[A-Z]+-\d+", f.stem):
             out.append(f"имя файла → ID истории US-<КОМП>-<NN>.yaml")

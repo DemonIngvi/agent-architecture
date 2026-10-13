@@ -324,14 +324,14 @@
 | `docs/rnd/us-analogs-agent-tracker.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-12 | ✅ | f6b5a75d | повторная проверка: Z-ICP-53 закрыт |
 | `docs/rules/api-methodology.md` | В | — | — | — | ⏳ | d2ea729f | Методология |
 | `docs/rules/api-methodology.md` | А | — | — | — | ⏳ | d2ea729f | Методология |
-| `docs/rules/approval-methodology.md` | В | — | — | — | ⏳ | 9ee3caad | Методология |
-| `docs/rules/approval-methodology.md` | А | — | — | — | ⏳ | 9ee3caad | Методология |
+| `docs/rules/approval-methodology.md` | В | — | — | — | ⏳ | 71048353 | Методология |
+| `docs/rules/approval-methodology.md` | А | — | — | — | ⏳ | 71048353 | Методология |
 | `docs/rules/architecture-methodology.md` | В | — | — | — | ⏳ | 03347175 | Методология |
 | `docs/rules/architecture-methodology.md` | А | — | — | — | ⏳ | 03347175 | Методология |
 | `docs/rules/block-methodology.md` | В | — | — | — | ⏳ | 09b05810 | Методология |
 | `docs/rules/block-methodology.md` | А | — | — | — | ⏳ | 09b05810 | Методология |
-| `docs/rules/data-methodology.md` | В | — | — | — | ⏳ | b56fd05c | Методология |
-| `docs/rules/data-methodology.md` | А | — | — | — | ⏳ | b56fd05c | Методология |
+| `docs/rules/data-methodology.md` | В | — | — | — | ⏳ | 9b7a95d2 | Методология |
+| `docs/rules/data-methodology.md` | А | — | — | — | ⏳ | 9b7a95d2 | Методология |
 | `docs/rules/decision-methodology.md` | В | — | — | — | ⏳ | 0af1d5d9 | Методология |
 | `docs/rules/decision-methodology.md` | А | — | — | — | ⏳ | 0af1d5d9 | Методология |
 | `docs/rules/review-methodology.md` | В | — | — | — | ⏳ | 00fb603f | Методология |
