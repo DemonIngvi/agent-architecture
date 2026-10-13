@@ -16,7 +16,7 @@
 | [Чтение единицы для правки](#unit-read) | [data-methodology.md#yaml](data-methodology.md#yaml) | блок | — | 240 | — | 2026-10-13 |
 | [tooling](#tooling) | [data-methodology.md#yaml](data-methodology.md#yaml) | инструмент | 2000,0 тыс. – 20000,0 тыс. | 20079,0 тыс. | ✅ | 2026-10-13 |
 | [review-batch](#review-batch) | [approval-methodology.md#economy](approval-methodology.md#economy) | документ | 4,0 тыс. – 8,0 тыс. | 5,1 тыс. | ✅ | 2026-10-13 |
-| [finding-fix](#finding-fix) | [review-methodology.md#findings](review-methodology.md#findings) | замечание | 250,0 тыс. – 500,0 тыс. | 323,6 тыс. | ✅ | 2026-10-13 |
+| [finding-fix](#finding-fix) | [review-methodology.md#findings](review-methodology.md#findings) | замечание | 250,0 тыс. – 500,0 тыс. | 274,2 тыс. | ✅ | 2026-10-13 |
 
 ## Как замерять {#measure}
 
@@ -119,3 +119,4 @@
 |---|---|---|---|---|---|---|---|---|---|---|
 | 2026-10-13 | 1 | замечание | 631,1 тыс. | 631,1 тыс. | 14 | 53,4 тыс. | sonnet-5-5 | — | ✅ | Z-SBX-1: тип resources (cpu, memory_mb, disk_gb) в interfaces.md и профиле sandbox; исследование + правка |
 | 2026-10-13 | 2 | замечание | 647,3 тыс. | 323,6 тыс. | 13 | 60,7 тыс. | sonnet-5-5 | — | ✅ | Z-ICP-86 ✅ / Z-ICP-106 📌: версии агента не в MVP (закрепление в 2.3.7, выбор — 4.4); R&D runner-agent-definition Э8/Э10 |
+| 2026-10-13 | 2 | замечание | 548,4 тыс. | 274,2 тыс. | 13 | 46,2 тыс. | sonnet-5-5 | — | ✅ | Observability ❌×2 (R-OBS-05/13): чтение через ICPlan API (I14, I20) — таблица в docs/api/observability.md; перепроверка ролями — шаг 8 |

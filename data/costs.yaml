@@ -349,3 +349,15 @@ costs:
   calls: 13
   context: 60685
   note: 'Z-ICP-86 ✅ / Z-ICP-106 📌: версии агента не в MVP (закрепление в 2.3.7, выбор — 4.4); R&D runner-agent-definition Э8/Э10'
+- date: '2026-10-13'
+  process: finding-fix
+  methodology: review-methodology.md#findings
+  units: 2
+  unit: замечание
+  tokens: 548357
+  model: sonnet-5-5
+  expected: [250000, 500000]
+  agents: [affe6063d8fb1166f]
+  calls: 13
+  context: 46237
+  note: 'Observability ❌×2 (R-OBS-05/13): чтение через ICPlan API (I14, I20) — таблица в docs/api/observability.md; перепроверка ролями — шаг 8'
