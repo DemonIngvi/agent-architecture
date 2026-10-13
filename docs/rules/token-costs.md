@@ -15,7 +15,7 @@
 | [Перенос правил в методологию и «Справку»](#rules-transfer) | [change-process.md#rules-change](change-process.md#rules-change) | документ | — | 282,0 тыс. | — | 2026-10-13 |
 | [Чтение единицы для правки](#unit-read) | [data-methodology.md#yaml](data-methodology.md#yaml) | блок | — | 240 | — | 2026-10-13 |
 | [tooling](#tooling) | [data-methodology.md#yaml](data-methodology.md#yaml) | инструмент | 200,0 тыс. – 300,0 тыс. | 290,7 тыс. | ✅ | 2026-10-13 |
-| [review-batch](#review-batch) | [approval-methodology.md#economy](approval-methodology.md#economy) | документ | 1,0 тыс. – 1,9 тыс. | 1,6 тыс. | ✅ | 2026-10-13 |
+| [review-batch](#review-batch) | [approval-methodology.md#economy](approval-methodology.md#economy) | документ | 2,5 тыс. – 4,5 тыс. | 4,2 тыс. | ✅ | 2026-10-13 |
 
 ## Как замерять {#measure}
 
@@ -106,3 +106,4 @@
 | 2026-10-13 | 40 | документ | 54,3 тыс. | 1,4 тыс. | sonnet | 2 | ✅ | пачка 40 страниц Harness+Sandbox+MCP (114 пар, ✅106 ❌8), агент Explore (накладные 19,4 тыс.); кириллица ≈2 симв./ток. |
 | 2026-10-13 | 104 | документ | 125,0 тыс. | 1,2 тыс. | sonnet | 1 | ✅ | БРАК: 3 пачки, 295 пар, один шаблонный комментарий; решения откачены, добавлена защита approve-batch |
 | 2026-10-13 | 104 | документ | 168,1 тыс. | 1,6 тыс. | sonnet | 6 | ✅ | 3 пачки (40+40+24 страниц), 295 пар: ✅285 ❌10; агент doc-batch-reviewer; уникальные комментарии ~140 симв. |
+| 2026-10-13 | 9 | документ | 38,2 тыс. | 4,2 тыс. | haiku | 1 | ✅ | перепроверка 9 страниц на Haiku: ✅20 ❌7, из 7 отказов 6 неверны (факт. ошибки, артефакт карточки) — для перепроверки Haiku не годится |

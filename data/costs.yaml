@@ -219,3 +219,13 @@ costs:
   minutes: 6
   expected: [1000, 1900]
   note: '3 пачки (40+40+24 страниц), 295 пар: ✅285 ❌10; агент doc-batch-reviewer; уникальные комментарии ~140 симв.'
+- date: '2026-10-13'
+  process: review-batch
+  methodology: approval-methodology.md#economy
+  units: 9
+  unit: документ
+  tokens: 38200
+  model: haiku
+  minutes: 1
+  expected: [2500, 4500]
+  note: 'перепроверка 9 страниц на Haiku: ✅20 ❌7, из 7 отказов 6 неверны (факт. ошибки, артефакт карточки) — для перепроверки Haiku не годится'

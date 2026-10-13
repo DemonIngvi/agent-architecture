@@ -326,6 +326,9 @@ def card(page: str) -> str:
         body += [f"{k}: {_flat(v)}" for k, v in u.items() if k not in ("title", "kind", "tech", "reqs", "why", "rnd") and v not in ("", [], {}, None)]
     elif kind in ("Архитектура компонента", "Данные", "Интеграции"):
         body = _comp_lines(comp) + _endpoint_lines(comp) + (_table_lines(comp) if kind != "Интеграции" else [])
+        # только требования самого компонента (из его блоков): собранная страница несёт и чужие — из моделей и интеграций соседей
+        own = {r for f in (ROOT / "data/blocks" / comp).glob("*.yaml") if not f.name.startswith("_") for r in ((_yaml(f) or {}).get("reqs") or [])}
+        ids = [i for i in ids if i in own] if own else ids
     elif kind == "Задача":
         body = _task_lines(text)
         ids = re.findall(r"\bR-[A-Z]+-\d+\b", _section(text, "Закрывает требования"))
