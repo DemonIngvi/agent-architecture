@@ -16,7 +16,7 @@ screens:
 - {name: 'Платформа: экземпляр', where: God mode → «Платформа», what: 'профили среды и памяти (удаление запрещено, пока профиль используется — 409), глобальный kill switch, журнал изменений — `/platform/sandbox-profiles`, `/platform/memory-profiles` (`GET`, `PUT`, `DELETE`), `PUT /platform/kill-switch/:scope` (`platform`), `GET /platform/audit`; владелец экземпляра (D24)', status: новое, code: 'точка расширения `@/cloud` (как godSections.ts), новая страница маршрута', stories: [US-ICP-21]}
 params:
 - {name: agent.model, value: —}
-- {name: agent.instruction, value: —}
+- {name: agent.instruction, note: —}
 - {name: agent.tools, value: нет}
 - {name: agent.skills, value: нет}
 - {name: agent.projects, value: нет}

@@ -3,8 +3,8 @@ tech: LiteLLM virtual keys
 kind: service
 stories: [US-LLM-03]
 params:
-- {name: key.max_budget, value: бюджет ключа агента}
-- {name: key.rpm / tpm, value: запросы и токены в минуту на ключ}
+- {name: key.max_budget, note: бюджет ключа агента}
+- {name: key.rpm / tpm, note: запросы и токены в минуту на ключ}
 does:
 - Отделяет агентов друг от друга по учёту и лимитам
 - Ключ создаёт и обновляет Platform module через admin API (master key)

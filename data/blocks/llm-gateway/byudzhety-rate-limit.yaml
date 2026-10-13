@@ -3,8 +3,8 @@ tech: LiteLLM budgets, RPM / TPM
 kind: service
 stories: [US-LLM-03]
 params:
-- {name: key.max_budget, value: бюджет ключа из Platform module}
-- {name: key.rpm / tpm, value: запросы и токены в минуту}
+- {name: key.max_budget, note: бюджет ключа из Platform module}
+- {name: key.rpm / tpm, note: запросы и токены в минуту}
 does:
 - Отклоняет вызов до траты при превышении
 - Ограничивает запросы и токены в минуту на модель и на агента (RPM / TPM)

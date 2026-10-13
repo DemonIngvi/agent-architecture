@@ -5,7 +5,7 @@ stories: [US-ICP-01, US-ICP-05, US-ICP-25, US-ICP-26, US-ICP-27, US-ICP-07, US-I
 params:
 - {name: step.column, value: —}
 - {name: step.agent, value: нет}
-- {name: step.on_success / on_failure, value: —}
+- {name: step.on_success / on_failure, note: —}
 - {name: step.max_runs, value: '3'}
 - {name: step.require_review, value: выкл}
 - {name: project.actions, value: нет}

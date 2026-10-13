@@ -202,7 +202,7 @@ def params(comp):
                     name = r.get("Параметр", "").strip("`")
                     if name and name not in d:
                         d[name] = {"spec": sp.parent.name, "default": r.get("По умолчанию", ""), "min": r.get("Мин", ""),
-                                   "max": r.get("Макс", ""), "what": r.get("Что задаёт", "")}
+                                   "max": r.get("Макс", ""), "what": r.get("Что задаёт", ""), "decl": r.get("Тип", "")}
                         d[name]["type"] = param_type(d[name])
             out[c] = d
         return out
@@ -237,6 +237,10 @@ def parse_dur(s):
 
 def param_type(r):
     """Формальный тип параметра по колонкам «По умолчанию», «Мин», «Макс» или None (описан словами)."""
+    if r.get("decl"):
+        t = parse_decl(r["decl"])
+        if t:
+            return t
     d, mn, mx = (_clean(r[k]) for k in ("default", "min", "max"))
     nd, nmn, nmx = parse_num(d), parse_num(mn), parse_num(mx)
     if nd and nmn and nd[1] == nmn[1]:
@@ -259,7 +263,46 @@ def param_type(r):
     return None
 
 
+def parse_decl(s):
+    """Явный «Тип» таблицы параметров → dict типа или None. Грамматика: число [ед.] · длительность · одно из: a, b ·
+    список <каталог> · ссылка <что> · строка [<мин>–<макс> симв.] · доля окна % · части через « / » (составной)."""
+    s = s.strip().strip("`")
+    parts = [p.strip() for p in s.split(" / ")]
+    if len(parts) > 1:
+        ps = [parse_decl(p) for p in parts]
+        return {"kind": "composite", "parts": ps} if all(ps) else None
+    m = re.fullmatch(r"число(?:\s+(\S+))?", s)
+    if m:
+        return {"kind": "number", "unit": m.group(1) or "", "min": 0.0, "max": None}
+    if s == "длительность":
+        return {"kind": "duration", "min": 0.0, "max": None}
+    if s.startswith("одно из:"):
+        v = [x.strip() for x in s[8:].split(",") if x.strip()]
+        return {"kind": "enum", "values": v} if v else None
+    m = re.fullmatch(r"(список|ссылка)\s+(.+)", s)
+    if m:
+        return {"kind": "list" if m.group(1) == "список" else "ref", "what": m.group(2)}
+    m = re.fullmatch(r"строка(?:\s+(\d[\d  ]*)[–-](\d[\d  ]*)\s+симв\.)?", s)
+    if m:
+        f = lambda x: int(re.sub(r"[  ]", "", x)) if x else None
+        return {"kind": "string", "min": f(m.group(1)), "max": f(m.group(2))}
+    if s == "доля окна %":
+        return {"kind": "percent"}
+    return None
+
+
 def type_text(t) -> str:
+    k = t["kind"]
+    if k == "composite":
+        return " / ".join(type_text(p) for p in t["parts"])
+    if k == "list":
+        return f"список: {t['what']}"
+    if k == "ref":
+        return f"ссылка: {t['what']}"
+    if k == "string":
+        return "строка" + (f" {t['min']}–{t['max']} симв." if t["min"] is not None else "")
+    if k == "percent":
+        return "доля окна, %"
     if t["kind"] == "number":
         u = f" {t['unit']}" if t["unit"] else ""
         return f"число{u} от {t['min']:g}" + (f" до {t['max']:g}" if t["max"] is not None else "")
@@ -270,6 +313,16 @@ def type_text(t) -> str:
 
 def value_ok(t, v: str) -> bool:
     """Значение параметра соответствует формальному типу."""
+    k = t["kind"]
+    if k == "composite":
+        vs = [x.strip() for x in v.split(" / ")]
+        return len(vs) == len(t["parts"]) and all(value_ok(p, x) for p, x in zip(t["parts"], vs))
+    if k in ("list", "ref"):
+        return bool(v.strip())
+    if k == "string":
+        return (t["min"] is None or len(v) >= t["min"]) and (t["max"] is None or len(v) <= t["max"])
+    if k == "percent":
+        return bool(re.fullmatch(r"\d+\s*%( окна)?", v.strip()))
     if t["kind"] == "number":
         n = parse_num(v)
         return bool(n) and n[1] == t["unit"] and n[0] >= t["min"] and (t["max"] is None or n[0] <= t["max"])

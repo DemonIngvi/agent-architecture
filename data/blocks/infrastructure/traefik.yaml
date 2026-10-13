@@ -3,7 +3,7 @@ tech: Traefik v3.7 (в составе k3s), MIT
 kind: service
 stories: [US-INF-02]
 params:
-- {name: ingress.host / tls, value: 'домен и сертификат: ACME по умолчанию, свой сертификат — по настройке'}
+- {name: ingress.host / tls, note: 'домен и сертификат: ACME по умолчанию, свой сертификат — по настройке'}
 does:
 - Принимает внешний трафик по HTTPS
 - Маршрутизирует на сервисы ICPlan

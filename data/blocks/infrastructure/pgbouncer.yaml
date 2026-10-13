@@ -3,7 +3,7 @@ tech: PgBouncer 1.26 (пулер CloudNativePG), ISC
 kind: service
 stories: [US-INF-03]
 params:
-- {name: pgbouncer.pool_mode / size, value: 'режим и размер пула: transaction / 30 по умолчанию'}
+- {name: pgbouncer.pool_mode / size, note: 'режим и размер пула: transaction / 30 по умолчанию'}
 does:
 - Держит пул серверных соединений
 - Защищает Postgres от роста числа клиентов

@@ -17,35 +17,35 @@
 
 Значения и границы пересматриваются по статистике запусков (3.9) и нагрузочному тесту (4.8); правило — [виды спек, таблица параметров](../../../../../docs/rules/spec-kinds.md#params).
 
-| Параметр | Что задаёт | Уровень | Хранилище | По умолчанию | Почему так по умолчанию | Мин | Макс | На что опираться при выборе |
-|---|---|---|---|---|---|---|---|---|
-| `scheduling.aging_s` | Интервал повышения приоритета ждущего запуска при `order: priority` | L0 | S9 | 600 | низкий приоритет стартует не позже ~30 мин при 3 уровнях выше | 60 | 3600 | длина очереди в пике и ожидание низкоприоритетных задач |
-| `poll_interval_ms` | Как часто опрашивать очередь | L0 | S9 | 3000 | ~0,3 RPS на агента — малая доля пика API (20 RPS) | 1000 | 30000 | агентов × 1000 / интервал ≤ 10% пика API; дольше — задержка старта запуска |
-| `concurrency` | Параллельных запусков на агента | L1 | S2 | 1 | задачи агента обычно в одной кодовой базе — без гонок | 1 | `scheduling.global_max` | параллельно — только агентам с независимыми задачами |
-| `timeout_s` | Таймаут запуска по умолчанию | L1 | S2 | 1800 | 30 мин — длинная задача с кодом и тестами | 60 | 14400 | p95 длительности запусков; дольше 4 ч — дробить задачу |
-| `retry` | Повтор при сбое инфраструктуры | L0 | S9 | 0 (без повтора) | повтор неидемпотентной работы даёт двойные комментарии и PR | 0 | 3 | 3 — как `AGENT_RUN_MAX_ATTEMPTS` ICPlan; повторять, только если инфраструктура упала до первого действия |
-| `agents` | Ключи агентов, которые обслуживает Runner | L0 | S9 | — (обязательный) | Runner без ключей не получает запусков | 1 ключ | все внешние агенты команды | один Runner может вести несколько агентов |
-| `guardrails.g1.enabled` | Проверка допуска и бюджета | L0 | S9 | true | fail-closed по умолчанию | false | true | false — только в dev |
-| `scheduling.mode` | sequential или parallel | L0 | S9 | parallel | полезная пропускная способность | sequential | parallel | sequential — для отладки и разбора проблем |
-| `scheduling.global_max` | Всего запусков одновременно | L0 | S9 | 4 | профиль нагрузки: 4 активных; 8 vCPU узла − сервисы ≈ 4 CPU по 1 CPU на sandbox | 1 | (vCPU узла − резерв сервисов) / CPU профиля sandbox | ёмкость узла и лимиты провайдера моделей |
-| `scheduling.per_issue` | Запусков на задачу | L0 | S9 | 1 | исключает гонки внутри задачи (R-RUN-05) | 1 | 1 | фиксировано требованием |
-| `scheduling.order` | fifo или priority | L0 | S9 | fifo | предсказуемо, без голодания | fifo | priority | priority — если есть срочные задачи; следить за голоданием |
-| `scheduling.agents.<id>.parallel / max` | Может ли агент идти в несколько потоков | L1 | S2 | нет / 1 | как `concurrency` | 1 | `concurrency` | независимость задач агента |
-| `scheduling.models.<alias>.max` | Запусков на модель | L0 | S9 | 3 | rate limit типового ключа провайдера при ~1 RPS к LiteLLM | 1 | `scheduling.global_max` | rpm / tpm ключа провайдера модели |
-| `pool.size` | Готовых контейнеров на профиль: Sandbox claim берёт из пула, Finalizer доливает | L1 | S2 | 2 | см. agent-sandbox | 0 | `scheduling.global_max` | см. agent-sandbox |
-| `provider` | Реализация `SandboxProvider`: Docker или K8s | L0 | S9 | docker | см. agent-sandbox | docker | k8s | см. agent-sandbox |
-| `workspace.sources` | Источники рабочего пространства запуска: из них манифест и токены репозиториев | L1 | S2 | нет | см. agent-sandbox | нет | все ресурсы каталога проекта | см. agent-sandbox |
-| `setup.script` | Скрипт шага подготовки проекта | L1 | S2 | нет | см. agent-sandbox | нет | — | см. agent-sandbox |
-| `setup.cache_ttl_h` | Срок кэша подготовки по хешу lock-файлов (`setup_cache`) | L0 | S9 | 168 | см. agent-sandbox | 0 | 720 | см. agent-sandbox |
-| `setup.timeout_s` | Таймаут шага подготовки | L1 | S2 | 600 | см. agent-sandbox | 60 | 3600 | см. agent-sandbox |
-| `servers` | MCP-серверы агента, к которым пускает MCP-прокси | L2 | S1 | itsaplan-core | см. tool-integration | itsaplan-core | каталог серверов | см. tool-integration |
-| `tools` | Allowlist тулов сервера, по которому MCP-прокси фильтрует `tools/list` и проверяет `tools/call` | L2 | S1 | минимальный (чтение задачи, комментарий) | см. tool-integration | пусто | все тулы сервера | см. tool-integration |
-| `auth.secret_ref` | Secret с учётными данными MCP-сервера, которые подставляет MCP-прокси | L2 | S1 | — (обязательный) | см. tool-integration | ссылка на Secret | ссылка на Secret | см. tool-integration |
-| `on_engine_error` | Решение G1 и G2, если OPA не ответила | L0 | S9 | deny | см. guardrails | deny | allow | см. guardrails |
-| `kill_switch` | Аварийная остановка агента или платформы: Admission не пускает новые запуски | L1 | S2 | выкл | см. guardrails | выкл | вкл | см. guardrails |
-| `budget.run / agent_day / project_month` | Бюджеты, которые проверяет G1 до старта | L1 | S2 | 1 $ / 5 $ / задаётся | см. guardrails | 0,1 $ / 0 $ / 0 $ | run ≤ agent_day ≤ project_month / 20 | см. guardrails |
-| `limits.idle_s` | Простой без событий, после которого Run supervisor останавливает запуск | L1 | S2 | 300 | см. guardrails | 60 | `timeout_s` | см. guardrails |
-| `events.level` | Детализация событий, которые Event relay передаёт в ICPlan | L0 | S9 | всё | см. observability | итоги | всё | см. observability |
+| Параметр | Что задаёт | Уровень | Хранилище | По умолчанию | Почему так по умолчанию | Мин | Макс | Тип | На что опираться при выборе |
+|---|---|---|---|---|---|---|---|---|---|
+| `scheduling.aging_s` | Интервал повышения приоритета ждущего запуска при `order: priority` | L0 | S9 | 600 | низкий приоритет стартует не позже ~30 мин при 3 уровнях выше | 60 | 3600 |  | длина очереди в пике и ожидание низкоприоритетных задач |
+| `poll_interval_ms` | Как часто опрашивать очередь | L0 | S9 | 3000 | ~0,3 RPS на агента — малая доля пика API (20 RPS) | 1000 | 30000 |  | агентов × 1000 / интервал ≤ 10% пика API; дольше — задержка старта запуска |
+| `concurrency` | Параллельных запусков на агента | L1 | S2 | 1 | задачи агента обычно в одной кодовой базе — без гонок | 1 | `scheduling.global_max` |  | параллельно — только агентам с независимыми задачами |
+| `timeout_s` | Таймаут запуска по умолчанию | L1 | S2 | 1800 | 30 мин — длинная задача с кодом и тестами | 60 | 14400 |  | p95 длительности запусков; дольше 4 ч — дробить задачу |
+| `retry` | Повтор при сбое инфраструктуры | L0 | S9 | 0 (без повтора) | повтор неидемпотентной работы даёт двойные комментарии и PR | 0 | 3 |  | 3 — как `AGENT_RUN_MAX_ATTEMPTS` ICPlan; повторять, только если инфраструктура упала до первого действия |
+| `agents` | Ключи агентов, которые обслуживает Runner | L0 | S9 | — (обязательный) | Runner без ключей не получает запусков | 1 ключ | все внешние агенты команды | список agents | один Runner может вести несколько агентов |
+| `guardrails.g1.enabled` | Проверка допуска и бюджета | L0 | S9 | true | fail-closed по умолчанию | false | true |  | false — только в dev |
+| `scheduling.mode` | sequential или parallel | L0 | S9 | parallel | полезная пропускная способность | sequential | parallel |  | sequential — для отладки и разбора проблем |
+| `scheduling.global_max` | Всего запусков одновременно | L0 | S9 | 4 | профиль нагрузки: 4 активных; 8 vCPU узла − сервисы ≈ 4 CPU по 1 CPU на sandbox | 1 | (vCPU узла − резерв сервисов) / CPU профиля sandbox |  | ёмкость узла и лимиты провайдера моделей |
+| `scheduling.per_issue` | Запусков на задачу | L0 | S9 | 1 | исключает гонки внутри задачи (R-RUN-05) | 1 | 1 |  | фиксировано требованием |
+| `scheduling.order` | fifo или priority | L0 | S9 | fifo | предсказуемо, без голодания | fifo | priority |  | priority — если есть срочные задачи; следить за голоданием |
+| `scheduling.agents.<id>.parallel / max` | Может ли агент идти в несколько потоков | L1 | S2 | нет / 1 | как `concurrency` | 1 | `concurrency` | одно из: да, нет / число | независимость задач агента |
+| `scheduling.models.<alias>.max` | Запусков на модель | L0 | S9 | 3 | rate limit типового ключа провайдера при ~1 RPS к LiteLLM | 1 | `scheduling.global_max` |  | rpm / tpm ключа провайдера модели |
+| `pool.size` | Готовых контейнеров на профиль: Sandbox claim берёт из пула, Finalizer доливает | L1 | S2 | 2 | см. agent-sandbox | 0 | `scheduling.global_max` |  | см. agent-sandbox |
+| `provider` | Реализация `SandboxProvider`: Docker или K8s | L0 | S9 | docker | см. agent-sandbox | docker | k8s |  | см. agent-sandbox |
+| `workspace.sources` | Источники рабочего пространства запуска: из них манифест и токены репозиториев | L1 | S2 | нет | см. agent-sandbox | нет | все ресурсы каталога проекта | список sources | см. agent-sandbox |
+| `setup.script` | Скрипт шага подготовки проекта | L1 | S2 | нет | см. agent-sandbox | нет | — | строка | см. agent-sandbox |
+| `setup.cache_ttl_h` | Срок кэша подготовки по хешу lock-файлов (`setup_cache`) | L0 | S9 | 168 | см. agent-sandbox | 0 | 720 |  | см. agent-sandbox |
+| `setup.timeout_s` | Таймаут шага подготовки | L1 | S2 | 600 | см. agent-sandbox | 60 | 3600 |  | см. agent-sandbox |
+| `servers` | MCP-серверы агента, к которым пускает MCP-прокси | L2 | S1 | itsaplan-core | см. tool-integration | itsaplan-core | каталог серверов | список servers | см. tool-integration |
+| `tools` | Allowlist тулов сервера, по которому MCP-прокси фильтрует `tools/list` и проверяет `tools/call` | L2 | S1 | минимальный (чтение задачи, комментарий) | см. tool-integration | пусто | все тулы сервера | список tools | см. tool-integration |
+| `auth.secret_ref` | Secret с учётными данными MCP-сервера, которые подставляет MCP-прокси | L2 | S1 | — (обязательный) | см. tool-integration | ссылка на Secret | ссылка на Secret | ссылка Secret | см. tool-integration |
+| `on_engine_error` | Решение G1 и G2, если OPA не ответила | L0 | S9 | deny | см. guardrails | deny | allow |  | см. guardrails |
+| `kill_switch` | Аварийная остановка агента или платформы: Admission не пускает новые запуски | L1 | S2 | выкл | см. guardrails | выкл | вкл |  | см. guardrails |
+| `budget.run / agent_day / project_month` | Бюджеты, которые проверяет G1 до старта | L1 | S2 | 1 $ / 5 $ / задаётся | см. guardrails | 0,1 $ / 0 $ / 0 $ | run ≤ agent_day ≤ project_month / 20 | число $ / число $ / число $ | см. guardrails |
+| `limits.idle_s` | Простой без событий, после которого Run supervisor останавливает запуск | L1 | S2 | 300 | см. guardrails | 60 | `timeout_s` |  | см. guardrails |
+| `events.level` | Детализация событий, которые Event relay передаёт в ICPlan | L0 | S9 | всё | см. observability | итоги | всё | одно из: итоги, всё | см. observability |
 
 ## Хранилища данных
 

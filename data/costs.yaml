@@ -373,3 +373,15 @@ costs:
   calls: 16
   context: 61937
   note: 'каталог участников data/participants.yaml (64 псевдонима, 8 внешних): 128 строк label → with, отрисовка без изменений; yaml-migrate остаток 194→89'
+- date: '2026-10-13'
+  process: bulk-edit
+  methodology: change-process.md#bulk
+  units: 13
+  unit: файл
+  tokens: 632669
+  model: sonnet-5-5
+  expected: [3000, 10000]
+  agents: [aa3d30b81c02cfe96]
+  calls: 12
+  context: 60422
+  note: колонка «Тип» в таблицах параметров (8 видов грамматики), 73 параметра получили тип; parse_decl/value_ok в yamlcat; 9 пояснений из value → note (yaml-fmt)
