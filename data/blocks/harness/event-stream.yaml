@@ -8,16 +8,16 @@ does:
 - Нумерует события `seq` для порядка и идемпотентности
 - Буферизует события, пока Runner их не принимает, и досылает без потерь
 io:
-- [←, 'Hooks, Pause / resume, Policy / stop', события шагов]
-- [→, Agent Runner, '`RunEvent` (I7)']
+- {dir: ←, label: 'Hooks, Pause / resume, Policy / stop', what: события шагов}
+- {dir: →, with: Agent Runner, model: [RunEvent], via: [I7]}
 data:
-- [run_event, 'косвенно: события пишет Runner (владелец — Observability)']
+- {table: run_event, access: indirect, why: события пишет Runner (владелец — Observability)}
 reqs: [R-HRN-06, R-HRN-12]
 tasks: ['1.3']
 failures:
-- Runner временно не принимает события — Harness буферизует и досылает с последнего `seq` (R-HRN-06)
-- Провайдер не отдаёт `reasoning_content` — событий `REASONING_*` нет, реплики агента о намерении отдаются
+- {when: Runner временно не принимает события, then: Harness буферизует и досылает с последнего `seq`, reqs: [R-HRN-06]}
+- {when: Провайдер не отдаёт `reasoning_content`, then: 'событий `REASONING_*` нет, реплики агента о намерении отдаются'}
 why: Чат запуска в задаче и аудит.
 rnd: observability.md
 ops:
-- ['`GET /run/events?seq=` — поток `RunEvent` NDJSON, переподключение с последнего `seq`', Agent Runner (Event relay), I7]
+- {op: '`GET /run/events?seq=` — поток `RunEvent` NDJSON, переподключение с последнего `seq`', label: Agent Runner (Event relay), via: [I7]}

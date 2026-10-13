@@ -6,6 +6,6 @@ accept:
 - Тул вне allowlist → отказ
 - Правило с ошибкой → не применяется, прежнее действует
 reqs:
-- 'guardrails: G2 Action'
-- 'guardrails: Единый источник правил'
+- {spec: guardrails, title: G2 Action}
+- {spec: guardrails, title: Единый источник правил}
 entry: агент → правила

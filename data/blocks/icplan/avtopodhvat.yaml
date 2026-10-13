@@ -3,42 +3,42 @@ tech: 'Доработка форка (D17): тип задачи задаёт п�
 kind: service
 stories: [US-ICP-01, US-ICP-05, US-ICP-25, US-ICP-26, US-ICP-27, US-ICP-07, US-ICP-16, US-ICP-18]
 params:
-- [step.column, —]
-- [step.agent, нет]
-- [step.on_success / on_failure, —]
-- [step.max_runs, '3']
-- [step.require_review, выкл]
-- [project.actions, нет]
+- {name: step.column, value: —}
+- {name: step.agent, value: нет}
+- {name: step.on_success / on_failure, value: —}
+- {name: step.max_runs, value: '3'}
+- {name: step.require_review, value: выкл}
+- {name: project.actions, value: нет}
 does:
 - Задача вошла в шаг → агент шага становится делегатом, запуск в его очереди
 - По итогу запуска ICPlan переводит задачу по правилам шага
 - Пишет в историю, по какому правилу агент взял задачу
 - Не создаёт второй активный запуск на агента и задачу — главная защита (R-AP-05); слот `per_issue` Runner — страховка (D14)
 io:
-- [←, 'Task UI, Действия проекта', задача вошла в колонку шага]
-- [→, Run Queue, '`Run` (pending) — запуск в очередь агента шага']
-- [←, Run Queue, итог запуска → переход по `step.on_success / on_failure`]
+- {dir: ←, label: 'Task UI, Действия проекта', what: задача вошла в колонку шага}
+- {dir: →, label: Run Queue, what: '`Run` (pending) — запуск в очередь агента шага'}
+- {dir: ←, label: Run Queue, what: итог запуска → переход по `step.on_success / on_failure`}
 data:
-- [process, чтение]
-- [process_step, чтение]
-- [process_version, 'чтение: шаги версии, с которой задача вошла']
-- [issue_process_state, 'запись: шаг, версия процесса входа (`process_version`, R-AP-22), число запусков, состояние']
-- [agent_run, 'запись: запуск в очередь, шаг `process_step_id`']
-- [issue, 'запись: делегат, колонка']
-- [project_action, чтение]
-- [issue_activity, 'запись: «агент взял задачу», переходы']
+- {table: process, access: read}
+- {table: process_step, access: read}
+- {table: process_version, access: read, why: 'шаги версии, с которой задача вошла'}
+- {table: issue_process_state, access: write, why: 'шаг, версия процесса входа (`process_version`, R-AP-22), число запусков, состояние'}
+- {table: agent_run, access: write, why: 'запуск в очередь, шаг `process_step_id`'}
+- {table: issue, access: write, why: 'делегат, колонка'}
+- {table: project_action, access: read}
+- {table: issue_activity, access: write, why: '«агент взял задачу», переходы'}
 reqs: [R-AP-01, R-AP-02, R-AP-03, R-AP-04, R-AP-05, R-AP-07, R-AP-10, R-AP-12, R-ICP-13, R-AP-15, R-AP-16, R-AP-17, R-AP-21, R-AP-22]
 tasks: ['3.1', '3.5', '3.6']
 failures:
-- Агент шага не участник проекта — запуск не создаётся, предупреждение в истории
-- Постановка в очередь не удалась — делегат установлен, повтор с backoff до 60 с, до 5 попыток; затем запись в истории и уведомление владельцу процесса (R-AP-12)
-- Цикл переходов — второй активный запуск не создаётся (R-AP-05); вход в шаг сверх `step.max_runs` — запуск не создаётся, задача идёт по `on_failure` шага, запись в истории (R-AP-12)
-- БД ICPlan недоступна — итог остаётся у Runner, он повторяет отправку; переход — когда итог принят (R-AP-10, R-ICP-13)
+- {when: Агент шага не участник проекта, then: 'запуск не создаётся, предупреждение в истории'}
+- {when: Постановка в очередь не удалась, then: 'делегат установлен, повтор с backoff до 60 с, до 5 попыток; затем запись в истории и уведомление владельцу процесса', reqs: [R-AP-12]}
+- {when: Цикл переходов, then: 'второй активный запуск не создаётся (R-AP-05); вход в шаг сверх `step.max_runs` — запуск не создаётся, задача идёт по `on_failure` шага, запись в истории', reqs: [R-AP-12]}
+- {when: БД ICPlan недоступна, then: 'итог остаётся у Runner, он повторяет отправку; переход — когда итог принят', reqs: [R-AP-10, R-ICP-13]}
 why: Процесс идёт сам, а переход делает трекер, а не агент — правило однозначно. Что передаётся между шагами и как подтверждаются критерии приёмки — контракт шага D20.
 rnd: autopickup-rules.md
 ops:
-- ['Вход задачи в шаг: делегат = агент шага, запуск в очередь', ICPlan при смене колонки или переходе, внутри]
-- [Переход по итогу запуска (`step.on_success / on_failure`), 'приём итога `POST /agent-runs/:runId/result`', I2]
-- ['`GET /projects/:projectKey/processes`, `PUT /projects/:projectKey/processes/:issueTypeId` — процесс типа задачи', Администратор (интерфейс ICPlan), I20]
-- ['`POST /projects/:projectKey/actions` — Действие «делегировать агенту»', Администратор, I20]
-- ['`POST /issues/:issueId/process/retry` — повтор шага', Пользователь, I20]
+- {op: 'Вход задачи в шаг: делегат = агент шага, запуск в очередь', label: ICPlan при смене колонки или переходе, internal: true}
+- {op: Переход по итогу запуска (`step.on_success / on_failure`), label: 'приём итога `POST /agent-runs/:runId/result`', via: [I2]}
+- {op: '`GET /projects/:projectKey/processes`, `PUT /projects/:projectKey/processes/:issueTypeId` — процесс типа задачи', label: Администратор (интерфейс ICPlan), via: [I20]}
+- {op: Действие «делегировать агенту», endpoint: 'POST /projects/:projectKey/actions', label: Администратор, via: [I20]}
+- {op: повтор шага, endpoint: 'POST /issues/:issueId/process/retry', label: Пользователь, via: [I20]}

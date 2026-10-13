@@ -2,7 +2,8 @@
 
 Единица — один файл 1–3 КБ: блок, компонент, модель, таблица, эндпоинты страницы API, истории и процессы компонента.
 Модули datamodel.py, subcomponents.py, stories.py, components.py только загружают отсюда значения (имена прежние).
-Методология: docs/rules/data-methodology.md#yaml. Команды: doctool yaml-check | yaml-fmt | unit | yaml-export.
+Методология: docs/rules/data-methodology.md#yaml (схема единиц — #yaml-units). Команды: doctool yaml-check | yaml-fmt | unit | yaml-schema | yaml-migrate | yaml-export.
+Каталоги для полей-ссылок — html-view/yamlcat.py; прежний позиционный вид и перевод — html-view/yamlmigrate.py.
 
 Раскладка (порядок — data/<вид>/_order.yaml: список имён файлов без .yaml):
     data/components/<slug>.yaml        COMPONENTS, ABOUT, BLOCKS (схема), datamodel.STORES, ICPLAN_TABLES
@@ -33,10 +34,10 @@ _Loader = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 
 # ---------------------------------------------------------------- схема
 class Ctx:
-    """Контекст проверки: ошибки и (для yaml-check) проверка ссылок на другие единицы."""
+    """Контекст проверки: ошибки, (для yaml-check) проверка ссылок по каталогам, компонент файла (для имён параметров)."""
 
-    def __init__(self, refs=False):
-        self.errors, self.refs = [], refs
+    def __init__(self, refs=False, comp=None):
+        self.errors, self.refs, self.comp = [], refs, comp
 
     def err(self, p, msg):
         self.errors.append(f"{p or '<корень>'} → {msg}")
@@ -46,8 +47,13 @@ def _kind(v):
     return {str: "строка", int: "число", bool: "да/нет", list: "список", dict: "словарь", float: "дробное", type(None): "null"}.get(type(v), type(v).__name__)
 
 
+def _jsre(rx):
+    return "^(?:" + rx + ")$"
+
+
 class Any_:
     scalar = True
+    desc = ""
 
     def load(self, v, p, c):
         return v
@@ -58,10 +64,13 @@ class Any_:
     def accepts(self, v):
         return True
 
+    def js(self, ctx):
+        return {}
+
 
 class Str(Any_):
-    def __init__(self, choices=None, pattern=None, ref=None, hint=""):
-        self.choices, self.pattern, self.ref, self.hint = choices, pattern, ref, hint
+    def __init__(self, choices=None, pattern=None, ref=None, hint="", desc=""):
+        self.choices, self.pattern, self.ref, self.hint, self.desc = choices, pattern, ref, hint, desc
 
     def accepts(self, v):
         return isinstance(v, str)
@@ -73,7 +82,7 @@ class Str(Any_):
         if not c.refs:  # загрузка модулем — только структура и типы; значения и ссылки — yaml-check
             return v
         if self.choices and v not in self.choices:
-            c.err(p, f"«{v}» — допустимо: {', '.join(x or '«»' for x in self.choices)}")
+            c.err(p, f"«{v}» — допустимо: {', '.join(x or '«»' for x in self.choices)}" + _cat().suggest(v, self.choices))
         if self.pattern and v and not re.fullmatch(self.pattern, v):
             c.err(p, f"«{v}» не по формату {self.hint or self.pattern}")
         if self.ref and v:
@@ -81,6 +90,49 @@ class Str(Any_):
             if bad:
                 c.err(p, bad)
         return v
+
+    def js(self, ctx):
+        out = {"type": "string"}
+        if self.choices:
+            out["enum"] = list(self.choices)
+        elif self.pattern:
+            out["pattern"] = _jsre(self.pattern)
+        return out
+
+
+def _cat():
+    import yamlcat
+    return yamlcat
+
+
+class Ref(Str):
+    """Значение из каталога (yamlcat): не из списка — ошибка yaml-check с подсказкой ближайшего; в JSON Schema — enum."""
+
+    def __init__(self, cat, desc="", also=None):
+        super().__init__(desc=desc)
+        self.cat, self.also = cat, also  # also — регулярка допустимых значений вне каталога (S<N> вместо таблицы)
+
+    def load(self, v, p, c):
+        if not isinstance(v, str):
+            c.err(p, f"нужна строка, а не {_kind(v)} — возьми значение в кавычки")
+            return v
+        if c.refs and v and not (self.also and re.fullmatch(self.also, v)):
+            bad = _cat().check(self.cat, v, c.comp)
+            if bad:
+                c.err(p, bad)
+        return v
+
+    def js(self, ctx):
+        if self.cat == "ref":
+            return {"type": "string", "pattern": _jsre(r"I\d+|R-[A-Z]+-\d+|D\d+|US-[A-Z]+-\d+")}
+        if self.cat == "param" and not ctx.get("comp"):
+            return {"type": "string"}
+        if self.cat == "param":
+            out = {"type": "string", "enum": [str(x) for x in _cat().values(self.cat, ctx.get("comp"))]}
+        else:  # каталоги — один раз в catalog.schema.json
+            out = {"$ref": f"catalog.schema.json#/definitions/{self.cat}"}
+        alts = [out] + ([{"type": "string", "pattern": _jsre(self.also)}] if self.also else []) + [{"const": ""}]  # пусто — как в yaml-check
+        return {"anyOf": alts}
 
 
 class Int(Any_):
@@ -92,6 +144,9 @@ class Int(Any_):
             c.err(p, f"нужно целое число, а не {_kind(v)}")
         return v
 
+    def js(self, ctx):
+        return {"type": "integer"}
+
 
 class Bool(Any_):
     def accepts(self, v):
@@ -101,6 +156,9 @@ class Bool(Any_):
         if not isinstance(v, bool):
             c.err(p, f"нужно true или false, а не {_kind(v)}")
         return v
+
+    def js(self, ctx):
+        return {"type": "boolean"}
 
 
 class Opt(Any_):
@@ -118,6 +176,9 @@ class Opt(Any_):
 
     def dump(self, v):
         return None if v is None else self.inner.dump(v)
+
+    def js(self, ctx):
+        return {"anyOf": [{"type": "null"}, self.inner.js(ctx)]}
 
 
 class FlowList(list):
@@ -148,9 +209,12 @@ class Lst(Any_):
         out = [self.item.dump(x) for x in v]
         return FlowList(out) if self.flow else out
 
+    def js(self, ctx):
+        return {"type": "array", "items": self.item.js(ctx)}
+
 
 class Tup(Any_):
-    """Строка таблицы: [a, b, c] в YAML, кортеж в Python. names — подписи полей для сообщений и карточки."""
+    """Строка таблицы: [a, b, c] в YAML, кортеж в Python (прежний позиционный вид; в схемах единиц — только для yaml-migrate)."""
     scalar = False
 
     def __init__(self, *items, names=()):
@@ -169,14 +233,17 @@ class Tup(Any_):
     def dump(self, v):
         return FlowList(s.dump(x) for s, x in zip(self.items, v))
 
+    def js(self, ctx):
+        return {"type": "array", "items": [s.js(ctx) for s in self.items], "minItems": len(self.items), "maxItems": len(self.items)}
+
 
 class Fields(Any_):
-    """Общее для записей: fields = [(имя, схема, режим)], режим: "req" | "opt" | ("def", значение по умолчанию)."""
+    """Общее для записей: fields = [(имя, схема, режим, описание)], режим: "req" | "opt" | ("def", значение по умолчанию)."""
     scalar = False
 
-    def __init__(self, *fields, flow=False, tag=None):
-        self.fields = [f if len(f) == 3 else (*f, "req") for f in fields]
-        self.flow, self.tag = flow, tag
+    def __init__(self, *fields, flow=False, tag=None, one_of=()):
+        self.fields = [tuple(f) + ("req", "")[len(f) - 2:] if len(f) < 4 else tuple(f) for f in fields]
+        self.flow, self.tag, self.one_of = flow, tag, one_of  # one_of — хотя бы одно из полей (with | label)
         self.names = [f[0] for f in self.fields]
 
     def accepts(self, v):
@@ -188,9 +255,9 @@ class Fields(Any_):
             return None
         for k in v:
             if k not in self.names:
-                c.err(f"{p}.{k}" if p else str(k), f"лишнее поле — допустимы: {', '.join(self.names)}")
+                c.err(f"{p}.{k}" if p else str(k), f"лишнее поле — допустимы: {', '.join(self.names)}" + _cat().suggest(k, self.names))
         out = {}
-        for name, sch, mode in self.fields:
+        for name, sch, mode, _ in self.fields:
             q = f"{p}.{name}" if p else name
             if name in v:
                 out[name] = sch.load(v[name], q, c)
@@ -198,6 +265,22 @@ class Fields(Any_):
                 c.err(q, "обязательное поле не заполнено")
             elif isinstance(mode, tuple):
                 out[name] = mode[1]() if callable(mode[1]) else mode[1]
+        if self.one_of and not any(v.get(k) for k in self.one_of):
+            c.err(p, f"нужно хотя бы одно из полей: {', '.join(self.one_of)}")
+        return out
+
+    def js(self, ctx):
+        props = {}
+        for name, sch, mode, desc in self.fields:
+            j = dict(sch.js(ctx))
+            d = desc or getattr(sch, "desc", "")
+            if d:
+                j["description"] = d
+            props[name] = j
+        out = {"type": "object", "properties": props, "additionalProperties": False,
+               "required": [n for n, _, m, _ in self.fields if m == "req"]}
+        if self.one_of:
+            out["anyOf"] = [{"required": [k]} for k in self.one_of]
         return out
 
 
@@ -210,7 +293,7 @@ class Rec(Fields):
 
     def dump(self, v):
         out = {}
-        for name, sch, mode in self.fields:
+        for name, sch, mode, _ in self.fields:
             if name not in v:
                 continue
             if isinstance(mode, tuple) and v[name] == (mode[1]() if callable(mode[1]) else mode[1]):
@@ -233,6 +316,46 @@ class TRec(Fields):
             idx = [i for i in idx if i not in opt[:len(self.fields) - len(v)]]
         out = {self.fields[i][0]: self.fields[i][1].dump(x) for i, x in zip(idx, v)}
         return FlowDict(out) if self.flow else out
+
+
+class Row(Fields):
+    """Строка таблицы с именованными полями: словарь в YAML, прежнее значение в Python (кортеж или строка).
+
+    to_py(поля) → значение для модулей (прежняя структура, тексты собираются из полей — страницы не меняются);
+    from_py(значение) → варианты полей по убыванию извлечения ID; берётся первый, который собирается обратно без потерь.
+    Последний вариант — без извлечения (текст как есть)."""
+
+    def __init__(self, *fields, to_py, from_py, flow=True, tag=None, one_of=()):
+        super().__init__(*fields, flow=flow, tag=tag, one_of=one_of)
+        self.to_py, self.from_py = to_py, from_py
+
+    def load(self, v, p, c):
+        out = self._load_map(v, p, c)
+        if out is None:
+            return v
+        try:
+            return self.to_py(out)
+        except (KeyError, TypeError) as e:
+            c.err(p, f"не собрать строку из полей ({e})")
+            return v
+
+    def dump(self, v):
+        for cand in self.from_py(v):
+            if any(k not in self.names and x not in (None, "", [], False) for k, x in cand.items()):
+                continue  # извлечённого поля нет в этой строке
+            cand = {k: x for k, x in cand.items() if k in self.names and (self._required(k) or x not in (None, "", [], False))}
+            full = {**{n: (m[1]() if callable(m[1]) else m[1]) for n, _, m, _ in self.fields if isinstance(m, tuple) and n not in cand}, **cand}
+            try:
+                same = self.to_py(full) == v
+            except KeyError:
+                same = False
+            if same:
+                out = {name: sch.dump(cand[name]) for name, sch, _, _ in self.fields if name in cand}
+                return FlowDict(out) if self.flow else out
+        raise ValueError(f"строка не собирается обратно: {v!r}")
+
+    def _required(self, k):
+        return next(m for n, _, m, _ in self.fields if n == k) == "req"
 
 
 class Map(Any_):
@@ -258,6 +381,13 @@ class Map(Any_):
     def dump(self, v):
         out = {k: self.val.dump(x) for k, x in v.items()}
         return FlowDict(out) if self.flow else out
+
+    def js(self, ctx):
+        out = {"type": "object", "additionalProperties": self.val.js(ctx)}
+        k = self.key.js(ctx)
+        if k.get("pattern") or k.get("enum"):
+            out["propertyNames"] = k
+        return out
 
 
 class OneOf(Any_):
@@ -287,12 +417,15 @@ class OneOf(Any_):
                 return a.dump(v)
         return v
 
+    def js(self, ctx):
+        return {"anyOf": [a.js(ctx) for a in self.alts]}
+
 
 class Lazy(Any_):
     scalar = False
 
-    def __init__(self, fn):
-        self.fn = fn
+    def __init__(self, fn, name):
+        self.fn, self.name = fn, name
 
     def __getattr__(self, k):
         return getattr(self.fn(), k)
@@ -306,8 +439,40 @@ class Lazy(Any_):
     def dump(self, v):
         return self.fn().dump(v)
 
+    def js(self, ctx):
+        defs = ctx.setdefault("definitions", {})
+        if self.name not in defs:
+            defs[self.name] = {}
+            defs[self.name] = self.fn().js(ctx)
+        return {"$ref": f"#/definitions/{self.name}"}
 
-# ---------------------------------------------------------------- ссылки (yaml-check)
+
+class NextStep(Any_):
+    """Переход процесса: «куда» строкой или {to, label}; в Python — (куда, подпись)."""
+    scalar = False
+
+    def accepts(self, v):
+        return isinstance(v, (str, dict))
+
+    def load(self, v, p, c):
+        if isinstance(v, str):
+            return (v, "")
+        if isinstance(v, dict) and set(v) <= {"to", "label"} and isinstance(v.get("to"), str) and isinstance(v.get("label", ""), str):
+            return (v["to"], v.get("label", ""))
+        c.err(p, "переход — id шага строкой или {to: <id шага>, label: <подпись>}")
+        return ("", "")
+
+    def dump(self, v):
+        return v[0] if not v[1] else FlowDict(to=v[0], label=v[1])
+
+    def js(self, ctx):
+        return {"anyOf": [{"type": "string", "description": "id шага"},
+                          {"type": "object", "properties": {"to": {"type": "string", "description": "id шага"},
+                                                            "label": {"type": "string", "description": "подпись перехода (да / нет)"}},
+                           "required": ["to"], "additionalProperties": False}]}
+
+
+# ---------------------------------------------------------------- ссылки без каталога (yaml-check)
 _REFCACHE = {}
 
 
@@ -321,112 +486,416 @@ def _stems(sub):
     return {f.stem for f in (DATA / sub).glob("*.yaml") if not f.stem.startswith("_")}
 
 
-def _story_ids():
-    return {f.stem for f in DATA.glob("stories/*/*.yaml") if not f.stem.startswith("_")}
-
-
-def _spec_text():
-    return "".join(f.read_text(encoding="utf-8") for f in ROOT.glob("openspec/changes/*/specs/*/spec.md"))
-
-
-def _tables():
-    schema = json.loads((HERE / "icplan_schema.json").read_text(encoding="utf-8"))
-    d = datamodel()
-    return set(d["PLATFORM_TABLES"]) | {v["table"] for v in schema.values()} | set(d["LITELLM_TABLES"]) | set(d["FORK_COLUMNS"])
-
-
 def _miss(what, ok, fix):
     return None if ok else f"{what} — {fix}"
 
 
 REF = {
-    "component": lambda v: _miss(f"компонента «{v}» нет", v in _cached("comp", lambda: _stems("components")), "есть data/components/<slug>.yaml"),
     "component*": lambda v: None if v.startswith("«") or v in _cached("comp", lambda: _stems("components"))
-    else f"«{v}» — slug компонента (data/components) или внешний участник в «…»",
-    "story": lambda v: _miss(f"истории {v} нет", v in _cached("stories", _story_ids), "файл data/stories/<компонент>/<US-ID>.yaml"),
-    "stories": lambda v: next((f"истории {x} нет — id из data/stories" for x in re.split(r",\s*", v) if x.startswith("US-")
-                               and x not in _cached("stories", _story_ids)), None),
-    "req": lambda v: _miss(f"требования {v} нет", f"`{v}`" in _cached("spec", _spec_text), "код R-… из spec.md"),
-    "task": lambda v: _miss(f"задачи {v} нет", bool(list((ROOT / "docs/tasks").glob(f"{v}-*.md"))), "номер файла docs/tasks/<номер>-*.md"),
-    "icode": lambda v: _miss(f"интерфейса {v} нет", v in _cached("integ", lambda: set(datamodel()["INTEG"])), "I-код из data/integrations.yaml"),
-    "model": lambda v: _miss(f"модели {v} нет", v in _cached("models", lambda: _stems("models")), "имя файла data/models/<Имя>.yaml"),
-    "rnd": lambda v: _miss(f"R&D {v} нет", (ROOT / "docs/rnd" / v).exists(), "файл в docs/rnd или пусто"),
-    "role": lambda v: _miss(f"роли {v} нет", v in _cached("roles", lambda: set(stories()["ROLES"]) | set(stories()["PERSONAS"])), "ключ roles / personas в data/personas.yaml"),
-    "table": lambda v: None if re.match(r"S\d+", v.split(" ")[0].strip("`")) or v.split(" ")[0].strip("`") in _cached("tables", _tables)
-    else f"таблицы `{v.split(' ')[0].strip('`')}` нет в модели данных — data/tables, схема форка или LiteLLM",
+    else f"«{v}» — slug компонента (data/components) или внешний участник в «…»" + _cat().suggest(v, _cat().components()),
     "path": lambda v: _miss(f"файла {v} нет", (ROOT / v).exists(), "путь от корня репозитория"),
-    "irefs": lambda v: next((f"I-код {i} нет в data/integrations.yaml" for i in re.findall(r"\bI\d+\b", v)
-                             if i not in _cached("integ", lambda: set(datamodel()["INTEG"]))), None),
 }
+
+
+# ---------------------------------------------------------------- ID в тексте: хвост «(I11, R-MEM-04, D20)», «(FMEA <спека>; R-…)»
+_ID = r"(?:I\d+|R-[A-Z]+-\d+|D\d+)"
+_IDS = rf"{_ID}(?:, {_ID})*"
+
+
+def split_ids(text):
+    """(тело, fmea, [ID]) — хвост в скобках, составленный только из ID (и «FMEA <спека>»); нет такого хвоста — (text, None, [])."""
+    if re.fullmatch(_IDS, text):
+        return "", None, text.split(", ")
+    m = re.fullmatch(rf"(.*?) \(((?:FMEA [a-z-]+)?(?:; )?(?:{_IDS})?)\)", text, flags=re.S)
+    if not m or not m.group(2):
+        return text, None, []
+    inner = m.group(2)
+    fm = re.match(r"FMEA ([a-z-]+)(?:; )?", inner)
+    fmea = fm.group(1) if fm else None
+    rest = inner[fm.end():] if fm else inner
+    if fm and rest and not inner[fm.end() - 2:fm.end()] == "; ":
+        return text, None, []
+    return m.group(1), fmea, (rest.split(", ") if rest else [])
+
+
+def join_ids(body, fmea=None, ids=()):
+    groups = ([f"FMEA {fmea}"] if fmea else []) + ([", ".join(ids)] if ids else [])
+    if not groups:
+        return body
+    return f"{body} ({'; '.join(groups)})" if body else "; ".join(groups)
+
+
+def _by_kind(ids):
+    """ID хвоста → поля via (I), reqs (R), decisions (D); порядок при сборке — via, reqs, decisions."""
+    d = {"via": [], "reqs": [], "decisions": []}
+    for i in ids:
+        d["via" if i.startswith("I") else "reqs" if i.startswith("R-") else "decisions"].append(i)
+    return d
+
+
+def _ids_of(d):
+    return list(d.get("via") or []) + list(d.get("reqs") or []) + list(d.get("decisions") or [])
+
+
+def _sfx(text, fmea_ok=False):
+    """Варианты (тело, поля хвоста): с извлечением ID и без."""
+    body, fmea, ids = split_ids(text)
+    out = []
+    if (ids or fmea) and (fmea_ok or not fmea) and (not fmea or fmea in _cat().specs()):
+        d = _by_kind(ids)
+        if fmea:
+            d["fmea"] = fmea
+        out.append((body, d))
+    out.append((text, {}))
+    return out
+
+
+_EP = r"(?:GET|POST|PUT|PATCH|DELETE) [^`]+"
+
+
+def _known_endpoints(eps):
+    return all(e in _cat().endpoints() for e in eps)
+
+
+# ---------------------------------------------------------------- строки таблиц: поля ↔ прежнее значение
+S = Str()
+DIR = Str(choices=("→", "←", "↔"), desc="направление: → блок отдаёт, ← блок получает, ↔ в обе стороны")
+VIA = Lst(Ref("icode"), flow=True)
+REQS = Lst(Ref("req"), flow=True)
+DECS = Lst(Ref("decision"), flow=True)
+SFX = [("via", VIA, "opt", "I-коды интерфейса (data/integrations.yaml)"), ("reqs", REQS, "opt", "R-коды требований"),
+       ("decisions", DECS, "opt", "решения D<N> (design.md)")]
+
+
+def _models_text(models, what):
+    if not models:
+        return what
+    return ", ".join(f"`{m}`" for m in models) + (f" — {what}" if what else "")
+
+
+def _io_py(d):
+    return (d["dir"], d.get("label") or d["with"], join_ids(_models_text(d.get("model"), d.get("what", "")), None, _ids_of(d)))
+
+
+def _who(w, key="with"):
+    return {key: w} if w in _cat().participants() else {"label": w}
+
+
+def _io_from(v):
+    dr, w, text = v
+    for body, ids in _sfx(text):
+        m = re.fullmatch(r"(`[A-Z]\w*`(?:, `[A-Z]\w*`)*)(?: — (.*))?", body, flags=re.S)
+        if m:
+            ms = re.findall(r"`(\w+)`", m.group(1))
+            if all(x in _cat().models() for x in ms):
+                yield {"dir": dr, **_who(w), "model": ms, "what": m.group(2) or "", **ids}
+        yield {"dir": dr, **_who(w), "what": body, **ids}
+    yield {"dir": dr, "label": w, "what": text}
+
+
+IO_ROW = Row(("dir", DIR), ("with", Ref("participant"), "opt", "с кем: компонент, блок, «Компонент · Блок» или роль (каталог)"),
+             ("label", S, "opt", "подпись участника, если её нет в каталоге или она отличается (текст как на странице)"),
+             ("model", Lst(Ref("model"), flow=True), "opt", "модели data/models, которые передаются"),
+             ("what", S, "opt", "что передаётся (без моделей и I-кодов)"), *SFX,
+             to_py=_io_py, from_py=_io_from, one_of=("with", "label"))
+
+ACCESS = {"read": "чтение", "write": "запись", "read-write": "запись, чтение", "store": "хранение", "indirect": "косвенно"}
+
+
+def _data_text(d):
+    if not d.get("access"):
+        return d.get("why", "")
+    t = ACCESS[d["access"]] + (" через " + ", ".join(d["via"]) if d.get("via") else "")
+    why = d.get("why", "")
+    if not why:
+        return t
+    return t + (" " if why[:1] == "(" or why.split(" ")[0] in ("по", "через", "при", "для") else ": ") + why
+
+
+def _data_from(v):
+    table, text = v
+    for k, word in sorted(ACCESS.items(), key=lambda x: -len(x[1])):
+        if text == word or text.startswith(word + " ") or text.startswith(word + ":"):
+            rest = text[len(word):]
+            m = re.match(r" через (I\d+(?:, I\d+)*)", rest)
+            via = m.group(1).split(", ") if m else []
+            rest = rest[m.end():] if m else rest
+            why = rest[2:] if rest.startswith(": ") else rest[1:] if rest.startswith(" ") else rest
+            yield {"table": table, "access": k, "via": via, "why": why}
+            yield {"table": table, "access": k, "why": text[len(word):].lstrip(": ").lstrip()}
+    yield {"table": table, "why": text}
+
+
+DATA_ROW = Row(("table", Ref("table", also=r"S\d+"), "req", "таблица модели данных (каталог) или хранилище S<N>"),
+               ("access", Str(choices=tuple(ACCESS)), "opt", "доступ: " + ", ".join(f"{k} — «{w}»" for k, w in ACCESS.items())),
+               ("via", VIA, "opt", "через какой интерфейс (I-код)"), ("why", S, "opt", "что и зачем (текст)"),
+               to_py=lambda d: (d["table"], _data_text(d)), from_py=_data_from)
+
+_PARAM_COMP = []  # компонент файла при записи (для решения «значение или пояснение»)
+
+
+def _param_from(v):
+    name, val = v
+    comp = _PARAM_COMP[-1] if _PARAM_COMP else None
+    t = _cat().params(comp).get(name, {}).get("type") if comp else None
+    if t and val and not _cat().value_ok(t, val) and val != _cat().params(comp)[name]["default"]:
+        yield {"name": name, "note": val}
+    yield {"name": name, "value": val}
+
+
+PARAM_ROW = Row(("name", Ref("param"), "req", "имя параметра из таблицы «Параметры модуля» interfaces.md спек компонента"),
+                ("value", S, "opt", "значение по типу из interfaces.md (число, длительность, перечисление); на странице — значение спеки"),
+                ("note", S, "opt", "пояснение вместо значения (когда значение задаёт спека)"),
+                to_py=lambda d: (d["name"], d["value"] if "value" in d else d.get("note", "")), from_py=_param_from)
+
+
+def _screen_what(d):
+    return d["what"] + (" — " + ", ".join(f"`{e}`" for e in d["endpoints"]) if d.get("endpoints") else "")
+
+
+def _screen_from(v):
+    name, where, what, status, code, stories = v
+    base = {"name": name, "where": where, "status": status, "code": code, "stories": stories.split(", ") if stories else []}
+    m = re.fullmatch(rf"(.*) — (`{_EP}`(?:, `{_EP}`)*)", what, flags=re.S)
+    if m:
+        eps = re.findall(r"`([^`]+)`", m.group(2))
+        if _known_endpoints(eps):
+            yield {**base, "what": m.group(1), "endpoints": eps}
+    yield {**base, "what": what}
+
+
+SCREEN_ROW = Row(("name", S, "req", "экран"), ("where", S, "req", "где в интерфейсе"), ("what", S, "req", "что на экране"),
+                 ("endpoints", Lst(Ref("endpoint"), flow=True), "opt", "эндпоинты экрана «МЕТОД путь» (data/endpoints)"),
+                 ("status", Str(choices=("есть", "доработка", "новое")), "req", "есть | доработка | новое"),
+                 ("code", S, "req", "где код (путь в форке)"),
+                 ("stories", Lst(Ref("story"), flow=True), "req", "истории US-…"),
+                 to_py=lambda d: (d["name"], d["where"], _screen_what(d), d["status"], d["code"], ", ".join(d["stories"])),
+                 from_py=_screen_from)
+
+
+def _op_text(d):
+    return join_ids((f"`{d['endpoint']}` — " if d.get("endpoint") else "") + d["op"], None, _ids_of({"reqs": d.get("reqs"), "decisions": d.get("decisions")}))
+
+
+def _op_via(d):
+    return ", ".join(d["via"]) if d.get("via") else "внутри" if d.get("internal") else d.get("via_note", "")
+
+
+def _op_from(v):
+    op, who, via = v
+    vv = {"via": via.split(", ")} if re.fullmatch(r"I\d+(?:, I\d+)*", via) else {"internal": True} if via == "внутри" else {"via_note": via}
+    for body, ids in _sfx(op):
+        ids = {k: x for k, x in ids.items() if k in ("reqs", "decisions")} if not ids.get("via") else None
+        if ids is None:
+            continue
+        m = re.fullmatch(rf"`({_EP})` — (.*)", body, flags=re.S)
+        if m and _known_endpoints([m.group(1)]):
+            yield {"op": m.group(2), "endpoint": m.group(1), **_who(who, "who"), **vv, **ids}
+        yield {"op": body, **_who(who, "who"), **vv, **ids}
+    yield {"op": op, "label": who, **vv}
+
+
+OP_ROW = Row(("op", S, "req", "операция (текст)"), ("endpoint", Ref("endpoint"), "opt", "эндпоинт «МЕТОД путь» (data/endpoints)"),
+             ("who", Ref("participant"), "opt", "кто вызывает: компонент, блок, роль (каталог)"),
+             ("label", S, "opt", "кто вызывает — текстом, если нет в каталоге"),
+             ("via", VIA, "opt", "I-код интерфейса"), ("internal", Bool(), "opt", "вызов внутри компонента (на странице — «внутри»)"),
+             ("via_note", S, "opt", "канал текстом, если не I-код и не «внутри»"),
+             ("reqs", REQS, "opt", "R-коды"), ("decisions", DECS, "opt", "решения D<N>"),
+             to_py=lambda d: (_op_text(d), d.get("label") or d["who"], _op_via(d)), from_py=_op_from, one_of=("who", "label"))
+
+
+def _fail_text(d):
+    return join_ids(d["when"] + (f" — {d['then']}" if d.get("then") else ""), d.get("fmea"), _ids_of(d))
+
+
+def _fail_from(v):
+    for body, ids in _sfx(v, fmea_ok=True):
+        when, sep, then = body.partition(" — ")
+        yield {"when": when, "then": then, **ids}
+
+
+FAIL_ROW = Row(("when", S, "req", "что сломалось"), ("then", S, "opt", "что происходит (поведение при сбое)"),
+               ("fmea", Ref("spec"), "opt", "спека, в FMEA которой отказ (interfaces.md)"), *SFX,
+               to_py=_fail_text, from_py=_fail_from)
+
+
+def _sfx_row(names, text_field, to_tuple):
+    """Строка, у которой последнее текстовое поле может кончаться хвостом ID."""
+    def from_py(v):
+        base = dict(zip(names, v))
+        for body, ids in _sfx(base[text_field]):
+            if "fmea" in ids:
+                continue
+            yield {**base, text_field: body, **ids}
+    return from_py
+
+
+def _field_py(d):
+    return (d["name"], d["type"], d["required"], join_ids(d["desc"], None, _ids_of(d)))
+
+
+FIELD_ROW = Row(("name", S, "req", "поле модели"), ("type", S, "req", "тип: int, string, enum: …, Модель, Модель[]"),
+                ("required", Bool(), "req", "обязательное"), ("desc", S, "req", "описание"), *SFX,
+                to_py=_field_py, from_py=_sfx_row(("name", "type", "required", "desc"), "desc", None))
+
+
+def _key_text(d):
+    return d["key"] if "key" in d else ", ".join((["PK"] if d.get("pk") else []) + ([f"FK {d['fk']}"] if d.get("fk") else []))
+
+
+def _col_from(v):
+    name, typ, key, desc = v
+    m = re.fullmatch(r"(PK)?(?:, )?(?:FK (\w+))?", key)
+    keys = [{"pk": bool(m.group(1)), "fk": m.group(2) or ""}] if m and (not m.group(2) or m.group(2) in _cat().tables()) else []
+    keys.append({"key": key})
+    for k in keys:
+        for body, ids in _sfx(desc):
+            if "fmea" not in ids:
+                yield {"name": name, "type": typ, **k, "desc": body, **ids}
+
+
+COLUMN_ROW = Row(("name", S, "req", "колонка"), ("type", S, "req", "тип SQL"), ("pk", Bool(), "opt", "входит в первичный ключ"),
+                 ("fk", Ref("table"), "opt", "внешний ключ на таблицу (каталог)"), ("key", S, "opt", "ключ текстом, если не PK / FK <таблица>"),
+                 ("desc", S, "opt", "описание"), *SFX,
+                 to_py=lambda d: (d["name"], d["type"], _key_text(d), join_ids(d.get("desc", ""), None, _ids_of(d))), from_py=_col_from)
+
+INDEX_ROW = Row(("kind", Str(choices=("unique", "index", "hnsw")), "req", "unique | index | hnsw"),
+                ("columns", Lst(S, flow=True), "req", "колонки индекса (этой таблицы)"), ("why", S, "req", "зачем"),
+                to_py=lambda d: (d["kind"], ", ".join(d["columns"]), d["why"]),
+                from_py=lambda v: [{"kind": v[0], "columns": v[1].split(", "), "why": v[2]}])
+
+
+def _src_py(d):
+    return tuple([d["kind"], ", ".join(d["refs"]) if d.get("refs") else d.get("ref", "")] + ([d["part"]] if "part" in d else []) + [d["why"]])
+
+
+def _src_from(v):
+    kind, ref, *rest = v
+    part = {"part": rest[0]} if len(rest) == 2 else {}
+    why = rest[-1]
+    if re.fullmatch(rf"(?:{_ID}|US-[A-Z]+-\d+)(?:, (?:{_ID}|US-[A-Z]+-\d+))*", ref):
+        yield {"kind": kind, "refs": ref.split(", "), **part, "why": why}
+    yield {"kind": kind, "ref": ref, **part, "why": why}
+
+
+SOURCE_ROW = Row(("kind", Str(choices=("fork", "ours", "ext")), "req", "fork — форк ICPlan, ours — наша, ext — внешний стандарт"),
+                 ("refs", Lst(Ref("ref"), flow=True), "opt", "основание — ID: R-…, D<N>, I…, US-…"),
+                 ("ref", S, "opt", "основание текстом: URL, эндпоинт, схема форка"),
+                 ("part", S, "opt", "часть источника"), ("why", S, "req", "почему так"),
+                 to_py=_src_py, from_py=_src_from, flow=False, one_of=("refs", "ref"))
+
+GRANT_ROW = Row(("role", S, "req", "роль БД"), ("right", Str(choices=("SELECT", "REFERENCES", "INSERT", "UPDATE", "DELETE")), "req", "право"),
+                ("table", Str(pattern=r"\w+\.\w+\.\w+", hint="база.схема.таблица"), "req", "база.схема.таблица"), ("why", S, "req", "зачем"),
+                to_py=lambda d: (d["role"], d["right"], d["table"], d["why"]),
+                from_py=lambda v: [dict(zip(("role", "right", "table", "why"), v))])
+
+DOMAIN_ROW = Row(("domain", S, "req", "домен S1"), ("tables", Lst(Ref("table"), flow=True), "req", "таблицы домена"),
+                 to_py=lambda d: (d["domain"], d["tables"]), from_py=lambda v: [{"domain": v[0], "tables": v[1]}])
+
+
+def _sreq_from(v):
+    spec, sep, title = v.partition(": ")
+    if sep and spec in _cat().specs():
+        yield {"spec": spec, "title": title}
+    yield {"text": v}
+
+
+STORY_REQ = Row(("spec", Ref("spec"), "opt", "спека openspec/changes/*/specs/<спека>"),
+                ("title", S, "opt", "требование — заголовок «### Requirement: …» спеки"),
+                ("text", S, "opt", "требование текстом, если не «спека: заголовок»"),
+                to_py=lambda d: d["text"] if "text" in d else f"{d['spec']}: {d['title']}", from_py=_sreq_from, one_of=("spec", "text"))
+
+STEP_ROW = Row(("id", S, "req", "id шага (латиница)"), ("lane", Int(), "req", "дорожка: номер в lanes с 0"),
+               ("type", Str(choices=("start", "task", "gateway", "end", "error")), "req", "start | task | gateway | end | error"),
+               ("label", S, "req", "подпись шага"), ("next", Lst(NextStep(), flow=True), ("def", list), "переходы: id шага или {to, label}"),
+               to_py=lambda d: (d["id"], d["lane"], d["type"], d["label"], d["next"]),
+               from_py=lambda v: [{"id": v[0], "lane": v[1], "type": v[2], "label": v[3], "next": v[4]}])
+
+SPEC_LINK = Row(("label", S, "req", "подпись"), ("path", Str(ref="path"), "req", "путь от корня репозитория"),
+                to_py=lambda d: (d["label"], d["path"]), from_py=lambda v: [{"label": v[0], "path": v[1]}])
+CHAIN_ROW = Row(("label", S, "req", "подпись звена"), ("comp", Ref("component"), "opt", "компонент (slug); нет — внешний участник"),
+                to_py=lambda d: (d["label"], d.get("comp")), from_py=lambda v: [{"label": v[0], "comp": v[1]}])
+ICPLAN_ROW = Row(("key", Ref("icplan_key"), "req", "ключ html-view/icplan_schema.json"), ("note", S, "req", "пометка (уровень памяти и т. п.)"),
+                 to_py=lambda d: (d["key"], d["note"]), from_py=lambda v: [{"key": v[0], "note": v[1]}])
 
 # ---------------------------------------------------------------- схемы единиц
 S = Str()
-SID = Str(ref="story", pattern=r"US-[A-Z]+-\d+", hint="US-<КОМП>-<NN>")
-TASK = Str(ref="task", pattern=r"\d+\.\d+", hint="номер задачи «2.3» в кавычках")
-REQ = Str(ref="req", pattern=r"R-[A-Z]+-\d+", hint="R-<КОМП>-<NN>")
-COMP = Str(ref="component")
+SID = Ref("story")
+TASK = Ref("task", desc="номер задачи «2.3» в кавычках")
+REQ = Ref("req")
+COMP = Ref("component")
+NONE_TEXT = Str(pattern=r"нет: .+", hint="«нет: <почему>»")
 
 BLOCK_CELL = Rec(("title", S), ("desc", S, ("def", "")), ("kind", Str(choices=("core", "ext", "store", "user", "back", ""))), ("st", S, ("def", "")),
-                 ("g", S, ("def", "")), ("to", Str(ref="component"), ("def", "")), flow=True, tag="title")
-ROW = Lazy(lambda: _ROW)
+                 ("g", S, ("def", "")), ("to", Ref("component"), ("def", "")), flow=True, tag="title")
+ROW = Lazy(lambda: _ROW, "row")
 ZONE = Rec(("zone", S), ("rows", Lst(ROW)), ("cls", S, ("def", "")), ("g", S, ("def", "")), ("note", S, ("def", "")), tag="zone")
 _ROW = OneOf(S, Lst(BLOCK_CELL), ZONE, hint="строка-подпись потока, список блоков [{title, desc, kind, st, g, to}] или зона {zone, rows}")
 
 SCHEMAS = {
     "component": Rec(
-        ("name", S), ("status", Str(choices=("done", "part", "todo"))), ("guardrails", Str(pattern=r"(G\d+([–-]G\d+)?(, )?)*", hint="G1, G1–G4 или пусто")),
-        ("desc", S), ("links", Lst(Any_()), ("def", list)),
-        ("specs", Lst(Tup(S, Str(ref="path"), names=("подпись", "путь")))), ("tasks", Lst(TASK, flow=True)),
-        ("about", TRec(("chain", Lst(Tup(S, Opt(COMP), names=("подпись", "slug|null")))), ("purpose", S), ("does", Lst(S))), "opt"),
-        ("stores", Lst(Str(pattern=r"S\d+", hint="S<N>"), flow=True), "opt"),
-        ("icplan_tables", Lst(Tup(S, S, names=("ключ icplan_schema.json", "пометка"))), "opt"),
-        ("blocks", Lst(ROW), "opt")),
+        ("name", S, "req", "название компонента"), ("status", Str(choices=("done", "part", "todo")), "req", "done | part | todo"),
+        ("guardrails", Str(pattern=r"(G\d+([–-]G\d+)?(, )?)*", hint="G1, G1–G4 или пусто"), "req", "G1, G1–G4 или пусто"),
+        ("desc", S, "req", "одна фраза о компоненте"), ("links", Lst(Any_()), ("def", list)),
+        ("specs", Lst(SPEC_LINK), "req", "спеки и схемы: {label, path}"), ("tasks", Lst(TASK, flow=True), "req", "задачи компонента"),
+        ("about", TRec(("chain", Lst(CHAIN_ROW)), ("purpose", S), ("does", Lst(S))), "opt", "справка: цепочка, назначение, что делает"),
+        ("stores", Lst(Ref("store"), flow=True), "opt", "хранилища S<N>"),
+        ("icplan_tables", Lst(ICPLAN_ROW), "opt", "таблицы форка ICPlan, которые использует компонент"),
+        ("blocks", Lst(ROW), "opt", "блочная схема")),
     "block": Rec(
-        ("title", S), ("tech", S), ("kind", Str(choices=("ui", "service", "store")), "opt"),
-        ("stories", Lst(SID, flow=True), "opt"),
-        ("screens", Lst(TRec(("name", S), ("where", S), ("what", S), ("status", S), ("code", S), ("stories", Str(ref="stories")), flow=True)), "opt"),
-        ("params", OneOf(S, Lst(Tup(S, S, names=("параметр", "значение"))), hint="строка «нет: …» или список [параметр, значение]"), "opt"),
-        ("does", Lst(S), "opt"),
-        ("io", Lst(Tup(Str(choices=("→", "←", "↔")), Str(ref="irefs"), Str(ref="irefs"), names=("→|←", "с кем", "что (I-код)"))), "opt"),
-        ("data", OneOf(S, Lst(Tup(Str(ref="table"), S, names=("таблица", "доступ"))), hint="строка «нет: …» или список [таблица, доступ]"), "opt"),
-        ("reqs", Lst(REQ, flow=True), "opt"), ("tasks", Lst(TASK, flow=True), "opt"),
-        ("failures", Lst(S), "opt"), ("why", S, "opt"), ("rnd", Str(ref="rnd"), "opt"),
-        ("ops", Lst(Tup(S, S, S)), "opt"), ("schema", S, "opt"), ("iface", Lst(S), "opt")),
+        ("title", S, "req", "название блока = имя файла (slug)"), ("tech", S, "req", "технология"),
+        ("kind", Str(choices=("ui", "service", "store")), "opt", "ui → screens, service → ops, store → schema"),
+        ("stories", Lst(SID, flow=True), "opt", "истории US-…"),
+        ("screens", Lst(SCREEN_ROW), "opt", "экраны (kind: ui)"),
+        ("params", OneOf(NONE_TEXT, Lst(PARAM_ROW), hint="строка «нет: …» или список {name, value}"), "opt",
+         "параметры: {name, value} из interfaces.md или «нет: <почему>»"),
+        ("does", Lst(S), "opt", "что делает"),
+        ("io", Lst(IO_ROW), "opt", "входы и выходы: {dir, with, what, model, via}"),
+        ("data", OneOf(NONE_TEXT, Lst(DATA_ROW), hint="строка «нет: …» или список {table, access, why}"), "opt",
+         "таблицы: {table, access, why} или «нет: <почему>»"),
+        ("reqs", Lst(REQ, flow=True), "opt", "R-коды"), ("tasks", Lst(TASK, flow=True), "opt", "задачи"),
+        ("failures", Lst(FAIL_ROW), "opt", "при сбое: {when, then, reqs}"), ("why", S, "opt", "почему так"),
+        ("rnd", Ref("rnd"), "opt", "R&D: файл в docs/rnd"),
+        ("ops", Lst(OP_ROW), "opt", "операции (kind: service): {op, endpoint, who, via}"), ("schema", S, "opt", "схема хранения (kind: store)"),
+        ("iface", Lst(Ref("icode"), flow=True), "opt", "I-коды, которые блок реализует")),
     "hosts": Lst(Rec(("owner", COMP), ("block", S, "opt"), ("host", COMP), flow=True)),
     "model": Rec(
-        ("purpose", S),
-        ("fields", Lst(Tup(S, S, Bool(), S, names=("поле", "тип", "обязательное", "описание")))),
-        ("source", TRec(("kind", Str(choices=("fork", "ours", "ext"))), ("ref", S), ("part", S, "opt"), ("why", S))),
+        ("purpose", S, "req", "назначение модели"),
+        ("fields", Lst(FIELD_ROW), "req", "поля: {name, type, required, desc}"),
+        ("source", SOURCE_ROW, "req", "источник: {kind, refs | ref, part, why}"),
         ("field_src", Map(S, S), "opt"), ("planned", Map(S, S), "opt")),
     "table": Rec(
-        ("kind", Str(choices=("platform", "fork", "litellm"))), ("store", Str(pattern=r"S\d+"), "opt"), ("owner", COMP, "opt"),
-        ("schema", Str(pattern=r"\w+\.\w+", hint="база.схема"), "opt"), ("written", Bool(), "opt"),
-        ("columns", Lst(Tup(S, S, S, S, names=("колонка", "тип", "ключ", "описание"))), "opt"),
-        ("policy", TRec(("indexes", Opt(Lst(Tup(Str(choices=("unique", "index", "hnsw")), S, S, names=("вид", "колонки", "зачем"))))),
-                        ("retention", S), ("cleanup", S), ("migrate", S)), "opt")),
+        ("kind", Str(choices=("platform", "fork", "litellm")), "req", "platform | fork | litellm"),
+        ("store", Ref("store"), "opt", "хранилище S<N>"), ("owner", COMP, "opt", "компонент-владелец"),
+        ("schema", Str(pattern=r"\w+\.\w+", hint="база.схема"), "opt", "база.схема"), ("written", Bool(), "opt", "форк: пишем в таблицу"),
+        ("columns", Lst(COLUMN_ROW), "opt", "колонки: {name, type, pk, fk, desc}"),
+        ("policy", TRec(("indexes", Opt(Lst(INDEX_ROW))), ("retention", S), ("cleanup", S), ("migrate", S)), "opt",
+         "индексы {kind, columns, why}, хранение, очистка, миграции")),
     "endpoints": Map(Str(pattern=r"(GET|POST|PUT|PATCH|DELETE) \S.*", hint="«МЕТОД путь»"),
-                     TRec(("request", S), ("response", S), ("note", S))),
+                     TRec(("request", S, "req", "тело или параметры запроса"), ("response", S, "req", "код · тело ответа"),
+                          ("note", S, "req", "ошибки и примечания"))),
     "integrations": Map(Str(pattern=r"I\d+", hint="I<N>"), Rec(
         ("from", Str(ref="component*")), ("to", Str(ref="component*")), ("via", Str(ref="component*")), ("what", S),
-        ("models", Lst(Str(ref="model"), flow=True)), ("types", S, "opt"), ("also", Lst(COMP, flow=True), "opt"),
+        ("models", Lst(Ref("model"), flow=True)), ("types", S, "opt"), ("also", Lst(COMP, flow=True), "opt"),
         ("data_in_response", Bool(), "opt"))),
     "databases": Rec(
         ("cluster", Map(S, S)),
         ("databases", Map(S, Rec(("owner", COMP), ("schemas", Map(S, Rec(("owner", COMP), ("role", S), ("stores", S), ("migrate", S), ("what", S))))))),
-        ("grants", Lst(Tup(S, Str(choices=("SELECT", "REFERENCES", "INSERT", "UPDATE", "DELETE")), S, S, names=("роль", "право", "таблица", "зачем")))),
+        ("grants", Lst(GRANT_ROW), "req", "GRANT: {role, right, table, why}"),
         ("migrate", Map(S, S))),
     "datamodel": Rec(
         ("naming", S), ("litellm_ref", S),
-        ("s1_domains", Lst(Tup(S, Lst(S, flow=True), names=("домен", "таблицы")))),
+        ("s1_domains", Lst(DOMAIN_ROW), "req", "домены S1: {domain, tables}"),
         ("trees", Map(Str(pattern=r"S\d+"), TRec(("title", S), ("lines", Lst(S)))))),
     "story": Rec(
-        ("role", Str(ref="role")), ("want", S), ("so_that", S), ("accept", Lst(S)), ("reqs", Lst(S)), ("entry", S, "opt"),
-        ("chain", TRec(("path", Lst(SID, flow=True)), ("end", S)), "opt")),
+        ("role", Ref("role"), "req", "роль: ключ roles / personas"), ("want", S, "req", "хочу"), ("so_that", S, "req", "чтобы"),
+        ("accept", Lst(S), "req", "критерии приёмки"), ("reqs", Lst(STORY_REQ), "req", "требования: {spec, title}"),
+        ("entry", S, "opt", "точка входа"),
+        ("chain", TRec(("path", Lst(SID, flow=True)), ("end", S)), "opt", "цепочка историй")),
     "processes": Rec(
         ("processes", Lst(Rec(
             ("title", S), ("stories", Lst(SID, flow=True)), ("lanes", Lst(S, flow=True)),
-            ("steps", Lst(Tup(S, Int(), Str(choices=("start", "task", "gateway", "end", "error")), S,
-                              Lst(Tup(S, S)), names=("id", "дорожка", "тип", "подпись", "[[куда, подпись]]")))),
+            ("steps", Lst(STEP_ROW), "req", "шаги: {id, lane, type, label, next}"),
             ("artifacts", Map(S, Lst(S, flow=True)), ("def", dict))))),
         ("artifacts", Map(S, Lst(S, flow=True)), "opt")),
     "costs": Rec(("costs", Lst(Rec(
@@ -492,7 +961,7 @@ _CACHE = {}
 def load_unit(path: Path, kind: str = "", refs=False):
     """(значение в Python, ошибки) одной единицы."""
     kind = kind or kind_of(path)
-    c = Ctx(refs)
+    c = Ctx(refs, comp_of(path, kind))
     try:
         raw = _read(path)
     except yaml.YAMLError as e:
@@ -502,7 +971,21 @@ def load_unit(path: Path, kind: str = "", refs=False):
             return raw, ["нужен список имён файлов без .yaml"]
         return raw, []
     v = SCHEMAS[kind].load(raw, "", c)
+    if c.errors and LEGACY and kind in LEGACY:  # yaml-migrate: файл ещё в прежнем (позиционном) виде
+        c2 = Ctx(refs, c.comp)
+        v2 = LEGACY[kind].load(raw, "", c2)
+        if not c2.errors:
+            return v2, []
     return v, c.errors
+
+
+LEGACY = {}  # прежние схемы видов — только на время yaml-migrate (yamlmigrate.POSITIONAL)
+
+
+def comp_of(path, kind) -> str:
+    """Компонент файла: папка блока / истории или имя файла компонента (для имён параметров и типов)."""
+    p = Path(path)
+    return p.parent.name if kind in ("block", "story") else p.stem if kind == "component" else ""
 
 
 def _unit(path: Path, kind: str):
@@ -528,7 +1011,7 @@ def comp_order() -> list:
 
 def write_unit(path: Path, kind: str, value) -> bool:
     """Записать единицу (в формате схемы). True — файл изменился."""
-    text = to_yaml(SCHEMAS[kind].dump(value) if kind != "order" else value)
+    text = to_yaml(dump_unit(path, kind, value) if kind != "order" else value)
     if path.exists():
         text = _header(path) + text
         if path.read_text(encoding="utf-8") == text:
@@ -536,6 +1019,15 @@ def write_unit(path: Path, kind: str, value) -> bool:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8", newline="\n")
     return True
+
+
+def dump_unit(path, kind, value):
+    """Значение в Python → YAML-вид единицы (именованные поля, ID извлечены из текста, где это без потерь)."""
+    _PARAM_COMP.append(comp_of(path, kind))
+    try:
+        return SCHEMAS[kind].dump(value)
+    finally:
+        _PARAM_COMP.pop()
 
 
 # ---------------------------------------------------------------- сборка значений модулей
@@ -785,8 +1277,9 @@ def unit_files(path=None) -> list:
 
 
 def check(path=None) -> list:
-    """Замечания «файл: поле → что исправить» по схеме, ссылкам и порядку (_order.yaml)."""
+    """Замечания «файл: поле → что исправить» по схеме, ссылкам (каталоги yamlcat) и порядку (_order.yaml)."""
     _REFCACHE.clear()
+    _cat().clear()
     issues = []
     files = unit_files(path)
     for f in files:
@@ -820,6 +1313,24 @@ def _extra(f: Path, kind: str, v) -> list:
             out.append(f"title → имя файла должно быть {slug(v['title'])}.yaml (адрес страницы блока); переименуй файл и строку в _order.yaml")
         if f.parent.name not in _cached("comp", lambda: _stems("components")):
             out.append(f"папка {f.parent.name} → нет компонента data/components/{f.parent.name}.yaml")
+        raw = _read(f)
+        ps = _cat().params(f.parent.name)
+        for n, r in enumerate(raw.get("params") if isinstance(raw.get("params"), list) else []):
+            spec = ps.get(r.get("name"), {})
+            t = spec.get("type")
+            if t and "value" in r and r["value"] != spec["default"] and not _cat().value_ok(t, str(r["value"])):
+                out.append(f"params[{n}].value → «{r['value']}» не по типу {spec['spec']}/interfaces.md: {_cat().type_text(t)} "
+                           f"(по умолчанию {spec['default']}); пояснение вместо значения — поле note")
+    if kind == "table":
+        cols = [c[0] for c in v.get("columns", [])]
+        for n, ix in enumerate((v.get("policy") or ((),))[0] or []):
+            out += [f"policy.indexes[{n}].columns → колонки {c} нет в columns таблицы{_cat().suggest(c, cols)}"
+                    for c in ix[1].split(", ") if cols and c not in cols]
+    if kind == "databases":
+        for n, g in enumerate(v["grants"]):
+            tb = g[2].split(".")[-1]
+            if tb not in _cat().tables():
+                out.append(f"grants[{n}].table → таблицы {tb} нет в каталоге{_cat().suggest(tb, _cat().tables())}")
     if kind == "processes":
         for n, pr in enumerate(v["processes"]):
             ids = {s[0] for s in pr["steps"]}
@@ -845,6 +1356,10 @@ def _extra(f: Path, kind: str, v) -> list:
             out.append(f"имя файла → ID истории US-<КОМП>-<NN>.yaml")
         if f.parent.name not in _cached("comp", lambda: _stems("components")):
             out.append(f"папка {f.parent.name} → нет компонента data/components/{f.parent.name}.yaml")
+        for n, r in enumerate(_read(f).get("reqs") or []):
+            if isinstance(r, dict) and r.get("spec") in _cat().specs() and r.get("title") not in _cat().spec_requirements(r["spec"]):
+                out.append(f"reqs[{n}].title → «{r.get('title')}» нет среди «### Requirement:» спеки {r['spec']}"
+                           f"{_cat().suggest(r.get('title'), _cat().spec_requirements(r['spec']))}")
         if "chain" in v and v["chain"][0][:1] != [f.stem]:
             out.append(f"chain.path → цепочка начинается с самой истории {f.stem}")
     return out
@@ -964,7 +1479,7 @@ def related(kind, v, key=None) -> list:
         ids += sorted(set(re.findall(rx, txt)), key=lambda x: [int(n) if n.isdigit() else n for n in re.split(r"(\d+)", x)])
     if kind == "block":
         ids += [f"задача {t}" for t in v.get("tasks", [])]
-        ids += [f"таблица {d[0].split(' ')[0].strip('`')}" for d in v.get("data", []) if not isinstance(v.get("data"), str)]
+        ids += [f"таблица {d['table']}" for d in v.get("data", []) if not isinstance(v.get("data"), str)]
     if kind == "story" and key:
         ids += [f"блок {c}/{t}" for (c, t), s in sub().items() if key in s.get("stories", [])]
         ids += [f"процесс «{p['title']}»" for lst in stories()["BPMN"].values() for p in lst if key in p["stories"]]
@@ -990,7 +1505,7 @@ def card(q: str) -> str:
         return f"{q}: единица не найдена — ID (US-…, I…, «МЕТОД путь»), slug компонента, блок «компонент/slug», модель, таблица или путь data/…"
     v, errs = load_unit(Path(f), kind)
     rel = Path(f).resolve().relative_to(ROOT.resolve()).as_posix()
-    raw = _read(Path(f)) if errs or kind == "order" else SCHEMAS[kind].dump(v)  # в формате схемы: строки таблиц — в одну строку
+    raw = _read(Path(f)) if errs or kind == "order" else dump_unit(f, kind, v)  # в формате схемы: строки таблиц — в одну строку
     if key is not None:
         raw = {key: raw[key]}
     name = key or Path(f).stem
@@ -999,3 +1514,90 @@ def card(q: str) -> str:
     tail = ["связано: " + ", ".join(dict.fromkeys(rel_ids))] if rel_ids else []
     tail.append(f"править: {rel} → python html-view/doctool.py yaml-check {rel}")
     return head + "\n" + to_yaml(_strip(raw)).rstrip("\n") + "\n" + "\n".join(tail) + ("" if name else "")
+
+
+# ---------------------------------------------------------------- JSON Schema для редактора (yaml-schema)
+SCHEMA_DIR = DATA / "_schema"
+_GLOB = {"components/*.yaml": "data/components/[!_]*.yaml", "blocks/*/*.yaml": None, "stories/*/*.yaml": "data/stories/*/[!_]*.yaml",
+         "models/*.yaml": "data/models/[!_]*.yaml", "tables/*.yaml": "data/tables/[!_]*.yaml", "endpoints/*.yaml": "data/endpoints/*.yaml",
+         "processes/*.yaml": "data/processes/*.yaml"}
+
+
+def json_schemas() -> dict:
+    """Имя файла data/_schema → (JSON Schema, glob файлов) по SCHEMAS; enum'ы — из каталогов (yamlcat), описания полей — по-русски.
+    Блоки — по компоненту (имена параметров из interfaces.md его спек): block-<компонент>.schema.json."""
+    _cat().clear()
+
+    def one(kind, ctx, title):
+        c = dict(ctx)
+        body = SCHEMAS[kind].js(c)
+        out = {"$schema": "http://json-schema.org/draft-07/schema#", "title": title,
+               "description": f"Единица data/ вида «{kind}». Генерируется: python html-view/doctool.py yaml-schema (не править руками)."}
+        out.update(body)
+        if c.get("definitions"):
+            out["definitions"] = c["definitions"]
+        return out
+
+    res = {}
+    for pat, kind in KIND_OF:
+        if kind == "block":
+            for comp in _cat().components():
+                res[f"block-{comp}.schema.json"] = (one("block", {"comp": comp}, f"Блок компонента {comp}"), f"data/blocks/{comp}/[!_]*.yaml")
+            continue
+        res[f"{kind}.schema.json"] = (one(kind, {}, f"Единица «{kind}»"), _GLOB.get(pat) or f"data/{pat}")
+    res["catalog.schema.json"] = ({"$schema": "http://json-schema.org/draft-07/schema#", "title": "Каталоги data/",
+                                   "description": "Перечисления для полей-ссылок; строятся из данных и документов (html-view/yamlcat.py).",
+                                   "definitions": {k: {"type": "string", "description": what, "enum": [str(x) for x in fn()]}
+                                                   for k, (fn, what) in _cat().CATALOGS.items()}}, None)
+    res["order.schema.json"] = ({"$schema": "http://json-schema.org/draft-07/schema#", "title": "Порядок единиц папки",
+                                 "description": "Имена файлов папки без .yaml в порядке на странице.", "type": "array",
+                                 "items": {"type": "string"}}, "data/**/_order.yaml")
+    return res
+
+
+def schema_files() -> dict:
+    """Путь → текст: data/_schema/*.schema.json и сопоставление для .vscode/settings.json (yaml.schemas)."""
+    out = {}
+    for name, (sch, _) in json_schemas().items():
+        out[SCHEMA_DIR / name] = json.dumps(sch, ensure_ascii=False, indent=1) + "\n"
+    return out
+
+
+def vscode_settings() -> str:
+    """.vscode/settings.json с yaml.schemas (прочие настройки файла сохраняются)."""
+    f = ROOT / ".vscode/settings.json"
+    cur = json.loads(f.read_text(encoding="utf-8")) if f.exists() and f.read_text(encoding="utf-8").strip() else {}
+    m = {k: v for k, v in (cur.get("yaml.schemas") or {}).items() if not k.startswith("./data/_schema/")}
+    for name, (_, glob) in json_schemas().items():
+        if glob:
+            m[f"./data/_schema/{name}"] = glob
+    cur["yaml.schemas"] = m
+    return json.dumps(cur, ensure_ascii=False, indent=2) + "\n"
+
+
+def write_schemas() -> list:
+    changed = []
+    files = schema_files()
+    files[ROOT / ".vscode/settings.json"] = vscode_settings()
+    for p, text in files.items():
+        if not p.exists() or p.read_text(encoding="utf-8") != text:
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(text, encoding="utf-8", newline="\n")
+            changed.append(p.relative_to(ROOT).as_posix())
+    stale = [p for p in SCHEMA_DIR.glob("*.schema.json") if p not in files]
+    for p in stale:
+        p.unlink()
+        changed.append(p.relative_to(ROOT).as_posix() + " (удалён)")
+    return changed
+
+
+def schemas_stale() -> list:
+    """Замечания check: JSON Schema редактора не совпадает с SCHEMAS и каталогами."""
+    files = schema_files()
+    out = [f"{p.relative_to(ROOT).as_posix()}: устарела — python html-view/doctool.py yaml-schema"
+           for p, text in files.items() if not p.exists() or p.read_text(encoding="utf-8") != text]
+    out += [f"{p.relative_to(ROOT).as_posix()}: лишняя — python html-view/doctool.py yaml-schema" for p in SCHEMA_DIR.glob("*.schema.json") if p not in files]
+    vs = ROOT / ".vscode/settings.json"  # локальный файл (.vscode/ в .gitignore): проверяется, если есть; создаёт yaml-schema / tools/setup
+    if vs.exists() and vs.read_text(encoding="utf-8") != vscode_settings():
+        out.append(".vscode/settings.json: yaml.schemas устарело — python html-view/doctool.py yaml-schema")
+    return out

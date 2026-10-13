@@ -3,28 +3,28 @@ tech: Агрегаты из spend log LiteLLM (журнал `LiteLLM_SpendLogs`,
 kind: service
 stories: [US-OBS-05, US-ICP-12]
 params:
-- [cost.source, 'LiteLLM spend log']
-- [retention_days, '90']
+- {name: cost.source, value: LiteLLM spend log}
+- {name: retention_days, value: '90'}
 does:
 - Считает токены и $ по запуску, задаче, агенту, модели и периоду из журнала LiteLLM по `metadata.run_id`
 - Отдаёт затраты задачи (`CostAggregate`) для карточки задачи и сводки
 - Не получает цену модели — помечает стоимость «неизвестна», токены учитывает
 io:
-- [←, LiteLLM (spend log), 'записи журнала с `metadata.run_id` (I14)']
-- [→, Task UI ICPlan, '`CostAggregate` — затраты задачи и сводка (I20)']
+- {dir: ←, label: LiteLLM (spend log), what: записи журнала с `metadata.run_id`, via: [I14]}
+- {dir: →, label: Task UI ICPlan, model: [CostAggregate], what: затраты задачи и сводка, via: [I20]}
 data:
-- [LiteLLM_SpendLogs, 'чтение: токены и $ по `metadata.run_id` (роль `litellm_read`, владелец — LLM Gateway)']
-- [agent_run, 'чтение: связь `run_id` → задача и агент (владелец — ICPlan)']
+- {table: LiteLLM_SpendLogs, access: read, why: 'токены и $ по `metadata.run_id` (роль `litellm_read`, владелец — LLM Gateway)'}
+- {table: agent_run, access: read, why: связь `run_id` → задача и агент (владелец — ICPlan)}
 reqs: [R-OBS-05, R-OBS-06, R-OBS-10, R-OBS-13, R-LLM-02]
 tasks: ['3.5', '3.9']
 failures:
-- Нет цены модели — токены учтены, стоимость «неизвестна» (FMEA «Нет цены модели», R-OBS-05)
-- Журнал LiteLLM недоступен — затраты показываются как «неизвестно», задача и сводка работают (R-OBS-05)
-- Срок хранения событий истёк — агрегаты затрат сохраняются (R-OBS-06)
-- Запуск без `run_id` — в агрегат не попадает; отклонение вызова без `run_id` — pre-call хук LiteLLM (D26, задача 4.5)
+- {when: Нет цены модели, then: 'токены учтены, стоимость «неизвестна» (FMEA «Нет цены модели», R-OBS-05)'}
+- {when: Журнал LiteLLM недоступен, then: 'затраты показываются как «неизвестно», задача и сводка работают', reqs: [R-OBS-05]}
+- {when: Срок хранения событий истёк, then: агрегаты затрат сохраняются, reqs: [R-OBS-06]}
+- {when: Запуск без `run_id`, then: 'в агрегат не попадает; отклонение вызова без `run_id` — pre-call хук LiteLLM (D26, задача 4.5)'}
 why: Один источник правды по деньгам — LiteLLM; свой учёт токенов расходился бы с провайдером.
 rnd: observability.md
 ops:
-- ['`GET /issues/:issueId/costs` — затраты задачи по агентам (`CostAggregate`)', Task UI ICPlan, I20]
-- ['`GET /me/agent-summary` — сводка по задачам с агентами: время, токены и $', Task UI ICPlan, I20]
-- ['`GET /projects/:projectKey/analytics/agent-run-stats` — статистика запусков агентов и затраты по периодам', Task UI ICPlan, I20]
+- {op: затраты задачи по агентам (`CostAggregate`), endpoint: 'GET /issues/:issueId/costs', label: Task UI ICPlan, via: [I20]}
+- {op: 'сводка по задачам с агентами: время, токены и $', endpoint: GET /me/agent-summary, label: Task UI ICPlan, via: [I20]}
+- {op: статистика запусков агентов и затраты по периодам, endpoint: 'GET /projects/:projectKey/analytics/agent-run-stats', label: Task UI ICPlan, via: [I20]}

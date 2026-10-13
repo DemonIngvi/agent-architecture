@@ -49,13 +49,42 @@
 | Базы и общее | `data/databases.yaml`, `data/datamodel.yaml` | `DB_CLUSTER`, `DATABASES`, `DB_GRANTS`, `MIGRATE`; `NAMING`, `LITELLM_REF`, `S1_DOMAINS`, `TREES` |
 | История, процесс, персоны | `data/stories/<компонент>/<US-ID>.yaml` (`chain` — сквозная цепочка), `data/processes/<компонент>.yaml`, `data/personas.yaml` | `STORIES`, `CHAINS`, `BPMN`, `ARTIFACTS`, `ROLES`, `PERSONAS` |
 
-- **Правится только YAML.** Строки таблиц — `[a, b, c]` в одну строку, записи — словари; поля, типы и допустимые значения — схема `yamldata.SCHEMAS`, проверка — `doctool yaml-check`.
+- **Правится только YAML.** Строки таблиц — словари с именованными полями в одну строку (`{dir: ←, with: Poller, what: …}`), ID — в своих полях; поля, типы и допустимые значения — схема `yamldata.SCHEMAS` ([схема единиц](#yaml-units)), проверка — `doctool yaml-check`.
 - **Сгенерированные страницы руками не правятся**: `doctool generated <файл>` называет источник, хук до правки не даёт изменить такой файл.
 - Читать единицу — `doctool unit <ID>` (YAML без пустых полей + связанные ID), а не страницу и не весь файл данных.
 - Формат — `doctool yaml-fmt [путь]` (порядок ключей по схеме, `_order.yaml`); новый файл без строки в `_order.yaml` — замечание `yaml-check`.
 - Сборка (`python html-view/build.py`) — **один раз в конце пути изменений**, не после каждой единицы ([порядок](change-process.md#yaml-path)).
 
 **Правило имён (кратко):** JSON наших контрактов — camelCase, как в API ICPlan; задача — `issueId` + `issueIdentifier`; агент — `agentId`, автор — `username`; единица — суффиксом (`readyMs`, `ttlSec`); внешние протоколы (OpenAI, LiteLLM, MCP, AG-UI, OPA) — в их стиле; колонки БД и параметры конфигурации — snake_case. Полностью — [ниже](#naming).
+
+### Схема единиц {#yaml-units}
+
+Строка таблицы — словарь с **именованными полями**, а не позиционный список: поле видно по имени, пропуск необязательного поля не сдвигает остальные. **ID — в отдельных полях** (`via`, `reqs`, `decisions`, `table`, `model`, `endpoint`, `fmea`), не внутри текста; поле-ссылка принимает только значение из **каталога**, а каталоги строятся автоматически из данных и документов (`html-view/yamlcat.py`), руками не ведутся. Значение не из каталога — замечание `yaml-check` с ближайшими вариантами («может быть: …»). Модули по-прежнему получают прежние структуры (кортежи и строки): текст на странице собирается из полей, страницы от перевода не меняются.
+
+| Вид · поле | Поля строки (обязательные — **жирно**) | Допустимые значения | Откуда список |
+|---|---|---|---|
+| блок · `io` | **`dir`**, `with` или `label`, `model`, `what`, `via`, `reqs`, `decisions` | `dir`: → ← ↔; `with`: участник; `model`: модели; `via`: I-коды | участники — компоненты (slug и имя), блоки, «Компонент · Блок», роли (`data/components`, `data/blocks`, `data/personas.yaml`); модели — `data/models`; I-коды — `data/integrations.yaml` |
+| блок · `data` | **`table`**, `access`, `via`, `why`; или строка «нет: …» | `table`: таблица или S\<N\>; `access`: read («чтение»), write («запись»), read-write («запись, чтение»), store («хранение»), indirect («косвенно») | таблицы — `data/tables`, схема форка `icplan_schema.json`, LiteLLM |
+| блок · `params` | **`name`**, `value` или `note`; или строка «нет: …» | `name`: параметр спек компонента; `value`: по типу параметра (число и диапазон, длительность, перечисление) | таблицы «Параметры модуля» `interfaces.md` спек из `specs` компонента: тип — из колонок «По умолчанию», «Мин», «Макс» |
+| блок · `screens` | **`name`, `where`, `what`, `status`, `code`, `stories`**, `endpoints` | `status`: есть, доработка, новое; `endpoints`: «МЕТОД путь»; `stories`: US | эндпоинты — `data/endpoints` и операции форка `icplan_openapi.json`; истории — `data/stories` |
+| блок · `ops` | **`op`**, `endpoint`, `who` или `label`, `via` / `internal` / `via_note`, `reqs`, `decisions` | `who`: участник; `via`: I-коды; `internal: true` — «внутри» | как у `io` и `screens` |
+| блок · `failures` | **`when`**, `then`, `fmea`, `reqs`, `via`, `decisions` | `fmea`: спека; `reqs`: R-коды | спеки — `openspec/changes/*/specs/*`; R-коды — `spec.md`; D — «### D\<N\>.» в `design.md` |
+| блок · `stories`, `reqs`, `tasks`, `iface`, `rnd` | списки ID | US, R-коды, задачи, I-коды, файл R&D | `data/stories`, `spec.md`, `docs/tasks`, `data/integrations.yaml`, `docs/rnd` |
+| модель · `fields` | **`name`, `type`, `required`, `desc`**, `via`, `reqs`, `decisions` | `required`: true / false | — |
+| модель · `source` | **`kind`**, `refs` или `ref`, `part`, **`why`** | `kind`: fork, ours, ext; `refs`: ID (I, R, D, US) | каталоги ID |
+| таблица · `columns` | **`name`, `type`**, `pk`, `fk`, `key`, `desc`, `decisions` | `fk`: таблица | каталог таблиц |
+| таблица · `policy.indexes` | **`kind`, `columns`, `why`** | `kind`: unique, index, hnsw; `columns`: колонки этой таблицы | `columns` таблицы |
+| компонент · `specs`, `about.chain`, `icplan_tables`, `stores` | `{label, path}`, `{label, comp}`, `{key, note}`, S\<N\> | `comp`: компонент; `key`: ключ схемы форка; S\<N\>: хранилище | `data/components`, `icplan_schema.json`, таблицы хранилищ `interfaces.md` |
+| база · `grants` · домены S1 | `{role, right, table, why}` · `{domain, tables}` | `right`: SELECT, REFERENCES, INSERT, UPDATE, DELETE; таблицы — каталог | каталог таблиц |
+| история · `reqs`, `role` | `{spec, title}` (или `{text}`), роль | `title`: «### Requirement: …» этой спеки | `spec.md` спеки; `data/personas.yaml` |
+| процесс · `steps` | **`id`, `lane`, `type`, `label`**, `next` | `type`: start, task, gateway, end, error; `next`: id шага или `{to, label}` | шаги процесса (`yaml-check`) |
+
+Эндпоинты, интерфейсы, персоны, затраты — записи с именованными полями и раньше; их ссылки (`models`, компоненты) проверяются теми же каталогами.
+
+- **Текст остаётся текстом**, если ID не извлекается однозначно (ID в середине фразы, участник не из каталога, доступ сформулирован иначе): `label`, `why`, `then` хранят фразу как на странице. Перевод и список таких строк — `doctool yaml-migrate` (идемпотентен: повторный запуск ничего не меняет и снова печатает список для ручного разбора). Сократить список — правка формулировки, которая меняет страницу, — решение автора, не инструмента.
+- **Параметр**: `value` — значение по типу из `interfaces.md` (число в пределах «Мин – Макс», длительность, одно из перечисления); на странице показывается значение спеки, `value` — запасное. Пояснение вместо значения — `note`. Тип выводится, только когда колонки заполнены числами, длительностями или словами-значениями; описанное словами («алиас из `model_list`») не формализуется — это открытый вопрос спеки.
+- **JSON Schema для редактора**: `doctool yaml-schema` пишет `data/_schema/<вид>.schema.json` (блок — `block-<компонент>.schema.json`: имена параметров своей спеки; каталоги — один раз в `catalog.schema.json`) и `yaml.schemas` в `.vscode/settings.json` (прочие настройки сохраняются; `.vscode/` не в git — файл создаёт `tools/setup`). Редактор подсказывает поля и значения и подчёркивает ошибку до `yaml-check`. `doctool check` сообщает, если схема устарела (изменились `SCHEMAS` или каталоги).
+- Порядок для новой единицы: файл → `doctool yaml-check <файл>` → `doctool next <файл>`; новое значение каталога (таблица, модель, I-код) — сначала своей единицей, потом ссылка на него.
 
 ## Правило имён {#naming}
 
@@ -90,7 +119,7 @@
 
 ## Проверки в сборке
 
-`IG.check`: I-коды = `interfaces.md` спек в обе стороны; модели «форк» = OpenAPI; примеры API = поля моделей (точные имена); FK покрыты индексами; `db_check`: схема каждой таблицы есть в `DATABASES`, владелец схемы — компонент, его Deploy упоминает базу; у таблиц платформы и у таблиц форка из `FORK_WRITTEN` есть политика; коммит схемы форка = коммит импорта; версия LiteLLM = TECHNOLOGIES.
+`IG.check`: I-коды = `interfaces.md` спек в обе стороны; модели «форк» = OpenAPI; примеры API = поля моделей (точные имена); FK покрыты индексами; `db_check`: схема каждой таблицы есть в `DATABASES`, владелец схемы — компонент, его Deploy упоминает базу; у таблиц платформы и у таблиц форка из `FORK_WRITTEN` есть политика; коммит схемы форка = коммит импорта; версия LiteLLM = TECHNOLOGIES. `doctool check`: `yaml-check` (поля, типы, каталоги, типы параметров) и актуальность `data/_schema` ([схема единиц](#yaml-units)).
 
 ## Типичные ошибки
 

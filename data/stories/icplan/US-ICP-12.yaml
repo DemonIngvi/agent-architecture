@@ -7,9 +7,9 @@ accept:
 - Нет запусков за период → пустая сводка с пояснением
 - Данные затрат недоступны (LiteLLM) → показываются без затрат с пометкой
 reqs:
-- 'observability: Сводка и статистика агентов'
-- 'observability: Затраты'
-- 'observability: События запуска'
+- {spec: observability, title: Сводка и статистика агентов}
+- {spec: observability, title: Затраты}
+- {spec: observability, title: События запуска}
 entry: дашборд проекта; «Мои задачи»
 chain:
   path: [US-ICP-12, US-LLM-03, US-OBS-05]

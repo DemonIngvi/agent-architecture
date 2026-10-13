@@ -1,12 +1,12 @@
 purpose: заявка Runner на среду запуска
 fields:
-- [profile, string, true, имя профиля среды]
-- [sandboxId, string, false, 'в ответе: идентификатор среды, назначает провайдер']
-- [image, string, true, образ Harness из профиля]
-- [runtime, 'enum: runc · runsc', true, 'runc — обычный контейнер; runsc — gVisor, изоляция ядра для недоверенного кода (R-SBX-05)']
-- [cpu / memoryMb / diskGb, number, true, 'ядра, МБ памяти, ГБ диска из профиля']
-- [readyMs, int, false, 'в ответе: время до готовности среды']
+- {name: profile, type: string, required: true, desc: имя профиля среды}
+- {name: sandboxId, type: string, required: false, desc: 'в ответе: идентификатор среды, назначает провайдер'}
+- {name: image, type: string, required: true, desc: образ Harness из профиля}
+- {name: runtime, type: 'enum: runc · runsc', required: true, desc: 'runc — обычный контейнер; runsc — gVisor, изоляция ядра для недоверенного кода', reqs: [R-SBX-05]}
+- {name: cpu / memoryMb / diskGb, type: number, required: true, desc: 'ядра, МБ памяти, ГБ диска из профиля'}
+- {name: readyMs, type: int, required: false, desc: 'в ответе: время до готовности среды'}
 source:
   kind: ours
-  ref: D1, R-SBX-05
+  refs: [D1, R-SBX-05]
   why: 'Заявка Runner провайдеру среды (Docker, позже Kubernetes): профиль, образ и ресурсы.'

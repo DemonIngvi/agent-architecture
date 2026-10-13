@@ -3,14 +3,14 @@ status: part
 guardrails: ''
 desc: События запуска → чат запуска в задаче, затраты. Langfuse и метрики — в бэклоге.
 specs:
-- [Спека, openspec/changes/define-agent-platform/specs/observability/spec.md]
-- [Схема, openspec/changes/define-agent-platform/specs/observability/architecture.md]
+- {label: Спека, path: openspec/changes/define-agent-platform/specs/observability/spec.md}
+- {label: Схема, path: openspec/changes/define-agent-platform/specs/observability/architecture.md}
 tasks: ['3.3']
 about:
   chain:
-  - [Agent Runner, agent-runner]
-  - [Observability, observability]
-  - [ICPlan, icplan]
+  - {label: Agent Runner, comp: agent-runner}
+  - {label: Observability, comp: observability}
+  - {label: ICPlan, comp: icplan}
   purpose: 'Прозрачность: что агент делал по шагам и сколько это стоило.'
   does:
   - Пишет события каждого запуска
@@ -20,8 +20,8 @@ about:
   - Удаляет старые события по сроку
 stores: [S3, S6, S1]
 icplan_tables:
-- [agentRun, 'итоги, токены']
-- [issue, '']
+- {key: agentRun, note: 'итоги, токены'}
+- {key: issue, note: ''}
 blocks:
 - - {title: Harness · Event stream, desc: шаги, kind: ext, to: harness}
   - {title: LiteLLM · Spend log, desc: токены и $, kind: ext, to: llm-gateway}

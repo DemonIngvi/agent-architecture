@@ -6,6 +6,6 @@ accept:
 - Записать в документ проекта агент не может
 - Документ недоступен по правам → агент сообщает и продолжает без него
 reqs:
-- 'agent-memory: Уровни памяти M0–M6'
-- 'tool-integration: MCP-сервер ICPlan'
+- {spec: agent-memory, title: Уровни памяти M0–M6}
+- {spec: tool-integration, title: MCP-сервер ICPlan}
 entry: документы проекта ICPlan

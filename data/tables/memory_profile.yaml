@@ -3,16 +3,16 @@ store: S2
 owner: platform-module
 schema: itsaplan.platform
 columns:
-- [id, serial, PK, '']
-- [name, text, '', '']
-- [read, jsonb, '', уровни]
-- [write, jsonb, '', '']
-- [m2_last_runs, int, '', '3']
-- [retention, jsonb, '', '']
-- [scope, text, '', задача…]
+- {name: id, type: serial, pk: true}
+- {name: name, type: text}
+- {name: read, type: jsonb, desc: уровни}
+- {name: write, type: jsonb}
+- {name: m2_last_runs, type: int, desc: '3'}
+- {name: retention, type: jsonb}
+- {name: scope, type: text, desc: задача…}
 policy:
   indexes:
-  - [unique, name, профиль по имени]
+  - {kind: unique, columns: [name], why: профиль по имени}
   retention: бессрочно (справочник)
   cleanup: удаление запрещено, пока профиль используется
   migrate: cp

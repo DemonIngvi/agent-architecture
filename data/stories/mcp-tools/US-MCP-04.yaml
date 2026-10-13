@@ -6,5 +6,5 @@ accept:
 - Навык изменён → со следующего запуска
 - Навык удалён → отвязан у всех агентов
 reqs:
-- 'tool-integration: Скиллы'
+- {spec: tool-integration, title: Скиллы}
 entry: Команда → навыки

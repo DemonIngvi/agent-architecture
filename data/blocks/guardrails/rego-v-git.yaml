@@ -3,24 +3,24 @@ tech: Rego-политики в репозитории политик (S8), `opa 
 kind: store
 stories: [US-GRD-01, US-GRD-06]
 params:
-- [bundles.<name>.resource, 'бандл `opa-bundle`: Rego из git + данные Platform module']
-- [engine, opa]
+- {name: bundles.<name>.resource, value: 'бандл `opa-bundle`: Rego из git + данные Platform module'}
+- {name: engine, value: opa}
 does:
 - 'Хранит логику проверок: что разрешено, что требует подтверждения; базовые правила D6 — allowlist и approval'
 - Каждое правило указывает точку G1–G4; правило без точки не принимается
 - Изменение правил — через PR с ревью безопасности и обязательным `opa test`
 io:
-- [←, Ревьюер безопасности, 'PR с изменением Rego']
-- [→, CI, 'сборка бандла: `opa test` → `opa build`']
-- [→, OPA, 'bundle `opa-bundle` (I16)']
+- {dir: ←, label: Ревьюер безопасности, what: PR с изменением Rego}
+- {dir: →, label: CI, what: 'сборка бандла: `opa test` → `opa build`'}
+- {dir: →, with: OPA, what: bundle `opa-bundle`, via: [I16]}
 data:
-- [agent_settings, 'косвенно: данные правил агента (`tools_allow`, `approval_tools`) приходят в бандл из Platform module, в git их нет']
+- {table: agent_settings, access: indirect, why: 'данные правил агента (`tools_allow`, `approval_tools`) приходят в бандл из Platform module, в git их нет'}
 reqs: [R-GRD-01, R-GRD-07]
 tasks: ['4.3']
 failures:
-- Тесты `opa test` не прошли — бандл не собирается и не публикуется (задача 4.3.5)
-- Битый Rego попал в бандл — OPA остаётся на прежнем бандле, исправление в git (FMEA «Битый Rego»)
-- Правило без точки G1–G4 — сохранение отклоняется (R-GRD-01 «Правило без точки»)
+- {when: Тесты `opa test` не прошли, then: бандл не собирается и не публикуется (задача 4.3.5)}
+- {when: Битый Rego попал в бандл, then: 'OPA остаётся на прежнем бандле, исправление в git (FMEA «Битый Rego»)'}
+- {when: Правило без точки G1–G4, then: сохранение отклоняется (R-GRD-01 «Правило без точки»)}
 why: Безопасник ревьюит политику, а не код сервисов.
 rnd: guardrails-engine.md
 schema: 'Репозиторий политик Rego (S8, владелец — git-провайдер): `*.rego` по точкам G1 и G2 и тесты `*_test.rego`. Данные агентов в репозитории не хранятся — их добавляет Platform module в бандл (S2). Бандл собирает CI, версия бандла = sha коммита правил.'

@@ -3,14 +3,14 @@ status: part
 guardrails: ''
 desc: 'Память M0–M6: M1, M2, M5, M6 уже есть в ICPlan; M3 — первой; M4 — вместе с RAG.'
 specs:
-- [Спека, openspec/changes/define-agent-platform/specs/agent-memory/spec.md]
-- [Схема, openspec/changes/define-agent-platform/specs/agent-memory/architecture.md]
+- {label: Спека, path: openspec/changes/define-agent-platform/specs/agent-memory/spec.md}
+- {label: Схема, path: openspec/changes/define-agent-platform/specs/agent-memory/architecture.md}
 tasks: ['2.5']
 about:
   chain:
-  - [Harness, harness]
-  - [Memory, memory]
-  - [ICPlan, icplan]
+  - {label: Harness, comp: harness}
+  - {label: Memory, comp: memory}
+  - {label: ICPlan, comp: icplan}
   purpose: 'Память агента: чтобы следующий этап продолжал работу, а не начинал заново, и агент учился на прошлых запусках.'
   does:
   - Уровни M0–M6 по видам знания
@@ -20,11 +20,11 @@ about:
   - Следит за правами и сроками хранения
 stores: [S4, S1]
 icplan_tables:
-- [agentChatMessage, M1]
-- [agentRun, M2]
-- [issueActivity, 'M1, M2']
-- [projectDocument, M6]
-- [aiAgent, M5]
+- {key: agentChatMessage, note: M1}
+- {key: agentRun, note: M2}
+- {key: issueActivity, note: 'M1, M2'}
+- {key: projectDocument, note: M6}
+- {key: aiAgent, note: M5}
 blocks:
 - - {title: Harness, desc: 'чтение в контекст, запись через тул', kind: ext, to: harness}
 - ↓

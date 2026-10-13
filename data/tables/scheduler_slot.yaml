@@ -3,15 +3,15 @@ store: S3
 owner: agent-runner
 schema: itsaplan.runner
 columns:
-- [slot_key, text, PK, 'global:N / agent:<id> / model:<alias> / issue:<id>']
-- [run_id, int, FK agent_run, '']
-- [runner_id, text, '', экземпляр Runner]
-- [lease_until, timestamptz, '', аренда слота]
-- [acquired_at, timestamptz, '', '']
+- {name: slot_key, type: text, pk: true, desc: 'global:N / agent:<id> / model:<alias> / issue:<id>'}
+- {name: run_id, type: int, fk: agent_run}
+- {name: runner_id, type: text, desc: экземпляр Runner}
+- {name: lease_until, type: timestamptz, desc: аренда слота}
+- {name: acquired_at, type: timestamptz}
 policy:
   indexes:
-  - [index, run_id, FK; освобождение по запуску]
-  - [index, lease_until, забор просроченных аренд]
+  - {kind: index, columns: [run_id], why: FK; освобождение по запуску}
+  - {kind: index, columns: [lease_until], why: забор просроченных аренд}
   retention: на время аренды
   cleanup: строка удаляется при освобождении; просроченная аренда (`lease_until`) забирается
   migrate: runner

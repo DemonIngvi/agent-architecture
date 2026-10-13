@@ -3,11 +3,11 @@ store: S2
 owner: platform-module
 schema: itsaplan.platform
 columns:
-- [scope, text, PK, 'platform / agent:<id>']
-- [enabled, bool, '', '']
-- [reason, text, '', '']
-- [by, text, '', '']
-- [at, timestamptz, '', '']
+- {name: scope, type: text, pk: true, desc: 'platform / agent:<id>'}
+- {name: enabled, type: bool}
+- {name: reason, type: text}
+- {name: by, type: text}
+- {name: at, type: timestamptz}
 policy:
   indexes: []
   retention: бессрочно (текущее состояние)

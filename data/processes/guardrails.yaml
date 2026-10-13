@@ -3,14 +3,14 @@ processes:
   stories: [US-GRD-01, US-GRD-02, US-GRD-06]
   lanes: [Runner / Harness, OPA, Администратор]
   steps:
-  - [s, 0, start, Действие агента, [[g1, '']]]
-  - [g1, 0, gateway, 'Точка включена?', [[t1, да], [e0, нет]]]
-  - [e0, 0, end, Без проверки, []]
-  - [t1, 1, task, Решение по Rego, [[g2, '']]]
-  - [g2, 1, gateway, 'Ответ?', [[e1, allow], [t2, confirm], [x1, deny / сбой]]]
-  - [t2, 2, task, Подтверждение человеком, [[e1, да], [x1, нет]]]
-  - [x1, 0, error, Отказ + аудит, []]
-  - [e1, 0, end, Выполнить, []]
+  - {id: s, lane: 0, type: start, label: Действие агента, next: [g1]}
+  - {id: g1, lane: 0, type: gateway, label: 'Точка включена?', next: [{to: t1, label: да}, {to: e0, label: нет}]}
+  - {id: e0, lane: 0, type: end, label: Без проверки}
+  - {id: t1, lane: 1, type: task, label: Решение по Rego, next: [g2]}
+  - {id: g2, lane: 1, type: gateway, label: 'Ответ?', next: [{to: e1, label: allow}, {to: t2, label: confirm}, {to: x1, label: deny / сбой}]}
+  - {id: t2, lane: 2, type: task, label: Подтверждение человеком, next: [{to: e1, label: да}, {to: x1, label: нет}]}
+  - {id: x1, lane: 0, type: error, label: Отказ + аудит}
+  - {id: e1, lane: 0, type: end, label: Выполнить}
   artifacts:
     t1: [PolicyDecision]
     t2: [ApprovalDecision]
@@ -19,13 +19,13 @@ processes:
   stories: [US-GRD-03, US-GRD-04, US-GRD-05]
   lanes: [Владелец продукта / Эксплуатация / Безопасность, Guardrails]
   steps:
-  - [s, 1, start, Расход или инцидент, [[g, '']]]
-  - [g, 1, gateway, 'Что?', [[b, бюджет], [k, инцидент], [j, разбор], [x, нет данных]]]
-  - [b, 1, task, Отказ G1 / стоп при аномалии, [[e, '']]]
-  - [x, 1, error, 'Нет данных правил агента: deny всех тулов, кроме разрешённых в L0', []]
-  - [k, 0, task, Kill switch агента или платформы, [[e, '']]]
-  - [j, 0, task, Журнал срабатываний, [[e, '']]]
-  - [e, 1, end, Под контролем, []]
+  - {id: s, lane: 1, type: start, label: Расход или инцидент, next: [g]}
+  - {id: g, lane: 1, type: gateway, label: 'Что?', next: [{to: b, label: бюджет}, {to: k, label: инцидент}, {to: j, label: разбор}, {to: x, label: нет данных}]}
+  - {id: b, lane: 1, type: task, label: Отказ G1 / стоп при аномалии, next: [e]}
+  - {id: x, lane: 1, type: error, label: 'Нет данных правил агента: deny всех тулов, кроме разрешённых в L0'}
+  - {id: k, lane: 0, type: task, label: Kill switch агента или платформы, next: [e]}
+  - {id: j, lane: 0, type: task, label: Журнал срабатываний, next: [e]}
+  - {id: e, lane: 1, type: end, label: Под контролем}
   artifacts:
     b: [событие отказа]
     k: [отменённые запуски]

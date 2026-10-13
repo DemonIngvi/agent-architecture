@@ -1,11 +1,11 @@
 purpose: критерий приёмки (D20)
 fields:
-- [text, string, true, проверяемая формулировка]
-- [origin, 'enum: process · user:<username> · agent:<username> · reviewer:<username>', true, 'кто задал: процесс, человек, агент предыдущего шага, ревьюер при возврате; `<username>` — `username` пользователя или агента ICPlan; порядок при конфликте: user и reviewer > process > agent; противоречие двух людей — агент задаёт вопрос исполнителю задачи (D20)']
-- [status, 'enum: active · pending_approval', true, '`pending_approval` — критерий агента ждёт подтверждения человеком (по `criteriaApproval` шага); проверка gate берёт только `active`']
+- {name: text, type: string, required: true, desc: проверяемая формулировка}
+- {name: origin, type: 'enum: process · user:<username> · agent:<username> · reviewer:<username>', required: true, desc: 'кто задал: процесс, человек, агент предыдущего шага, ревьюер при возврате; `<username>` — `username` пользователя или агента ICPlan; порядок при конфликте: user и reviewer > process > agent; противоречие двух людей — агент задаёт вопрос исполнителю задачи', decisions: [D20]}
+- {name: status, type: 'enum: active · pending_approval', required: true, desc: '`pending_approval` — критерий агента ждёт подтверждения человеком (по `criteriaApproval` шага); проверка gate берёт только `active`'}
 source:
   kind: ours
-  ref: D20
+  refs: [D20]
   why: Критерий хранится пунктом чек-листа задачи ICPlan (`issue_checklist_item`) с полями `origin` и `status`. Происхождение нужно, чтобы применить порядок «человек > процесс > агент» и показать, кто что задал.
 field_src:
   text: ✅ форк (`issue_checklist_item.content`)

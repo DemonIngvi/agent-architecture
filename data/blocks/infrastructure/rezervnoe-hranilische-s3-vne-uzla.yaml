@@ -3,18 +3,18 @@ tech: S3-совместимое хранилище вне узла (второй
 kind: store
 stories: [US-INF-04]
 params:
-- [postgres.backup.target, 'куда класть копии: S3 вне узла']
+- {name: postgres.backup.target, value: 'куда класть копии: S3 вне узла'}
 does:
 - Хранит копии вне узла
 io:
-- [←, PostgreSQL 17 + pgvector, базовые копии ежедневно и WAL непрерывно]
-- [←, RustFS, копия объектного хранилища]
+- {dir: ←, with: PostgreSQL 17 + pgvector, what: базовые копии ежедневно и WAL непрерывно}
+- {dir: ←, with: RustFS, what: копия объектного хранилища}
 data: 'нет: хранит копии бэкапов и WAL, а не таблицы модели'
 reqs: [R-INF-08, R-INF-16]
 tasks: ['4.7']
 failures:
-- Узел недоступен — вся платформа недоступна, восстановление узла, данные — из бэкапа вне узла (FMEA platform-infrastructure; R-INF-16)
-- Проверка восстановления не прошла — пересмотр оператора (Crunchy PGO), задача 4.7.6 (R-INF-08)
+- {when: Узел недоступен, then: 'вся платформа недоступна, восстановление узла, данные — из бэкапа вне узла', fmea: platform-infrastructure, reqs: [R-INF-16]}
+- {when: Проверка восстановления не прошла, then: 'пересмотр оператора (Crunchy PGO), задача 4.7.6', reqs: [R-INF-08]}
 why: Копии на том же диске — не бэкап.
 rnd: data-stores.md
 schema: 'Бакет S3 вне узла: базовые копии и WAL Postgres, копия RustFS; восстановление проверяется раз в месяц.'

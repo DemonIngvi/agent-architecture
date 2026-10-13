@@ -1,0 +1,128 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "title": "Единица «databases»",
+ "description": "Единица data/ вида «databases». Генерируется: python html-view/doctool.py yaml-schema (не править руками).",
+ "type": "object",
+ "properties": {
+  "cluster": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "string"
+   }
+  },
+  "databases": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "object",
+    "properties": {
+     "owner": {
+      "anyOf": [
+       {
+        "$ref": "catalog.schema.json#/definitions/component"
+       },
+       {
+        "const": ""
+       }
+      ]
+     },
+     "schemas": {
+      "type": "object",
+      "additionalProperties": {
+       "type": "object",
+       "properties": {
+        "owner": {
+         "anyOf": [
+          {
+           "$ref": "catalog.schema.json#/definitions/component"
+          },
+          {
+           "const": ""
+          }
+         ]
+        },
+        "role": {
+         "type": "string"
+        },
+        "stores": {
+         "type": "string"
+        },
+        "migrate": {
+         "type": "string"
+        },
+        "what": {
+         "type": "string"
+        }
+       },
+       "additionalProperties": false,
+       "required": [
+        "owner",
+        "role",
+        "stores",
+        "migrate",
+        "what"
+       ]
+      }
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "owner",
+     "schemas"
+    ]
+   }
+  },
+  "grants": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "role": {
+      "type": "string",
+      "description": "роль БД"
+     },
+     "right": {
+      "type": "string",
+      "enum": [
+       "SELECT",
+       "REFERENCES",
+       "INSERT",
+       "UPDATE",
+       "DELETE"
+      ],
+      "description": "право"
+     },
+     "table": {
+      "type": "string",
+      "pattern": "^(?:\\w+\\.\\w+\\.\\w+)$",
+      "description": "база.схема.таблица"
+     },
+     "why": {
+      "type": "string",
+      "description": "зачем"
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "role",
+     "right",
+     "table",
+     "why"
+    ]
+   },
+   "description": "GRANT: {role, right, table, why}"
+  },
+  "migrate": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "string"
+   }
+  }
+ },
+ "additionalProperties": false,
+ "required": [
+  "cluster",
+  "databases",
+  "grants",
+  "migrate"
+ ]
+}

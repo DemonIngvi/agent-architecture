@@ -6,5 +6,5 @@ accept:
 - Старый отзывается
 - Секрет не в git и не в БД
 reqs:
-- 'platform-infrastructure: Секреты'
+- {spec: platform-infrastructure, title: Секреты}
 entry: Secret кластера

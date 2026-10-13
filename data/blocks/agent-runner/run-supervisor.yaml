@@ -3,36 +3,36 @@ tech: Go
 kind: service
 stories: [US-RUN-01, US-ICP-04, US-RUN-06, US-HAR-05]
 params:
-- [timeout_s, '1800']
-- [limits.idle_s, '300']
-- [retry, '0']
+- {name: timeout_s, value: '1800'}
+- {name: limits.idle_s, value: '300'}
+- {name: retry, value: '0'}
 does:
 - На старте после слотов берёт определение и настройки версии запуска — `GET /platform/runs/:runId/agent` (I4, D23)
 - Запускает Harness с `RunBundle`
 - Следит за таймаутом, простоем, отменой
 - 'Хранит checkpoint цикла Harness в схеме `harness_ckpt` (I12): учётных данных БД в sandbox нет'
 io:
-- [←, Platform module, '`AgentDefinition`, `AgentSettings`, `WorkspaceSource` (I4)']
-- [→, Harness, '`RunBundle`, отмена (I7)']
-- [↔, ICPlan, 'heartbeat: аренда, отмена — 404 (I3)']
-- [←, Harness, '`Checkpoint` (I12)']
-- [→, Finalizer, итог или причина остановки]
+- {dir: ←, with: Platform module, model: [AgentDefinition, AgentSettings, WorkspaceSource], via: [I4]}
+- {dir: →, with: Harness, what: '`RunBundle`, отмена', via: [I7]}
+- {dir: ↔, with: ICPlan, what: 'heartbeat: аренда, отмена — 404', via: [I3]}
+- {dir: ←, with: Harness, model: [Checkpoint], via: [I12]}
+- {dir: →, with: Finalizer, what: итог или причина остановки}
 data:
-- [run_checkpoint, 'запись, чтение: checkpoint цикла']
-- [agent_run, 'через I4: версия запуска `agent_version` закрепляется Platform module (таблица ICPlan)']
+- {table: run_checkpoint, access: read-write, why: checkpoint цикла}
+- {table: agent_run, why: 'через I4: версия запуска `agent_version` закрепляется Platform module (таблица ICPlan)'}
 reqs: [R-RUN-01, R-RUN-07, R-RUN-09, R-RUN-17, R-GRD-10, R-HRN-05, R-ICP-07, R-RUN-14]
 tasks: ['2.1', '2.6']
 failures:
-- Нет настроек агента или агент выключен — запуск `agent_unavailable`, sandbox не создаётся (R-RUN-01, FMEA)
-- Platform module недоступен — новые запуски не стартуют, кэш настроек не используется (FMEA)
-- Превышен `timeout_s` или простой `limits.idle_s` — `limit_exceeded`, частичный итог, слот освобождается (R-GRD-10)
-- Heartbeat вернул 404 — Harness останавливается, итог не шлётся (R-ICP-07)
-- Runner упал — аренда истекает, запуск возвращается в очередь; при повторной выдаче Harness продолжает с последнего checkpoint (R-RUN-14, R-HRN-05)
+- {when: Нет настроек агента или агент выключен, then: 'запуск `agent_unavailable`, sandbox не создаётся (R-RUN-01, FMEA)'}
+- {when: Platform module недоступен, then: 'новые запуски не стартуют, кэш настроек не используется (FMEA)'}
+- {when: Превышен `timeout_s` или простой `limits.idle_s`, then: '`limit_exceeded`, частичный итог, слот освобождается', reqs: [R-GRD-10]}
+- {when: Heartbeat вернул 404, then: 'Harness останавливается, итог не шлётся', reqs: [R-ICP-07]}
+- {when: Runner упал, then: 'аренда истекает, запуск возвращается в очередь; при повторной выдаче Harness продолжает с последнего checkpoint', reqs: [R-RUN-14, R-HRN-05]}
 why: Зависшие запуски не держат слоты.
 rnd: runaway-protection.md
 ops:
-- ['`GET /platform/runs/:runId/agent` — определение и настройки версии запуска', Run supervisor после слотов, I4]
-- ['`GET /platform/runs/:runId/manifest` — манифест рабочего пространства', Run supervisor, I4]
-- ['`GET /ready`, затем `POST /run` с `RunBundle`; отмена — `POST /run/cancel`', Run supervisor, I7]
-- ['`POST /agent-runs/:runId/heartbeat` — продление аренды; 404 — отмена', Run supervisor, I3]
-- ['`PUT`, `GET /runs/:runId/checkpoint` — приём checkpoint цикла в `run_checkpoint`', 'Harness, токен запуска', I12]
+- {op: определение и настройки версии запуска, endpoint: 'GET /platform/runs/:runId/agent', label: Run supervisor после слотов, via: [I4]}
+- {op: манифест рабочего пространства, endpoint: 'GET /platform/runs/:runId/manifest', who: Run supervisor, via: [I4]}
+- {op: '`GET /ready`, затем `POST /run` с `RunBundle`; отмена — `POST /run/cancel`', who: Run supervisor, via: [I7]}
+- {op: продление аренды; 404 — отмена, endpoint: 'POST /agent-runs/:runId/heartbeat', who: Run supervisor, via: [I3]}
+- {op: '`PUT`, `GET /runs/:runId/checkpoint` — приём checkpoint цикла в `run_checkpoint`', label: 'Harness, токен запуска', via: [I12]}

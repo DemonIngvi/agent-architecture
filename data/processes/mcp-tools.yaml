@@ -3,14 +3,14 @@ processes:
   stories: [US-MCP-02, US-MCP-03]
   lanes: [Harness, Tool Executor, MCP-сервер]
   steps:
-  - [s, 0, start, Модель просит тул, [[g1, '']]]
-  - [g1, 1, gateway, 'В allowlist?', [[t1, да], [x1, нет]]]
-  - [x1, 0, error, Отказ в контекст, []]
-  - [t1, 2, task, tools/call, [[g2, '']]]
-  - [g2, 1, gateway, 'Ответ вовремя?', [[t2, да], [t3, таймаут]]]
-  - [t3, 1, task, Ошибка тула, [[e1, '']]]
-  - [t2, 1, task, 'Обрезать, вернуть', [[e1, '']]]
-  - [e1, 0, end, Следующий шаг, []]
+  - {id: s, lane: 0, type: start, label: Модель просит тул, next: [g1]}
+  - {id: g1, lane: 1, type: gateway, label: 'В allowlist?', next: [{to: t1, label: да}, {to: x1, label: нет}]}
+  - {id: x1, lane: 0, type: error, label: Отказ в контекст}
+  - {id: t1, lane: 2, type: task, label: tools/call, next: [g2]}
+  - {id: g2, lane: 1, type: gateway, label: 'Ответ вовремя?', next: [{to: t2, label: да}, {to: t3, label: таймаут}]}
+  - {id: t3, lane: 1, type: task, label: Ошибка тула, next: [e1]}
+  - {id: t2, lane: 1, type: task, label: 'Обрезать, вернуть', next: [e1]}
+  - {id: e1, lane: 0, type: end, label: Следующий шаг}
   artifacts:
     t1: [tools/call]
     t2: [результат тула]
@@ -19,12 +19,12 @@ processes:
   stories: [US-MCP-01, US-MCP-04, US-MCP-05]
   lanes: [Администратор / Безопасность, MCP / Tools]
   steps:
-  - [s, 0, start, Нужен новый тул или навык, [[rg, '']]]
-  - [rg, 1, gateway, 'Сервер отвечает?', [[al, да], [x, нет]]]
-  - [x, 0, error, Ошибка регистрации, []]
-  - [al, 0, task, 'Allowlist тулов агенту, навыки', [[rv, '']]]
-  - [rv, 0, task, 'Проверка прав: агент × тулы', [[e, '']]]
-  - [e, 1, end, Со следующего запуска, []]
+  - {id: s, lane: 0, type: start, label: Нужен новый тул или навык, next: [rg]}
+  - {id: rg, lane: 1, type: gateway, label: 'Сервер отвечает?', next: [{to: al, label: да}, {to: x, label: нет}]}
+  - {id: x, lane: 0, type: error, label: Ошибка регистрации}
+  - {id: al, lane: 0, type: task, label: 'Allowlist тулов агенту, навыки', next: [rv]}
+  - {id: rv, lane: 0, type: task, label: 'Проверка прав: агент × тулы', next: [e]}
+  - {id: e, lane: 1, type: end, label: Со следующего запуска}
   artifacts:
     al: [набор тулов агента, навыки]
     rv: [матрица агент × тулы]

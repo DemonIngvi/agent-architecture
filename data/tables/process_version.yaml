@@ -3,10 +3,10 @@ store: S1
 owner: icplan
 schema: itsaplan.public
 columns:
-- [process_id, int, 'PK, FK process', '']
-- [version, int, PK, версия процесса]
-- [steps, jsonb, '', 'снимок шагов: задача дорабатывает шаг по версии, с которой вошла (R-AP-22)']
-- [created_at, timestamptz, '', '']
+- {name: process_id, type: int, pk: true, fk: process}
+- {name: version, type: int, pk: true, desc: версия процесса}
+- {name: steps, type: jsonb, desc: 'снимок шагов: задача дорабатывает шаг по версии, с которой вошла', reqs: [R-AP-22]}
+- {name: created_at, type: timestamptz}
 policy:
   indexes: []
   retention: пока жив процесс

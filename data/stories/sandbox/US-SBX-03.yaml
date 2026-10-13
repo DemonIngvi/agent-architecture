@@ -6,6 +6,6 @@ accept:
 - Разрешённый домен → через egress-прокси с журналом
 - Прямой выход мимо прокси → заблокирован сетевой политикой
 reqs:
-- 'agent-sandbox: Сетевая изоляция'
-- 'guardrails: G3 Isolation'
+- {spec: agent-sandbox, title: Сетевая изоляция}
+- {spec: guardrails, title: G3 Isolation}
 entry: —

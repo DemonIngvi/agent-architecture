@@ -3,30 +3,30 @@ tech: Go, официальный MCP Go SDK (D19)
 kind: service
 stories: [US-MCP-05, US-SBX-03]
 params:
-- [servers, itsaplan-core]
-- [tools, 'минимальный (чтение задачи, комментарий)']
-- [auth.secret_ref, — (обязательный)]
+- {name: servers, value: itsaplan-core}
+- {name: tools, value: 'минимальный (чтение задачи, комментарий)'}
+- {name: auth.secret_ref, value: — (обязательный)}
 does:
 - Отдаёт агенту только разрешённые тулы
 - 'Проверяет каждый вызов вне sandbox: allowlist манифеста и G2 в OPA'
 - Подставляет учётные данные MCP-сервера из Secret по `auth.secret_ref`
 io:
-- [←, Harness, '`McpToolCall` (I9)']
-- [→, Guardrails (OPA), '`PolicyInput` → `PolicyDecision` (I10)']
-- [→, MCP itsaplan-core в api ICPlan, '`McpToolCall` (I24)']
-- [→, Event relay, решение G2 с причиной]
+- {dir: ←, with: Harness, model: [McpToolCall], via: [I9]}
+- {dir: →, label: Guardrails (OPA), what: '`PolicyInput` → `PolicyDecision`', via: [I10]}
+- {dir: →, label: MCP itsaplan-core в api ICPlan, model: [McpToolCall], via: [I24]}
+- {dir: →, with: Event relay, what: решение G2 с причиной}
 data:
-- [project_resource, 'чтение через I4: MCP-серверы агента (`kind = mcp`, владелец Platform module)']
-- [run_event, 'запись через I2: решения G2 (владелец Observability)']
+- {table: project_resource, access: read, via: [I4], why: 'MCP-серверы агента (`kind = mcp`, владелец Platform module)'}
+- {table: run_event, access: write, via: [I2], why: решения G2 (владелец Observability)}
 reqs: [R-MCP-02, R-MCP-03, R-RUN-13, R-GRD-03]
 tasks: ['2.1']
 failures:
-- Тул вне allowlist — вызов отклонён без обращения к серверу, решение G2 с причиной в событиях (R-RUN-13 «MCP-прокси запуска»)
-- MCP-сервер недоступен — агент получает ошибку тула, цикл продолжается; чтение повторяется 2 раза, запись — нет (FMEA «MCP-сервер недоступен», I9)
-- OPA не ответила — решение по `on_engine_error` (deny)
+- {when: Тул вне allowlist, then: 'вызов отклонён без обращения к серверу, решение G2 с причиной в событиях (R-RUN-13 «MCP-прокси запуска»)'}
+- {when: MCP-сервер недоступен, then: 'агент получает ошибку тула, цикл продолжается; чтение повторяется 2 раза, запись — нет (FMEA «MCP-сервер недоступен», I9)'}
+- {when: OPA не ответила, then: решение по `on_engine_error` (deny)}
 why: Проверка внутри sandbox обходится кодом агента; Runner уже знает манифест, токен и подтверждения.
 rnd: mcp-vs-direct.md
 ops:
-- ['`POST /runs/:runId/mcp/:server` — `tools/list` с фильтром по allowlist, `tools/call` с проверкой allowlist', 'Harness, токен запуска', I9]
-- ['`POST /v1/data/agent/g2` — G2 для `tools/call`', MCP-прокси перед вызовом сервера, I10]
-- ['`POST /mcp` itsaplan-core с ключом агента из Secret', MCP-прокси, I24]
+- {op: '`tools/list` с фильтром по allowlist, `tools/call` с проверкой allowlist', endpoint: 'POST /runs/:runId/mcp/:server', label: 'Harness, токен запуска', via: [I9]}
+- {op: G2 для `tools/call`, endpoint: POST /v1/data/agent/g2, label: MCP-прокси перед вызовом сервера, via: [I10]}
+- {op: '`POST /mcp` itsaplan-core с ключом агента из Secret', who: MCP-прокси, via: [I24]}

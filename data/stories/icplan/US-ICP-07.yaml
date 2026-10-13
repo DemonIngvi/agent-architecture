@@ -6,8 +6,8 @@ accept:
 - У задачи не более одного активного запуска
 - Runner пропал → по истечении аренды запуск снова в голове очереди
 reqs:
-- 'icplan-agent-autopickup: Очередь агента'
-- 'icplan-integration: Однократная выдача запуска'
+- {spec: icplan-agent-autopickup, title: Очередь агента}
+- {spec: icplan-integration, title: Однократная выдача запуска}
 entry: очередь запусков (Runner)
 chain:
   path: [US-ICP-07, US-RUN-03, US-RUN-01]

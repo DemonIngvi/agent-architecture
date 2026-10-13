@@ -3,20 +3,20 @@ status: part
 guardrails: ''
 desc: 'Таск-трекер It''s a Plan: доска, процессы, настройка агентов, очередь запусков, UI задачи. Уже есть, дорабатываем.'
 specs:
-- [Registry — спека, openspec/changes/define-agent-platform/specs/agent-registry/spec.md]
-- [Registry — схема, openspec/changes/define-agent-platform/specs/agent-registry/architecture.md]
-- [Интеграция — proposal, openspec/changes/add-icplan-integration/proposal.md]
-- [Интеграция — спека, openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md]
-- [Интеграция — схема и user flow, openspec/changes/add-icplan-integration/specs/icplan-integration/architecture.md]
-- [Автоподхват — proposal, openspec/changes/icplan-agent-autopickup/proposal.md]
-- [Автоподхват — спека, openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md]
-- [Автоподхват — схема, openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/architecture.md]
+- {label: Registry — спека, path: openspec/changes/define-agent-platform/specs/agent-registry/spec.md}
+- {label: Registry — схема, path: openspec/changes/define-agent-platform/specs/agent-registry/architecture.md}
+- {label: Интеграция — proposal, path: openspec/changes/add-icplan-integration/proposal.md}
+- {label: Интеграция — спека, path: openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md}
+- {label: Интеграция — схема и user flow, path: openspec/changes/add-icplan-integration/specs/icplan-integration/architecture.md}
+- {label: Автоподхват — proposal, path: openspec/changes/icplan-agent-autopickup/proposal.md}
+- {label: Автоподхват — спека, path: openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md}
+- {label: Автоподхват — схема, path: openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/architecture.md}
 tasks: ['1.2', '2.3', '3.1', '3.2', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9']
 about:
   chain:
-  - [Пользователь, null]
-  - [ICPlan, icplan]
-  - [Agent Runner, agent-runner]
+  - {label: Пользователь}
+  - {label: ICPlan, comp: icplan}
+  - {label: Agent Runner, comp: agent-runner}
   purpose: 'Рабочее место людей: задачи, доска и процесс. Отсюда агенты получают работу и сюда возвращают результат.'
   does:
   - Доска и статусы — процесс, который пользователь настраивает сам
@@ -26,23 +26,23 @@ about:
   - Показ хода работы агента, approve и затрат в задаче
 stores: [S1, S7]
 icplan_tables:
-- [project, '']
-- [projectColumn, '']
-- [issueType, '']
-- [issue, + `review_with_me` (D17)]
-- [issueChecklist, '']
-- [issueChecklistItem, '+ `origin`, `status` (D20)']
-- [issueActivity, '']
-- [aiAgent, + `enabled` (D17)]
-- [agentRun, '']
-- [agentSchedule, '']
-- [agentChatThread, '']
-- [agentChatMessage, '']
-- [projectAction, + ключ `delegateUserId` в `effect` (R-AP-03)]
-- [projectDocument, '']
-- [issueAttachment, '']
-- [user, Better Auth; у агента — бот-пользователь]
-- [apikey, 'ключ агента: Bearer для I1–I3; `reference_id` → `user.id`']
+- {key: project, note: ''}
+- {key: projectColumn, note: ''}
+- {key: issueType, note: ''}
+- {key: issue, note: + `review_with_me` (D17)}
+- {key: issueChecklist, note: ''}
+- {key: issueChecklistItem, note: '+ `origin`, `status` (D20)'}
+- {key: issueActivity, note: ''}
+- {key: aiAgent, note: + `enabled` (D17)}
+- {key: agentRun, note: ''}
+- {key: agentSchedule, note: ''}
+- {key: agentChatThread, note: ''}
+- {key: agentChatMessage, note: ''}
+- {key: projectAction, note: + ключ `delegateUserId` в `effect` (R-AP-03)}
+- {key: projectDocument, note: ''}
+- {key: issueAttachment, note: ''}
+- {key: user, note: Better Auth; у агента — бот-пользователь}
+- {key: apikey, note: 'ключ агента: Bearer для I1–I3; `reference_id` → `user.id`'}
 blocks:
 - - {title: Пользователь, desc: 'задачи, доска, чат', kind: user}
   - {title: Администратор, desc: 'агенты, процесс', kind: user}

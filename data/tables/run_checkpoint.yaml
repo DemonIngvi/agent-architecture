@@ -3,15 +3,15 @@ store: S5
 owner: agent-runner
 schema: itsaplan.harness_ckpt
 columns:
-- [run_id, int, 'PK, FK agent_run', '']
-- [iteration, int, PK, итерация цикла]
-- [parent_iteration, int, '', '']
-- [state, bytea, '', состояние LangGraph]
-- [created_at, timestamptz, '', '']
-- [expires_at, timestamptz, '', '`checkpoint.ttl`']
+- {name: run_id, type: int, pk: true, fk: agent_run}
+- {name: iteration, type: int, pk: true, desc: итерация цикла}
+- {name: parent_iteration, type: int}
+- {name: state, type: bytea, desc: состояние LangGraph}
+- {name: created_at, type: timestamptz}
+- {name: expires_at, type: timestamptz, desc: '`checkpoint.ttl`'}
 policy:
   indexes:
-  - [index, expires_at, очистка]
+  - {kind: index, columns: [expires_at], why: очистка}
   retention: '`checkpoint.ttl` = 7 дней (agent-harness)'
   cleanup: очистка по `expires_at`
   migrate: runner

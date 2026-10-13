@@ -3,17 +3,17 @@ store: S1
 owner: icplan
 schema: itsaplan.public
 columns:
-- [id, serial, PK, '']
-- [run_id, int, FK agent_run, запуск]
-- [kind, text, '', approval · message]
-- [seq, int, '', событие запроса подтверждения (для approval)]
-- [payload, jsonb, '', '`ApprovalDecision` или `UserMessage`']
-- [created_at, timestamptz, '', '']
-- [delivered_at, timestamptz, '', 'Runner подтвердил получение: `decision_applied` · `message_received` (R-ICP-16)']
+- {name: id, type: serial, pk: true}
+- {name: run_id, type: int, fk: agent_run, desc: запуск}
+- {name: kind, type: text, desc: approval · message}
+- {name: seq, type: int, desc: событие запроса подтверждения (для approval)}
+- {name: payload, type: jsonb, desc: '`ApprovalDecision` или `UserMessage`'}
+- {name: created_at, type: timestamptz}
+- {name: delivered_at, type: timestamptz, desc: 'Runner подтвердил получение: `decision_applied` · `message_received`', reqs: [R-ICP-16]}
 policy:
   indexes:
-  - [index, run_id, FK; недоставленное по запуску]
-  - [index, delivered_at, выборка недоставленного]
+  - {kind: index, columns: [run_id], why: FK; недоставленное по запуску}
+  - {kind: index, columns: [delivered_at], why: выборка недоставленного}
   retention: пока жив запуск
   cleanup: каскадно с `agent_run`; доставленное — со сроком `agent_run`
   migrate: fork

@@ -1,0 +1,260 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "title": "Единица «component»",
+ "description": "Единица data/ вида «component». Генерируется: python html-view/doctool.py yaml-schema (не править руками).",
+ "type": "object",
+ "properties": {
+  "name": {
+   "type": "string",
+   "description": "название компонента"
+  },
+  "status": {
+   "type": "string",
+   "enum": [
+    "done",
+    "part",
+    "todo"
+   ],
+   "description": "done | part | todo"
+  },
+  "guardrails": {
+   "type": "string",
+   "pattern": "^(?:(G\\d+([–-]G\\d+)?(, )?)*)$",
+   "description": "G1, G1–G4 или пусто"
+  },
+  "desc": {
+   "type": "string",
+   "description": "одна фраза о компоненте"
+  },
+  "links": {
+   "type": "array",
+   "items": {}
+  },
+  "specs": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "label": {
+      "type": "string",
+      "description": "подпись"
+     },
+     "path": {
+      "type": "string",
+      "description": "путь от корня репозитория"
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "label",
+     "path"
+    ]
+   },
+   "description": "спеки и схемы: {label, path}"
+  },
+  "tasks": {
+   "type": "array",
+   "items": {
+    "anyOf": [
+     {
+      "$ref": "catalog.schema.json#/definitions/task"
+     },
+     {
+      "const": ""
+     }
+    ]
+   },
+   "description": "задачи компонента"
+  },
+  "about": {
+   "type": "object",
+   "properties": {
+    "chain": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "label": {
+        "type": "string",
+        "description": "подпись звена"
+       },
+       "comp": {
+        "anyOf": [
+         {
+          "$ref": "catalog.schema.json#/definitions/component"
+         },
+         {
+          "const": ""
+         }
+        ],
+        "description": "компонент (slug); нет — внешний участник"
+       }
+      },
+      "additionalProperties": false,
+      "required": [
+       "label"
+      ]
+     }
+    },
+    "purpose": {
+     "type": "string"
+    },
+    "does": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    }
+   },
+   "additionalProperties": false,
+   "required": [
+    "chain",
+    "purpose",
+    "does"
+   ],
+   "description": "справка: цепочка, назначение, что делает"
+  },
+  "stores": {
+   "type": "array",
+   "items": {
+    "anyOf": [
+     {
+      "$ref": "catalog.schema.json#/definitions/store"
+     },
+     {
+      "const": ""
+     }
+    ]
+   },
+   "description": "хранилища S<N>"
+  },
+  "icplan_tables": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "key": {
+      "anyOf": [
+       {
+        "$ref": "catalog.schema.json#/definitions/icplan_key"
+       },
+       {
+        "const": ""
+       }
+      ],
+      "description": "ключ html-view/icplan_schema.json"
+     },
+     "note": {
+      "type": "string",
+      "description": "пометка (уровень памяти и т. п.)"
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "key",
+     "note"
+    ]
+   },
+   "description": "таблицы форка ICPlan, которые использует компонент"
+  },
+  "blocks": {
+   "type": "array",
+   "items": {
+    "$ref": "#/definitions/row"
+   },
+   "description": "блочная схема"
+  }
+ },
+ "additionalProperties": false,
+ "required": [
+  "name",
+  "status",
+  "guardrails",
+  "desc",
+  "specs",
+  "tasks"
+ ],
+ "definitions": {
+  "row": {
+   "anyOf": [
+    {
+     "type": "string"
+    },
+    {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "title": {
+        "type": "string"
+       },
+       "desc": {
+        "type": "string"
+       },
+       "kind": {
+        "type": "string",
+        "enum": [
+         "core",
+         "ext",
+         "store",
+         "user",
+         "back",
+         ""
+        ]
+       },
+       "st": {
+        "type": "string"
+       },
+       "g": {
+        "type": "string"
+       },
+       "to": {
+        "anyOf": [
+         {
+          "$ref": "catalog.schema.json#/definitions/component"
+         },
+         {
+          "const": ""
+         }
+        ]
+       }
+      },
+      "additionalProperties": false,
+      "required": [
+       "title",
+       "kind"
+      ]
+     }
+    },
+    {
+     "type": "object",
+     "properties": {
+      "zone": {
+       "type": "string"
+      },
+      "rows": {
+       "type": "array",
+       "items": {
+        "$ref": "#/definitions/row"
+       }
+      },
+      "cls": {
+       "type": "string"
+      },
+      "g": {
+       "type": "string"
+      },
+      "note": {
+       "type": "string"
+      }
+     },
+     "additionalProperties": false,
+     "required": [
+      "zone",
+      "rows"
+     ]
+    }
+   ]
+  }
+ }
+}

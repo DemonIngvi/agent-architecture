@@ -6,6 +6,6 @@ accept:
 - Неудачное обновление → откат
 - Миграции БД до запуска новой версии
 reqs:
-- 'platform-infrastructure: Упаковка и развёртывание Helm'
-- 'platform-infrastructure: Проверки готовности и порядок запуска'
+- {spec: platform-infrastructure, title: Упаковка и развёртывание Helm}
+- {spec: platform-infrastructure, title: Проверки готовности и порядок запуска}
 entry: Helm

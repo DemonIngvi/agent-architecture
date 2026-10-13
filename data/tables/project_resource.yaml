@@ -3,14 +3,14 @@ store: S2
 owner: platform-module
 schema: itsaplan.platform
 columns:
-- [id, serial, PK, '']
-- [project_id, int, FK project, '']
-- [kind, text, '', git / folder / document / mcp]
-- [ref, text, '', 'адрес, префикс, id']
-- [name, text, '', '']
+- {name: id, type: serial, pk: true}
+- {name: project_id, type: int, fk: project}
+- {name: kind, type: text, desc: git / folder / document / mcp}
+- {name: ref, type: text, desc: 'адрес, префикс, id'}
+- {name: name, type: text}
 policy:
   indexes:
-  - [unique, 'project_id, kind, ref', ресурс один раз в проекте]
+  - {kind: unique, columns: [project_id, kind, ref], why: ресурс один раз в проекте}
   retention: пока жив проект
   cleanup: каскадно с проектом
   migrate: cp

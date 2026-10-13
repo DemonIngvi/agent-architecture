@@ -6,10 +6,10 @@ accept:
 - Runner не в сети → «платформа агентов не в сети»
 - Агент выключен, бюджет исчерпан или задача вне процесса → причина текстом
 reqs:
-- 'icplan-agent-autopickup: Очередь агента'
-- 'icplan-agent-autopickup: Видимость подхвата'
-- 'icplan-integration: Каталог агентов платформы'
-- 'guardrails: G1 Admission'
+- {spec: icplan-agent-autopickup, title: Очередь агента}
+- {spec: icplan-agent-autopickup, title: Видимость подхвата}
+- {spec: icplan-integration, title: Каталог агентов платформы}
+- {spec: guardrails, title: G1 Admission}
 entry: карточка задачи
 chain:
   path: [US-ICP-18, US-GRD-03, US-ICP-06, US-RUN-03]

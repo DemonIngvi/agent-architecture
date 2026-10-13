@@ -6,8 +6,8 @@ accept:
 - «Не выполнено» → возврат на шаг с заметкой (как US-ICP-13)
 - Нет ответа дольше таймаута → напоминание, задача не двигается
 reqs:
-- 'icplan-agent-autopickup: Проверка пользователем перед переходом'
-- 'icplan-agent-autopickup: Вердикт по результату'
+- {spec: icplan-agent-autopickup, title: Проверка пользователем перед переходом}
+- {spec: icplan-agent-autopickup, title: Вердикт по результату}
 entry: 'карточка задачи: переключатель «проверять со мной»'
 chain:
   path: [US-ICP-15, US-ICP-13]

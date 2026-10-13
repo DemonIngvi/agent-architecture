@@ -6,6 +6,6 @@ accept:
 - Одобрено → выполняется
 - Отклонено или таймаут → не выполняется, агент продолжает без него
 reqs:
-- 'agent-harness: Пауза и возобновление'
-- 'guardrails: G2 Action'
+- {spec: agent-harness, title: Пауза и возобновление}
+- {spec: guardrails, title: G2 Action}
 entry: карточка задачи, уведомление

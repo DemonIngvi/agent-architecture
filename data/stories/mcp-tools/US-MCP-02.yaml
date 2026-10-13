@@ -6,6 +6,6 @@ accept:
 - Ошибка сервера → текст ошибки агенту
 - Тул не в наборе агента → отказ без вызова
 reqs:
-- 'tool-integration: Таймауты и ошибки тулов'
-- 'tool-integration: Ограничение набора тулов'
+- {spec: tool-integration, title: Таймауты и ошибки тулов}
+- {spec: tool-integration, title: Ограничение набора тулов}
 entry: —

@@ -1,9 +1,9 @@
 purpose: решение OPA
 fields:
-- [allow, bool, true, можно ли выполнить сразу; при `true` поле `approval` = `false`]
-- [approval, bool, true, 'при `allow = false`: `true` — можно после подтверждения человеком (пауза), `false` — запрещено']
-- [reason, string, true, причина для аудита и ленты]
+- {name: allow, type: bool, required: true, desc: можно ли выполнить сразу; при `true` поле `approval` = `false`}
+- {name: approval, type: bool, required: true, desc: 'при `allow = false`: `true` — можно после подтверждения человеком (пауза), `false` — запрещено'}
+- {name: reason, type: string, required: true, desc: причина для аудита и ленты}
 source:
   kind: ours
-  ref: D6, R-GRD-03
+  refs: [D6, R-GRD-03]
   why: 'Ответ нашего правила Rego, OPA кладёт его в `{result: …}`. Три исхода: выполнить сразу (`allow`), после подтверждения (`approval`), запрещено.'

@@ -6,6 +6,6 @@ accept:
 - Fallback тоже недоступен → `failed` с причиной
 - Rate limit → повтор с задержкой
 reqs:
-- 'llm-gateway: Fallback'
-- 'llm-gateway: Несколько провайдеров'
+- {spec: llm-gateway, title: Fallback}
+- {spec: llm-gateway, title: Несколько провайдеров}
 entry: —

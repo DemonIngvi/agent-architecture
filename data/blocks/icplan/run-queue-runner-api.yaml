@@ -3,12 +3,12 @@ tech: Очередь `agent_run` + протокол `@itsaplan/runner` (опро
 kind: service
 stories: [US-ICP-07, US-ICP-29, US-ICP-04, US-ICP-06, US-ICP-10]
 params:
-- [AGENT_RUN_LEASE_SECONDS, '300']
-- [AGENT_RUN_MAX_ATTEMPTS, '3']
-- [runner.offline_after_s, '60']
-- [protocol.version, '0.5']
-- [agent.runner_scope, team]
-- [agent.delegation_delay_sec, '120']
+- {name: AGENT_RUN_LEASE_SECONDS, value: '300'}
+- {name: AGENT_RUN_MAX_ATTEMPTS, value: '3'}
+- {name: runner.offline_after_s, value: '60'}
+- {name: protocol.version, value: '0.5'}
+- {name: agent.runner_scope, value: team}
+- {name: agent.delegation_delay_sec, value: '120'}
 does:
 - Хранит запуски в статусе pending
 - Отдаёт запуск внешнему раннеру (наш Agent Runner) с арендой; Runner опрашивает очередь со своим интервалом
@@ -16,27 +16,27 @@ does:
 - Отдаёт решения и указания пользователя в ответе heartbeat (доработка, R-ICP-16); отмену — ответом 404 на heartbeat, как в форке
 - Запуск, выданный `AGENT_RUN_MAX_ATTEMPTS` = 3 раза без итога, при следующем claim завершается `failed` с `last_error` «Runner did not report a result» и записью в истории задачи (`expireExhaustedRuns` форка)
 io:
-- [←, Автоподхват, '`Run` (pending)']
-- [→, Agent Runner, '`Run` — выдача с арендой (I1)']
-- [←, Agent Runner, '`RunEvent`, `RunResult` (I2)']
-- [↔, Agent Runner, 'heartbeat: продление аренды, решения, указания; отмена — 404 (I3)']
+- {dir: ←, with: Автоподхват, what: '`Run` (pending)'}
+- {dir: →, with: Agent Runner, model: [Run], what: выдача с арендой, via: [I1]}
+- {dir: ←, with: Agent Runner, model: [RunEvent, RunResult], via: [I2]}
+- {dir: ↔, with: Agent Runner, what: 'heartbeat: продление аренды, решения, указания; отмена — 404', via: [I3]}
 data:
-- [agent_run, 'запись, чтение: очередь и итог, доработанные поля RunResult']
-- [run_event, 'запись: шаги запуска — таблица Observability (схема `platform`)']
-- [agent_run_delivery, 'чтение, запись: решения и указания до подтверждения Runner (R-ICP-16)']
-- [apikey, 'чтение: ключ агента']
+- {table: agent_run, access: read-write, why: 'очередь и итог, доработанные поля RunResult'}
+- {table: run_event, access: write, why: шаги запуска — таблица Observability (схема `platform`)}
+- {table: agent_run_delivery, why: 'чтение, запись: решения и указания до подтверждения Runner (R-ICP-16)'}
+- {table: apikey, access: read, why: ключ агента}
 reqs: [R-ICP-02, R-ICP-03, R-ICP-04, R-ICP-07, R-ICP-09, R-ICP-16, R-AP-12, R-AP-17]
 tasks: ['2.1', '3.3', '3.6']
 failures:
-- Runner не в сети дольше `runner.offline_after_s` — агенты «не в сети», запуски ждут
-- Runner упал трижды на одном запуске (аренда истекла `AGENT_RUN_MAX_ATTEMPTS` раз) — запуск `failed`, процесс идёт по ошибке шага (R-AP-12)
-- Несовместимая версия протокола — Runner не берёт запуски
-- БД ICPlan недоступна — выдача и приём итогов останавливаются, Runner повторяет с backoff (FMEA icplan-integration)
+- {when: Runner не в сети дольше `runner.offline_after_s`, then: 'агенты «не в сети», запуски ждут'}
+- {when: Runner упал трижды на одном запуске (аренда истекла `AGENT_RUN_MAX_ATTEMPTS` раз), then: 'запуск `failed`, процесс идёт по ошибке шага', reqs: [R-AP-12]}
+- {when: Несовместимая версия протокола, then: Runner не берёт запуски}
+- {when: БД ICPlan недоступна, then: 'выдача и приём итогов останавливаются, Runner повторяет с backoff', fmea: icplan-integration}
 why: Протокол уже есть — Agent Runner подключается к нему, ICPlan почти не меняем.
 rnd: runner-and-scheduling.md
 ops:
-- ['`POST /agent-runs/claim` — выдать запуск с арендой', Agent Runner, I1]
-- ['`POST /agent-runs/:runId/events` — шаги запуска', Agent Runner, I2]
-- ['`POST /agent-runs/:runId/result` — итог', Agent Runner, I2]
-- ['`POST /agent-runs/:runId/heartbeat` — аренда, решения; отмена — ответ 404', Agent Runner, I3]
-- ['`GET /agent-runs/:runId/stream` — живой поток для чата запуска', Task UI, I20]
+- {op: выдать запуск с арендой, endpoint: POST /agent-runs/claim, who: Agent Runner, via: [I1]}
+- {op: шаги запуска, endpoint: 'POST /agent-runs/:runId/events', who: Agent Runner, via: [I2]}
+- {op: итог, endpoint: 'POST /agent-runs/:runId/result', who: Agent Runner, via: [I2]}
+- {op: 'аренда, решения; отмена — ответ 404', endpoint: 'POST /agent-runs/:runId/heartbeat', who: Agent Runner, via: [I3]}
+- {op: живой поток для чата запуска, endpoint: 'GET /agent-runs/:runId/stream', who: Task UI, via: [I20]}

@@ -1,0 +1,607 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "title": "Блок компонента icplan",
+ "description": "Единица data/ вида «block». Генерируется: python html-view/doctool.py yaml-schema (не править руками).",
+ "type": "object",
+ "properties": {
+  "title": {
+   "type": "string",
+   "description": "название блока = имя файла (slug)"
+  },
+  "tech": {
+   "type": "string",
+   "description": "технология"
+  },
+  "kind": {
+   "type": "string",
+   "enum": [
+    "ui",
+    "service",
+    "store"
+   ],
+   "description": "ui → screens, service → ops, store → schema"
+  },
+  "stories": {
+   "type": "array",
+   "items": {
+    "anyOf": [
+     {
+      "$ref": "catalog.schema.json#/definitions/story"
+     },
+     {
+      "const": ""
+     }
+    ]
+   },
+   "description": "истории US-…"
+  },
+  "screens": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "экран"
+     },
+     "where": {
+      "type": "string",
+      "description": "где в интерфейсе"
+     },
+     "what": {
+      "type": "string",
+      "description": "что на экране"
+     },
+     "endpoints": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/endpoint"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "эндпоинты экрана «МЕТОД путь» (data/endpoints)"
+     },
+     "status": {
+      "type": "string",
+      "enum": [
+       "есть",
+       "доработка",
+       "новое"
+      ],
+      "description": "есть | доработка | новое"
+     },
+     "code": {
+      "type": "string",
+      "description": "где код (путь в форке)"
+     },
+     "stories": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/story"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "истории US-…"
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "name",
+     "where",
+     "what",
+     "status",
+     "code",
+     "stories"
+    ]
+   },
+   "description": "экраны (kind: ui)"
+  },
+  "params": {
+   "anyOf": [
+    {
+     "type": "string",
+     "pattern": "^(?:нет: .+)$"
+    },
+    {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "name": {
+        "anyOf": [
+         {
+          "type": "string",
+          "enum": [
+           "AGENT_RUN_LEASE_SECONDS",
+           "AGENT_RUN_MAX_ATTEMPTS",
+           "AGENT_RUN_TIMEOUT_MS",
+           "agent.delegation_delay_sec",
+           "agent.enabled",
+           "agent.instruction",
+           "agent.kind",
+           "agent.mcp_servers",
+           "agent.model",
+           "agent.projects",
+           "agent.runner_scope",
+           "agent.skills",
+           "agent.tools",
+           "agent.version",
+           "chat.retention_days",
+           "issue.process_paused",
+           "issue.review_with_me",
+           "process.issue_type",
+           "project.actions",
+           "project.mcp_enabled",
+           "protocol.version",
+           "review_reminder_hours",
+           "runner.offline_after_s",
+           "runs.retention_days",
+           "step.agent",
+           "step.column",
+           "step.max_runs",
+           "step.on_success / on_failure",
+           "step.require_review"
+          ]
+         },
+         {
+          "const": ""
+         }
+        ],
+        "description": "имя параметра из таблицы «Параметры модуля» interfaces.md спек компонента"
+       },
+       "value": {
+        "type": "string",
+        "description": "значение по типу из interfaces.md (число, длительность, перечисление); на странице — значение спеки"
+       },
+       "note": {
+        "type": "string",
+        "description": "пояснение вместо значения (когда значение задаёт спека)"
+       }
+      },
+      "additionalProperties": false,
+      "required": [
+       "name"
+      ]
+     }
+    }
+   ],
+   "description": "параметры: {name, value} из interfaces.md или «нет: <почему>»"
+  },
+  "does": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   },
+   "description": "что делает"
+  },
+  "io": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "dir": {
+      "type": "string",
+      "enum": [
+       "→",
+       "←",
+       "↔"
+      ],
+      "description": "направление: → блок отдаёт, ← блок получает, ↔ в обе стороны"
+     },
+     "with": {
+      "anyOf": [
+       {
+        "$ref": "catalog.schema.json#/definitions/participant"
+       },
+       {
+        "const": ""
+       }
+      ],
+      "description": "с кем: компонент, блок, «Компонент · Блок» или роль (каталог)"
+     },
+     "label": {
+      "type": "string",
+      "description": "подпись участника, если её нет в каталоге или она отличается (текст как на странице)"
+     },
+     "model": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/model"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "модели data/models, которые передаются"
+     },
+     "what": {
+      "type": "string",
+      "description": "что передаётся (без моделей и I-кодов)"
+     },
+     "via": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/icode"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "I-коды интерфейса (data/integrations.yaml)"
+     },
+     "reqs": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/req"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "R-коды требований"
+     },
+     "decisions": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/decision"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "решения D<N> (design.md)"
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "dir"
+    ],
+    "anyOf": [
+     {
+      "required": [
+       "with"
+      ]
+     },
+     {
+      "required": [
+       "label"
+      ]
+     }
+    ]
+   },
+   "description": "входы и выходы: {dir, with, what, model, via}"
+  },
+  "data": {
+   "anyOf": [
+    {
+     "type": "string",
+     "pattern": "^(?:нет: .+)$"
+    },
+    {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "properties": {
+       "table": {
+        "anyOf": [
+         {
+          "$ref": "catalog.schema.json#/definitions/table"
+         },
+         {
+          "type": "string",
+          "pattern": "^(?:S\\d+)$"
+         },
+         {
+          "const": ""
+         }
+        ],
+        "description": "таблица модели данных (каталог) или хранилище S<N>"
+       },
+       "access": {
+        "type": "string",
+        "enum": [
+         "read",
+         "write",
+         "read-write",
+         "store",
+         "indirect"
+        ],
+        "description": "доступ: read — «чтение», write — «запись», read-write — «запись, чтение», store — «хранение», indirect — «косвенно»"
+       },
+       "via": {
+        "type": "array",
+        "items": {
+         "anyOf": [
+          {
+           "$ref": "catalog.schema.json#/definitions/icode"
+          },
+          {
+           "const": ""
+          }
+         ]
+        },
+        "description": "через какой интерфейс (I-код)"
+       },
+       "why": {
+        "type": "string",
+        "description": "что и зачем (текст)"
+       }
+      },
+      "additionalProperties": false,
+      "required": [
+       "table"
+      ]
+     }
+    }
+   ],
+   "description": "таблицы: {table, access, why} или «нет: <почему>»"
+  },
+  "reqs": {
+   "type": "array",
+   "items": {
+    "anyOf": [
+     {
+      "$ref": "catalog.schema.json#/definitions/req"
+     },
+     {
+      "const": ""
+     }
+    ]
+   },
+   "description": "R-коды"
+  },
+  "tasks": {
+   "type": "array",
+   "items": {
+    "anyOf": [
+     {
+      "$ref": "catalog.schema.json#/definitions/task"
+     },
+     {
+      "const": ""
+     }
+    ]
+   },
+   "description": "задачи"
+  },
+  "failures": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "when": {
+      "type": "string",
+      "description": "что сломалось"
+     },
+     "then": {
+      "type": "string",
+      "description": "что происходит (поведение при сбое)"
+     },
+     "fmea": {
+      "anyOf": [
+       {
+        "$ref": "catalog.schema.json#/definitions/spec"
+       },
+       {
+        "const": ""
+       }
+      ],
+      "description": "спека, в FMEA которой отказ (interfaces.md)"
+     },
+     "via": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/icode"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "I-коды интерфейса (data/integrations.yaml)"
+     },
+     "reqs": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/req"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "R-коды требований"
+     },
+     "decisions": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/decision"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "решения D<N> (design.md)"
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "when"
+    ]
+   },
+   "description": "при сбое: {when, then, reqs}"
+  },
+  "why": {
+   "type": "string",
+   "description": "почему так"
+  },
+  "rnd": {
+   "anyOf": [
+    {
+     "$ref": "catalog.schema.json#/definitions/rnd"
+    },
+    {
+     "const": ""
+    }
+   ],
+   "description": "R&D: файл в docs/rnd"
+  },
+  "ops": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "op": {
+      "type": "string",
+      "description": "операция (текст)"
+     },
+     "endpoint": {
+      "anyOf": [
+       {
+        "$ref": "catalog.schema.json#/definitions/endpoint"
+       },
+       {
+        "const": ""
+       }
+      ],
+      "description": "эндпоинт «МЕТОД путь» (data/endpoints)"
+     },
+     "who": {
+      "anyOf": [
+       {
+        "$ref": "catalog.schema.json#/definitions/participant"
+       },
+       {
+        "const": ""
+       }
+      ],
+      "description": "кто вызывает: компонент, блок, роль (каталог)"
+     },
+     "label": {
+      "type": "string",
+      "description": "кто вызывает — текстом, если нет в каталоге"
+     },
+     "via": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/icode"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "I-код интерфейса"
+     },
+     "internal": {
+      "type": "boolean",
+      "description": "вызов внутри компонента (на странице — «внутри»)"
+     },
+     "via_note": {
+      "type": "string",
+      "description": "канал текстом, если не I-код и не «внутри»"
+     },
+     "reqs": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/req"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "R-коды"
+     },
+     "decisions": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/decision"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "решения D<N>"
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "op"
+    ],
+    "anyOf": [
+     {
+      "required": [
+       "who"
+      ]
+     },
+     {
+      "required": [
+       "label"
+      ]
+     }
+    ]
+   },
+   "description": "операции (kind: service): {op, endpoint, who, via}"
+  },
+  "schema": {
+   "type": "string",
+   "description": "схема хранения (kind: store)"
+  },
+  "iface": {
+   "type": "array",
+   "items": {
+    "anyOf": [
+     {
+      "$ref": "catalog.schema.json#/definitions/icode"
+     },
+     {
+      "const": ""
+     }
+    ]
+   },
+   "description": "I-коды, которые блок реализует"
+  }
+ },
+ "additionalProperties": false,
+ "required": [
+  "title",
+  "tech"
+ ]
+}

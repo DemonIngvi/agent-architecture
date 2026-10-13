@@ -3,22 +3,22 @@ tech: Таблица в БД ICPlan + тул записи
 kind: store
 stories: [US-MEM-01, US-MEM-03]
 params:
-- [m3_max_kb, 'предельный размер записи M3']
-- [retention, 'срок хранения: M3 — до закрытия задачи']
+- {name: m3_max_kb, note: предельный размер записи M3}
+- {name: retention, value: 'срок хранения: M3 — до закрытия задачи'}
 does:
 - Агент записывает состояние работы по задаче
 - Следующий агент получает его в контексте
-data:
-- [memory_m3, 'чтение и запись через Memory API (владелец — Memory, роль `memory`)']
-schema: 'Таблица `memory_m3`: ключ — задача и область; `done`, `next`, `blockers` и передача следующему `artifacts`, `questions`, `criteria_next` (D20); `version` растёт при каждой записи, прежняя версия остаётся в истории.'
 io:
-- [←, Memory API, 'запись `M3Record` (`PUT /m3/:issueId`, I11)']
-- [→, Memory API, 'M3 для контекста следующего запуска (`GET /context`, I11)']
+- {dir: ←, with: Memory API, what: 'запись `M3Record` (`PUT /m3/:issueId`, I11)'}
+- {dir: →, with: Memory API, what: 'M3 для контекста следующего запуска (`GET /context`, I11)'}
+data:
+- {table: memory_m3, why: 'чтение и запись через Memory API (владелец — Memory, роль `memory`)'}
 reqs: [R-MEM-04, R-MEM-15]
 tasks: ['2.5']
 failures:
-- Два запуска пишут M3 одновременно — сохраняется последняя версия, прежняя остаётся в истории (R-MEM-04)
-- Запись больше `m3_max_kb` или с секретом — отклонена с причиной (R-MEM-15)
-- Очистка M3 не прошла — записи остаются, M3 закрытых задач не отдаётся в контекст (FMEA agent-memory)
+- {when: Два запуска пишут M3 одновременно, then: 'сохраняется последняя версия, прежняя остаётся в истории', reqs: [R-MEM-04]}
+- {when: Запись больше `m3_max_kb` или с секретом, then: отклонена с причиной, reqs: [R-MEM-15]}
+- {when: Очистка M3 не прошла, then: 'записи остаются, M3 закрытых задач не отдаётся в контекст', fmea: agent-memory}
 why: Самый дешёвый способ преемственности этапов.
 rnd: memory-model.md
+schema: 'Таблица `memory_m3`: ключ — задача и область; `done`, `next`, `blockers` и передача следующему `artifacts`, `questions`, `criteria_next` (D20); `version` растёт при каждой записи, прежняя версия остаётся в истории.'

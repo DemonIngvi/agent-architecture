@@ -1,8 +1,8 @@
 kind: litellm
 columns:
-- [budget_id, String, PK, '']
-- [max_budget, Float, '', '']
-- [soft_budget, Float, '', '']
-- [budget_duration, String, '', '']
-- [rpm_limit, BigInt, '', '']
-- [tpm_limit, BigInt, '', '']
+- {name: budget_id, type: String, pk: true}
+- {name: max_budget, type: Float}
+- {name: soft_budget, type: Float}
+- {name: budget_duration, type: String}
+- {name: rpm_limit, type: BigInt}
+- {name: tpm_limit, type: BigInt}

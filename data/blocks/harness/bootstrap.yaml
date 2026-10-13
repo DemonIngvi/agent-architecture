@@ -3,25 +3,25 @@ tech: Python, загрузка `AgentDefinition`
 kind: service
 stories: [US-HAR-01, US-MEM-07]
 params:
-- [prompt.platform_version, версия образа Harness]
+- {name: prompt.platform_version, value: версия образа Harness}
 does:
 - 'Собирает агента: промпт, навыки, тулы, лимиты'
 - Даёт агенту только тулы и навыки из определения
 - Проверяет параметры по границам «Мин»–«Макс» с именем параметра в ошибке (R-HRN-10)
 io:
-- [←, Agent Runner, '`RunBundle`: определение версии запуска, задание, память на старте, манифест, MCP (I7)']
-- [→, Context Manager, 'собранный агент: инструкция, навыки, тулы, лимиты']
+- {dir: ←, with: Agent Runner, what: '`RunBundle`: определение версии запуска, задание, память на старте, манифест, MCP', via: [I7]}
+- {dir: →, with: Context Manager, what: 'собранный агент: инструкция, навыки, тулы, лимиты'}
 data:
-- [ai_agent, 'чтение через Runner: определение агента в `RunBundle` (владелец — ICPlan; источник — Platform module, I4)']
-- [agent_settings_version, 'чтение через Runner: версия определения запуска (владелец — Platform module, D23)']
+- {table: ai_agent, access: read, why: 'через Runner: определение агента в `RunBundle` (владелец — ICPlan; источник — Platform module, I4)'}
+- {table: agent_settings_version, access: read, why: 'через Runner: версия определения запуска (владелец — Platform module, D23)'}
 reqs: [R-HRN-01, R-HRN-10]
 tasks: ['1.3']
 failures:
-- Определение не проходит схему — цикл не стартует, запуск завершается `invalid_definition` (FMEA agent-harness)
-- Навык из определения не найден — запуск завершается ошибкой с именем навыка
-- Параметр вне границ — значение отклонено, ошибка называет параметр и границы
+- {when: Определение не проходит схему, then: 'цикл не стартует, запуск завершается `invalid_definition`', fmea: agent-harness}
+- {when: Навык из определения не найден, then: запуск завершается ошибкой с именем навыка}
+- {when: Параметр вне границ, then: 'значение отклонено, ошибка называет параметр и границы'}
 why: Агент полностью задаётся конфигом.
 rnd: harness-framework.md
 ops:
-- ['`POST /run` — принять `RunBundle`, проверить определение по схеме `agent/v1`, собрать агента и начать цикл', Agent Runner (Run supervisor), I7]
-- ['`GET /ready` — готовность процесса и версия до `POST /run`', Agent Runner, I7]
+- {op: 'принять `RunBundle`, проверить определение по схеме `agent/v1`, собрать агента и начать цикл', endpoint: POST /run, label: Agent Runner (Run supervisor), via: [I7]}
+- {op: готовность процесса и версия до `POST /run`, endpoint: GET /ready, who: Agent Runner, via: [I7]}

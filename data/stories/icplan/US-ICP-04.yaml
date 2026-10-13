@@ -6,8 +6,8 @@ accept:
 - Отмена в очереди → запуск снят без среды
 - Отмена завершённого → без изменений
 reqs:
-- 'icplan-integration: Отмена из ICPlan'
-- 'agent-runner: Отмена запуска'
+- {spec: icplan-integration, title: Отмена из ICPlan}
+- {spec: agent-runner, title: Отмена запуска}
 entry: карточка задачи, чат
 chain:
   path: [US-ICP-04, US-RUN-01, US-SBX-01, US-OBS-01]

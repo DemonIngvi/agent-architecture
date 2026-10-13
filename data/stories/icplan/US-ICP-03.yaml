@@ -6,8 +6,8 @@ accept:
 - Итог шага или ошибка → уведомление по настройкам пользователя (в ICPlan, Telegram)
 - Нет прав на подтверждение → кнопка недоступна, решение не принимается
 reqs:
-- 'icplan-integration: Уведомление о решении пользователя'
-- 'icplan-integration: Подтверждения и ответы'
+- {spec: icplan-integration, title: Уведомление о решении пользователя}
+- {spec: icplan-integration, title: Подтверждения и ответы}
 entry: уведомления ICPlan, Telegram
 chain:
   path: [US-ICP-03, US-HAR-02, US-HAR-07]

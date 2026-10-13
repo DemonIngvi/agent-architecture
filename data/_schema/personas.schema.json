@@ -1,0 +1,50 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "title": "Единица «personas»",
+ "description": "Единица data/ вида «personas». Генерируется: python html-view/doctool.py yaml-schema (не править руками).",
+ "type": "object",
+ "properties": {
+  "roles": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "string"
+   }
+  },
+  "personas": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "can": {
+      "type": "string"
+     },
+     "wants": {
+      "type": "string"
+     },
+     "conflict": {
+      "type": "string"
+     },
+     "prompt": {
+      "type": "string"
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "name",
+     "can",
+     "wants",
+     "conflict",
+     "prompt"
+    ]
+   }
+  }
+ },
+ "additionalProperties": false,
+ "required": [
+  "roles",
+  "personas"
+ ]
+}

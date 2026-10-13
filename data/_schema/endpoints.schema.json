@@ -1,0 +1,33 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "title": "Единица «endpoints»",
+ "description": "Единица data/ вида «endpoints». Генерируется: python html-view/doctool.py yaml-schema (не править руками).",
+ "type": "object",
+ "additionalProperties": {
+  "type": "object",
+  "properties": {
+   "request": {
+    "type": "string",
+    "description": "тело или параметры запроса"
+   },
+   "response": {
+    "type": "string",
+    "description": "код · тело ответа"
+   },
+   "note": {
+    "type": "string",
+    "description": "ошибки и примечания"
+   }
+  },
+  "additionalProperties": false,
+  "required": [
+   "request",
+   "response",
+   "note"
+  ]
+ },
+ "propertyNames": {
+  "type": "string",
+  "pattern": "^(?:(GET|POST|PUT|PATCH|DELETE) \\S.*)$"
+ }
+}

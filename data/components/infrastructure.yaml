@@ -3,15 +3,15 @@ status: part
 guardrails: G3
 desc: Кластер k3s, Helm, Traefik ingress, PostgreSQL (CloudNativePG) с PgBouncer, RustFS, секреты, бэкапы, сетевые политики, профиль нагрузки.
 specs:
-- [Спека, openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md]
-- [Схема развёртывания, openspec/changes/define-agent-platform/specs/platform-infrastructure/architecture.md]
+- {label: Спека, path: openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md}
+- {label: Схема развёртывания, path: openspec/changes/define-agent-platform/specs/platform-infrastructure/architecture.md}
 tasks: ['4.6', '4.7', '4.8']
 about:
   chain:
-  - [Пользователи, null]
-  - [Инфраструктура, infrastructure]
-  - [ICPlan, icplan]
-  - [Agent Runner, agent-runner]
+  - {label: Пользователи}
+  - {label: Инфраструктура, comp: infrastructure}
+  - {label: ICPlan, comp: icplan}
+  - {label: Agent Runner, comp: agent-runner}
   purpose: 'Основание платформы: где и как всё запущено, как распределяется нагрузка, где лежат данные и как они сохраняются.'
   does:
   - Кластер k3s на одном узле, namespaces по зонам

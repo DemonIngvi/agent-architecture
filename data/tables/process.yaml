@@ -3,17 +3,17 @@ store: S1
 owner: icplan
 schema: itsaplan.public
 columns:
-- [id, serial, PK, '']
-- [project_id, int, FK project, '']
-- [issue_type_id, int, FK issue_type, один процесс на тип]
-- [owner_user_id, text, '', владелец]
-- [first_step_id, int, FK process_step, '']
-- [version, int, '', версия процесса]
+- {name: id, type: serial, pk: true}
+- {name: project_id, type: int, fk: project}
+- {name: issue_type_id, type: int, fk: issue_type, desc: один процесс на тип}
+- {name: owner_user_id, type: text, desc: владелец}
+- {name: first_step_id, type: int, fk: process_step}
+- {name: version, type: int, desc: версия процесса}
 policy:
   indexes:
-  - [unique, 'project_id, issue_type_id', один процесс на тип задачи]
-  - [index, issue_type_id, FK; процесс по типу задачи]
-  - [index, first_step_id, FK]
+  - {kind: unique, columns: [project_id, issue_type_id], why: один процесс на тип задачи}
+  - {kind: index, columns: [issue_type_id], why: FK; процесс по типу задачи}
+  - {kind: index, columns: [first_step_id], why: FK}
   retention: пока жив проект
   cleanup: каскадно с проектом; версия процесса растёт при правке
   migrate: fork

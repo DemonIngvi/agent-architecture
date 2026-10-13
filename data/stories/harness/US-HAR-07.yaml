@@ -6,6 +6,6 @@ accept:
 - Ответ → продолжение с ответом в контексте
 - Таймаут → завершение с причиной «нет ответа»
 reqs:
-- 'agent-harness: Пауза и возобновление'
-- 'icplan-integration: Подтверждения и ответы'
+- {spec: agent-harness, title: Пауза и возобновление}
+- {spec: icplan-integration, title: Подтверждения и ответы}
 entry: —

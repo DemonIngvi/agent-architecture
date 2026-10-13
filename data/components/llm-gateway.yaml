@@ -3,14 +3,14 @@ status: part
 guardrails: G4
 desc: 'Единственный выход к моделям: алиасы, virtual key на агента, лимиты, fallback. Развёрнут, не подключён.'
 specs:
-- [Спека, openspec/changes/define-agent-platform/specs/llm-gateway/spec.md]
-- [Схема, openspec/changes/define-agent-platform/specs/llm-gateway/architecture.md]
+- {label: Спека, path: openspec/changes/define-agent-platform/specs/llm-gateway/spec.md}
+- {label: Схема, path: openspec/changes/define-agent-platform/specs/llm-gateway/architecture.md}
 tasks: ['1.1', '4.5']
 about:
   chain:
-  - [Harness, harness]
-  - [LiteLLM gateway, llm-gateway]
-  - [Модели, null]
+  - {label: Harness, comp: harness}
+  - {label: LiteLLM gateway, comp: llm-gateway}
+  - {label: Модели}
   purpose: 'Единственная дверь к моделям: смена модели, лимиты и учёт затрат в одном месте.'
   does:
   - 'Алиасы моделей: смена модели без изменения агентов'

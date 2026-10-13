@@ -6,6 +6,6 @@ accept:
 - Фильтр по агенту и периоду
 - Изменение через импорт YAML → тоже в журнале
 reqs:
-- 'control-plane: Версии настроек агента'
-- 'control-plane: Права на настройки'
+- {spec: control-plane, title: Версии настроек агента}
+- {spec: control-plane, title: Права на настройки}
 entry: God mode → «Платформа» → журнал изменений; Безопасность — `GET /platform/audit`

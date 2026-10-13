@@ -6,6 +6,6 @@ accept:
 - Исправление → новая версия
 - Удаление по сроку хранения → автоматически
 reqs:
-- 'agent-memory: Управление памятью'
-- 'agent-memory: Срок хранения'
+- {spec: agent-memory, title: Управление памятью}
+- {spec: agent-memory, title: Срок хранения}
 entry: агент → память

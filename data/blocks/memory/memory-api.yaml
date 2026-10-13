@@ -3,12 +3,12 @@ tech: Сервис над БД ICPlan
 kind: service
 stories: [US-MEM-01, US-MEM-02, US-MEM-03, US-MEM-10]
 params:
-- [read, 'какие уровни памяти отдавать в контекст']
-- [write, 'какие уровни агент может писать']
-- [m2_last_runs, 'сколько итогов прошлых запусков добавлять в контекст']
-- [retention, 'срок хранения; для M1 и M2 — срок чтения']
-- [scope, 'область записи: задача, агент, проект, команда']
-- [m3_max_kb, 'предельный размер записи M3']
+- {name: read, value: какие уровни памяти отдавать в контекст}
+- {name: write, value: какие уровни агент может писать}
+- {name: m2_last_runs, note: сколько итогов прошлых запусков добавлять в контекст}
+- {name: retention, value: срок хранения; для M1 и M2 — срок чтения}
+- {name: scope, value: 'область записи: задача, агент, проект, команда'}
+- {name: m3_max_kb, note: предельный размер записи M3}
 does:
 - Проверяет права и области
 - Отдаёт память в контекст запуска
@@ -16,28 +16,28 @@ does:
 - Проверяет запись M3 до сохранения (профиль, область, схема и размер, секреты)
 - Позволяет администратору удалять записи
 io:
-- [←, Harness · Context Manager, 'запрос контекста `GET /context` по задаче и агенту (I11)']
-- [←, Harness · Tool Executor, 'запись `M3Record` — `PUT /m3/:issueId` (I11)']
-- [←, Администратор, 'удаление записи — `DELETE /records/:level/:id`, сервисный токен']
-- [←, Kubernetes CronJob, 'очистка по срокам — `POST /retention/run`, сервисный токен']
-- [→, PostgreSQL 17, 'чтение M1, M2 и запись M3 через PgBouncer (I22)']
+- {dir: ←, with: Harness · Context Manager, what: запрос контекста `GET /context` по задаче и агенту, via: [I11]}
+- {dir: ←, with: Harness · Tool Executor, what: 'запись `M3Record` — `PUT /m3/:issueId`', via: [I11]}
+- {dir: ←, label: Администратор, what: 'удаление записи — `DELETE /records/:level/:id`, сервисный токен'}
+- {dir: ←, label: Kubernetes CronJob, what: 'очистка по срокам — `POST /retention/run`, сервисный токен'}
+- {dir: →, label: PostgreSQL 17, what: 'чтение M1, M2 и запись M3 через PgBouncer', via: [I22]}
 data:
-- [memory_m3, 'чтение и запись (владелец — Memory, роль `memory`)']
-- [agent_run, 'чтение итогов запусков (M2) по GRANT (владелец — ICPlan)']
-- [agent_chat_message, 'чтение переписки в треде (M1) по GRANT (владелец — ICPlan)']
-- [issue_activity, 'чтение по GRANT (владелец — ICPlan)']
+- {table: memory_m3, why: 'чтение и запись (владелец — Memory, роль `memory`)'}
+- {table: agent_run, why: чтение итогов запусков (M2) по GRANT (владелец — ICPlan)}
+- {table: agent_chat_message, why: чтение переписки в треде (M1) по GRANT (владелец — ICPlan)}
+- {table: issue_activity, access: read, why: по GRANT (владелец — ICPlan)}
 reqs: [R-MEM-01, R-MEM-04, R-MEM-05, R-MEM-07, R-MEM-08, R-MEM-12, R-MEM-15]
 tasks: ['2.5']
 failures:
-- БД недоступна — чтение отдаёт пустой контекст с предупреждением, запись повторяется (FMEA agent-memory; R-MEM-12)
-- Два запуска пишут M3 одновременно — сохраняется последняя версия, прежняя остаётся в истории (R-MEM-04)
-- Очистка M3 не прошла — записи остаются, M3 закрытых задач не отдаётся в контекст, уведомление эксплуатации, повтор задания CronJob (FMEA agent-memory)
-- Профиль памяти не задан — применяются значения по умолчанию из таблицы параметров (R-MEM-12)
-- Запись с секретом, больше `m3_max_kb` или на уровень вне профиля — отклонена с причиной (R-MEM-15)
+- {when: БД недоступна, then: 'чтение отдаёт пустой контекст с предупреждением, запись повторяется', fmea: agent-memory, reqs: [R-MEM-12]}
+- {when: Два запуска пишут M3 одновременно, then: 'сохраняется последняя версия, прежняя остаётся в истории', reqs: [R-MEM-04]}
+- {when: Очистка M3 не прошла, then: 'записи остаются, M3 закрытых задач не отдаётся в контекст, уведомление эксплуатации, повтор задания CronJob', fmea: agent-memory}
+- {when: Профиль памяти не задан, then: применяются значения по умолчанию из таблицы параметров, reqs: [R-MEM-12]}
+- {when: 'Запись с секретом, больше `m3_max_kb` или на уровень вне профиля', then: отклонена с причиной, reqs: [R-MEM-15]}
 why: Агенты не ходят в БД напрямую.
 rnd: memory-model.md
 ops:
-- ['контекст запуска: M1, M2, M3 по профилю памяти — `GET /context`', Harness · Context Manager, I11]
-- ['запись M3 с проверками — `PUT /m3/:issueId`', Harness · Tool Executor, I11]
-- ['удаление записи M1–M4 — `DELETE /records/:level/:id`', Администратор, I11]
-- ['очистка M3 по срокам — `POST /retention/run`', Kubernetes CronJob, I11]
+- {op: 'контекст запуска: M1, M2, M3 по профилю памяти — `GET /context`', who: Harness · Context Manager, via: [I11]}
+- {op: 'запись M3 с проверками — `PUT /m3/:issueId`', who: Harness · Tool Executor, via: [I11]}
+- {op: 'удаление записи M1–M4 — `DELETE /records/:level/:id`', label: Администратор, via: [I11]}
+- {op: очистка M3 по срокам — `POST /retention/run`, label: Kubernetes CronJob, via: [I11]}

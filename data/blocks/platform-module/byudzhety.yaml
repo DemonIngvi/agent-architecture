@@ -3,28 +3,28 @@ tech: Бюджеты virtual key LiteLLM + проверка G1 в Runner
 kind: service
 stories: [US-PM-01, US-PM-06]
 params:
-- [budget.per_run_tokens, "200 000"]
-- [budget.daily_usd, 5 $]
+- {name: budget.per_run_tokens, value: 200 000}
+- {name: budget.daily_usd, value: 5 $}
 does:
 - Задаёт лимиты трат агента, проекта, команды
 - Отказ до траты, а не после; пороги 80% (предупреждение) и 100% (отказ G1)
 io:
-- [←, ICPlan UI, 'бюджеты агента и проекта (I20)']
-- [→, LiteLLM, 'лимит бюджета ключа — `/key/update`, действует сразу (I15)']
+- {dir: ←, label: ICPlan UI, what: бюджеты агента и проекта, via: [I20]}
+- {dir: →, label: LiteLLM, what: 'лимит бюджета ключа — `/key/update`, действует сразу', via: [I15]}
 data:
-- [agent_settings, 'запись, чтение: `budget_run_usd`, `budget_day_usd`']
-- [project_platform, 'запись, чтение: `budget_month_usd`']
-- [LiteLLM_VerificationToken, 'запись через admin API: лимит ключа (I15)']
-- [LiteLLM_BudgetTable, 'запись через admin API: бюджеты (I15)']
+- {table: agent_settings, access: read-write, why: '`budget_run_usd`, `budget_day_usd`'}
+- {table: project_platform, access: read-write, why: '`budget_month_usd`'}
+- {table: LiteLLM_VerificationToken, access: write, why: 'через admin API: лимит ключа (I15)'}
+- {table: LiteLLM_BudgetTable, access: write, why: 'через admin API: бюджеты (I15)'}
 reqs: [R-CP-01, R-CP-03, R-CP-06]
 tasks: ['4.4']
 failures:
-- LiteLLM не отвечает при сохранении бюджета — изменение «не применено», повтор (R-CP-06 «LiteLLM недоступен»)
-- Бюджет в модуле и в LiteLLM различается — предупреждение администратору (R-CP-06 «Рассинхронизация»)
-- Отрицательный бюджет или выше потолка — 400 с названием поля (R-CP-01)
-ops:
-- ['`PATCH /platform/agents/:agentId/settings` — бюджет агента', Администратор, I20]
-- ['`PUT /platform/projects/:projectKey/budget` — бюджет проекта', Администратор, I20]
-- ['Применить лимит к ключу LiteLLM', Platform module, I15]
+- {when: LiteLLM не отвечает при сохранении бюджета, then: 'изменение «не применено», повтор (R-CP-06 «LiteLLM недоступен»)'}
+- {when: Бюджет в модуле и в LiteLLM различается, then: предупреждение администратору (R-CP-06 «Рассинхронизация»)}
+- {when: Отрицательный бюджет или выше потолка, then: 400 с названием поля, reqs: [R-CP-01]}
 why: Иерархия бюджетов — стандарт (LiteLLM, облачные биллинги).
 rnd: runaway-protection.md
+ops:
+- {op: бюджет агента, endpoint: 'PATCH /platform/agents/:agentId/settings', label: Администратор, via: [I20]}
+- {op: бюджет проекта, endpoint: 'PUT /platform/projects/:projectKey/budget', label: Администратор, via: [I20]}
+- {op: Применить лимит к ключу LiteLLM, who: Platform module, via: [I15]}

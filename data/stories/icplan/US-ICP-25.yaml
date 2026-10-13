@@ -6,8 +6,8 @@ accept:
 - Задачи в работе доделывают текущий шаг, дальше идут по новой версии
 - Удалён шаг, на котором стоят задачи → сохранение требует выбрать, куда их перевести
 reqs:
-- 'icplan-agent-autopickup: Определение процесса'
-- 'icplan-agent-autopickup: Изменение процесса'
+- {spec: icplan-agent-autopickup, title: Определение процесса}
+- {spec: icplan-agent-autopickup, title: Изменение процесса}
 entry: Настройки проекта → Процессы
 chain:
   path: [US-ICP-25, US-ICP-26]

@@ -6,7 +6,7 @@ accept:
 - Восстановление по инструкции на новый сервер
 - Бэкап не прошёл → уведомление
 reqs:
-- 'platform-infrastructure: Резервное копирование'
-- 'platform-infrastructure: СУБД и пул соединений'
-- 'platform-infrastructure: Объектное хранилище'
+- {spec: platform-infrastructure, title: Резервное копирование}
+- {spec: platform-infrastructure, title: СУБД и пул соединений}
+- {spec: platform-infrastructure, title: Объектное хранилище}
 entry: —

@@ -6,6 +6,6 @@ accept:
 - Экспорт в CSV
 - Нет данных за период → пустой отчёт
 reqs:
-- 'llm-gateway: Атрибуция затрат'
-- 'llm-gateway: Учёт токенов'
+- {spec: llm-gateway, title: Атрибуция затрат}
+- {spec: llm-gateway, title: Учёт токенов}
 entry: дашборд затрат

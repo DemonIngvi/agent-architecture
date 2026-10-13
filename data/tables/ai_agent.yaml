@@ -1,3 +1,3 @@
 kind: fork
 columns:
-- [enabled, bool, '', '🛠 агент включён: создаются и выдаются запуски (D17, R-ICP-17)']
+- {name: enabled, type: bool, desc: '🛠 агент включён: создаются и выдаются запуски (D17, R-ICP-17)'}

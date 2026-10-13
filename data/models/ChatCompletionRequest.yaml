@@ -1,12 +1,12 @@
 purpose: запрос к модели (OpenAI Chat Completions через LiteLLM)
 fields:
-- [model, string, true, алиас из `model_list`]
-- [messages, '{role, content}[]', true, слои промпта (R-HRN-18)]
-- [tools, '{type, function: {name, parameters}}[]', false, '']
-- [tool_choice / parallel_tool_calls, enum / bool, false, 'Harness: `auto`, без параллельных вызовов']
-- [temperature / max_tokens / reasoning_effort, number / enum, false, '`model.*`; неподдерживаемое отбрасывает `drop_params`']
-- [metadata, '{run_id, issue_key, agent}', true, 'наши ключи для атрибуции затрат (R-LLM-03): `run_id` = `Run.id`, `issue_key` = `issueIdentifier`, `agent` = `username`']
-- [stream, bool, false, '']
+- {name: model, type: string, required: true, desc: алиас из `model_list`}
+- {name: messages, type: '{role, content}[]', required: true, desc: слои промпта, reqs: [R-HRN-18]}
+- {name: tools, type: '{type, function: {name, parameters}}[]', required: false, desc: ''}
+- {name: tool_choice / parallel_tool_calls, type: enum / bool, required: false, desc: 'Harness: `auto`, без параллельных вызовов'}
+- {name: temperature / max_tokens / reasoning_effort, type: number / enum, required: false, desc: '`model.*`; неподдерживаемое отбрасывает `drop_params`'}
+- {name: metadata, type: '{run_id, issue_key, agent}', required: true, desc: 'наши ключи для атрибуции затрат (R-LLM-03): `run_id` = `Run.id`, `issue_key` = `issueIdentifier`, `agent` = `username`'}
+- {name: stream, type: bool, required: false, desc: ''}
 source:
   kind: ext
   ref: https://platform.openai.com/docs/api-reference/chat/create

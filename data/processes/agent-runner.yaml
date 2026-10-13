@@ -3,16 +3,16 @@ processes:
   stories: [US-RUN-01, US-RUN-03]
   lanes: [ICPlan, Agent Runner, Sandbox / Harness]
   steps:
-  - [s, 0, start, Запуск в очереди, [[t1, '']]]
-  - [t1, 1, task, 'Опрос, аренда', [[g1, '']]]
-  - [g1, 1, gateway, 'Слоты свободны?', [[g2, да], [t1, ждать]]]
-  - [g2, 1, gateway, 'G1 допуск?', [[t2, да], [x1, нет]]]
-  - [x1, 0, error, 'Отказ: бюджет / kill', []]
-  - [t2, 2, task, 'Среда из пула, Harness', [[g3, '']]]
-  - [g3, 2, gateway, 'Итог?', [[t3, done], [x2, error / limit]]]
-  - [x2, 1, error, failed / limit, []]
-  - [t3, 1, task, 'Итог в ICPlan, destroy', [[e1, '']]]
-  - [e1, 0, end, Задача обновлена, []]
+  - {id: s, lane: 0, type: start, label: Запуск в очереди, next: [t1]}
+  - {id: t1, lane: 1, type: task, label: 'Опрос, аренда', next: [g1]}
+  - {id: g1, lane: 1, type: gateway, label: 'Слоты свободны?', next: [{to: g2, label: да}, {to: t1, label: ждать}]}
+  - {id: g2, lane: 1, type: gateway, label: 'G1 допуск?', next: [{to: t2, label: да}, {to: x1, label: нет}]}
+  - {id: x1, lane: 0, type: error, label: 'Отказ: бюджет / kill'}
+  - {id: t2, lane: 2, type: task, label: 'Среда из пула, Harness', next: [g3]}
+  - {id: g3, lane: 2, type: gateway, label: 'Итог?', next: [{to: t3, label: done}, {to: x2, label: error / limit}]}
+  - {id: x2, lane: 1, type: error, label: failed / limit}
+  - {id: t3, lane: 1, type: task, label: 'Итог в ICPlan, destroy', next: [e1]}
+  - {id: e1, lane: 0, type: end, label: Задача обновлена}
   artifacts:
     t1: [аренда запуска]
     g2: [PolicyDecision]
@@ -23,16 +23,16 @@ processes:
   stories: [US-RUN-02, US-RUN-04, US-RUN-05, US-RUN-06]
   lanes: [Эксплуатация, Agent Runner, ICPlan]
   steps:
-  - [s, 1, start, Runner работает, [[g, '']]]
-  - [g, 1, gateway, Событие, [[md, смена режима], [ap, ждёт approve], [cr, падение], [dr, обновление], [sx, слоты недоступны]]]
-  - [md, 0, task, sequential / parallel, [[e, '']]]
-  - [ap, 1, task, Освободить глобальный и модельный слоты, [[e, '']]]
-  - [cr, 2, task, Аренда истекла → запуск снова в очереди, [[e, '']]]
-  - [dr, 0, task, 'Не брать новые, доделать активные', [[dg, '']]]
-  - [dg, 0, gateway, 'Активные завершились до таймаута вывода?', [[e, да], [dx, нет]]]
-  - [dx, 0, error, 'Таймаут вывода: оставшиеся запуски возвращаются в очередь', []]
-  - [sx, 2, error, 'Хранилище слотов недоступно: новые не стартуют, активные идут', []]
-  - [e, 1, end, Очередь разбирается, []]
+  - {id: s, lane: 1, type: start, label: Runner работает, next: [g]}
+  - {id: g, lane: 1, type: gateway, label: Событие, next: [{to: md, label: смена режима}, {to: ap, label: ждёт approve}, {to: cr, label: падение}, {to: dr, label: обновление}, {to: sx, label: слоты недоступны}]}
+  - {id: md, lane: 0, type: task, label: sequential / parallel, next: [e]}
+  - {id: ap, lane: 1, type: task, label: Освободить глобальный и модельный слоты, next: [e]}
+  - {id: cr, lane: 2, type: task, label: Аренда истекла → запуск снова в очереди, next: [e]}
+  - {id: dr, lane: 0, type: task, label: 'Не брать новые, доделать активные', next: [dg]}
+  - {id: dg, lane: 0, type: gateway, label: 'Активные завершились до таймаута вывода?', next: [{to: e, label: да}, {to: dx, label: нет}]}
+  - {id: dx, lane: 0, type: error, label: 'Таймаут вывода: оставшиеся запуски возвращаются в очередь'}
+  - {id: sx, lane: 2, type: error, label: 'Хранилище слотов недоступно: новые не стартуют, активные идут'}
+  - {id: e, lane: 1, type: end, label: Очередь разбирается}
   artifacts:
     md: [конфиг деплоя]
     ap: [освобождённые слоты]

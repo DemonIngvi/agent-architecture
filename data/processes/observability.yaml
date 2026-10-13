@@ -3,15 +3,15 @@ processes:
   stories: [US-OBS-01, US-OBS-03]
   lanes: [Harness / Runner, Observability, Пользователь]
   steps:
-  - [s, 0, start, Шаг запуска, [[t1, '']]]
-  - [t1, 1, task, Маскировать данные, [[t2, '']]]
-  - [t2, 1, task, Записать событие, [[g1, '']]]
-  - [g1, 1, gateway, 'Запись удалась?', [[t3, да], [t4, нет]]]
-  - [t4, 0, task, 'Буфер, досылка', [[t2, '']]]
-  - [t3, 2, task, Чат запуска и затраты, [[g2, '']]]
-  - [g2, 2, gateway, 'Цена модели задана?', [[e1, да], [x1, нет]]]
-  - [x1, 1, error, 'Цены нет: токены учтены, стоимость «неизвестна»', []]
-  - [e1, 2, end, Пользователь видит, []]
+  - {id: s, lane: 0, type: start, label: Шаг запуска, next: [t1]}
+  - {id: t1, lane: 1, type: task, label: Маскировать данные, next: [t2]}
+  - {id: t2, lane: 1, type: task, label: Записать событие, next: [g1]}
+  - {id: g1, lane: 1, type: gateway, label: 'Запись удалась?', next: [{to: t3, label: да}, {to: t4, label: нет}]}
+  - {id: t4, lane: 0, type: task, label: 'Буфер, досылка', next: [t2]}
+  - {id: t3, lane: 2, type: task, label: Чат запуска и затраты, next: [g2]}
+  - {id: g2, lane: 2, type: gateway, label: 'Цена модели задана?', next: [{to: e1, label: да}, {to: x1, label: нет}]}
+  - {id: x1, lane: 1, type: error, label: 'Цены нет: токены учтены, стоимость «неизвестна»'}
+  - {id: e1, lane: 2, type: end, label: Пользователь видит}
   artifacts:
     t1: [замаскированное событие]
     t2: [RunEvent]
@@ -22,14 +22,14 @@ processes:
   stories: [US-OBS-02, US-OBS-04, US-OBS-05]
   lanes: [Администратор / Эксплуатация / Владелец продукта, Observability]
   steps:
-  - [s, 0, start, Вопрос о работе агентов, [[g, '']]]
-  - [g, 0, gateway, 'Что нужно?', [[rn, разбор задачи], [tr, сбой], [pv, польза]]]
-  - [rn, 1, task, 'Запуски, версии, итоги', [[g2, '']]]
-  - [tr, 1, task, Трасса Runner → Harness → LiteLLM, [[g2, '']]]
-  - [g2, 1, gateway, 'События ещё хранятся?', [[e, да], [x, нет]]]
-  - [x, 1, error, 'Срок `retention_days` истёк: события удалены, остались агрегаты затрат', []]
-  - [pv, 1, task, 'Закрыто, возвраты, затраты', [[e, '']]]
-  - [e, 0, end, Ответ получен, []]
+  - {id: s, lane: 0, type: start, label: Вопрос о работе агентов, next: [g]}
+  - {id: g, lane: 0, type: gateway, label: 'Что нужно?', next: [{to: rn, label: разбор задачи}, {to: tr, label: сбой}, {to: pv, label: польза}]}
+  - {id: rn, lane: 1, type: task, label: 'Запуски, версии, итоги', next: [g2]}
+  - {id: tr, lane: 1, type: task, label: Трасса Runner → Harness → LiteLLM, next: [g2]}
+  - {id: g2, lane: 1, type: gateway, label: 'События ещё хранятся?', next: [{to: e, label: да}, {to: x, label: нет}]}
+  - {id: x, lane: 1, type: error, label: 'Срок `retention_days` истёк: события удалены, остались агрегаты затрат'}
+  - {id: pv, lane: 1, type: task, label: 'Закрыто, возвраты, затраты', next: [e]}
+  - {id: e, lane: 0, type: end, label: Ответ получен}
   artifacts:
     rn: [список запусков]
     tr: [трасса]

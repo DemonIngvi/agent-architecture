@@ -6,6 +6,6 @@ accept:
 - Длинный вывод свёрнут
 - Событий нет → «запуск не начался» с причиной
 reqs:
-- 'observability: Чат запуска в задаче'
-- 'observability: События запуска'
+- {spec: observability, title: Чат запуска в задаче}
+- {spec: observability, title: События запуска}
 entry: карточка задачи

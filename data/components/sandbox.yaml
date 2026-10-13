@@ -3,14 +3,14 @@ status: todo
 guardrails: G3
 desc: Одноразовый изолированный контейнер из тёплого пула; эфемерный /workspace, egress-прокси, доступ к репозиториям.
 specs:
-- [Спека, openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md]
-- [Схема, openspec/changes/define-agent-platform/specs/agent-sandbox/architecture.md]
+- {label: Спека, path: openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md}
+- {label: Схема, path: openspec/changes/define-agent-platform/specs/agent-sandbox/architecture.md}
 tasks: ['2.2', '4.1', '4.2']
 about:
   chain:
-  - [Agent Runner, agent-runner]
-  - [Sandbox, sandbox]
-  - [Harness, harness]
+  - {label: Agent Runner, comp: agent-runner}
+  - {label: Sandbox, comp: sandbox}
+  - {label: Harness, comp: harness}
   purpose: 'Изоляция: каждый запуск агента идёт в своём одноразовом контейнере и не видит другие запуски и хост.'
   does:
   - Держит тёплый пул готовых контейнеров

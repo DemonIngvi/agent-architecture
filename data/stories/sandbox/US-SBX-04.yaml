@@ -6,5 +6,5 @@ accept:
 - Код → PR со ссылкой в задаче
 - Файл больше лимита или с секретом → не прикладывается, пометка в итоге
 reqs:
-- 'agent-sandbox: Эфемерный workspace'
+- {spec: agent-sandbox, title: Эфемерный workspace}
 entry: 'карточка задачи: вложения, ссылка на PR'

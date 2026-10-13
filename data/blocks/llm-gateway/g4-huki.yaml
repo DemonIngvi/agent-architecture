@@ -3,22 +3,22 @@ tech: LiteLLM guardrail hooks pre_call / post_call
 kind: service
 stories: [US-LLM-03]
 params:
-- [guardrails, 'G4: PII, injection, модерация; по умолчанию выключены']
+- {name: guardrails, note: 'G4: PII, injection, модерация; по умолчанию выключены'}
 does:
 - Маскирует секреты и PII во входе
 - Модерирует ответ
 io:
-- [←, Harness, 'вызов модели (I8)']
-- [→, «провайдер / mock», 'запрос после маскирования (I13)']
+- {dir: ←, with: Harness, what: вызов модели, via: [I8]}
+- {dir: →, label: «провайдер / mock», what: запрос после маскирования, via: [I13]}
 data:
-- [LiteLLM_SpendLogs, 'запись: результат вызова с хуками (владелец — LiteLLM)']
+- {table: LiteLLM_SpendLogs, access: write, why: результат вызова с хуками (владелец — LiteLLM)}
 reqs: [R-GRD-05]
 tasks: ['4.5']
 failures:
-- Секрет в промпте — строка маскируется до отправки провайдеру (R-GRD-05)
-- Ответ нарушает политику модерации — блокируется, агент получает отказ (R-GRD-05)
+- {when: Секрет в промпте, then: строка маскируется до отправки провайдеру, reqs: [R-GRD-05]}
+- {when: Ответ нарушает политику модерации, then: 'блокируется, агент получает отказ', reqs: [R-GRD-05]}
 why: Весь трафик к модели проходит через одну точку.
 rnd: guardrails-engine.md
 ops:
-- ['pre_call: маскирование секретов и PII, детект injection', Harness, I8]
-- ['post_call: модерация ответа', провайдер / mock, I13]
+- {op: 'pre_call: маскирование секретов и PII, детект injection', who: Harness, via: [I8]}
+- {op: 'post_call: модерация ответа', label: провайдер / mock, via: [I13]}

@@ -15,6 +15,8 @@
     python html-view/doctool.py yaml-check [путь] схема единиц data/: поля, типы, значения, ссылки, _order.yaml
     python html-view/doctool.py yaml-fmt [путь]   нормализовать формат единиц data/ (порядок ключей по схеме, _order.yaml)
     python html-view/doctool.py yaml-export       разовая выгрузка Python-данных в data/ (идемпотентна)
+    python html-view/doctool.py yaml-migrate      перевод data/ в именованные поля строк, ID — в поля (идемпотентно); что осталось текстом
+    python html-view/doctool.py yaml-schema       JSON Schema редактора data/_schema/*.schema.json и yaml.schemas в .vscode/settings.json
     python html-view/doctool.py rnd <slug|путь.md> <тема>  заготовка R&D v3.2 (docs/rnd/<slug>.md или указанный путь)
     python html-view/doctool.py rnd-check <файл.md>...  структура R&D v3.2: Э1–Э10, «Вывод этапа», ворота G1–G10, источники
     python html-view/doctool.py pre <файл>         до правки: код 2 и источник, если файл генерируется (любой агент)
@@ -222,10 +224,11 @@ def check() -> list:
     yissues = Y.check()
     if yissues:  # с ошибкой в YAML модули данных не загрузятся — сначала она
         return yissues + tooling_check()
+    yissues = Y.schemas_stale()  # JSON Schema редактора — по SCHEMAS и каталогам (data-methodology.md#yaml-units)
     with contextlib.redirect_stdout(io.StringIO()):
         import build as B
         issues = B.check_docs() + B.check_req_tasks()
-    return issues + tooling_check()
+    return yissues + issues + tooling_check()
 
 
 RND = """# R&D: {title}
@@ -524,6 +527,20 @@ def main():
         import yamldata as Y
         ch = Y.fmt(args[0] if args else None)
         print(f"отформатировано: {len(ch)}" + "".join(f"\n- {c}" for c in ch))
+    elif cmd == "yaml-migrate":  # именованные поля строк, ID из текста в поля (идемпотентно; data-methodology.md#yaml-units)
+        sys.path.insert(0, str(HERE))
+        import yamlmigrate as M
+        ch, errs = M.migrate()
+        print(f"data/: переведено файлов {len(ch)}" + "".join(f"\n- {c}" for c in ch[:30]) + ("\n…" if len(ch) > 30 else ""))
+        print("\n".join(f"⚠️ {e}" for e in errs))
+        left = M.leftovers()
+        print(f"осталось текстом (разобрать вручную): {len(left)}" + "".join(f"\n- {x}" for x in left))
+        sys.exit(1 if errs else 0)
+    elif cmd == "yaml-schema":  # JSON Schema редактора из SCHEMAS и каталогов
+        sys.path.insert(0, str(HERE))
+        import yamldata as Y
+        ch = Y.write_schemas()
+        print(f"схемы: изменено {len(ch)}" + "".join(f"\n- {c}" for c in ch))
     elif cmd == "unit":  # карточка единицы: YAML без пустых полей + связанные ID — читать вместо страницы
         sys.path.insert(0, str(HERE))
         import yamldata as Y

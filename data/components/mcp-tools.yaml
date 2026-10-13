@@ -3,14 +3,14 @@ status: part
 guardrails: ''
 desc: 'Тулы и MCP-серверы агента; правила R1–R7: MCP или прямой вызов.'
 specs:
-- [Спека, openspec/changes/define-agent-platform/specs/tool-integration/spec.md]
-- [Схема, openspec/changes/define-agent-platform/specs/tool-integration/architecture.md]
+- {label: Спека, path: openspec/changes/define-agent-platform/specs/tool-integration/spec.md}
+- {label: Схема, path: openspec/changes/define-agent-platform/specs/tool-integration/architecture.md}
 tasks: ['2.4']
 about:
   chain:
-  - [Harness, harness]
-  - [MCP / Tools, mcp-tools]
-  - [ICPlan, icplan]
+  - {label: Harness, comp: harness}
+  - {label: MCP / Tools, comp: mcp-tools}
+  - {label: ICPlan, comp: icplan}
   purpose: 'Руки агента: действия во внешних системах — задачи, документы, git.'
   does:
   - 'MCP ICPlan: читать задачу, писать комментарий, менять статус'
@@ -20,15 +20,15 @@ about:
   - 'Правила R1–R7: когда MCP, когда прямой вызов'
 stores: [S1]
 icplan_tables:
-- [aiAgent, '']
-- [agentTool, '']
-- [agentToolLink, '']
-- [agentSkill, '']
-- [agentSkillLink, '']
-- [integrationCredential, '']
-- [project, '`mcp_enabled`']
-- [gitProviderConnection, '']
-- [gitManagedRepository, '']
+- {key: aiAgent, note: ''}
+- {key: agentTool, note: ''}
+- {key: agentToolLink, note: ''}
+- {key: agentSkill, note: ''}
+- {key: agentSkillLink, note: ''}
+- {key: integrationCredential, note: ''}
+- {key: project, note: '`mcp_enabled`'}
+- {key: gitProviderConnection, note: ''}
+- {key: gitManagedRepository, note: ''}
 blocks:
 - - {title: Harness · Tool Executor, desc: вызывает тулы, kind: ext, to: harness}
 - ↓ решает модель → тул · детерминированное → прямой вызов

@@ -1,0 +1,115 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "title": "Единица «story»",
+ "description": "Единица data/ вида «story». Генерируется: python html-view/doctool.py yaml-schema (не править руками).",
+ "type": "object",
+ "properties": {
+  "role": {
+   "anyOf": [
+    {
+     "$ref": "catalog.schema.json#/definitions/role"
+    },
+    {
+     "const": ""
+    }
+   ],
+   "description": "роль: ключ roles / personas"
+  },
+  "want": {
+   "type": "string",
+   "description": "хочу"
+  },
+  "so_that": {
+   "type": "string",
+   "description": "чтобы"
+  },
+  "accept": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   },
+   "description": "критерии приёмки"
+  },
+  "reqs": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "spec": {
+      "anyOf": [
+       {
+        "$ref": "catalog.schema.json#/definitions/spec"
+       },
+       {
+        "const": ""
+       }
+      ],
+      "description": "спека openspec/changes/*/specs/<спека>"
+     },
+     "title": {
+      "type": "string",
+      "description": "требование — заголовок «### Requirement: …» спеки"
+     },
+     "text": {
+      "type": "string",
+      "description": "требование текстом, если не «спека: заголовок»"
+     }
+    },
+    "additionalProperties": false,
+    "required": [],
+    "anyOf": [
+     {
+      "required": [
+       "spec"
+      ]
+     },
+     {
+      "required": [
+       "text"
+      ]
+     }
+    ]
+   },
+   "description": "требования: {spec, title}"
+  },
+  "entry": {
+   "type": "string",
+   "description": "точка входа"
+  },
+  "chain": {
+   "type": "object",
+   "properties": {
+    "path": {
+     "type": "array",
+     "items": {
+      "anyOf": [
+       {
+        "$ref": "catalog.schema.json#/definitions/story"
+       },
+       {
+        "const": ""
+       }
+      ]
+     }
+    },
+    "end": {
+     "type": "string"
+    }
+   },
+   "additionalProperties": false,
+   "required": [
+    "path",
+    "end"
+   ],
+   "description": "цепочка историй"
+  }
+ },
+ "additionalProperties": false,
+ "required": [
+  "role",
+  "want",
+  "so_that",
+  "accept",
+  "reqs"
+ ]
+}

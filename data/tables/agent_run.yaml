@@ -1,14 +1,14 @@
 kind: fork
 written: true
 columns:
-- [process_step_id, int, FK process_step, 🛠 шаг процесса запуска — `Run.rule.stepId` (D17)]
-- [agent_version, int, '', '🛠 версия определения агента запуска (R-REG-03): задаёт задача или Platform module при первом вызове `GET /platform/runs/:runId/agent` (D23)']
-- [reason, text, '', 🛠 причина итога — `RunResult.reason` (R-RUN-07)]
-- [artifacts, jsonb, '', 🛠 опубликованное — `RunResult.artifacts` (D20)]
-- [gate, jsonb, '', 🛠 проверка по критериям — `RunResult.gate` (D20)]
-- [reasoning_tokens, int, '', 🛠 `RunResult.usage.reasoningTokens` (D18)]
-- [iterations, int, '', 🛠 `RunResult.usage.iterations` (D18)]
-- [cost_usd, numeric, '', 🛠 `RunResult.usage.costUsd`; null — неизвестна (R-OBS-05)]
+- {name: process_step_id, type: int, fk: process_step, desc: 🛠 шаг процесса запуска — `Run.rule.stepId`, decisions: [D17]}
+- {name: agent_version, type: int, desc: '🛠 версия определения агента запуска (R-REG-03): задаёт задача или Platform module при первом вызове `GET /platform/runs/:runId/agent`', decisions: [D23]}
+- {name: reason, type: text, desc: 🛠 причина итога — `RunResult.reason`, reqs: [R-RUN-07]}
+- {name: artifacts, type: jsonb, desc: 🛠 опубликованное — `RunResult.artifacts`, decisions: [D20]}
+- {name: gate, type: jsonb, desc: 🛠 проверка по критериям — `RunResult.gate`, decisions: [D20]}
+- {name: reasoning_tokens, type: int, desc: 🛠 `RunResult.usage.reasoningTokens`, decisions: [D18]}
+- {name: iterations, type: int, desc: 🛠 `RunResult.usage.iterations`, decisions: [D18]}
+- {name: cost_usd, type: numeric, desc: 🛠 `RunResult.usage.costUsd`; null — неизвестна, reqs: [R-OBS-05]}
 policy:
   indexes: null
   retention: завершённые — `runs.retention_days` = 365 по `finished_at` (icplan-integration, D25)

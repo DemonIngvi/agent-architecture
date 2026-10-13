@@ -3,25 +3,25 @@ tech: Узлы графа before/after llm и tool, on_stop
 kind: service
 stories: [US-HAR-02, US-HAR-04]
 params:
-- [hooks, G2]
+- {name: hooks, value: G2}
 does:
 - Проверяет каждое действие (G2)
 - Ловит зацикливание и серию ошибок (R-GRD-09, R-GRD-13)
 - Может изменить аргументы или отклонить вызов; изменение видно в событии
 io:
-- [←, LLM client, действие перед вызовом тула]
-- [↔, guardrails, '`PolicyInput` / `PolicyDecision` (I10)']
-- [→, Pause / resume, решение «нужно подтверждение»]
-- [→, Event stream, решение G2 событием]
+- {dir: ←, with: LLM client, what: действие перед вызовом тула}
+- {dir: ↔, with: guardrails, what: '`PolicyInput` / `PolicyDecision`', via: [I10]}
+- {dir: →, with: Pause / resume, what: решение «нужно подтверждение»}
+- {dir: →, with: Event stream, what: решение G2 событием}
 data:
-- [run_event, 'косвенно: решение G2 — событие `CUSTOM` `guardrail_decision`, пишет Runner (владелец — Observability)']
+- {table: run_event, access: indirect, why: 'решение G2 — событие `CUSTOM` `guardrail_decision`, пишет Runner (владелец — Observability)'}
 reqs: [R-HRN-04, R-GRD-09, R-GRD-13]
 tasks: ['1.5', '1.6']
 failures:
-- Hook упал с исключением — действие отклоняется (fail-closed), событие об ошибке hook (R-HRN-04)
-- OPA не ответил за 200 мс — без повтора, по `on_engine_error` (I10)
+- {when: Hook упал с исключением, then: 'действие отклоняется (fail-closed), событие об ошибке hook', reqs: [R-HRN-04]}
+- {when: OPA не ответил за 200 мс, then: 'без повтора, по `on_engine_error`', via: [I10]}
 why: Правила применяются на каждом шаге детерминированно.
 rnd: runaway-protection.md
 ops:
-- ['`before_tool` / `after_tool`, `before_llm` / `after_llm`, `on_stop` — узлы графа', граф LangGraph, внутри]
-- [проверка действия G2 — `POST /v1/data/agent/g2`, hook `before_tool`, I10]
+- {op: '`before_tool` / `after_tool`, `before_llm` / `after_llm`, `on_stop` — узлы графа', label: граф LangGraph, internal: true}
+- {op: проверка действия G2 — `POST /v1/data/agent/g2`, label: hook `before_tool`, via: [I10]}

@@ -1,11 +1,11 @@
 purpose: ключ LiteLLM на агента (`/key/generate`)
 fields:
-- [key_alias, string, true, '`agent:<agentId>`']
-- [models, 'string[]', true, разрешённые алиасы]
-- [max_budget, float, true, бюджет $ за период = `AgentSettings.budget.dayUsd`]
-- [budget_duration, string, true, 'всегда `1d`: бюджет ключа = дневной лимит агента; лимит на запуск проверяет G1']
-- [rpm_limit / tpm_limit, int, false, '']
-- [metadata, object, false, 'наши ключи в стиле LiteLLM: `agent_id`']
+- {name: key_alias, type: string, required: true, desc: '`agent:<agentId>`'}
+- {name: models, type: 'string[]', required: true, desc: разрешённые алиасы}
+- {name: max_budget, type: float, required: true, desc: бюджет $ за период = `AgentSettings.budget.dayUsd`}
+- {name: budget_duration, type: string, required: true, desc: 'всегда `1d`: бюджет ключа = дневной лимит агента; лимит на запуск проверяет G1'}
+- {name: rpm_limit / tpm_limit, type: int, required: false, desc: ''}
+- {name: metadata, type: object, required: false, desc: 'наши ключи в стиле LiteLLM: `agent_id`'}
 source:
   kind: ext
   ref: https://docs.litellm.ai/docs/proxy/virtual_keys

@@ -1,11 +1,11 @@
 purpose: вызов тула MCP (JSON-RPC 2.0)
 fields:
-- [jsonrpc / id, string / int, true, конверт JSON-RPC 2.0]
-- [method, 'enum: tools/list · tools/call', true, '']
-- [params.name, string, false, 'в запросе: имя тула']
-- [params.arguments, object, false, 'в запросе: аргументы']
-- [result.content, '{type, text}[]', false, 'в ответе: результат; MCP-прокси Runner обрезает до `max_result_kb`']
-- [error, '{code, message}', false, в ответе при ошибке (JSON-RPC 2.0)]
+- {name: jsonrpc / id, type: string / int, required: true, desc: конверт JSON-RPC 2.0}
+- {name: method, type: 'enum: tools/list · tools/call', required: true, desc: ''}
+- {name: params.name, type: string, required: false, desc: 'в запросе: имя тула'}
+- {name: params.arguments, type: object, required: false, desc: 'в запросе: аргументы'}
+- {name: result.content, type: '{type, text}[]', required: false, desc: 'в ответе: результат; MCP-прокси Runner обрезает до `max_result_kb`'}
+- {name: error, type: '{code, message}', required: false, desc: в ответе при ошибке (JSON-RPC 2.0)}
 source:
   kind: ext
   ref: https://modelcontextprotocol.io/specification

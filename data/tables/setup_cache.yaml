@@ -3,15 +3,15 @@ store: S3
 owner: agent-runner
 schema: itsaplan.runner
 columns:
-- [lock_hash, text, PK, хеш lock-файлов]
-- [project_id, int, FK project, '']
-- [path, text, '', том кэша]
-- [created_at, timestamptz, '', '']
-- [expires_at, timestamptz, '', '`setup.cache_ttl_h`']
+- {name: lock_hash, type: text, pk: true, desc: хеш lock-файлов}
+- {name: project_id, type: int, fk: project}
+- {name: path, type: text, desc: том кэша}
+- {name: created_at, type: timestamptz}
+- {name: expires_at, type: timestamptz, desc: '`setup.cache_ttl_h`'}
 policy:
   indexes:
-  - [index, project_id, FK]
-  - [index, expires_at, очистка]
+  - {kind: index, columns: [project_id], why: FK}
+  - {kind: index, columns: [expires_at], why: очистка}
   retention: '`setup.cache_ttl_h` = 168 (agent-sandbox)'
   cleanup: очистка по `expires_at` вместе с томом кэша
   migrate: runner

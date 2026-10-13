@@ -6,9 +6,9 @@ accept:
 - Ответ в чате, комментарии или Telegram → агент продолжает с ответом
 - Нет ответа дольше таймаута → переход при ошибке с причиной «нет ответа»
 reqs:
-- 'icplan-integration: Подтверждения и ответы'
-- 'icplan-integration: Уведомление о решении пользователя'
-- 'agent-harness: Пауза и возобновление'
+- {spec: icplan-integration, title: Подтверждения и ответы}
+- {spec: icplan-integration, title: Уведомление о решении пользователя}
+- {spec: agent-harness, title: Пауза и возобновление}
 entry: уведомление; чат; комментарий; Telegram-бот
 chain:
   path: [US-ICP-11, US-ICP-03, US-HAR-07, US-MEM-06]

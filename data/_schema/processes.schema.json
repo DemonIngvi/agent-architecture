@@ -1,0 +1,135 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "title": "Единица «processes»",
+ "description": "Единица data/ вида «processes». Генерируется: python html-view/doctool.py yaml-schema (не править руками).",
+ "type": "object",
+ "properties": {
+  "processes": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "title": {
+      "type": "string"
+     },
+     "stories": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/story"
+        },
+        {
+         "const": ""
+        }
+       ]
+      }
+     },
+     "lanes": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "steps": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "id": {
+         "type": "string",
+         "description": "id шага (латиница)"
+        },
+        "lane": {
+         "type": "integer",
+         "description": "дорожка: номер в lanes с 0"
+        },
+        "type": {
+         "type": "string",
+         "enum": [
+          "start",
+          "task",
+          "gateway",
+          "end",
+          "error"
+         ],
+         "description": "start | task | gateway | end | error"
+        },
+        "label": {
+         "type": "string",
+         "description": "подпись шага"
+        },
+        "next": {
+         "type": "array",
+         "items": {
+          "anyOf": [
+           {
+            "type": "string",
+            "description": "id шага"
+           },
+           {
+            "type": "object",
+            "properties": {
+             "to": {
+              "type": "string",
+              "description": "id шага"
+             },
+             "label": {
+              "type": "string",
+              "description": "подпись перехода (да / нет)"
+             }
+            },
+            "required": [
+             "to"
+            ],
+            "additionalProperties": false
+           }
+          ]
+         },
+         "description": "переходы: id шага или {to, label}"
+        }
+       },
+       "additionalProperties": false,
+       "required": [
+        "id",
+        "lane",
+        "type",
+        "label"
+       ]
+      },
+      "description": "шаги: {id, lane, type, label, next}"
+     },
+     "artifacts": {
+      "type": "object",
+      "additionalProperties": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "title",
+     "stories",
+     "lanes",
+     "steps"
+    ]
+   }
+  },
+  "artifacts": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "additionalProperties": false,
+ "required": [
+  "processes"
+ ]
+}

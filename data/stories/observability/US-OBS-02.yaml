@@ -6,6 +6,6 @@ accept:
 - Переход к событиям запуска
 - События старше срока хранения → только итог
 reqs:
-- 'observability: События запуска'
-- 'observability: Политика хранения'
+- {spec: observability, title: События запуска}
+- {spec: observability, title: Политика хранения}
 entry: карточка задачи → запуски

@@ -6,6 +6,6 @@ accept:
 - Новая модель недоступна → fallback
 - Откат алиаса → со следующего вызова
 reqs:
-- 'llm-gateway: Алиасы моделей'
-- 'agent-registry: Смена модели агента'
+- {spec: llm-gateway, title: Алиасы моделей}
+- {spec: agent-registry, title: Смена модели агента}
 entry: LiteLLM UI / Платформа

@@ -1,12 +1,12 @@
 purpose: решение пользователя по вопросу или подтверждению
 fields:
-- [runId, int, true, '']
-- [seq, int, true, '`seq` события `CUSTOM` `approval_request` или `question`']
-- [decision, 'enum: approve · reject · answer', true, на `approval_request` — `approve` или `reject`; на `question` — `answer`]
-- [scope, 'enum: once · run', false, 'только для `approve`: этот вызов или такие же вызовы до конца запуска (R-GRD-03)']
-- [by, string, true, '`username` того, кто решил']
-- [comment, string | null, false, при `answer` — ответ на вопрос; иначе пояснение]
+- {name: runId, type: int, required: true, desc: ''}
+- {name: seq, type: int, required: true, desc: '`seq` события `CUSTOM` `approval_request` или `question`'}
+- {name: decision, type: 'enum: approve · reject · answer', required: true, desc: на `approval_request` — `approve` или `reject`; на `question` — `answer`}
+- {name: scope, type: 'enum: once · run', required: false, desc: 'только для `approve`: этот вызов или такие же вызовы до конца запуска', reqs: [R-GRD-03]}
+- {name: by, type: string, required: true, desc: '`username` того, кто решил'}
+- {name: comment, type: string | null, required: false, desc: при `answer` — ответ на вопрос; иначе пояснение}
 source:
   kind: ours
-  ref: D17, R-GRD-03
+  refs: [D17, R-GRD-03]
   why: 'Решение привязано к `seq` события-вопроса: так Harness понимает, на какой вопрос ответ, даже если их несколько. Доставляется в ответе heartbeat.'

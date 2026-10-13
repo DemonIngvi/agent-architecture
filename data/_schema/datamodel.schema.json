@@ -1,0 +1,79 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "title": "Единица «datamodel»",
+ "description": "Единица data/ вида «datamodel». Генерируется: python html-view/doctool.py yaml-schema (не править руками).",
+ "type": "object",
+ "properties": {
+  "naming": {
+   "type": "string"
+  },
+  "litellm_ref": {
+   "type": "string"
+  },
+  "s1_domains": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "domain": {
+      "type": "string",
+      "description": "домен S1"
+     },
+     "tables": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/table"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "таблицы домена"
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "domain",
+     "tables"
+    ]
+   },
+   "description": "домены S1: {domain, tables}"
+  },
+  "trees": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "object",
+    "properties": {
+     "title": {
+      "type": "string"
+     },
+     "lines": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "title",
+     "lines"
+    ]
+   },
+   "propertyNames": {
+    "type": "string",
+    "pattern": "^(?:S\\d+)$"
+   }
+  }
+ },
+ "additionalProperties": false,
+ "required": [
+  "naming",
+  "litellm_ref",
+  "s1_domains",
+  "trees"
+ ]
+}

@@ -6,5 +6,5 @@ accept:
 - HTTP → перенаправление на HTTPS
 - Админки сервисов снаружи недоступны
 reqs:
-- 'platform-infrastructure: Ingress и TLS'
+- {spec: platform-infrastructure, title: Ingress и TLS}
 entry: браузер

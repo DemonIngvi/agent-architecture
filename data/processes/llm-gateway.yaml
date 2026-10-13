@@ -3,14 +3,14 @@ processes:
   stories: [US-LLM-02, US-LLM-03, US-LLM-04]
   lanes: [Harness, LiteLLM, Провайдер / mock]
   steps:
-  - [s, 0, start, Вызов модели, [[g1, '']]]
-  - [g1, 1, gateway, 'Ключ, бюджет, лимит?', [[t1, ок], [x1, превышен]]]
-  - [x1, 0, error, Отказ до траты, []]
-  - [t1, 2, task, Основная модель, [[g2, '']]]
-  - [g2, 1, gateway, 'Успех?', [[t3, да], [t2, сбой]]]
-  - [t2, 2, task, Fallback-модель, [[t3, '']]]
-  - [t3, 1, task, Учёт затрат, [[e1, '']]]
-  - [e1, 0, end, Ответ, []]
+  - {id: s, lane: 0, type: start, label: Вызов модели, next: [g1]}
+  - {id: g1, lane: 1, type: gateway, label: 'Ключ, бюджет, лимит?', next: [{to: t1, label: ок}, {to: x1, label: превышен}]}
+  - {id: x1, lane: 0, type: error, label: Отказ до траты}
+  - {id: t1, lane: 2, type: task, label: Основная модель, next: [g2]}
+  - {id: g2, lane: 1, type: gateway, label: 'Успех?', next: [{to: t3, label: да}, {to: t2, label: сбой}]}
+  - {id: t2, lane: 2, type: task, label: Fallback-модель, next: [t3]}
+  - {id: t3, lane: 1, type: task, label: Учёт затрат, next: [e1]}
+  - {id: e1, lane: 0, type: end, label: Ответ}
   artifacts:
     t1: [запрос провайдеру]
     x1: [ошибка лимита]
@@ -19,13 +19,13 @@ processes:
   stories: [US-LLM-01, US-LLM-05]
   lanes: [Администратор / Владелец продукта, LiteLLM]
   steps:
-  - [s, 0, start, Нужна другая модель или отчёт, [[g, '']]]
-  - [g, 0, gateway, 'Что?', [[al, модель], [rp, отчёт]]]
-  - [al, 1, gateway, 'Алиас существует?', [[ok, да], [xe, нет]]]
-  - [xe, 1, error, 'Ошибка алиаса, модель не меняется', []]
-  - [ok, 1, task, Алиас → новая модель, [[e, '']]]
-  - [rp, 1, task, 'Отчёт за период, CSV', [[e, '']]]
-  - [e, 1, end, Готово, []]
+  - {id: s, lane: 0, type: start, label: Нужна другая модель или отчёт, next: [g]}
+  - {id: g, lane: 0, type: gateway, label: 'Что?', next: [{to: al, label: модель}, {to: rp, label: отчёт}]}
+  - {id: al, lane: 1, type: gateway, label: 'Алиас существует?', next: [{to: ok, label: да}, {to: xe, label: нет}]}
+  - {id: xe, lane: 1, type: error, label: 'Ошибка алиаса, модель не меняется'}
+  - {id: ok, lane: 1, type: task, label: Алиас → новая модель, next: [e]}
+  - {id: rp, lane: 1, type: task, label: 'Отчёт за период, CSV', next: [e]}
+  - {id: e, lane: 1, type: end, label: Готово}
   artifacts:
     ok: ['`model_list`']
     xe: [ошибка алиаса]

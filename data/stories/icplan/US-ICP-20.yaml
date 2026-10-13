@@ -6,11 +6,11 @@ accept:
 - Ссылка на несуществующий тул или модель → сохранение отклонено с полем
 - Runner не в сети → агент создан, статус «не в сети»
 reqs:
-- 'agent-registry: Определение агента'
-- 'agent-registry: Валидация связей'
-- 'agent-registry: Каталог ресурсов'
-- 'icplan-integration: Каталог агентов платформы'
-- 'icplan-integration: Агент платформы как внешний агент ICPlan'
+- {spec: agent-registry, title: Определение агента}
+- {spec: agent-registry, title: Валидация связей}
+- {spec: agent-registry, title: Каталог ресурсов}
+- {spec: icplan-integration, title: Каталог агентов платформы}
+- {spec: icplan-integration, title: Агент платформы как внешний агент ICPlan}
 entry: Команда → ИИ-агенты
 chain:
   path: [US-ICP-20, US-PM-01, US-MCP-01, US-ICP-24]

@@ -6,6 +6,6 @@ accept:
 - Превышение → очередь, а не падение
 - Нехватка ёмкости → предупреждение заранее
 reqs:
-- 'platform-infrastructure: Профиль нагрузки и ёмкость'
-- 'platform-infrastructure: Балансировка между репликами'
+- {spec: platform-infrastructure, title: Профиль нагрузки и ёмкость}
+- {spec: platform-infrastructure, title: Балансировка между репликами}
 entry: —

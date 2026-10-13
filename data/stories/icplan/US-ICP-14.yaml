@@ -7,8 +7,8 @@ accept:
 - «Возобновить» → запуск агента текущего шага
 - Остановленная задача видна в сводке как «остановлена»
 reqs:
-- 'icplan-integration: Отмена из ICPlan'
-- 'icplan-agent-autopickup: Остановка и возобновление процесса по задаче'
+- {spec: icplan-integration, title: Отмена из ICPlan}
+- {spec: icplan-agent-autopickup, title: Остановка и возобновление процесса по задаче}
 entry: карточка задачи; сводка
 chain:
   path: [US-ICP-14, US-ICP-04, US-SBX-01]

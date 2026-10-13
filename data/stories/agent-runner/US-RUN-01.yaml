@@ -6,7 +6,7 @@ accept:
 - Агент выключен или нет настроек → `agent_unavailable`, sandbox не создаётся
 - Нет свободного слота → запуск ждёт в `queued`
 reqs:
-- 'agent-runner: Запуск из очереди ICPlan'
-- 'agent-runner: Статусы запуска'
-- 'agent-runner: Возврат результата'
+- {spec: agent-runner, title: Запуск из очереди ICPlan}
+- {spec: agent-runner, title: Статусы запуска}
+- {spec: agent-runner, title: Возврат результата}
 entry: очередь ICPlan

@@ -3,12 +3,12 @@ store: S2
 owner: platform-module
 schema: itsaplan.platform
 columns:
-- [agent_id, int, 'PK, FK agent_settings', '']
-- [version, int, PK, '']
-- [data, jsonb, '', снимок определения агента и настроек (D26)]
-- [definition_hash, text, '', 'хеш определения ICPlan: при вызове I4 отличие от последней версии создаёт новую (D26)']
-- [created_by, text, '', '']
-- [created_at, timestamptz, '', '']
+- {name: agent_id, type: int, pk: true, fk: agent_settings}
+- {name: version, type: int, pk: true}
+- {name: data, type: jsonb, desc: снимок определения агента и настроек, decisions: [D26]}
+- {name: definition_hash, type: text, desc: 'хеш определения ICPlan: при вызове I4 отличие от последней версии создаёт новую', decisions: [D26]}
+- {name: created_by, type: text}
+- {name: created_at, type: timestamptz}
 policy:
   indexes: []
   retention: все версии (откат и аудит)

@@ -3,39 +3,39 @@ tech: It's a Plan web (Next.js), доработки в форке
 kind: ui
 stories: [US-ICP-01, US-ICP-08, US-ICP-09, US-ICP-02, US-ICP-10, US-ICP-11, US-ICP-03, US-ICP-12, US-ICP-13, US-ICP-14, US-ICP-04, US-ICP-15, US-ICP-16, US-ICP-17, US-ICP-18]
 screens:
-- {name: Доска проекта, where: Проект → доска, what: 'колонки процесса, карточки задач, перенос задачи', status: есть, code: apps/web/src/features/work-items/WorkItemsPage.tsx, stories: US-ICP-01}
-- {name: Карточка задачи, where: задача, what: 'описание, делегат, исполнитель, комментарии и упоминания агента, история', status: есть, code: apps/web/src/features/issue/IssueViewPage.tsx, stories: 'US-ICP-08, US-ICP-09'}
-- {name: Чат запуска, where: задача → панель «Агент», what: 'шаги агента по ходу (AG-UI, D21) — `GET /agent-runs/:runId/stream`, история — `GET /issues/:issueId/agent-feed`; указание — `POST /agent-runs/:runId/messages`; карточка итога', status: новое, code: по образцу apps/web/src/features/ai-chat, stories: 'US-ICP-02, US-ICP-10'}
-- {name: Подтверждение и ответ агенту, where: чат запуска, what: 'кнопки approve / отклонить, ответ на вопрос агента — `POST /agent-runs/:runId/decisions`', status: новое, code: apps/web/src/features/ai-chat, stories: US-ICP-11}
-- {name: Итог и вердикт, where: карточка итога в чате запуска, what: 'принять результат или вернуть с заметкой — `POST /issues/:issueId/agent-verdict`', status: доработка, code: —, stories: US-ICP-13}
-- {name: Управление ходом задачи, where: задача, what: 'остановить и возобновить процесс — `POST /issues/:issueId/process/pause`, `/resume`; отменить запуск — `POST /agent-runs/:runId/cancel`; повторить шаг — `/process/retry`; передать шаг и «проверять со мной» — `PATCH /issues/:issueId`', status: доработка, code: —, stories: 'US-ICP-14, US-ICP-04, US-ICP-15, US-ICP-16, US-ICP-17'}
-- {name: Почему агент не берёт задачу, where: история задачи, what: 'по какому правилу агент взял задачу или почему нет — `GET /issues/:issueId/agent-status`', status: доработка, code: apps/web/src/features/issue, stories: US-ICP-18}
-- {name: Уведомления, where: Входящие, what: 'агент ждёт решения, закончил, ошибка шага', status: есть, code: apps/web/src/features/inbox, stories: US-ICP-03}
-- {name: Сводка и затраты, where: 'задача, сводка по агентам', what: 'затраты задачи — `GET /issues/:issueId/costs`; что выполняется и в очереди — `GET /me/agent-summary`', status: новое, code: —, stories: US-ICP-12}
+- {name: Доска проекта, where: Проект → доска, what: 'колонки процесса, карточки задач, перенос задачи', status: есть, code: apps/web/src/features/work-items/WorkItemsPage.tsx, stories: [US-ICP-01]}
+- {name: Карточка задачи, where: задача, what: 'описание, делегат, исполнитель, комментарии и упоминания агента, история', status: есть, code: apps/web/src/features/issue/IssueViewPage.tsx, stories: [US-ICP-08, US-ICP-09]}
+- {name: Чат запуска, where: задача → панель «Агент», what: 'шаги агента по ходу (AG-UI, D21) — `GET /agent-runs/:runId/stream`, история — `GET /issues/:issueId/agent-feed`; указание — `POST /agent-runs/:runId/messages`; карточка итога', status: новое, code: по образцу apps/web/src/features/ai-chat, stories: [US-ICP-02, US-ICP-10]}
+- {name: Подтверждение и ответ агенту, where: чат запуска, what: 'кнопки approve / отклонить, ответ на вопрос агента', endpoints: ['POST /agent-runs/:runId/decisions'], status: новое, code: apps/web/src/features/ai-chat, stories: [US-ICP-11]}
+- {name: Итог и вердикт, where: карточка итога в чате запуска, what: принять результат или вернуть с заметкой, endpoints: ['POST /issues/:issueId/agent-verdict'], status: доработка, code: —, stories: [US-ICP-13]}
+- {name: Управление ходом задачи, where: задача, what: 'остановить и возобновить процесс — `POST /issues/:issueId/process/pause`, `/resume`; отменить запуск — `POST /agent-runs/:runId/cancel`; повторить шаг — `/process/retry`; передать шаг и «проверять со мной»', endpoints: ['PATCH /issues/:issueId'], status: доработка, code: —, stories: [US-ICP-14, US-ICP-04, US-ICP-15, US-ICP-16, US-ICP-17]}
+- {name: Почему агент не берёт задачу, where: история задачи, what: по какому правилу агент взял задачу или почему нет, endpoints: ['GET /issues/:issueId/agent-status'], status: доработка, code: apps/web/src/features/issue, stories: [US-ICP-18]}
+- {name: Уведомления, where: Входящие, what: 'агент ждёт решения, закончил, ошибка шага', status: есть, code: apps/web/src/features/inbox, stories: [US-ICP-03]}
+- {name: Сводка и затраты, where: 'задача, сводка по агентам', what: 'затраты задачи — `GET /issues/:issueId/costs`; что выполняется и в очереди', endpoints: [GET /me/agent-summary], status: новое, code: —, stories: [US-ICP-12]}
 params:
-- [issue.review_with_me, выкл]
+- {name: issue.review_with_me, value: выкл}
 does:
 - Доска, статусы, карточка задачи, комментарии, чат агента
 - Показывает ход работы агента (чат запуска, задача 3.3) и итог
 - Даёт человеку подтвердить опасное действие (3.4)
 - Показывает затраты задачи из LiteLLM (3.5)
 io:
-- [←, api ICPlan (SSE), '`RunEvent` — шаги в чате запуска (I20)']
-- [←, api ICPlan, '`CostAggregate` — затраты задачи (I20)']
-- [→, api ICPlan, 'смена колонки, approve, указания пользователя, вердикт (I20)']
+- {dir: ←, label: api ICPlan (SSE), model: [RunEvent], what: шаги в чате запуска, via: [I20]}
+- {dir: ←, label: api ICPlan, model: [CostAggregate], what: затраты задачи, via: [I20]}
+- {dir: →, label: api ICPlan, what: 'смена колонки, approve, указания пользователя, вердикт', via: [I20]}
 data:
-- [issue, 'чтение, запись: колонка, делегат, исполнитель, `review_with_me`']
-- [run_event, 'чтение: чат запуска (таблица Observability)']
-- [agent_run, 'чтение: итог запуска']
-- [issue_process_state, 'чтение, запись: шаг, вердикт `last_verdict`']
-- [agent_run_delivery, 'запись: решения и указания до доставки Runner']
-- [LiteLLM_SpendLogs, 'чтение: затраты задачи (роль `litellm_read`)']
+- {table: issue, why: 'чтение, запись: колонка, делегат, исполнитель, `review_with_me`'}
+- {table: run_event, access: read, why: чат запуска (таблица Observability)}
+- {table: agent_run, access: read, why: итог запуска}
+- {table: issue_process_state, why: 'чтение, запись: шаг, вердикт `last_verdict`'}
+- {table: agent_run_delivery, access: write, why: решения и указания до доставки Runner}
+- {table: LiteLLM_SpendLogs, access: read, why: затраты задачи (роль `litellm_read`)}
 reqs: [R-ICP-04, R-ICP-05, R-ICP-06, R-ICP-07, R-ICP-16, R-AP-04, R-AP-07, R-AP-18, R-AP-19, R-AP-20, R-AP-21, R-OBS-05]
 tasks: ['3.3', '3.4', '3.5', '3.7']
 failures:
-- БД ICPlan недоступна — задача и чат не загружаются, действия пользователя не сохраняются (FMEA icplan-integration)
-- Runner не в сети — агенты помечены «не в сети», запуски ждут в очереди
-- Поток SSE оборвался — Task UI переподключается, пропущенные шаги берёт из `GET /issues/:issueId/agent-feed` (R-ICP-04)
-- Журнал затрат LiteLLM недоступен или цена не задана — затраты показываются как «неизвестно», задача работает (R-OBS-05)
+- {when: БД ICPlan недоступна, then: 'задача и чат не загружаются, действия пользователя не сохраняются', fmea: icplan-integration}
+- {when: Runner не в сети, then: 'агенты помечены «не в сети», запуски ждут в очереди'}
+- {when: Поток SSE оборвался, then: 'Task UI переподключается, пропущенные шаги берёт из `GET /issues/:issueId/agent-feed`', reqs: [R-ICP-04]}
+- {when: Журнал затрат LiteLLM недоступен или цена не задана, then: 'затраты показываются как «неизвестно», задача работает', reqs: [R-OBS-05]}
 why: Пользователи остаются в привычном трекере; всё про агента видно в задаче.
 rnd: tracker-choice.md

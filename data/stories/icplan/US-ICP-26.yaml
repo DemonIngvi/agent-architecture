@@ -6,8 +6,8 @@ accept:
 - Отключил → шаг ручной, активные запуски доделываются
 - Агент не участник проекта → подключение отклонено
 reqs:
-- 'icplan-agent-autopickup: Агент шага процесса'
-- 'icplan-agent-autopickup: Очистка при выходе агента из проекта'
+- {spec: icplan-agent-autopickup, title: Агент шага процесса}
+- {spec: icplan-agent-autopickup, title: Очистка при выходе агента из проекта}
 entry: Настройки проекта → Процессы → шаг
 chain:
   path: [US-ICP-26, US-PM-05]

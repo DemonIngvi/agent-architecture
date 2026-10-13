@@ -6,6 +6,6 @@ accept:
 - Сервер недоступен при регистрации → ошибка
 - Отключение сервера → тулы пропадают со следующего запуска
 reqs:
-- 'tool-integration: Регистрация MCP-сервера'
-- 'tool-integration: Ограничение набора тулов'
+- {spec: tool-integration, title: Регистрация MCP-сервера}
+- {spec: tool-integration, title: Ограничение набора тулов}
 entry: Команда → MCP-серверы

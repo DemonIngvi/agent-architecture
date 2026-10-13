@@ -3,26 +3,26 @@ tech: Ограничения контейнера
 kind: store
 stories: [US-SBX-01, US-SBX-03]
 params:
-- [resources, '1 CPU, 1 ГБ, 2 ГБ']
-- [image, 'agent-harness:<версия>']
-- [runtime, runc]
+- {name: resources, value: '1 CPU, 1 ГБ, 2 ГБ'}
+- {name: image, value: 'agent-harness:<версия>'}
+- {name: runtime, value: runc}
 does:
 - Ограничивает ресурсы и права (G3)
 - Задаёт образ и runtime среды (runc; runsc — после проверки 2.2.8)
 - Отклоняет значения вне границ `resources` с именем параметра
 io:
-- [←, Platform module, 'профиль агента через Runner (I4, `sandbox_profile`)']
-- [→, SandboxProvider, параметры создания среды]
+- {dir: ←, with: Platform module, what: 'профиль агента через Runner (I4, `sandbox_profile`)'}
+- {dir: →, with: SandboxProvider, what: параметры создания среды}
 data:
-- [sandbox_profile, 'чтение: профиль среды агента (владелец — Platform module)']
-- [agent_settings, 'чтение: `sandbox_profile_id` агента (владелец — Platform module)']
+- {table: sandbox_profile, access: read, why: профиль среды агента (владелец — Platform module)}
+- {table: agent_settings, access: read, why: '`sandbox_profile_id` агента (владелец — Platform module)'}
 reqs: [R-SBX-05, R-SBX-08, R-SBX-09]
 tasks: ['2.2']
 failures:
-- Профиль не найден — запуск отклоняется до создания контейнера (R-SBX-05)
-- '`runtime: runsc`, а на узле нет runsc — запуск отклоняется с причиной «runtime недоступен»'
-- Процесс превысил лимит RAM — контейнер останавливается, запуск `failed` с причиной
-- Переполнен диск `/workspace` — запись отклоняется, агент получает ошибку (FMEA agent-sandbox)
+- {when: Профиль не найден, then: запуск отклоняется до создания контейнера, reqs: [R-SBX-05]}
+- {when: '`runtime: runsc`, а на узле нет runsc', then: запуск отклоняется с причиной «runtime недоступен»}
+- {when: Процесс превысил лимит RAM, then: 'контейнер останавливается, запуск `failed` с причиной'}
+- {when: Переполнен диск `/workspace`, then: 'запись отклоняется, агент получает ошибку', fmea: agent-sandbox}
 why: Агент не съест хост и не выйдет за границы.
 rnd: sandbox-isolation.md
 schema: 'Таблица `sandbox_profile` (схема `platform`, владелец — Platform module): `image`, `runtime`, `cpu`, `memory_mb`, `disk_gb`, `egress_allow`, `pool_size`. Изоляция контейнера — Deploy Sandbox: read-only rootfs, `no-new-privileges`, drop ALL capabilities, seccomp RuntimeDefault.'

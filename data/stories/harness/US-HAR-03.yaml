@@ -6,5 +6,5 @@ accept:
 - Не прошёл → агент дорабатывает в пределах лимита
 - Лимит исчерпан → `failed` с отчётом проверки
 reqs:
-- 'agent-harness: Quality gate результата'
+- {spec: agent-harness, title: Quality gate результата}
 entry: итог запуска

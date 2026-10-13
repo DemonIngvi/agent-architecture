@@ -3,17 +3,17 @@ store: S2
 owner: platform-module
 schema: itsaplan.platform
 columns:
-- [id, serial, PK, '']
-- [project_id, int, FK project, '']
-- [agent_id, int, FK ai_agent, '']
-- [resource_id, int, FK project_resource, '']
-- [right, text, '', read / write (D18)]
-- [template_role, text, '', шаблон по роли агента]
+- {name: id, type: serial, pk: true}
+- {name: project_id, type: int, fk: project}
+- {name: agent_id, type: int, fk: ai_agent}
+- {name: resource_id, type: int, fk: project_resource}
+- {name: right, type: text, desc: read / write, decisions: [D18]}
+- {name: template_role, type: text, desc: шаблон по роли агента}
 policy:
   indexes:
-  - [unique, 'agent_id, resource_id', одно право агента на ресурс]
-  - [index, project_id, FK]
-  - [index, resource_id, FK]
+  - {kind: unique, columns: [agent_id, resource_id], why: одно право агента на ресурс}
+  - {kind: index, columns: [project_id], why: FK}
+  - {kind: index, columns: [resource_id], why: FK}
   retention: пока живы агент и ресурс
   cleanup: каскадно
   migrate: cp

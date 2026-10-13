@@ -3,24 +3,24 @@ tech: Алиасы LiteLLM, синхронизация из модуля
 kind: service
 stories: [US-PM-01, US-PM-04]
 params:
-- [model_alias, team-default]
-- [fallback, нет]
+- {name: model_alias, value: team-default}
+- {name: fallback, value: нет}
 does:
 - Связывает агента с моделью через алиас; сам алиас — поле определения агента в Registry (`ai_agent.model`, R-REG-02, D23), модуль его не хранит
 - Смена модели — без изменения агента
 io:
-- [←, Registry, 'алиас модели из `ai_agent.model` (R-REG-02, D23)']
-- [→, LiteLLM, 'алиас и резервная модель ключа (I15)']
+- {dir: ←, with: Registry, what: алиас модели из `ai_agent.model`, reqs: [R-REG-02], decisions: [D23]}
+- {dir: →, label: LiteLLM, what: алиас и резервная модель ключа, via: [I15]}
 data:
-- [ai_agent, 'чтение: `model` — алиас агента']
-- [LiteLLM_VerificationToken, 'запись через admin API: алиас ключа агента (I15)']
+- {table: ai_agent, access: read, why: '`model` — алиас агента'}
+- {table: LiteLLM_VerificationToken, access: write, why: 'через admin API: алиас ключа агента (I15)'}
 reqs: [R-CP-06, R-CP-11, R-REG-02, R-REG-06]
 tasks: ['4.4']
 failures:
-- LiteLLM admin API недоступен — изменение помечено «не применено», автоповтор (R-CP-11)
-- Алиаса нет в `model_list` — сохранение агента отклоняется с указанием модели (R-REG-06 «Модель без доступа»)
-ops:
-- ['Передать алиас агента ключу LiteLLM при сохранении агента', Platform module, I15]
-- ['Сверка алиасов модуля и LiteLLM', Platform module, I15]
+- {when: LiteLLM admin API недоступен, then: 'изменение помечено «не применено», автоповтор', reqs: [R-CP-11]}
+- {when: Алиаса нет в `model_list`, then: сохранение агента отклоняется с указанием модели (R-REG-06 «Модель без доступа»)}
 why: Модель меняется в одном месте.
 rnd: llm-gateway.md
+ops:
+- {op: Передать алиас агента ключу LiteLLM при сохранении агента, who: Platform module, via: [I15]}
+- {op: Сверка алиасов модуля и LiteLLM, who: Platform module, via: [I15]}

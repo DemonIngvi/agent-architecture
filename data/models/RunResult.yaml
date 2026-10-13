@@ -1,13 +1,13 @@
 purpose: итог запуска (`POST /agent-runs/:runId/result`)
 fields:
-- [status, 'enum: success · failed', true, 'отмену фиксирует ICPlan сам, раннер её не сообщает']
-- [output, string | null, false, итог для истории; ICPlan обрезает до 10 000 символов]
-- [error, string | null, false, причина при `failed`; ICPlan обрезает до 500 символов]
-- [usage, '{inputTokens, outputTokens, reasoningTokens, costUsd, iterations}', false, 'расход; `reasoningTokens`, `costUsd`, `iterations` (итерации цикла) — добавляем (D18)']
-- [reason, 'enum: done · limit · gate_failed · error', false, 'причина Harness (R-RUN-07): `done` → `status = success`; `limit`, `gate_failed`, `error` → `failed`']
-- [artifacts, '{name, url}[]', false, 'опубликованное для человека: файл в RustFS (`s3://…`), ветка или PR (D20); в M3 — рабочие ссылки `{path, ref}`']
-- [gate, '{passed: bool, failed: Criterion[]}', false, 'проверка по критериям (R-HRN-08, D20): не выполненные критерии']
-- [criteriaNext, 'Criterion[]', false, 'критерии, предложенные следующему шагу (D20, D26): Runner берёт их из итога Harness; ICPlan при приёме итога создаёт пункты чек-листа задачи с `origin = agent:<username>` и `status` по `criteriaApproval` шага']
+- {name: status, type: 'enum: success · failed', required: true, desc: 'отмену фиксирует ICPlan сам, раннер её не сообщает'}
+- {name: output, type: string | null, required: false, desc: итог для истории; ICPlan обрезает до 10 000 символов}
+- {name: error, type: string | null, required: false, desc: причина при `failed`; ICPlan обрезает до 500 символов}
+- {name: usage, type: '{inputTokens, outputTokens, reasoningTokens, costUsd, iterations}', required: false, desc: 'расход; `reasoningTokens`, `costUsd`, `iterations` (итерации цикла) — добавляем', decisions: [D18]}
+- {name: reason, type: 'enum: done · limit · gate_failed · error', required: false, desc: 'причина Harness (R-RUN-07): `done` → `status = success`; `limit`, `gate_failed`, `error` → `failed`'}
+- {name: artifacts, type: '{name, url}[]', required: false, desc: 'опубликованное для человека: файл в RustFS (`s3://…`), ветка или PR (D20); в M3 — рабочие ссылки `{path, ref}`'}
+- {name: gate, type: '{passed: bool, failed: Criterion[]}', required: false, desc: 'проверка по критериям (R-HRN-08, D20): не выполненные критерии'}
+- {name: criteriaNext, type: 'Criterion[]', required: false, desc: 'критерии, предложенные следующему шагу (D20, D26): Runner берёт их из итога Harness; ICPlan при приёме итога создаёт пункты чек-листа задачи с `origin = agent:<username>` и `status` по `criteriaApproval` шага'}
 source:
   kind: fork
   ref: POST /agent-runs/{runId}/result

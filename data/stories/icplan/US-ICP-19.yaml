@@ -7,9 +7,9 @@ accept:
 - Агент выключен → срабатывание пропущено с записью в истории
 - Изменил расписание → следующие срабатывания по новому расписанию; поставил на паузу (`paused`) → срабатываний нет до возобновления; удалил → запуски по нему больше не создаются, история остаётся
 reqs:
-- 'icplan-integration: Получение запуска из очереди (pull)'
-- 'agent-runner: Один запуск на задачу'
-- 'icplan-agent-autopickup: Триггеры запуска ICPlan'
+- {spec: icplan-integration, title: Получение запуска из очереди (pull)}
+- {spec: agent-runner, title: Один запуск на задачу}
+- {spec: icplan-agent-autopickup, title: Триггеры запуска ICPlan}
 entry: 'настройки агента: расписание (`agent_schedule`)'
 chain:
   path: [US-ICP-19, US-RUN-01, US-HAR-01, US-OBS-01]

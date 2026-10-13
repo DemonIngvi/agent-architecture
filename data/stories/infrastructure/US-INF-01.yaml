@@ -6,7 +6,7 @@ accept:
 - Порядок запуска по проверкам готовности
 - Не хватает ресурсов → ошибка до установки
 reqs:
-- 'platform-infrastructure: Упаковка и развёртывание Helm'
-- 'platform-infrastructure: Проверки готовности и порядок запуска'
-- 'platform-infrastructure: Кластер Kubernetes'
+- {spec: platform-infrastructure, title: Упаковка и развёртывание Helm}
+- {spec: platform-infrastructure, title: Проверки готовности и порядок запуска}
+- {spec: platform-infrastructure, title: Кластер Kubernetes}
 entry: Helm

@@ -3,14 +3,14 @@ status: todo
 guardrails: G1–G4
 desc: 'Единая политика: Rego в git, данные в БД ICPlan, OPA для G1/G2; каждая точка включается в конфиге деплоя.'
 specs:
-- [Спека, openspec/changes/define-agent-platform/specs/guardrails/spec.md]
-- [Схема, openspec/changes/define-agent-platform/specs/guardrails/architecture.md]
+- {label: Спека, path: openspec/changes/define-agent-platform/specs/guardrails/spec.md}
+- {label: Схема, path: openspec/changes/define-agent-platform/specs/guardrails/architecture.md}
 tasks: ['4.3']
 about:
   chain:
-  - [Platform module, platform-module]
-  - [Guardrails, guardrails]
-  - [Agent Runner, agent-runner]
+  - {label: Platform module, comp: platform-module}
+  - {label: Guardrails, comp: guardrails}
+  - {label: Agent Runner, comp: agent-runner}
   purpose: 'Ограничения: что агенту можно и что нельзя — в четырёх точках, каждая включается отдельно.'
   does:
   - G1 — допуск и бюджет до запуска (Runner)

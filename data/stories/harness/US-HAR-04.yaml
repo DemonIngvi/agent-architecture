@@ -6,7 +6,7 @@ accept:
 - Лимит шагов или времени → `limit`
 - Резкий рост расхода → стоп и уведомление
 reqs:
-- 'guardrails: Защита от зацикливания'
-- 'guardrails: Лимит шагов и времени'
-- 'guardrails: Аномальный расход'
+- {spec: guardrails, title: Защита от зацикливания}
+- {spec: guardrails, title: Лимит шагов и времени}
+- {spec: guardrails, title: Аномальный расход}
 entry: —

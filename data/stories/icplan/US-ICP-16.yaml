@@ -6,9 +6,9 @@ accept:
 - «Начать с шага N» → задача в колонке шага N, запуск его агента
 - Лимит запусков шага исчерпан → повтор только владельцем процесса
 reqs:
-- 'icplan-agent-autopickup: Переход по итогу запуска'
-- 'icplan-agent-autopickup: Передача результата следующему этапу'
-- 'icplan-agent-autopickup: Повтор шага'
+- {spec: icplan-agent-autopickup, title: Переход по итогу запуска}
+- {spec: icplan-agent-autopickup, title: Передача результата следующему этапу}
+- {spec: icplan-agent-autopickup, title: Повтор шага}
 entry: карточка задачи
 chain:
   path: [US-ICP-16, US-ICP-07, US-RUN-01, US-MEM-02, US-HAR-01]

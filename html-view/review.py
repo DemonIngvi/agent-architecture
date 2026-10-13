@@ -168,8 +168,17 @@ def _findings(page: str, comp: str) -> list:
 
 
 def _yaml(path: Path):
+    """Единица data/ в компактном позиционном виде (строки таблиц — [a, b, c]): карточка не растёт от имён полей."""
     import yamldata as Y
-    return Y._read(path) if path.exists() else None
+    import yamlmigrate as M
+    if not path.exists():
+        return None
+    kind = Y.kind_of(path)
+    if kind in M.POSITIONAL:
+        v, errs = Y.load_unit(path, kind)
+        if not errs:
+            return M.POSITIONAL[kind].dump(v)
+    return Y._read(path)
 
 
 def _components() -> dict:

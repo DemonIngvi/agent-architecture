@@ -3,15 +3,15 @@ status: todo
 guardrails: G1
 desc: Берёт запуск из очереди ICPlan, выдаёт sandbox из тёплого пула, следит за лимитами, возвращает итог.
 specs:
-- [Спека, openspec/changes/define-agent-platform/specs/agent-runner/spec.md]
-- [Схема, openspec/changes/define-agent-platform/specs/agent-runner/architecture.md]
+- {label: Спека, path: openspec/changes/define-agent-platform/specs/agent-runner/spec.md}
+- {label: Схема, path: openspec/changes/define-agent-platform/specs/agent-runner/architecture.md}
 tasks: ['2.1', '2.7', '2.6']
 about:
   chain:
-  - [ICPlan, icplan]
-  - [Agent Runner, agent-runner]
-  - [Sandbox, sandbox]
-  - [Harness, harness]
+  - {label: ICPlan, comp: icplan}
+  - {label: Agent Runner, comp: agent-runner}
+  - {label: Sandbox, comp: sandbox}
+  - {label: Harness, comp: harness}
   purpose: 'Исполнитель: превращает запуск из очереди ICPlan в работу агента в изолированной среде и возвращает итог.'
   does:
   - Забирает запуск из очереди ICPlan

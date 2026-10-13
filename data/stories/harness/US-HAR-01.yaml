@@ -6,7 +6,7 @@ accept:
 - Тул вернул ошибку → агент учитывает и продолжает
 - Модель недоступна → fallback или завершение `error` с причиной
 reqs:
-- 'agent-harness: Агентский цикл'
-- 'agent-harness: Инициализация из определения агента'
-- 'tool-integration: MCP-сервер ICPlan'
+- {spec: agent-harness, title: Агентский цикл}
+- {spec: agent-harness, title: Инициализация из определения агента}
+- {spec: tool-integration, title: MCP-сервер ICPlan}
 entry: задание `RunBundle`

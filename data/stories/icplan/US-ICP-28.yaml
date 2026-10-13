@@ -6,8 +6,8 @@ accept:
 - Переход к задачам с возвратами
 - Агент без запусков → нули, не ошибка
 reqs:
-- 'observability: Сводка и статистика агентов'
-- 'observability: Затраты'
+- {spec: observability, title: Сводка и статистика агентов}
+- {spec: observability, title: Затраты}
 entry: Команда → ИИ-агенты → статистика
 chain:
   path: [US-ICP-28, US-OBS-05, US-LLM-05]

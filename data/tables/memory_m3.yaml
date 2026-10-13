@@ -3,17 +3,17 @@ store: S4
 owner: memory
 schema: itsaplan.memory
 columns:
-- [issue_id, int, 'PK, FK issue', '']
-- [scope, text, PK, '']
-- [agent, text, '', автор]
-- [done, jsonb, '', '']
-- [next, jsonb, '', '']
-- [blockers, jsonb, '', '']
-- [artifacts, jsonb, '', D20]
-- [questions, jsonb, '', D20]
-- [criteria_next, jsonb, '', D20]
-- [version, int, '', '']
-- [updated_at, timestamptz, '', '']
+- {name: issue_id, type: int, pk: true, fk: issue}
+- {name: scope, type: text, pk: true}
+- {name: agent, type: text, desc: автор}
+- {name: done, type: jsonb}
+- {name: next, type: jsonb}
+- {name: blockers, type: jsonb}
+- {name: artifacts, type: jsonb, decisions: [D20]}
+- {name: questions, type: jsonb, decisions: [D20]}
+- {name: criteria_next, type: jsonb, decisions: [D20]}
+- {name: version, type: int}
+- {name: updated_at, type: timestamptz}
 policy:
   indexes: []
   retention: '`memory.retention`: M3 до закрытия задачи (agent-memory)'

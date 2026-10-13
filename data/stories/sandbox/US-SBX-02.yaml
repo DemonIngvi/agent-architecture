@@ -6,6 +6,6 @@ accept:
 - Не в allowlist → отказ, событие
 - Push в защищённую ветку → отклонён, работа через PR
 reqs:
-- 'agent-sandbox: Доступ к репозиториям'
-- 'agent-sandbox: Секреты'
+- {spec: agent-sandbox, title: Доступ к репозиториям}
+- {spec: agent-sandbox, title: Секреты}
 entry: агент → доступы

@@ -3,21 +3,21 @@ processes:
   stories: [US-MEM-01, US-MEM-02, US-MEM-03, US-MEM-04, US-MEM-05, US-MEM-06, US-MEM-07, US-MEM-08, US-MEM-09, US-MEM-10]
   lanes: ['Люди (пользователь, администратор)', ICPlan / Runner, Memory, Harness (агент)]
   steps:
-  - [s, 3, start, Старт запуска, [[m5, '']]]
-  - [m5, 3, task, 'Собрать агента: инструкция, навыки (M5)', [[pr, '']]]
-  - [pr, 2, gateway, 'Профиль: уровни доступны?', [[rd, да], [x1, нет]]]
-  - [x1, 2, task, 'Уровень пропущен, предупреждение', [[m0, '']]]
-  - [rd, 2, task, 'Контекст: M1, M2, M3', [[m0, '']]]
-  - [m0, 3, task, 'Работа в M0, сжатие при 80%', [[m6, '']]]
-  - [m6, 3, task, Читать документ (M6), [[m3, '']]]
-  - [m3, 3, task, Записать состояние (M3), [[wc, '']]]
-  - [wc, 2, gateway, 'Запись прошла проверки?', [[m1, да], [xe, нет]]]
-  - [xe, 2, error, 'Запись отклонена, причина инициатору и в события запуска', []]
-  - [m1, 1, task, Сообщения → M1 автоматически, [[en, '']]]
-  - [en, 1, task, Итог запуска → M2; M0 уничтожен, [[vd, '']]]
-  - [vd, 0, task, Вердикт пользователя → M2, [[rt, '']]]
-  - [rt, 2, task, Очистка по срокам M1–M3, [[e, '']]]
-  - [e, 2, end, Память обновлена, []]
+  - {id: s, lane: 3, type: start, label: Старт запуска, next: [m5]}
+  - {id: m5, lane: 3, type: task, label: 'Собрать агента: инструкция, навыки (M5)', next: [pr]}
+  - {id: pr, lane: 2, type: gateway, label: 'Профиль: уровни доступны?', next: [{to: rd, label: да}, {to: x1, label: нет}]}
+  - {id: x1, lane: 2, type: task, label: 'Уровень пропущен, предупреждение', next: [m0]}
+  - {id: rd, lane: 2, type: task, label: 'Контекст: M1, M2, M3', next: [m0]}
+  - {id: m0, lane: 3, type: task, label: 'Работа в M0, сжатие при 80%', next: [m6]}
+  - {id: m6, lane: 3, type: task, label: Читать документ (M6), next: [m3]}
+  - {id: m3, lane: 3, type: task, label: Записать состояние (M3), next: [wc]}
+  - {id: wc, lane: 2, type: gateway, label: 'Запись прошла проверки?', next: [{to: m1, label: да}, {to: xe, label: нет}]}
+  - {id: xe, lane: 2, type: error, label: 'Запись отклонена, причина инициатору и в события запуска'}
+  - {id: m1, lane: 1, type: task, label: Сообщения → M1 автоматически, next: [en]}
+  - {id: en, lane: 1, type: task, label: Итог запуска → M2; M0 уничтожен, next: [vd]}
+  - {id: vd, lane: 0, type: task, label: Вердикт пользователя → M2, next: [rt]}
+  - {id: rt, lane: 2, type: task, label: Очистка по срокам M1–M3, next: [e]}
+  - {id: e, lane: 2, type: end, label: Память обновлена}
   artifacts:
     m5: [инструкция и навыки версии запуска]
     rd: [контекст M1–M3 в RunBundle]

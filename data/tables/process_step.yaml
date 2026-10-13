@@ -3,24 +3,24 @@ store: S1
 owner: icplan
 schema: itsaplan.public
 columns:
-- [id, serial, PK, '']
-- [key, text, '', ключ шага в процессе (`sdd`) — `ProcessStep.id`]
-- [process_id, int, FK process, '']
-- [column_id, int, FK project_column, колонка]
-- [agent_id, int, FK ai_agent, нет — ручной шаг]
-- [on_success, jsonb, '', шаг / процесс / завершить]
-- [on_failure, jsonb, '', '']
-- [max_runs, int, '', '3']
-- [require_review, bool, '', '']
-- [deliverable, text, '', результат шага (D20)]
-- [done_criteria, jsonb, '', готовность шага (D20)]
-- [criteria_approval, text, '', auto / review / always]
+- {name: id, type: serial, pk: true}
+- {name: key, type: text, desc: ключ шага в процессе (`sdd`) — `ProcessStep.id`}
+- {name: process_id, type: int, fk: process}
+- {name: column_id, type: int, fk: project_column, desc: колонка}
+- {name: agent_id, type: int, fk: ai_agent, desc: нет — ручной шаг}
+- {name: on_success, type: jsonb, desc: шаг / процесс / завершить}
+- {name: on_failure, type: jsonb}
+- {name: max_runs, type: int, desc: '3'}
+- {name: require_review, type: bool}
+- {name: deliverable, type: text, desc: результат шага, decisions: [D20]}
+- {name: done_criteria, type: jsonb, desc: готовность шага, decisions: [D20]}
+- {name: criteria_approval, type: text, desc: auto / review / always}
 policy:
   indexes:
-  - [unique, 'process_id, key', ключ шага уникален в процессе]
-  - [unique, 'process_id, column_id', одна колонка — один шаг]
-  - [index, column_id, FK; переход по колонке]
-  - [index, agent_id, FK; шаги агента]
+  - {kind: unique, columns: [process_id, key], why: ключ шага уникален в процессе}
+  - {kind: unique, columns: [process_id, column_id], why: одна колонка — один шаг}
+  - {kind: index, columns: [column_id], why: FK; переход по колонке}
+  - {kind: index, columns: [agent_id], why: FK; шаги агента}
   retention: пока жив процесс
   cleanup: каскадно с процессом
   migrate: fork

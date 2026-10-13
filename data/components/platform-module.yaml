@@ -3,14 +3,14 @@ status: todo
 guardrails: ''
 desc: 'Модуль ICPlan (своя схема в БД ICPlan): алиасы LLM, бюджеты, профили sandbox и памяти, данные guardrails, версии агентов.'
 specs:
-- [Спека (control-plane), openspec/changes/define-agent-platform/specs/control-plane/spec.md]
-- [Схема, openspec/changes/define-agent-platform/specs/control-plane/architecture.md]
+- {label: Спека (control-plane), path: openspec/changes/define-agent-platform/specs/control-plane/spec.md}
+- {label: Схема, path: openspec/changes/define-agent-platform/specs/control-plane/architecture.md}
 tasks: ['4.4']
 about:
   chain:
-  - [ICPlan, icplan]
-  - [Platform module, platform-module]
-  - [Agent Runner, agent-runner]
+  - {label: ICPlan, comp: icplan}
+  - {label: Platform module, comp: platform-module}
+  - {label: Agent Runner, comp: agent-runner}
   purpose: Хранит внутри ICPlan наши настройки, которых в ICPlan нет, и отдаёт их исполнителям.
   does:
   - Алиасы моделей и бюджеты агентов

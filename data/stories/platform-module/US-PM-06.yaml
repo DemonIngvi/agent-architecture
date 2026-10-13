@@ -6,6 +6,6 @@ accept:
 - Достигнуто 80% → уведомление администратору
 - Исчерпан → новые запуски отклоняются G1 с причиной
 reqs:
-- 'guardrails: Иерархия бюджетов токенов и денег'
-- 'guardrails: G1 Admission'
+- {spec: guardrails, title: Иерархия бюджетов токенов и денег}
+- {spec: guardrails, title: G1 Admission}
 entry: Проект → ИИ-команда → «Платформа»

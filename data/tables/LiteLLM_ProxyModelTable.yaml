@@ -1,5 +1,5 @@
 kind: litellm
 columns:
-- [model_id, String, PK, '']
-- [model_name, String, '', алиас]
-- [litellm_params, Json, '', 'провайдер, модель']
+- {name: model_id, type: String, pk: true}
+- {name: model_name, type: String, desc: алиас}
+- {name: litellm_params, type: Json, desc: 'провайдер, модель'}

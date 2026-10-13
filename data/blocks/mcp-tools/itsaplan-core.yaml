@@ -3,34 +3,32 @@ tech: MCP-сервер ICPlan (`POST /mcp` в api ICPlan), весь REST API к�
 kind: service
 stories: [US-MCP-01, US-MCP-02, US-ICP-29, US-HAR-01]
 params:
-- [servers, 'itsaplan-core (по умолчанию); включается на проект, по умолчанию выключен']
-- [tools, 'allowlist: get_issue, add_comment, update_issue… (по умолчанию минимальный — чтение задачи, комментарий)']
-- [auth.secret_ref, 'ссылка на Secret с API-ключом агента; ключ подставляет MCP-прокси Runner']
-- [timeout_s, '30']
+- {name: servers, value: 'itsaplan-core (по умолчанию); включается на проект, по умолчанию выключен'}
+- {name: tools, value: 'allowlist: get_issue, add_comment, update_issue… (по умолчанию минимальный — чтение задачи, комментарий)'}
+- {name: auth.secret_ref, value: ссылка на Secret с API-ключом агента; ключ подставляет MCP-прокси Runner}
+- {name: timeout_s, value: '30'}
 does:
 - Агент читает задачу, пишет комментарий, меняет поля задачи; колонку задачи в процессе меняет ICPlan по итогу запуска (D17)
 - Доступ к документам проекта (M6)
 io:
-- [←, MCP-прокси Agent Runner, '`McpToolCall`: `tools/list`, `tools/call` с ключом агента (I24)']
-- [→, Harness, 'результат тула; ответ длиннее `max_result_kb` обрезает прокси (I9)']
-- [→, задача ICPlan, 'комментарий и поля задачи от имени агента']
+- {dir: ←, label: MCP-прокси Agent Runner, what: '`McpToolCall`: `tools/list`, `tools/call` с ключом агента', via: [I24]}
+- {dir: →, with: Harness, what: результат тула; ответ длиннее `max_result_kb` обрезает прокси, via: [I9]}
+- {dir: →, label: задача ICPlan, what: комментарий и поля задачи от имени агента}
 data:
-- [issue, 'чтение, запись: поля задачи через `update_issue` (колонка задачи в процессе — не меняется, D17; владелец — ICPlan)']
-- [issue_activity, 'запись: комментарий агента (владелец — ICPlan)']
-- [project_resource, 'чтение через I4: включён ли MCP проекта (`kind = mcp`, владелец Platform module)']
+- {table: issue, why: 'чтение, запись: поля задачи через `update_issue` (колонка задачи в процессе — не меняется, D17; владелец — ICPlan)'}
+- {table: issue_activity, access: write, why: комментарий агента (владелец — ICPlan)}
+- {table: project_resource, access: read, via: [I4], why: 'включён ли MCP проекта (`kind = mcp`, владелец Platform module)'}
 reqs: [R-MCP-13, R-AP-16, R-MCP-09, R-MCP-08]
 tasks: ['2.4']
 failures:
-- MCP проекта выключен — тулы ICPlan недоступны, запуск завершается с причиной (R-MCP-13 «MCP выключен в проекте»)
-- '`update_issue` со сменой колонки задачи в процессе — смена отклонена, остальные поля обновлены (R-MCP-13 «Смена колонки в процессе», D17)'
-- БД ICPlan (S1) недоступна — тул возвращает агенту ошибку типа «недоступно», агент не повторяет записи сам (FMEA «БД ICPlan (S1) недоступна», R-MCP-08)
-- Ключ агента отклонён — вызов не повторяется, событие с причиной (R-MCP-09 «Аутентификация I17»)
-- Запись прервалась сбоем сети — автоматического повтора нет, решает агент (R-MCP-09 «Неидемпотентный вызов I9»)
+- {when: MCP проекта выключен, then: 'тулы ICPlan недоступны, запуск завершается с причиной (R-MCP-13 «MCP выключен в проекте»)'}
+- {when: '`update_issue` со сменой колонки задачи в процессе', then: 'смена отклонена, остальные поля обновлены (R-MCP-13 «Смена колонки в процессе», D17)'}
+- {when: БД ICPlan (S1) недоступна, then: 'тул возвращает агенту ошибку типа «недоступно», агент не повторяет записи сам (FMEA «БД ICPlan (S1) недоступна», R-MCP-08)'}
+- {when: Ключ агента отклонён, then: 'вызов не повторяется, событие с причиной (R-MCP-09 «Аутентификация I17»)'}
+- {when: Запись прервалась сбоем сети, then: 'автоматического повтора нет, решает агент (R-MCP-09 «Неидемпотентный вызов I9»)'}
 why: 'Уже есть в ICPlan; стандарт MCP: тот же сервер используют и наши агенты, и внешние CLI.'
 rnd: mcp-vs-direct.md
-iface:
-- I9
-- I24
 ops:
-- ['`POST /mcp` — `tools/list`: тулы ICPlan, отфильтрованные allowlist запуска', MCP-прокси Runner, I24]
-- ['`POST /mcp` — `tools/call` `get_issue`, `add_comment`, `update_issue`, создание задач; ключ агента в `Authorization: Bearer`', MCP-прокси Runner, I24]
+- {op: '`tools/list`: тулы ICPlan, отфильтрованные allowlist запуска', endpoint: POST /mcp, label: MCP-прокси Runner, via: [I24]}
+- {op: '`tools/call` `get_issue`, `add_comment`, `update_issue`, создание задач; ключ агента в `Authorization: Bearer`', endpoint: POST /mcp, label: MCP-прокси Runner, via: [I24]}
+iface: [I9, I24]

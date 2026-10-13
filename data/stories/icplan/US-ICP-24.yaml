@@ -6,9 +6,9 @@ accept:
 - Можно выбрать mock-модель → без затрат
 - Тест упал → видно на каком шаге и почему
 reqs:
-- 'icplan-integration: Проверка агента в чате'
-- 'llm-gateway: Mock-модель для разработки'
-- 'agent-harness: Стрим шагов'
+- {spec: icplan-integration, title: Проверка агента в чате}
+- {spec: llm-gateway, title: Mock-модель для разработки}
+- {spec: agent-harness, title: Стрим шагов}
 entry: агент → «проверить»
 chain:
   path: [US-ICP-24, US-LLM-02, US-HAR-01]

@@ -1,14 +1,14 @@
 purpose: событие протокола AG-UI
 fields:
-- [type, 'enum: RUN_STARTED · RUN_FINISHED · RUN_ERROR · STEP_STARTED · STEP_FINISHED · TEXT_MESSAGE_START · TEXT_MESSAGE_CONTENT · TEXT_MESSAGE_END · REASONING_START · REASONING_MESSAGE_START · REASONING_MESSAGE_CONTENT · REASONING_MESSAGE_END · REASONING_END · TOOL_CALL_START · TOOL_CALL_ARGS · TOOL_CALL_END · TOOL_CALL_RESULT · ACTIVITY_SNAPSHOT · CUSTOM', true, тип события по протоколу]
-- [runId / threadId, string, false, 'у `RUN_*`: `runId` — запуск строкой (так требует AG-UI); `threadId` — `issueIdentifier`, у запуска без задачи — `run-<runId>`']
-- [stepName, string, false, 'у `STEP_*`: шаг цикла']
-- [messageId / role / delta, string, false, 'у `TEXT_MESSAGE_*`, `REASONING_MESSAGE_*`: сообщение, роль, фрагмент текста; в хранилище платформы `*_END` несёт собранный текст сообщения в `delta` (D21)']
-- [toolCallId / toolCallName / parentMessageId / content, string, false, 'у `TOOL_CALL_*`: вызов тула, имя, сообщение-родитель, результат']
-- [activityType / content, string / object, false, 'у `ACTIVITY_SNAPSHOT`: `plan` и план `{done[], next[]}` из M3']
-- [name, string, false, 'у `CUSTOM` — наш подтип: `question`, `approval_request`, `decision_applied`, `message_received`, `guardrail_decision`, `memory_write`, `llm_call`']
-- [value, object, false, 'у `CUSTOM` — наши данные: `question` → `{text}`; `approval_request` → `{tool, argsHash, reason}`; `decision_applied` → `{seq}`; `message_received` → `{id}`; `guardrail_decision` → `{point: g1 · g2 · g4, allow, approval, reason}`; `memory_write` → `{level, scope}`; `llm_call` → `{model, inputTokens, outputTokens, costUsd}`']
-- [message / code, string, false, 'у `RUN_ERROR`: причина']
+- {name: type, type: 'enum: RUN_STARTED · RUN_FINISHED · RUN_ERROR · STEP_STARTED · STEP_FINISHED · TEXT_MESSAGE_START · TEXT_MESSAGE_CONTENT · TEXT_MESSAGE_END · REASONING_START · REASONING_MESSAGE_START · REASONING_MESSAGE_CONTENT · REASONING_MESSAGE_END · REASONING_END · TOOL_CALL_START · TOOL_CALL_ARGS · TOOL_CALL_END · TOOL_CALL_RESULT · ACTIVITY_SNAPSHOT · CUSTOM', required: true, desc: тип события по протоколу}
+- {name: runId / threadId, type: string, required: false, desc: 'у `RUN_*`: `runId` — запуск строкой (так требует AG-UI); `threadId` — `issueIdentifier`, у запуска без задачи — `run-<runId>`'}
+- {name: stepName, type: string, required: false, desc: 'у `STEP_*`: шаг цикла'}
+- {name: messageId / role / delta, type: string, required: false, desc: 'у `TEXT_MESSAGE_*`, `REASONING_MESSAGE_*`: сообщение, роль, фрагмент текста; в хранилище платформы `*_END` несёт собранный текст сообщения в `delta`', decisions: [D21]}
+- {name: toolCallId / toolCallName / parentMessageId / content, type: string, required: false, desc: 'у `TOOL_CALL_*`: вызов тула, имя, сообщение-родитель, результат'}
+- {name: activityType / content, type: string / object, required: false, desc: 'у `ACTIVITY_SNAPSHOT`: `plan` и план `{done[], next[]}` из M3'}
+- {name: name, type: string, required: false, desc: 'у `CUSTOM` — наш подтип: `question`, `approval_request`, `decision_applied`, `message_received`, `guardrail_decision`, `memory_write`, `llm_call`'}
+- {name: value, type: object, required: false, desc: 'у `CUSTOM` — наши данные: `question` → `{text}`; `approval_request` → `{tool, argsHash, reason}`; `decision_applied` → `{seq}`; `message_received` → `{id}`; `guardrail_decision` → `{point: g1 · g2 · g4, allow, approval, reason}`; `memory_write` → `{level, scope}`; `llm_call` → `{model, inputTokens, outputTokens, costUsd}`'}
+- {name: message / code, type: string, required: false, desc: 'у `RUN_ERROR`: причина'}
 source:
   kind: ext
   ref: https://docs.ag-ui.com/concepts/events

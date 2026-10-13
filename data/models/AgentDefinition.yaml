@@ -1,16 +1,16 @@
 purpose: определение агента в YAML `agent/v1` — экспорт и импорт (R-REG-04, R-CP-05)
 fields:
-- [apiVersion, 'const: agent/v1', true, версия формата]
-- [id, string, true, имя агента (`username` в ICPlan)]
-- [version, int, true, версия определения]
-- [model, string, true, алиас LiteLLM]
-- [instructions, string, true, инструкция агента]
-- [skills, 'string[]', false, навыки]
-- [mcp, '{server, tools[]}[]', false, 'MCP-серверы и разрешённые тулы; источник — `project_resource` (`mcp`) и `access_policy` Platform module: MCP-серверов агента в форке нет (D23)']
-- [limits, '{max_steps, timeout_s, max_tokens}', false, параметры `limits.*`]
-- [approval, '{tools[]}', false, тулы с подтверждением]
-- [memory, '{profile, read[], write[]}', false, профиль памяти]
-- [sandbox, '{profile}', false, профиль среды]
+- {name: apiVersion, type: 'const: agent/v1', required: true, desc: версия формата}
+- {name: id, type: string, required: true, desc: имя агента (`username` в ICPlan)}
+- {name: version, type: int, required: true, desc: версия определения}
+- {name: model, type: string, required: true, desc: алиас LiteLLM}
+- {name: instructions, type: string, required: true, desc: инструкция агента}
+- {name: skills, type: 'string[]', required: false, desc: навыки}
+- {name: mcp, type: '{server, tools[]}[]', required: false, desc: 'MCP-серверы и разрешённые тулы; источник — `project_resource` (`mcp`) и `access_policy` Platform module: MCP-серверов агента в форке нет', decisions: [D23]}
+- {name: limits, type: '{max_steps, timeout_s, max_tokens}', required: false, desc: параметры `limits.*`}
+- {name: approval, type: '{tools[]}', required: false, desc: тулы с подтверждением}
+- {name: memory, type: '{profile, read[], write[]}', required: false, desc: профиль памяти}
+- {name: sandbox, type: '{profile}', required: false, desc: профиль среды}
 source:
   kind: ours
   ref: R-REG-04, R-CP-05, задача 1.2

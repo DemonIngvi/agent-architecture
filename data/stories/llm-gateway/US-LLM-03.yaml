@@ -6,6 +6,6 @@ accept:
 - По запускам задачи
 - Затраты недоступны → пометка, без ошибки
 reqs:
-- 'llm-gateway: Атрибуция затрат'
-- 'observability: Затраты'
+- {spec: llm-gateway, title: Атрибуция затрат}
+- {spec: observability, title: Затраты}
 entry: карточка задачи

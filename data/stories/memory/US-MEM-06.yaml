@@ -6,7 +6,7 @@ accept:
 - Новый запуск по задаче получает переписку, если M1 в профиле чтения
 - Переписка старше срока M1 не отдаётся агенту; треды удаляет ICPlan по `chat.retention_days` (D25)
 reqs:
-- 'agent-memory: Автоматическая запись M1 и M2'
-- 'agent-memory: Срок хранения'
-- 'agent-memory: Проверки записи в память'
+- {spec: agent-memory, title: Автоматическая запись M1 и M2}
+- {spec: agent-memory, title: Срок хранения}
+- {spec: agent-memory, title: Проверки записи в память}
 entry: чат агента, комментарии задачи

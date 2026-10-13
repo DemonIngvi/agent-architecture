@@ -6,6 +6,6 @@ accept:
 - Разбивка по проектам и агентам
 - Нет данных → нули
 reqs:
-- 'observability: Сводка и статистика агентов'
-- 'observability: Затраты'
+- {spec: observability, title: Сводка и статистика агентов}
+- {spec: observability, title: Затраты}
 entry: дашборд

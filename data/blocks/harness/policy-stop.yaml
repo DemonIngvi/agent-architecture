@@ -3,26 +3,26 @@ tech: Python
 kind: service
 stories: [US-HAR-03, US-HAR-04]
 params:
-- [limits.max_steps, '30']
-- [limits.max_tokens, 200 000]
+- {name: limits.max_steps, value: '30'}
+- {name: limits.max_tokens, value: 200 000}
 does:
 - Соблюдает лимиты шагов и токенов; время — `timeout_s` Runner (I7)
 - Завершает с done / limit / gate_failed / error и частичным итогом (статусы — R-RUN-07)
 - Проверяет итог по критериям приёмки; агент не может ослабить критерий своего шага
 io:
-- [←, Context Manager, 'ход цикла: шаги, токены']
-- [←, Agent Runner, отмена (I7)]
-- [→, Agent Runner, '`RunResult` с частичным итогом (I7)']
+- {dir: ←, with: Context Manager, what: 'ход цикла: шаги, токены'}
+- {dir: ←, with: Agent Runner, what: отмена, via: [I7]}
+- {dir: →, with: Agent Runner, what: '`RunResult` с частичным итогом', via: [I7]}
 data:
-- [agent_run, 'косвенно: статус и итог `RunResult` пишет Runner в ICPlan (владелец — ICPlan)']
+- {table: agent_run, access: indirect, why: статус и итог `RunResult` пишет Runner в ICPlan (владелец — ICPlan)}
 reqs: [R-HRN-08, R-HRN-09, R-RUN-07]
 tasks: ['1.6']
 failures:
-- Лимит шагов или токенов — остановка с причиной `limit` и частичным итогом (R-HRN-09)
-- Gate не пройден и повторы исчерпаны — `gate_failed` с перечнем непрошедших критериев
-- Ошибка модели после всех повторов — `error` с причиной и частичным итогом
+- {when: Лимит шагов или токенов, then: остановка с причиной `limit` и частичным итогом, reqs: [R-HRN-09]}
+- {when: Gate не пройден и повторы исчерпаны, then: '`gate_failed` с перечнем непрошедших критериев'}
+- {when: Ошибка модели после всех повторов, then: '`error` с причиной и частичным итогом'}
 why: Предсказуемые затраты и время.
 rnd: runaway-protection.md
 ops:
-- [проверка лимитов после каждого шага; quality gate итога по критериям задачи, граф LangGraph, внутри]
-- ['`POST /run/cancel` — завершить шаг и отдать `RUN_FINISHED`', Agent Runner, I7]
+- {op: проверка лимитов после каждого шага; quality gate итога по критериям задачи, label: граф LangGraph, internal: true}
+- {op: завершить шаг и отдать `RUN_FINISHED`, endpoint: POST /run/cancel, who: Agent Runner, via: [I7]}

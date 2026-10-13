@@ -3,26 +3,26 @@ tech: Профили Sandbox (образ, ресурсы, сеть, пул)
 kind: service
 stories: [US-PM-01]
 params:
-- [sandbox_profile, light]
-- [sandbox.egress_allow, только платформа]
-- [sandbox.pool.size, '2']
+- {name: sandbox_profile, value: light}
+- {name: sandbox.egress_allow, value: только платформа}
+- {name: sandbox.pool.size, value: '2'}
 does:
 - Определяет, что агент может запускать и куда ходить
 io:
-- [←, ICPlan UI, 'профили и выбор профиля агента (I20)']
-- [→, Agent Runner, 'профиль агента в настройках запуска (I4)']
+- {dir: ←, label: ICPlan UI, what: профили и выбор профиля агента, via: [I20]}
+- {dir: →, with: Agent Runner, what: профиль агента в настройках запуска, via: [I4]}
 data:
-- [sandbox_profile, 'запись, чтение: образ, runtime, CPU, RAM, диск, egress, пул']
-- [agent_settings, 'запись, чтение: `sandbox_profile_id` агента']
+- {table: sandbox_profile, access: read-write, why: 'образ, runtime, CPU, RAM, диск, egress, пул'}
+- {table: agent_settings, access: read-write, why: '`sandbox_profile_id` агента'}
 reqs: [R-CP-01, R-CP-03]
 tasks: ['4.4']
 failures:
-- Недопустимое значение профиля — 400 с названием поля (R-CP-01)
-- Удаление профиля, который используется, — 409, в ответе агенты с этим профилем
-- Смена профиля во время запуска — активный запуск идёт по прежнему, следующий по новому (R-CP-03)
-ops:
-- ['`GET /platform/sandbox-profiles`, `PUT`, `DELETE /platform/sandbox-profiles/:name` — профили', Владелец экземпляра, I20]
-- ['Профиль агента — `sandbox_profile` в настройках агента', Администратор, I20]
-- ['Отдать профиль запуска', Agent Runner, I4]
+- {when: Недопустимое значение профиля, then: 400 с названием поля, reqs: [R-CP-01]}
+- {when: 'Удаление профиля, который используется,', then: '409, в ответе агенты с этим профилем'}
+- {when: Смена профиля во время запуска, then: 'активный запуск идёт по прежнему, следующий по новому', reqs: [R-CP-03]}
 why: Разным агентам — разная среда без изменения кода.
 rnd: sandbox-isolation.md
+ops:
+- {op: '`GET /platform/sandbox-profiles`, `PUT`, `DELETE /platform/sandbox-profiles/:name` — профили', label: Владелец экземпляра, via: [I20]}
+- {op: Профиль агента — `sandbox_profile` в настройках агента, label: Администратор, via: [I20]}
+- {op: Отдать профиль запуска, who: Agent Runner, via: [I4]}

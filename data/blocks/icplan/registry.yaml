@@ -3,7 +3,7 @@ tech: 'Таблицы ICPlan: агенты, тулы, навыки, ключи �
 kind: service
 stories: [US-ICP-20, US-ICP-21, US-ICP-23, US-ICP-29]
 params:
-- [agent.version, последняя]
+- {name: agent.version, value: последняя}
 does:
 - Хранит определения агентов и их ресурсы
 - Отдаёт определение агента Runner и Harness
@@ -11,29 +11,29 @@ does:
 - Экспорт и импорт определения в YAML `agent/v1` (доработка, R-REG-04)
 - Не даёт удалить ресурс, на который ссылаются (R-REG-05)
 io:
-- [←, Control Plane UI, 'определения агентов, тулы, навыки, MCP-серверы']
-- [→, Harness через Agent Runner, 'инструкция и навыки версии запуска, M5 (через Platform module — I4, D23; I7)']
+- {dir: ←, with: Control Plane UI, what: 'определения агентов, тулы, навыки, MCP-серверы'}
+- {dir: →, label: Harness через Agent Runner, what: 'инструкция и навыки версии запуска, M5 (через Platform module — I4, D23; I7)'}
 data:
-- [ai_agent, 'запись, чтение: определение']
-- [agent_tool, 'запись, чтение: каталог тулов']
-- [agent_skill, 'запись, чтение: каталог навыков']
-- [agent_tool_link, 'запись, чтение']
-- [agent_skill_link, 'запись, чтение']
-- [apikey, 'запись, чтение: ключ агента для I1–I3 и MCP (`reference_id` → `user.id`), показывается один раз']
-- [integration_credential, 'запись, чтение: учётные данные тулов и ключи провайдеров внутренних агентов — шифротекст AES-256-GCM (`APP_ENCRYPTION_KEY`), клиенту не отдаётся']
-- [agent_settings_version, 'чтение: версии — снимок определения и наших настроек ведёт Platform module (D9); правка `PATCH /teams/:teamId/ai-agents/:agentId` форка версию сама не создаёт — Platform module при вызове I4 сравнивает хеш определения с последней версией и при отличии создаёт новую (D26)']
-- [agent_run, 'запись: `agent_version` запуска — задачей или Platform module при первом вызове I4 (D23)']
+- {table: ai_agent, access: read-write, why: определение}
+- {table: agent_tool, access: read-write, why: каталог тулов}
+- {table: agent_skill, access: read-write, why: каталог навыков}
+- {table: agent_tool_link, access: read-write}
+- {table: agent_skill_link, access: read-write}
+- {table: apikey, access: read-write, why: 'ключ агента для I1–I3 и MCP (`reference_id` → `user.id`), показывается один раз'}
+- {table: integration_credential, access: read-write, why: 'учётные данные тулов и ключи провайдеров внутренних агентов — шифротекст AES-256-GCM (`APP_ENCRYPTION_KEY`), клиенту не отдаётся'}
+- {table: agent_settings_version, access: read, why: 'версии — снимок определения и наших настроек ведёт Platform module (D9); правка `PATCH /teams/:teamId/ai-agents/:agentId` форка версию сама не создаёт — Platform module при вызове I4 сравнивает хеш определения с последней версией и при отличии создаёт новую (D26)'}
+- {table: agent_run, access: write, why: '`agent_version` запуска — задачей или Platform module при первом вызове I4 (D23)'}
 reqs: [R-REG-01, R-REG-02, R-REG-03, R-REG-04, R-REG-05, R-REG-06]
 tasks: ['1.2', '2.3', '4.4']
 failures:
-- БД ICPlan недоступна — определения не читаются, запуски не стартуют
-- Удаляется ресурс, на который ссылаются, — удаление отклоняется
-- Импорт с неверной схемой — импорт отклоняется (FMEA agent-registry)
+- {when: БД ICPlan недоступна, then: 'определения не читаются, запуски не стартуют'}
+- {when: 'Удаляется ресурс, на который ссылаются,', then: удаление отклоняется}
+- {when: Импорт с неверной схемой, then: импорт отклоняется, fmea: agent-registry}
 why: Источник правды — БД ICPlan; git только для ревью через экспорт.
 rnd: config-storage.md
 ops:
-- ['`GET`, `POST /teams/:teamId/ai-agents`; `PATCH`, `DELETE /teams/:teamId/ai-agents/:agentId` — агенты', Control Plane UI, I20]
-- ['`PUT /teams/:teamId/ai-agents/:agentId/projects`, `/skills`, `/tool-configs` — ресурсы агента', Control Plane UI, I20]
-- ['`POST /teams/:teamId/ai-agents/:agentId/regenerate-key` — новый ключ агента', Control Plane UI, I20]
-- ['версии и экспорт / импорт YAML — `GET /platform/agents/:agentId/export`, `POST /platform/agents/import` (Platform module)', Администратор, I20]
-- ['определение агента для запуска — `GET /platform/runs/:runId/agent`: Platform module читает таблицы Registry и отдаёт `{version, definition, settings}`; claim форка не меняется (D23)', Agent Runner, I4]
+- {op: '`GET`, `POST /teams/:teamId/ai-agents`; `PATCH`, `DELETE /teams/:teamId/ai-agents/:agentId` — агенты', who: Control Plane UI, via: [I20]}
+- {op: '`PUT /teams/:teamId/ai-agents/:agentId/projects`, `/skills`, `/tool-configs` — ресурсы агента', who: Control Plane UI, via: [I20]}
+- {op: новый ключ агента, endpoint: 'POST /teams/:teamId/ai-agents/:agentId/regenerate-key', who: Control Plane UI, via: [I20]}
+- {op: 'версии и экспорт / импорт YAML — `GET /platform/agents/:agentId/export`, `POST /platform/agents/import` (Platform module)', label: Администратор, via: [I20]}
+- {op: 'определение агента для запуска — `GET /platform/runs/:runId/agent`: Platform module читает таблицы Registry и отдаёт `{version, definition, settings}`; claim форка не меняется', who: Agent Runner, via: [I4], decisions: [D23]}

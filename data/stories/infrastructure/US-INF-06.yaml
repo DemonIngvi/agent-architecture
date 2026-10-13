@@ -6,5 +6,5 @@ accept:
 - Те же чарты и версии
 - Сброс среды к исходному состоянию одной командой
 reqs:
-- 'platform-infrastructure: Локальная среда'
+- {spec: platform-infrastructure, title: Локальная среда}
 entry: compose / k3d

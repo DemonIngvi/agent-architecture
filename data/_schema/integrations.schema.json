@@ -1,0 +1,67 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "title": "Единица «integrations»",
+ "description": "Единица data/ вида «integrations». Генерируется: python html-view/doctool.py yaml-schema (не править руками).",
+ "type": "object",
+ "additionalProperties": {
+  "type": "object",
+  "properties": {
+   "from": {
+    "type": "string"
+   },
+   "to": {
+    "type": "string"
+   },
+   "via": {
+    "type": "string"
+   },
+   "what": {
+    "type": "string"
+   },
+   "models": {
+    "type": "array",
+    "items": {
+     "anyOf": [
+      {
+       "$ref": "catalog.schema.json#/definitions/model"
+      },
+      {
+       "const": ""
+      }
+     ]
+    }
+   },
+   "types": {
+    "type": "string"
+   },
+   "also": {
+    "type": "array",
+    "items": {
+     "anyOf": [
+      {
+       "$ref": "catalog.schema.json#/definitions/component"
+      },
+      {
+       "const": ""
+      }
+     ]
+    }
+   },
+   "data_in_response": {
+    "type": "boolean"
+   }
+  },
+  "additionalProperties": false,
+  "required": [
+   "from",
+   "to",
+   "via",
+   "what",
+   "models"
+  ]
+ },
+ "propertyNames": {
+  "type": "string",
+  "pattern": "^(?:I\\d+)$"
+ }
+}

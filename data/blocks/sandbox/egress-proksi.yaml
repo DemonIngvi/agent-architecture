@@ -3,27 +3,27 @@ tech: 'Squid (D18): allowlist доменов по CONNECT, без расшифр
 kind: service
 stories: [US-SBX-03]
 params:
-- [network.egress_allow, только платформа]
-- [setup.registries, 'pypi.org, files.pythonhosted.org, registry.npmjs.org']
+- {name: network.egress_allow, value: только платформа}
+- {name: setup.registries, value: 'pypi.org, files.pythonhosted.org, registry.npmjs.org'}
 does:
 - Весь исходящий трафик только через прокси
 - Блокирует запрещённые хосты, пишет событие
 - Реестры пакетов — только подсети шага подготовки
 - 'Секреты: внешние хосты — прокси; MCP — MCP-прокси Runner'
 io:
-- [←, Sandbox (среда агента), исходящие соединения (I17)]
-- [→, «внешние хосты», разрешённые запросы с подставленным секретом (I17)]
+- {dir: ←, label: Sandbox (среда агента), what: исходящие соединения, via: [I17]}
+- {dir: →, label: «внешние хосты», what: разрешённые запросы с подставленным секретом, via: [I17]}
 data:
-- [sandbox_profile, 'чтение: `egress_allow` профиля (владелец — Platform module)']
-- [access_policy, 'чтение: конфиг allowlist генерируется из политики доступа (владелец — Platform module)']
+- {table: sandbox_profile, access: read, why: '`egress_allow` профиля (владелец — Platform module)'}
+- {table: access_policy, access: read, why: конфиг allowlist генерируется из политики доступа (владелец — Platform module)}
 reqs: [R-SBX-06, R-SBX-07, R-SBX-13]
 tasks: ['4.2']
 failures:
-- Прокси упал — исходящий трафик запрещён (fail-closed), перезапуск прокси (FMEA agent-sandbox)
-- Домен вне allowlist — соединение блокируется, событие фиксируется
-- Реестр пакетов недоступен на шаге подготовки — шаг завершается ошибкой, запуск `failed`; есть кэш — используется кэш
+- {when: Прокси упал, then: 'исходящий трафик запрещён (fail-closed), перезапуск прокси', fmea: agent-sandbox}
+- {when: Домен вне allowlist, then: 'соединение блокируется, событие фиксируется'}
+- {when: Реестр пакетов недоступен на шаге подготовки, then: 'шаг завершается ошибкой, запуск `failed`; есть кэш — используется кэш'}
 why: Закрывает утечки и доступ к внутренним сервисам (G3).
 rnd: sandbox-isolation.md
 ops:
-- [CONNECT / HTTP к внешнему хосту — пропуск по allowlist подсети источника, 'среда агента (`sbx-agent`), контейнер подготовки (`sbx-setup`)', I17]
-- [подстановка учётных данных внешнего хоста; подставленный секрет агенту не возвращается, внутри, I17]
+- {op: CONNECT / HTTP к внешнему хосту — пропуск по allowlist подсети источника, label: 'среда агента (`sbx-agent`), контейнер подготовки (`sbx-setup`)', via: [I17]}
+- {op: подстановка учётных данных внешнего хоста; подставленный секрет агенту не возвращается, label: внутри, via: [I17]}

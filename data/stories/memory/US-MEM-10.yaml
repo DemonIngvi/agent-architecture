@@ -6,7 +6,7 @@ accept:
 - Удаление попадает в журнал
 - Очистка не прошла → повтор и уведомление эксплуатации
 reqs:
-- 'agent-memory: Срок хранения'
-- 'agent-memory: Управление памятью'
-- 'icplan-integration: Очистка запусков и переписки по сроку'
+- {spec: agent-memory, title: Срок хранения}
+- {spec: agent-memory, title: Управление памятью}
+- {spec: icplan-integration, title: Очистка запусков и переписки по сроку}
 entry: расписание очистки

@@ -3,16 +3,16 @@ processes:
   stories: [US-HAR-01, US-HAR-02, US-HAR-03]
   lanes: [Пользователь, Harness, LiteLLM / MCP / OPA]
   steps:
-  - [s, 1, start, RunBundle, [[t1, '']]]
-  - [t1, 1, task, Собрать контекст, [[t2, '']]]
-  - [t2, 2, task, Вызов модели, [[g1, '']]]
-  - [g1, 1, gateway, 'Тулы?', [[g2, да], [g3, нет]]]
-  - [g2, 2, gateway, G2 решение, [[t3, allow], [t4, confirm], [t1, deny]]]
-  - [t4, 0, task, Подтверждение, [[t3, да], [t1, нет]]]
-  - [t3, 2, task, Вызов тула, [[t1, '']]]
-  - [g3, 1, gateway, 'Quality gate?', [[e1, пройден], [x1, не пройден]]]
-  - [x1, 1, error, gate_failed, []]
-  - [e1, 1, end, RunResult, []]
+  - {id: s, lane: 1, type: start, label: RunBundle, next: [t1]}
+  - {id: t1, lane: 1, type: task, label: Собрать контекст, next: [t2]}
+  - {id: t2, lane: 2, type: task, label: Вызов модели, next: [g1]}
+  - {id: g1, lane: 1, type: gateway, label: 'Тулы?', next: [{to: g2, label: да}, {to: g3, label: нет}]}
+  - {id: g2, lane: 2, type: gateway, label: G2 решение, next: [{to: t3, label: allow}, {to: t4, label: confirm}, {to: t1, label: deny}]}
+  - {id: t4, lane: 0, type: task, label: Подтверждение, next: [{to: t3, label: да}, {to: t1, label: нет}]}
+  - {id: t3, lane: 2, type: task, label: Вызов тула, next: [t1]}
+  - {id: g3, lane: 1, type: gateway, label: 'Quality gate?', next: [{to: e1, label: пройден}, {to: x1, label: не пройден}]}
+  - {id: x1, lane: 1, type: error, label: gate_failed}
+  - {id: e1, lane: 1, type: end, label: RunResult}
   artifacts:
     t1: [контекст (M0)]
     t2: [chat.completions, spend log]
@@ -25,13 +25,13 @@ processes:
   stories: [US-HAR-04, US-HAR-05, US-HAR-06, US-HAR-07]
   lanes: [Пользователь, Harness, Guardrails / checkpoint]
   steps:
-  - [s, 1, start, Шаг цикла, [[g, '']]]
-  - [g, 1, gateway, 'Что случилось?', [[q, нужен ответ], [m, указание], [l, лимит / цикл], [c, падение]]]
-  - [q, 0, task, Вопрос → ответ пользователя, [[e, '']]]
-  - [m, 0, task, Указание в контекст, [[e, '']]]
-  - [l, 2, error, 'Стоп: limit / цикл', []]
-  - [c, 2, task, Продолжить с checkpoint, [[e, '']]]
-  - [e, 1, end, Цикл продолжается, []]
+  - {id: s, lane: 1, type: start, label: Шаг цикла, next: [g]}
+  - {id: g, lane: 1, type: gateway, label: 'Что случилось?', next: [{to: q, label: нужен ответ}, {to: m, label: указание}, {to: l, label: лимит / цикл}, {to: c, label: падение}]}
+  - {id: q, lane: 0, type: task, label: Вопрос → ответ пользователя, next: [e]}
+  - {id: m, lane: 0, type: task, label: Указание в контекст, next: [e]}
+  - {id: l, lane: 2, type: error, label: 'Стоп: limit / цикл'}
+  - {id: c, lane: 2, type: task, label: Продолжить с checkpoint, next: [e]}
+  - {id: e, lane: 1, type: end, label: Цикл продолжается}
   artifacts:
     q: [вопрос и ответ в M1]
     m: [сообщение в контексте]

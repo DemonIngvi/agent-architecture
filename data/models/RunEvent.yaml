@@ -1,12 +1,12 @@
 purpose: 'событие запуска: конверт платформы вокруг события AG-UI (D21). Runner читает поток у Harness (`GET /run/events`, NDJSON) и пересылает в ICPlan (`POST /agent-runs/:runId/events`)'
 fields:
-- [runId, int, true, = `agent_run.id`]
-- [seq, int, true, 'порядковый номер от Harness; ключ идемпотентности и порядка; Runner своих событий не нумерует, кроме `RUN_ERROR` при сбое среды (`seq` = последний + 1)']
-- [at, timestamp, true, 'время события в Harness, ISO 8601 UTC']
-- [event, AgUiEvent, true, 'событие AG-UI как есть: `type` и поля протокола']
+- {name: runId, type: int, required: true, desc: = `agent_run.id`}
+- {name: seq, type: int, required: true, desc: 'порядковый номер от Harness; ключ идемпотентности и порядка; Runner своих событий не нумерует, кроме `RUN_ERROR` при сбое среды (`seq` = последний + 1)'}
+- {name: at, type: timestamp, required: true, desc: 'время события в Harness, ISO 8601 UTC'}
+- {name: event, type: AgUiEvent, required: true, desc: 'событие AG-UI как есть: `type` и поля протокола'}
 source:
   kind: ours
-  ref: D21
+  refs: [D21]
   why: 'Конверт добавляет к событию AG-UI то, чего в протоколе нет: номер запуска, сквозной `seq` для порядка и идемпотентности и время в Harness. Поля события не меняем — их понимает чат форка; единственное отличие в хранилище: дельты сообщения собираются, и `*_END` несёт полный текст в `delta`.'
 field_src:
   event: 📘 AG-UI; `*_END` в хранилище — с собранным `delta` (D21)

@@ -330,8 +330,8 @@
 | `docs/rules/architecture-methodology.md` | А | — | — | — | ⏳ | 03347175 | Методология |
 | `docs/rules/block-methodology.md` | В | — | — | — | ⏳ | c89c4621 | Методология |
 | `docs/rules/block-methodology.md` | А | — | — | — | ⏳ | c89c4621 | Методология |
-| `docs/rules/data-methodology.md` | В | — | — | — | ⏳ | 9b7a95d2 | Методология |
-| `docs/rules/data-methodology.md` | А | — | — | — | ⏳ | 9b7a95d2 | Методология |
+| `docs/rules/data-methodology.md` | В | — | — | — | ⏳ | 39f457d2 | Методология |
+| `docs/rules/data-methodology.md` | А | — | — | — | ⏳ | 39f457d2 | Методология |
 | `docs/rules/decision-methodology.md` | В | — | — | — | ⏳ | 0af1d5d9 | Методология |
 | `docs/rules/decision-methodology.md` | А | — | — | — | ⏳ | 0af1d5d9 | Методология |
 | `docs/rules/review-methodology.md` | В | — | — | — | ⏳ | 00fb603f | Методология |

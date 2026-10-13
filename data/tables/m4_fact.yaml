@@ -3,19 +3,19 @@ store: S4
 owner: memory
 schema: itsaplan.memory
 columns:
-- [id, bigserial, PK, после MVP]
-- [scope, text, '', '']
-- [text, text, '', маскированный]
-- [embedding, vector, '', pgvector]
-- [source, text, '', '']
-- [valid_from, timestamptz, '', '']
-- [valid_to, timestamptz, '', '']
-- [superseded_by, bigint, FK m4_fact, '']
+- {name: id, type: bigserial, pk: true, desc: после MVP}
+- {name: scope, type: text}
+- {name: text, type: text, desc: маскированный}
+- {name: embedding, type: vector, desc: pgvector}
+- {name: source, type: text}
+- {name: valid_from, type: timestamptz}
+- {name: valid_to, type: timestamptz}
+- {name: superseded_by, type: bigint, fk: m4_fact}
 policy:
   indexes:
-  - [index, superseded_by, FK]
-  - [index, 'scope, valid_to', действующие факты области]
-  - [hnsw, embedding, поиск похожих (pgvector)]
+  - {kind: index, columns: [superseded_by], why: FK}
+  - {kind: index, columns: [scope, valid_to], why: действующие факты области}
+  - {kind: hnsw, columns: [embedding], why: поиск похожих (pgvector)}
   retention: '`memory.retention`: M4 до замены факта (agent-memory)'
   cleanup: заменённый факт получает `valid_to`, удаляется по профилю
   migrate: memory

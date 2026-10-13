@@ -3,14 +3,14 @@ processes:
   stories: [US-PM-01, US-PM-02, US-PM-04, US-PM-05, US-PM-06, US-PM-08]
   lanes: [Администратор, Platform module, LiteLLM / OPA]
   steps:
-  - [s, 0, start, Изменить настройки, [[g1, '']]]
-  - [g1, 1, gateway, 'Значения верны?', [[t1, да], [x1, нет]]]
-  - [x1, 0, error, Ошибка поля, []]
-  - [t1, 1, task, Новая версия, [[t2, '']]]
-  - [t2, 2, task, Раздать настройки, [[g2, '']]]
-  - [g2, 2, gateway, 'Применено?', [[e1, да], [t3, нет]]]
-  - [t3, 1, task, '«Не применено», повтор', [[t2, '']]]
-  - [e1, 1, end, Действует со след. запуска, []]
+  - {id: s, lane: 0, type: start, label: Изменить настройки, next: [g1]}
+  - {id: g1, lane: 1, type: gateway, label: 'Значения верны?', next: [{to: t1, label: да}, {to: x1, label: нет}]}
+  - {id: x1, lane: 0, type: error, label: Ошибка поля}
+  - {id: t1, lane: 1, type: task, label: Новая версия, next: [t2]}
+  - {id: t2, lane: 2, type: task, label: Раздать настройки, next: [g2]}
+  - {id: g2, lane: 2, type: gateway, label: 'Применено?', next: [{to: e1, label: да}, {to: t3, label: нет}]}
+  - {id: t3, lane: 1, type: task, label: '«Не применено», повтор', next: [t2]}
+  - {id: e1, lane: 1, type: end, label: Действует со след. запуска}
   artifacts:
     t1: [AgentDefinition (версия), AgentSettings]
     t2: [virtual key, OPA bundle]
@@ -19,13 +19,13 @@ processes:
   stories: [US-PM-03, US-PM-07]
   lanes: [Администратор / Безопасность, Platform module]
   steps:
-  - [s, 0, start, Перенести агента, [[ex, '']]]
-  - [ex, 1, task, Экспорт YAML, [[im, '']]]
-  - [im, 1, gateway, 'Импорт: связи верны?', [[vr, да], [x, нет]]]
-  - [x, 0, error, Ошибка по полю, []]
-  - [vr, 1, task, 'Новая версия, журнал', [[au, '']]]
-  - [au, 0, task, Просмотр журнала изменений, [[e, '']]]
-  - [e, 0, end, Изменения видны, []]
+  - {id: s, lane: 0, type: start, label: Перенести агента, next: [ex]}
+  - {id: ex, lane: 1, type: task, label: Экспорт YAML, next: [im]}
+  - {id: im, lane: 1, type: gateway, label: 'Импорт: связи верны?', next: [{to: vr, label: да}, {to: x, label: нет}]}
+  - {id: x, lane: 0, type: error, label: Ошибка по полю}
+  - {id: vr, lane: 1, type: task, label: 'Новая версия, журнал', next: [au]}
+  - {id: au, lane: 0, type: task, label: Просмотр журнала изменений, next: [e]}
+  - {id: e, lane: 0, type: end, label: Изменения видны}
   artifacts:
     ex: [YAML агента]
     vr: [версия определения, запись журнала]

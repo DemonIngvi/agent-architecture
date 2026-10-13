@@ -3,31 +3,31 @@ tech: Python, узел графа LangGraph
 kind: service
 stories: [US-HAR-01, US-HAR-06, US-MEM-05, US-SBX-05]
 params:
-- [compaction.threshold, 80% окна]
-- [prompt.cache, вкл]
-- [prompt.platform_version, версия образа Harness]
+- {name: compaction.threshold, value: 80% окна}
+- {name: prompt.cache, value: вкл}
+- {name: prompt.platform_version, value: версия образа Harness}
 does:
 - Собирает контекст шага по слоям; нижний слой не отменяет правила промпта платформы
 - Сжимает историю при переполнении
 - Подгружает память M2 / M3 по профилю
 - Добавляет указания пользователя и описание `/workspace` в контекст
 io:
-- [←, Bootstrap, агент и задание]
-- [↔, Memory, '`M3Record`, контекст памяти (I11)']
-- [←, Agent Runner, '`UserMessage` (I7)']
-- [→, LLM client, запрос к модели по слоям]
+- {dir: ←, with: Bootstrap, what: агент и задание}
+- {dir: ↔, with: Memory, what: '`M3Record`, контекст памяти', via: [I11]}
+- {dir: ←, with: Agent Runner, model: [UserMessage], via: [I7]}
+- {dir: →, with: LLM client, what: запрос к модели по слоям}
 data:
-- [memory_m3, 'чтение, запись через Memory API (I11, владелец — Memory)']
-- [project_platform, 'чтение через Runner: `guidance` в `RunBundle` (владелец — Platform module)']
+- {table: memory_m3, why: 'чтение, запись через Memory API (I11, владелец — Memory)'}
+- {table: project_platform, access: read, why: 'через Runner: `guidance` в `RunBundle` (владелец — Platform module)'}
 reqs: [R-HRN-07, R-HRN-16, R-HRN-17, R-HRN-18]
 tasks: ['1.3', '1.6', '3.8']
 failures:
-- Даже после сжатия контекст не помещается — запуск `limit` с причиной `context_overflow` (R-HRN-07)
-- Memory API недоступен — запуск идёт без M3 / M2, событие-предупреждение; запись M3 повторяется в конце (FMEA agent-harness)
-- Инструкция или задача требуют игнорировать правила платформы — правила действуют, событие «конфликт слоёв»
+- {when: Даже после сжатия контекст не помещается, then: запуск `limit` с причиной `context_overflow`, reqs: [R-HRN-07]}
+- {when: Memory API недоступен, then: 'запуск идёт без M3 / M2, событие-предупреждение; запись M3 повторяется в конце', fmea: agent-harness}
+- {when: Инструкция или задача требуют игнорировать правила платформы, then: 'правила действуют, событие «конфликт слоёв»'}
 why: Длинные задачи не падают на окне модели, токены не тратятся на лишнее.
 rnd: memory-model.md
 ops:
-- ['узел `context`: сборка запроса по слоям — промпт платформы → руководство проекта → инструкция и навыки → тулы и рабочее пространство → память → задание → указания', граф LangGraph, внутри]
-- [чтение контекста памяти и запись M3, Context Manager → Memory API, I11]
-- ['`POST /run/message` — указание пользователя в контекст следующего шага', Agent Runner, I7]
+- {op: 'узел `context`: сборка запроса по слоям — промпт платформы → руководство проекта → инструкция и навыки → тулы и рабочее пространство → память → задание → указания', label: граф LangGraph, internal: true}
+- {op: чтение контекста памяти и запись M3, label: Context Manager → Memory API, via: [I11]}
+- {op: указание пользователя в контекст следующего шага, endpoint: POST /run/message, who: Agent Runner, via: [I7]}

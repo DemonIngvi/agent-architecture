@@ -3,26 +3,26 @@ tech: Go, протокол раннера ICPlan `@itsaplan/runner` (D3, D8)
 kind: service
 stories: [US-RUN-01, US-RUN-05]
 params:
-- [poll_interval_ms, '3000']
-- [agents, ключи обслуживаемых агентов (обязательный)]
+- {name: poll_interval_ms, value: '3000'}
+- {name: agents, value: ключи обслуживаемых агентов (обязательный)}
 does:
 - Опрашивает очередь ICPlan по ключу каждого обслуживаемого агента
 - Берёт запуск с арендой и создаёт у себя запись `run_id` в статусе `queued` (R-RUN-01)
 - При ошибках ICPlan повторяет опрос с backoff до 60 с; активные запуски при этом продолжаются
 io:
-- [←, ICPlan Run Queue, '`Run` — выдача с арендой (I1)']
-- [→, Scheduler, '`Run` в статусе `queued`']
+- {dir: ←, label: ICPlan Run Queue, model: [Run], what: выдача с арендой, via: [I1]}
+- {dir: →, with: Scheduler, what: '`Run` в статусе `queued`'}
 data:
-- [agent_run, 'чтение через I1 (`POST /agent-runs/claim`): таблица ICPlan, напрямую не читает']
+- {table: agent_run, access: read, via: [I1], why: '(`POST /agent-runs/claim`): таблица ICPlan, напрямую не читает'}
 reqs: [R-RUN-01, R-ICP-02, R-ICP-03, R-ICP-09, R-RUN-14, R-RUN-15, R-RUN-13]
 tasks: ['2.1']
 failures:
-- ICPlan недоступен — опрос с backoff до 60 с, активные запуски продолжаются, события буферизуются (FMEA «ICPlan недоступен», R-RUN-14)
-- Несовместимая версия протокола — Runner не берёт запуски (R-ICP-09)
-- Ключ агента отклонён (401) — опрос этого агента не повторяется, событие с причиной (R-RUN-13 «Аутентификация»)
-- Runner упал после claim — аренда истекает, ICPlan выдаёт запуск снова (R-ICP-03 «Runner упал после получения»)
+- {when: ICPlan недоступен, then: 'опрос с backoff до 60 с, активные запуски продолжаются, события буферизуются (FMEA «ICPlan недоступен», R-RUN-14)'}
+- {when: Несовместимая версия протокола, then: Runner не берёт запуски, reqs: [R-ICP-09]}
+- {when: Ключ агента отклонён (401), then: 'опрос этого агента не повторяется, событие с причиной (R-RUN-13 «Аутентификация»)'}
+- {when: Runner упал после claim, then: 'аренда истекает, ICPlan выдаёт запуск снова (R-ICP-03 «Runner упал после получения»)'}
 why: 'Pull-модель: ICPlan не нужно знать адрес Runner.'
 rnd: runner-and-scheduling.md
 ops:
-- ['`POST /agent-runs/claim` — взять запуск с арендой по ключу агента', Poller раз в `poll_interval_ms` по каждому ключу из `agents`, I1]
-- [передать взятый запуск в Scheduler (статус `queued`), Poller, внутри]
+- {op: взять запуск с арендой по ключу агента, endpoint: POST /agent-runs/claim, label: Poller раз в `poll_interval_ms` по каждому ключу из `agents`, via: [I1]}
+- {op: передать взятый запуск в Scheduler (статус `queued`), who: Poller, internal: true}

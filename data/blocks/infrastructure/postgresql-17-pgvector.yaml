@@ -3,22 +3,22 @@ tech: PostgreSQL 17 под CloudNativePG v1.30, образ с pgvector
 kind: store
 stories: [US-INF-04]
 params:
-- [postgres.backup.target, 'куда класть копии: S3 вне узла']
+- {name: postgres.backup.target, value: 'куда класть копии: S3 вне узла'}
 does:
 - Хранит данные ICPlan, платформы, LiteLLM, checkpoint
 io:
-- [←, PgBouncer, SQL по роли на схему (I22)]
-- [→, Резервное хранилище S3 вне узла, базовые копии и WAL]
+- {dir: ←, with: PgBouncer, what: SQL по роли на схему, via: [I22]}
+- {dir: →, with: Резервное хранилище S3 вне узла, what: базовые копии и WAL}
 data:
-- [agent_run, 'хранение: БД `itsaplan`, схема `public` (владелец — ICPlan)']
-- [run_checkpoint, 'хранение: БД `itsaplan`, схема `harness_ckpt` (владелец — Agent Runner)']
-- [memory_m3, 'хранение: БД `itsaplan`, схема `memory` (владелец — Memory)']
-- [LiteLLM_SpendLogs, 'хранение: БД `litellm` (владелец — LiteLLM)']
+- {table: agent_run, access: store, why: 'БД `itsaplan`, схема `public` (владелец — ICPlan)'}
+- {table: run_checkpoint, access: store, why: 'БД `itsaplan`, схема `harness_ckpt` (владелец — Agent Runner)'}
+- {table: memory_m3, access: store, why: 'БД `itsaplan`, схема `memory` (владелец — Memory)'}
+- {table: LiteLLM_SpendLogs, access: store, why: БД `litellm` (владелец — LiteLLM)}
 reqs: [R-INF-06, R-INF-14, R-INF-16]
 tasks: ['4.7']
 failures:
-- Postgres недоступен — сервисы не готовы, запуски не стартуют; CloudNativePG перезапускает, восстановление из бэкапа (FMEA platform-infrastructure; R-INF-16)
-- Переполнен диск — запись в БД и хранилище останавливается; очистка по срокам, расширение диска (R-INF-16)
+- {when: Postgres недоступен, then: 'сервисы не готовы, запуски не стартуют; CloudNativePG перезапускает, восстановление из бэкапа', fmea: platform-infrastructure, reqs: [R-INF-16]}
+- {when: Переполнен диск, then: 'запись в БД и хранилище останавливается; очистка по срокам, расширение диска', reqs: [R-INF-16]}
 why: Одна СУБД на всё; оператор даёт бэкап и восстановление.
 rnd: data-stores.md
 schema: 'Один кластер CloudNativePG: БД `itsaplan` (схемы `public`, `platform`, `harness_ckpt`) и БД `litellm`; роль на схему; базовые копии и WAL — в S3 вне узла.'

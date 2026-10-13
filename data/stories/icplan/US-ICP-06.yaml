@@ -6,8 +6,8 @@ accept:
 - Несовместимая версия протокола → предупреждение
 - Runner вернулся → статус «в сети», очередь разбирается
 reqs:
-- 'icplan-integration: Каталог агентов платформы'
-- 'icplan-integration: Версия протокола'
+- {spec: icplan-integration, title: Каталог агентов платформы}
+- {spec: icplan-integration, title: Версия протокола}
 entry: Команда → ИИ-агенты
 chain:
   path: [US-ICP-06, US-RUN-05, US-INF-03]

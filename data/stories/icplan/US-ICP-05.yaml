@@ -7,9 +7,9 @@ accept:
 - Переход в другой процесс → тип задачи меняется, задача на первом шаге нового процесса
 - Конфликт правил → явный делегат → шаг процесса → Действие
 reqs:
-- 'icplan-agent-autopickup: Определение процесса'
-- 'icplan-agent-autopickup: Тип задачи задаёт процесс'
-- 'icplan-agent-autopickup: Приоритет правил'
+- {spec: icplan-agent-autopickup, title: Определение процесса}
+- {spec: icplan-agent-autopickup, title: Тип задачи задаёт процесс}
+- {spec: icplan-agent-autopickup, title: Приоритет правил}
 entry: Настройки проекта → Процессы
 chain:
   path: [US-ICP-05, US-ICP-26, US-ICP-27]

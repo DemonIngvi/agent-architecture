@@ -3,15 +3,15 @@ processes:
   stories: [US-INF-05]
   lanes: [Эксплуатация, k3s / Helm, Данные]
   steps:
-  - [s, 0, start, Новая версия, [[t1, '']]]
-  - [t1, 1, task, helm upgrade, [[g1, '']]]
-  - [g1, 1, gateway, 'Миграции нужны?', [[t2, да], [t3, нет]]]
-  - [t2, 2, task, Миграции БД, [[t3, '']]]
-  - [t3, 1, task, Реплики по одной, [[g2, '']]]
-  - [g2, 1, gateway, 'Readiness ок?', [[e1, да], [t4, нет]]]
-  - [t4, 1, task, Откат ревизии, [[x1, '']]]
-  - [x1, 0, error, Разбор инцидента, []]
-  - [e1, 0, end, Версия выпущена, []]
+  - {id: s, lane: 0, type: start, label: Новая версия, next: [t1]}
+  - {id: t1, lane: 1, type: task, label: helm upgrade, next: [g1]}
+  - {id: g1, lane: 1, type: gateway, label: 'Миграции нужны?', next: [{to: t2, label: да}, {to: t3, label: нет}]}
+  - {id: t2, lane: 2, type: task, label: Миграции БД, next: [t3]}
+  - {id: t3, lane: 1, type: task, label: Реплики по одной, next: [g2]}
+  - {id: g2, lane: 1, type: gateway, label: 'Readiness ок?', next: [{to: e1, label: да}, {to: t4, label: нет}]}
+  - {id: t4, lane: 1, type: task, label: Откат ревизии, next: [x1]}
+  - {id: x1, lane: 0, type: error, label: Разбор инцидента}
+  - {id: e1, lane: 0, type: end, label: Версия выпущена}
   artifacts:
     t1: [ревизия Helm-релиза]
     t2: [миграция схемы]
@@ -21,14 +21,14 @@ processes:
   stories: [US-INF-01, US-INF-02, US-INF-06]
   lanes: [Эксплуатация / QA, k3s / Helm, Пользователь]
   steps:
-  - [s, 0, start, Чистый сервер, [[ck, '']]]
-  - [ck, 1, gateway, 'Ресурсов хватает?', [[in, да], [x, нет]]]
-  - [x, 0, error, Ошибка до установки, []]
-  - [in, 1, task, helm install по порядку готовности, [[tl, '']]]
-  - [tl, 1, task, 'Ingress, TLS (ACME)', [[us, '']]]
-  - [us, 2, task, ICPlan по HTTPS, [[lc, '']]]
-  - [lc, 0, task, Локальная среда с mock-LLM, [[e, '']]]
-  - [e, 0, end, Среда готова, []]
+  - {id: s, lane: 0, type: start, label: Чистый сервер, next: [ck]}
+  - {id: ck, lane: 1, type: gateway, label: 'Ресурсов хватает?', next: [{to: in, label: да}, {to: x, label: нет}]}
+  - {id: x, lane: 0, type: error, label: Ошибка до установки}
+  - {id: in, lane: 1, type: task, label: helm install по порядку готовности, next: [tl]}
+  - {id: tl, lane: 1, type: task, label: 'Ingress, TLS (ACME)', next: [us]}
+  - {id: us, lane: 2, type: task, label: ICPlan по HTTPS, next: [lc]}
+  - {id: lc, lane: 0, type: task, label: Локальная среда с mock-LLM, next: [e]}
+  - {id: e, lane: 0, type: end, label: Среда готова}
   artifacts:
     in: [релизы Helm]
     tl: [сертификат]
@@ -37,14 +37,14 @@ processes:
   stories: [US-INF-03, US-INF-04, US-INF-07]
   lanes: [Эксплуатация / Безопасность, Кластер, Данные]
   steps:
-  - [s, 0, start, Плановая работа или инцидент, [[g, '']]]
-  - [g, 0, gateway, 'Что?', [[ld, нагрузка], [bk, бэкап], [sc, секрет]]]
-  - [ld, 1, task, 'Нагрузочный тест, очередь при пике', [[e, '']]]
-  - [bk, 2, task, Бэкап вне узла / восстановление, [[vr, '']]]
-  - [vr, 2, gateway, 'Восстановление прошло?', [[e, да], [xe, нет]]]
-  - [xe, 2, error, 'Проверка восстановления не прошла, пересмотр оператора', []]
-  - [sc, 1, task, Смена секрета без простоя, [[e, '']]]
-  - [e, 0, end, Платформа устойчива, []]
+  - {id: s, lane: 0, type: start, label: Плановая работа или инцидент, next: [g]}
+  - {id: g, lane: 0, type: gateway, label: 'Что?', next: [{to: ld, label: нагрузка}, {to: bk, label: бэкап}, {to: sc, label: секрет}]}
+  - {id: ld, lane: 1, type: task, label: 'Нагрузочный тест, очередь при пике', next: [e]}
+  - {id: bk, lane: 2, type: task, label: Бэкап вне узла / восстановление, next: [vr]}
+  - {id: vr, lane: 2, type: gateway, label: 'Восстановление прошло?', next: [{to: e, label: да}, {to: xe, label: нет}]}
+  - {id: xe, lane: 2, type: error, label: 'Проверка восстановления не прошла, пересмотр оператора'}
+  - {id: sc, lane: 1, type: task, label: Смена секрета без простоя, next: [e]}
+  - {id: e, lane: 0, type: end, label: Платформа устойчива}
   artifacts:
     ld: [отчёт нагрузочного теста]
     bk: [копия БД, восстановленная БД]

@@ -3,22 +3,22 @@ store: S2
 owner: platform-module
 schema: itsaplan.platform
 columns:
-- [agent_id, int, 'PK, FK ai_agent', '']
-- [version, int, '', текущая версия]
-- [autonomy_level, text, '', R0–R5]
-- [budget_run_usd, numeric, '', '']
-- [budget_day_usd, numeric, '', '']
-- [sandbox_profile_id, int, FK sandbox_profile, '']
-- [memory_profile_id, int, FK memory_profile, '']
-- [tools_allow, jsonb, '', '']
-- [approval_tools, jsonb, '', '']
-- [scheduling, jsonb, '', 'parallel, max']
-- [updated_by, text, '', '']
-- [updated_at, timestamptz, '', '']
+- {name: agent_id, type: int, pk: true, fk: ai_agent}
+- {name: version, type: int, desc: текущая версия}
+- {name: autonomy_level, type: text, desc: R0–R5}
+- {name: budget_run_usd, type: numeric}
+- {name: budget_day_usd, type: numeric}
+- {name: sandbox_profile_id, type: int, fk: sandbox_profile}
+- {name: memory_profile_id, type: int, fk: memory_profile}
+- {name: tools_allow, type: jsonb}
+- {name: approval_tools, type: jsonb}
+- {name: scheduling, type: jsonb, desc: 'parallel, max'}
+- {name: updated_by, type: text}
+- {name: updated_at, type: timestamptz}
 policy:
   indexes:
-  - [index, sandbox_profile_id, FK]
-  - [index, memory_profile_id, FK]
+  - {kind: index, columns: [sandbox_profile_id], why: FK}
+  - {kind: index, columns: [memory_profile_id], why: FK}
   retention: пока жив агент
   cleanup: каскадно с агентом
   migrate: cp

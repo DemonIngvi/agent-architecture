@@ -6,9 +6,9 @@ accept:
 - Нет прошлых запусков → задание без них
 - Вложение недоступно → в задании пометка, работа продолжается
 reqs:
-- 'icplan-agent-autopickup: Передача результата следующему этапу'
-- 'agent-memory: История запусков в контексте'
-- 'tool-integration: MCP-сервер ICPlan'
+- {spec: icplan-agent-autopickup, title: Передача результата следующему этапу}
+- {spec: agent-memory, title: История запусков в контексте}
+- {spec: tool-integration, title: MCP-сервер ICPlan}
 entry: задание запуска (`Run`)
 chain:
   path: [US-ICP-29, US-MEM-01, US-MEM-02, US-MEM-08, US-MCP-02]

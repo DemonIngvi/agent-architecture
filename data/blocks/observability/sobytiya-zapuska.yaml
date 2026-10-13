@@ -3,32 +3,32 @@ tech: Таблица `run_event` в БД ICPlan (схема `platform`, S3)
 kind: service
 stories: [US-OBS-01, US-OBS-02, US-OBS-03]
 params:
-- [events.level, всё]
-- [retention_days, '90']
+- {name: events.level, value: всё}
+- {name: retention_days, value: '90'}
 does:
 - Принимает пакеты `RunEvent` от Runner, маскирует секреты и персональные данные до записи и хранит события AG-UI по `(run_id, seq)`
 - Собирает дельты `*_CONTENT` в одно сообщение на `*_END`; дельты уходят только в живой поток
 - Отдаёт чат запуска в задаче (живой поток и история по шагам процесса) и трассу запусков по задаче, агенту и версии
 - Удаляет события старше `retention_days`; агрегаты затрат и срабатываний guardrails остаются
 io:
-- [←, Event relay, 'пакеты `RunEvent` с `seq` (I2)']
-- [←, Guardrails (аудит), 'решения G1–G4 как события `CUSTOM` `guardrail_decision`']
-- [→, Task UI ICPlan, 'чат запуска: поток событий и история (I20)']
+- {dir: ←, with: Event relay, what: пакеты `RunEvent` с `seq`, via: [I2]}
+- {dir: ←, label: Guardrails (аудит), what: решения G1–G4 как события `CUSTOM` `guardrail_decision`}
+- {dir: →, label: Task UI ICPlan, what: 'чат запуска: поток событий и история', via: [I20]}
 data:
-- [run_event, 'запись, чтение, очистка по сроку (владелец — Observability, S3)']
-- [issue, 'чтение: лента событий по задаче (`issue_id`, владелец — ICPlan)']
+- {table: run_event, why: 'запись, чтение, очистка по сроку (владелец — Observability, S3)'}
+- {table: issue, access: read, why: 'лента событий по задаче (`issue_id`, владелец — ICPlan)'}
 reqs: [R-OBS-01, R-OBS-02, R-OBS-03, R-OBS-04, R-OBS-06, R-OBS-08, R-OBS-09, R-OBS-10, R-ICP-04, R-GRD-16]
 tasks: ['3.3']
 failures:
-- S3 недоступно — события буферизуются у Runner, запуск продолжается, чат запуска временно неполный; досылка по `seq` без дублей (FMEA «Нет записи событий», «Postgres событий (S3) недоступен», R-OBS-10)
-- Таблица событий переполняется — очистка по сроку, предупреждение эксплуатации; уровень детализации меняет только эксплуатация (`events.level`) (FMEA «Переполнение таблицы событий»)
-- Повтор пакета после сбоя I2 — дубля нет, дедупликация по `(run_id, seq)` (R-OBS-09)
-- Секрет или значение Secret платформы в событии — значение маскируется до записи (R-OBS-04)
-- Событий нет (срок истёк) — разбор запуска показывает агрегаты затрат без шагов (R-OBS-06)
+- {when: S3 недоступно, then: 'события буферизуются у Runner, запуск продолжается, чат запуска временно неполный; досылка по `seq` без дублей (FMEA «Нет записи событий», «Postgres событий (S3) недоступен», R-OBS-10)'}
+- {when: Таблица событий переполняется, then: 'очистка по сроку, предупреждение эксплуатации; уровень детализации меняет только эксплуатация (`events.level`) (FMEA «Переполнение таблицы событий»)'}
+- {when: Повтор пакета после сбоя I2, then: 'дубля нет, дедупликация по `(run_id, seq)`', reqs: [R-OBS-09]}
+- {when: Секрет или значение Secret платформы в событии, then: значение маскируется до записи, reqs: [R-OBS-04]}
+- {when: Событий нет (срок истёк), then: разбор запуска показывает агрегаты затрат без шагов, reqs: [R-OBS-06]}
 why: Самый дешёвый способ дать чат запуска в MVP — таблица в той же БД, без новых сервисов (D12).
 rnd: observability.md
 ops:
-- ['`POST /agent-runs/:runId/events` — принять `{events: RunEvent[]}`, маскировать, записать в `run_event`', Event relay, I2]
-- ['`GET /agent-runs/:runId/stream` — живой поток событий запуска (SSE)', Task UI ICPlan, I20]
-- ['`GET /issues/:issueId/agent-feed` — история чата запусков задачи по шагам процесса', Task UI ICPlan, I20]
-- [очистка событий старше `retention_days` по `ts` (ночная), Observability, внутри]
+- {op: 'принять `{events: RunEvent[]}`, маскировать, записать в `run_event`', endpoint: 'POST /agent-runs/:runId/events', who: Event relay, via: [I2]}
+- {op: живой поток событий запуска (SSE), endpoint: 'GET /agent-runs/:runId/stream', label: Task UI ICPlan, via: [I20]}
+- {op: история чата запусков задачи по шагам процесса, endpoint: 'GET /issues/:issueId/agent-feed', label: Task UI ICPlan, via: [I20]}
+- {op: очистка событий старше `retention_days` по `ts` (ночная), who: Observability, internal: true}

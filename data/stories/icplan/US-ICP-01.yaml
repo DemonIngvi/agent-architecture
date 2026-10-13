@@ -9,10 +9,10 @@ accept:
 - Лимит запусков на шаге превышен → переход при ошибке
 - Повторный вход в шаг при активном запуске → второго запуска нет
 reqs:
-- 'icplan-agent-autopickup: Агент шага процесса'
-- 'icplan-agent-autopickup: Переход по итогу запуска'
-- 'icplan-agent-autopickup: Защита от дублей'
-- 'icplan-agent-autopickup: Поведение при отказах зависимостей'
+- {spec: icplan-agent-autopickup, title: Агент шага процесса}
+- {spec: icplan-agent-autopickup, title: Переход по итогу запуска}
+- {spec: icplan-agent-autopickup, title: Защита от дублей}
+- {spec: icplan-agent-autopickup, title: Поведение при отказах зависимостей}
 entry: 'создание задачи: доска, Telegram-бот, API; перевод в колонку'
 chain:
   path: [US-ICP-01, US-ICP-07, US-GRD-03, US-RUN-01, US-SBX-01, US-SBX-05, US-MEM-07, US-MEM-01, US-HAR-01, US-MCP-02, US-LLM-03, US-OBS-01, US-ICP-02]

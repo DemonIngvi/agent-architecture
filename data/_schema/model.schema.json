@@ -1,0 +1,156 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "title": "Единица «model»",
+ "description": "Единица data/ вида «model». Генерируется: python html-view/doctool.py yaml-schema (не править руками).",
+ "type": "object",
+ "properties": {
+  "purpose": {
+   "type": "string",
+   "description": "назначение модели"
+  },
+  "fields": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "поле модели"
+     },
+     "type": {
+      "type": "string",
+      "description": "тип: int, string, enum: …, Модель, Модель[]"
+     },
+     "required": {
+      "type": "boolean",
+      "description": "обязательное"
+     },
+     "desc": {
+      "type": "string",
+      "description": "описание"
+     },
+     "via": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/icode"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "I-коды интерфейса (data/integrations.yaml)"
+     },
+     "reqs": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/req"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "R-коды требований"
+     },
+     "decisions": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/decision"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "решения D<N> (design.md)"
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "name",
+     "type",
+     "required",
+     "desc"
+    ]
+   },
+   "description": "поля: {name, type, required, desc}"
+  },
+  "source": {
+   "type": "object",
+   "properties": {
+    "kind": {
+     "type": "string",
+     "enum": [
+      "fork",
+      "ours",
+      "ext"
+     ],
+     "description": "fork — форк ICPlan, ours — наша, ext — внешний стандарт"
+    },
+    "refs": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "pattern": "^(?:I\\d+|R-[A-Z]+-\\d+|D\\d+|US-[A-Z]+-\\d+)$"
+     },
+     "description": "основание — ID: R-…, D<N>, I…, US-…"
+    },
+    "ref": {
+     "type": "string",
+     "description": "основание текстом: URL, эндпоинт, схема форка"
+    },
+    "part": {
+     "type": "string",
+     "description": "часть источника"
+    },
+    "why": {
+     "type": "string",
+     "description": "почему так"
+    }
+   },
+   "additionalProperties": false,
+   "required": [
+    "kind",
+    "why"
+   ],
+   "anyOf": [
+    {
+     "required": [
+      "refs"
+     ]
+    },
+    {
+     "required": [
+      "ref"
+     ]
+    }
+   ],
+   "description": "источник: {kind, refs | ref, part, why}"
+  },
+  "field_src": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "string"
+   }
+  },
+  "planned": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "string"
+   }
+  }
+ },
+ "additionalProperties": false,
+ "required": [
+  "purpose",
+  "fields",
+  "source"
+ ]
+}

@@ -3,36 +3,36 @@ tech: Модуль форка ICPlan (TypeScript), схема `platform` в Post
 kind: service
 stories: [US-PM-01, US-PM-02, US-PM-04, US-PM-07]
 params:
-- [concurrency, '1']
-- [prompt.guidance_max_chars, '4000']
-- [version, последняя]
+- {name: concurrency, value: '1'}
+- {name: prompt.guidance_max_chars, value: '4000'}
+- {name: version, value: последняя}
 does:
 - 'CRUD наших настроек агента: права по роли ICPlan, проверка границ и потолков, каждое изменение — версия'
 - Отдаёт настройки Runner, LiteLLM, OPA
 - Отдаёт Runner определение и настройки версии запуска одним ответом — `GET /platform/runs/:runId/agent` (I4, D23); таблицы Registry читает той же ролью `itsaplan`
 io:
-- [←, ICPlan UI, 'настройки агента и проекта, профили, kill switch (I20)']
-- [←, Agent Runner, 'запрос определения и настроек версии запуска (I4)']
-- [→, LiteLLM, 'лимиты и алиасы ключей (I15)']
-- [→, OPA, 'данные правил — bundle (I16)']
+- {dir: ←, label: ICPlan UI, what: 'настройки агента и проекта, профили, kill switch', via: [I20]}
+- {dir: ←, with: Agent Runner, what: запрос определения и настроек версии запуска, via: [I4]}
+- {dir: →, label: LiteLLM, what: лимиты и алиасы ключей, via: [I15]}
+- {dir: →, with: OPA, what: данные правил — bundle, via: [I16]}
 data:
-- [agent_settings, 'запись, чтение: настройки агента']
-- [agent_settings_version, 'запись, чтение: версия при каждом изменении']
-- [project_platform, 'запись, чтение: руководство, бюджет, шаг подготовки проекта']
-- [project_resource, 'запись, чтение: ресурсы проекта']
-- [access_policy, 'запись, чтение: доступы агентов к ресурсам']
-- [kill_switch, 'запись, чтение: аварийная остановка']
-- [ai_agent, 'чтение: определение агента для ответа Runner']
+- {table: agent_settings, access: read-write, why: настройки агента}
+- {table: agent_settings_version, access: read-write, why: версия при каждом изменении}
+- {table: project_platform, access: read-write, why: 'руководство, бюджет, шаг подготовки проекта'}
+- {table: project_resource, access: read-write, why: ресурсы проекта}
+- {table: access_policy, access: read-write, why: доступы агентов к ресурсам}
+- {table: kill_switch, access: read-write, why: аварийная остановка}
+- {table: ai_agent, access: read, why: определение агента для ответа Runner}
 reqs: [R-CP-01, R-CP-02, R-CP-03, R-CP-07, R-CP-11]
 tasks: ['4.4']
 failures:
-- БД платформы (S2) недоступна — сохранение настроек отклоняется с причиной, Runner не стартует новые запуски (FMEA control-plane)
-- Нет права `ai_agents` — запрос отклоняется 403, данные не меняются (R-CP-07)
-- Значение вне границ или выше потолка L0 — 400 с названием поля (R-CP-01)
-ops:
-- ['`GET`, `PATCH /platform/agents/:agentId/settings` — настройки агента', Администратор, I20]
-- ['`PUT /platform/projects/:projectKey/guidance`, `/budget`, `/access` — настройки проекта', Администратор, I20]
-- ['`GET /platform/runs/:runId/agent` — определение и настройки версии запуска', Agent Runner, I4]
-- ['`GET /platform/audit` — журнал изменений', Безопасность, I20]
+- {when: БД платформы (S2) недоступна, then: 'сохранение настроек отклоняется с причиной, Runner не стартует новые запуски', fmea: control-plane}
+- {when: Нет права `ai_agents`, then: 'запрос отклоняется 403, данные не меняются', reqs: [R-CP-07]}
+- {when: Значение вне границ или выше потолка L0, then: 400 с названием поля, reqs: [R-CP-01]}
 why: Одна БД и одна авторизация с ICPlan.
 rnd: config-storage.md
+ops:
+- {op: '`GET`, `PATCH /platform/agents/:agentId/settings` — настройки агента', label: Администратор, via: [I20]}
+- {op: '`PUT /platform/projects/:projectKey/guidance`, `/budget`, `/access` — настройки проекта', label: Администратор, via: [I20]}
+- {op: определение и настройки версии запуска, endpoint: 'GET /platform/runs/:runId/agent', who: Agent Runner, via: [I4]}
+- {op: журнал изменений, endpoint: GET /platform/audit, who: Безопасность, via: [I20]}

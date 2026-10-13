@@ -1,11 +1,11 @@
 purpose: процесс типа задачи (D17)
 fields:
-- [issueType, string, true, тип задачи]
-- [owner, string, true, '`username` владельца процесса']
-- [firstStep, string, true, '`id` первого шага']
-- [steps, 'ProcessStep[]', true, шаги]
-- [version, int, true, 'версия; растёт при каждом изменении; задача на шаге дорабатывает его по старой версии, следующий шаг берёт из новой']
+- {name: issueType, type: string, required: true, desc: тип задачи}
+- {name: owner, type: string, required: true, desc: '`username` владельца процесса'}
+- {name: firstStep, type: string, required: true, desc: '`id` первого шага'}
+- {name: steps, type: 'ProcessStep[]', required: true, desc: шаги}
+- {name: version, type: int, required: true, desc: 'версия; растёт при каждом изменении; задача на шаге дорабатывает его по старой версии, следующий шаг берёт из новой'}
 source:
   kind: ours
-  ref: D17
+  refs: [D17]
   why: 'Процесс задаётся на тип задачи: тип задачи = тип процесса. Шаги — колонка, агент и переходы; так ICPlan сам двигает задачу, агент колонку не меняет.'

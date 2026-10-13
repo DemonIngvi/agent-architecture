@@ -50,12 +50,12 @@ databases:
         migrate: litellm
         what: virtual keys, бюджеты, журнал затрат
 grants:
-- [memory, SELECT, itsaplan.public.agent_run, 'M2: итоги запусков']
-- [memory, SELECT, itsaplan.public.agent_chat_message, 'M1: переписка']
-- [memory, SELECT, itsaplan.public.issue_activity, 'M1, M2: комментарии и записи «агент взял / закончил» (D25)']
-- [memory, REFERENCES, itsaplan.public.issue, FK memory_m3.issue_id]
-- [runner, REFERENCES, itsaplan.public.agent_run, 'FK run_checkpoint.run_id, scheduler_slot']
-- [litellm_read (api ICPlan), SELECT, litellm.public.LiteLLM_SpendLogs, 'Observability: затраты задачи']
+- {role: memory, right: SELECT, table: itsaplan.public.agent_run, why: 'M2: итоги запусков'}
+- {role: memory, right: SELECT, table: itsaplan.public.agent_chat_message, why: 'M1: переписка'}
+- {role: memory, right: SELECT, table: itsaplan.public.issue_activity, why: 'M1, M2: комментарии и записи «агент взял / закончил» (D25)'}
+- {role: memory, right: REFERENCES, table: itsaplan.public.issue, why: FK memory_m3.issue_id}
+- {role: runner, right: REFERENCES, table: itsaplan.public.agent_run, why: 'FK run_checkpoint.run_id, scheduler_slot'}
+- {role: litellm_read (api ICPlan), right: SELECT, table: litellm.public.LiteLLM_SpendLogs, why: 'Observability: затраты задачи'}
 migrate:
   fork: Drizzle в форке (`packages/db`), применяются до старта `api`
   cp: миграции Platform module в `api` форка, своя таблица версий, только схема `platform`

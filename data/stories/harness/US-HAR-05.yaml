@@ -6,6 +6,6 @@ accept:
 - Перезапуск → продолжение с последнего checkpoint
 - Checkpoint недоступен → опасные действия отклоняются, событие
 reqs:
-- 'agent-harness: Пауза и возобновление'
-- 'agent-harness: Поведение при отказах зависимостей'
+- {spec: agent-harness, title: Пауза и возобновление}
+- {spec: agent-harness, title: Поведение при отказах зависимостей}
 entry: —

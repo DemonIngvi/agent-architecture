@@ -3,14 +3,14 @@ status: todo
 guardrails: G2
 desc: 'Агентский цикл на LangGraph: контекст → LLM → тулы, hooks, пауза на approve, возобновление, стрим шагов.'
 specs:
-- [Спека, openspec/changes/define-agent-platform/specs/agent-harness/spec.md]
-- [Схема, openspec/changes/define-agent-platform/specs/agent-harness/architecture.md]
+- {label: Спека, path: openspec/changes/define-agent-platform/specs/agent-harness/spec.md}
+- {label: Схема, path: openspec/changes/define-agent-platform/specs/agent-harness/architecture.md}
 tasks: ['1.3', '1.4', '1.5', '1.6', '1.7']
 about:
   chain:
-  - [Agent Runner, agent-runner]
-  - [Harness, harness]
-  - [LiteLLM gateway, llm-gateway]
+  - {label: Agent Runner, comp: agent-runner}
+  - {label: Harness, comp: harness}
+  - {label: LiteLLM gateway, comp: llm-gateway}
   purpose: 'Агентский цикл: делает из модели агента и заставляет его работать по правилам платформы.'
   does:
   - 'Собирает агента из определения: промпт, навыки, тулы, лимиты'

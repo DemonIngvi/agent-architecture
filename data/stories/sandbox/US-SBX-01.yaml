@@ -6,6 +6,6 @@ accept:
 - Пул пуст → холодный старт, событие
 - Контейнер после запуска уничтожается, не переиспользуется
 reqs:
-- 'agent-sandbox: Тёплый пул'
-- 'agent-sandbox: Среда на каждый запуск'
+- {spec: agent-sandbox, title: Тёплый пул}
+- {spec: agent-sandbox, title: Среда на каждый запуск}
 entry: —

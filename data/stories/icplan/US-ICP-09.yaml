@@ -6,10 +6,10 @@ accept:
 - Упомянут агент без доступа к проекту → ответ «нет доступа», запуска нет
 - Упоминание при активном запуске этого агента по задаче → сообщение попадает в текущий запуск, второго нет
 reqs:
-- 'icplan-integration: Получение запуска из очереди (pull)'
-- 'icplan-integration: Стрим шагов и итог в задачу'
-- 'agent-runner: Один запуск на задачу'
-- 'icplan-agent-autopickup: Триггеры запуска ICPlan'
+- {spec: icplan-integration, title: Получение запуска из очереди (pull)}
+- {spec: icplan-integration, title: Стрим шагов и итог в задачу}
+- {spec: agent-runner, title: Один запуск на задачу}
+- {spec: icplan-agent-autopickup, title: Триггеры запуска ICPlan}
 entry: комментарий с упоминанием
 chain:
   path: [US-ICP-09, US-RUN-01, US-MEM-06, US-HAR-01]

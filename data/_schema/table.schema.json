@@ -1,0 +1,202 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "title": "Единица «table»",
+ "description": "Единица data/ вида «table». Генерируется: python html-view/doctool.py yaml-schema (не править руками).",
+ "type": "object",
+ "properties": {
+  "kind": {
+   "type": "string",
+   "enum": [
+    "platform",
+    "fork",
+    "litellm"
+   ],
+   "description": "platform | fork | litellm"
+  },
+  "store": {
+   "anyOf": [
+    {
+     "$ref": "catalog.schema.json#/definitions/store"
+    },
+    {
+     "const": ""
+    }
+   ],
+   "description": "хранилище S<N>"
+  },
+  "owner": {
+   "anyOf": [
+    {
+     "$ref": "catalog.schema.json#/definitions/component"
+    },
+    {
+     "const": ""
+    }
+   ],
+   "description": "компонент-владелец"
+  },
+  "schema": {
+   "type": "string",
+   "pattern": "^(?:\\w+\\.\\w+)$",
+   "description": "база.схема"
+  },
+  "written": {
+   "type": "boolean",
+   "description": "форк: пишем в таблицу"
+  },
+  "columns": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "колонка"
+     },
+     "type": {
+      "type": "string",
+      "description": "тип SQL"
+     },
+     "pk": {
+      "type": "boolean",
+      "description": "входит в первичный ключ"
+     },
+     "fk": {
+      "anyOf": [
+       {
+        "$ref": "catalog.schema.json#/definitions/table"
+       },
+       {
+        "const": ""
+       }
+      ],
+      "description": "внешний ключ на таблицу (каталог)"
+     },
+     "key": {
+      "type": "string",
+      "description": "ключ текстом, если не PK / FK <таблица>"
+     },
+     "desc": {
+      "type": "string",
+      "description": "описание"
+     },
+     "via": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/icode"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "I-коды интерфейса (data/integrations.yaml)"
+     },
+     "reqs": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/req"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "R-коды требований"
+     },
+     "decisions": {
+      "type": "array",
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "catalog.schema.json#/definitions/decision"
+        },
+        {
+         "const": ""
+        }
+       ]
+      },
+      "description": "решения D<N> (design.md)"
+     }
+    },
+    "additionalProperties": false,
+    "required": [
+     "name",
+     "type"
+    ]
+   },
+   "description": "колонки: {name, type, pk, fk, desc}"
+  },
+  "policy": {
+   "type": "object",
+   "properties": {
+    "indexes": {
+     "anyOf": [
+      {
+       "type": "null"
+      },
+      {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "properties": {
+         "kind": {
+          "type": "string",
+          "enum": [
+           "unique",
+           "index",
+           "hnsw"
+          ],
+          "description": "unique | index | hnsw"
+         },
+         "columns": {
+          "type": "array",
+          "items": {
+           "type": "string"
+          },
+          "description": "колонки индекса (этой таблицы)"
+         },
+         "why": {
+          "type": "string",
+          "description": "зачем"
+         }
+        },
+        "additionalProperties": false,
+        "required": [
+         "kind",
+         "columns",
+         "why"
+        ]
+       }
+      }
+     ]
+    },
+    "retention": {
+     "type": "string"
+    },
+    "cleanup": {
+     "type": "string"
+    },
+    "migrate": {
+     "type": "string"
+    }
+   },
+   "additionalProperties": false,
+   "required": [
+    "indexes",
+    "retention",
+    "cleanup",
+    "migrate"
+   ],
+   "description": "индексы {kind, columns, why}, хранение, очистка, миграции"
+  }
+ },
+ "additionalProperties": false,
+ "required": [
+  "kind"
+ ]
+}

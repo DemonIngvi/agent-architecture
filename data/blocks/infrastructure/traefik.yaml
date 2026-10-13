@@ -3,22 +3,22 @@ tech: Traefik v3.7 (в составе k3s), MIT
 kind: service
 stories: [US-INF-02]
 params:
-- [ingress.host / tls, 'домен и сертификат: ACME по умолчанию, свой сертификат — по настройке']
+- {name: ingress.host / tls, value: 'домен и сертификат: ACME по умолчанию, свой сертификат — по настройке'}
 does:
 - Принимает внешний трафик по HTTPS
 - Маршрутизирует на сервисы ICPlan
 - Не публикует админки
 io:
-- [←, Пользователи, 'HTTPS-запросы к `web`, `api`, `/mcp` (I21)']
-- [→, ICPlan, 'маршрутизация на `web`, `api`, `/mcp` через Service ClusterIP (I21)']
+- {dir: ←, label: Пользователи, what: 'HTTPS-запросы к `web`, `api`, `/mcp`', via: [I21]}
+- {dir: →, with: ICPlan, what: 'маршрутизация на `web`, `api`, `/mcp` через Service ClusterIP', via: [I21]}
 data: 'нет: прокси без состояния — маршрутизирует HTTP(S), таблиц модели не хранит'
 reqs: [R-INF-04, R-INF-05, R-INF-16]
 tasks: ['4.6']
 failures:
-- Истёк TLS-сертификат — Traefik обновляет по ACME, при сбое предупреждение (FMEA platform-infrastructure; R-INF-16)
-- Запрос на админку (LiteLLM, OPA, Memory API, базы) — маршрута нет, ответ 404 (R-INF-04)
-- Нет готовых реплик сервиса — клиенты получают ошибку соединения (R-INF-05)
+- {when: Истёк TLS-сертификат, then: 'Traefik обновляет по ACME, при сбое предупреждение', fmea: platform-infrastructure, reqs: [R-INF-16]}
+- {when: 'Запрос на админку (LiteLLM, OPA, Memory API, базы)', then: 'маршрута нет, ответ 404', reqs: [R-INF-04]}
+- {when: Нет готовых реплик сервиса, then: клиенты получают ошибку соединения, reqs: [R-INF-05]}
 why: Встроен в k3s, ingress-nginx архивирован.
 rnd: ingress-and-balancing.md
 ops:
-- ['приём HTTPS, перенаправление HTTP на HTTPS, маршруты `web`, `api`, `/mcp` (Gateway API HTTPRoute)', Пользователи, I21]
+- {op: 'приём HTTPS, перенаправление HTTP на HTTPS, маршруты `web`, `api`, `/mcp` (Gateway API HTTPRoute)', label: Пользователи, via: [I21]}
