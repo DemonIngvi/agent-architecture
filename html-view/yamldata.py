@@ -1028,12 +1028,37 @@ def ref_ids(node) -> set:
 
 
 
+def _restore_ids(old, new):
+    """Вернуть в строки new ID полей via/reqs/decisions из old, если ID по-прежнему стоит в тексте строки:
+    join_ids не повторяет такой ID, и при записи поле пропало бы (ID в поле и в тексте — допустимое состояние, см. yamlmigrate.leftovers)."""
+    if isinstance(old, dict) and isinstance(new, dict):
+        lost = {k: [i for i in (old.get(k) or []) if i not in (new.get(k) or [])]
+                for k in ("via", "reqs", "decisions") if isinstance(old.get(k), list)}
+        text = " ".join(str(x) for x in new.values() if isinstance(x, str))
+        back = {k: [i for i in ids if re.search(rf"(?<![\w-]){re.escape(i)}(?![\w-])", text)] for k, ids in lost.items()}
+        if any(back.values()):
+            merged = {k: (list(new.get(k) or []) + back.get(k, [])) for k in ("via", "reqs", "decisions")}
+            merged = {k: [i for i in old.get(k) or [] if i in v] + [i for i in v if i not in (old.get(k) or [])]
+                      for k, v in merged.items() if v}
+            items = {**new, **merged}
+            order = [k for k in old if k in items] + [k for k in items if k not in old]
+            new.clear()
+            new.update({k: items[k] for k in order})
+        for k, x in new.items():
+            if k in old and k not in ("via", "reqs", "decisions"):
+                _restore_ids(old[k], x)
+    elif isinstance(old, list) and isinstance(new, list):
+        for o, n in zip(old, new):
+            _restore_ids(o, n)
+
+
 def write_unit(path: Path, kind: str, value, drop_ids=False) -> bool:
     """Записать единицу (в формате схемы). True — файл изменился.
     ID из полей via/reqs/decisions не теряются молча: join_ids не повторяет ID, уже стоящий в тексте, и при записи поле
     пропало бы — такая запись падает; намеренное удаление ID — drop_ids=True."""
     data = dump_unit(path, kind, value) if kind != "order" else value
     if path.exists() and not drop_ids and kind != "order":
+        _restore_ids(_read(path), data)
         lost = ref_ids(_read(path)) - ref_ids(data)
         if lost:
             raise ValueError(f"{path}: запись потеряла бы ID из полей: {', '.join(sorted(lost))} (намеренно — drop_ids=True)")

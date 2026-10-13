@@ -79,7 +79,9 @@ def migrate() -> tuple:
             vals[f] = (kind, v)
         lossy = set()
         for f, (kind, v) in vals.items():  # каталоги (yamlcat) уже собраны из прежнего вида — пишем новый
-            lost = Y.ref_ids(Y._read(f)) - Y.ref_ids(Y.dump_unit(f, kind, v))  # сначала всё собрать: ошибка сборки — до записи
+            d = Y.dump_unit(f, kind, v)
+            Y._restore_ids(Y._read(f), d)
+            lost = Y.ref_ids(Y._read(f)) - Y.ref_ids(d)  # сначала всё собрать: ошибка сборки — до записи
             if lost:  # ID из полей via/reqs/decisions пропал бы (join_ids не повторяет ID, уже стоящий в тексте)
                 lossy.add(f)
                 errors.append(f"{rel(f)}: не записан — пропали бы ID из полей: {', '.join(sorted(lost))}")
