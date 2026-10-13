@@ -385,3 +385,15 @@ costs:
   calls: 12
   context: 60422
   note: колонка «Тип» в таблицах параметров (8 видов грамматики), 73 параметра получили тип; parse_decl/value_ok в yamlcat; 9 пояснений из value → note (yaml-fmt)
+- date: '2026-10-13'
+  process: bulk-edit
+  methodology: change-process.md#bulk
+  units: 41
+  unit: файл
+  tokens: 429013
+  model: sonnet-5-5
+  expected: [3000, 10000]
+  agents: [ae331e4867f6e70ac]
+  calls: 8
+  context: 67500
+  note: 'остаток yaml-migrate 89→35: 2 правки via, leftovers() без ложных (_HAS, 52 строки); 35 — решения формата (endpoint списком, синонимы access, ?query)'

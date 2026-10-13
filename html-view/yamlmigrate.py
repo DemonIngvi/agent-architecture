@@ -112,6 +112,13 @@ _TEXT = {  # вид → (поле-список строк, текстовые п
 }
 
 
+# вид ссылки → поля, в которые она выносится, по виду строки (нет поля — остатком не считается)
+_HAS = {  # (поле таблицы) → I (via), R (reqs), D (decisions), M (модель), T (таблица), E (эндпоинт)
+    "io": "IRDM", "data": "I", "ops": "IRDE", "failures": "IRD", "screens": "E", "params": "",
+    "fields": "IRD", "columns": "IRD", "reqs": "",
+}
+
+
 def leftovers() -> list:
     """Строки, где в текстовом поле остались ID (I…, R-…, D…, US-…, `Модель`, `таблица`, `МЕТОД путь`) или участник не из каталога."""
     import yamlcat as C
@@ -137,11 +144,15 @@ def leftovers() -> list:
                     ids += [f"`{m}`" for m in re.findall(r"`((?:GET|POST|PUT|PATCH|DELETE) [^`]+)`", s)]
                     have = {str(x) for k in ("via", "reqs", "decisions", "model") for x in (r.get(k) or [])}
                     have |= {f"`{r[k]}`" for k in ("endpoint", "table") if r.get(k)} | {f"`{x}`" for x in (r.get("model") or [])}
-                    ids = [i for i in ids if i not in have]
+                    ok = _HAS.get(field, "IRDMTE")
+                    if field == "ops" and r.get("endpoint"):
+                        ok = ok.replace("E", "")  # поле endpoint одно: прочие упоминания в тексте — не остаток
+                    kind_of_id = lambda i: "E" if i[0] == "`" and " " in i else ("M" if i.strip("`") in models else "T") if i[0] == "`" else "I" if i[0] == "I" else "R" if i[0] == "R" else "D" if i[0] == "D" else "-"
+                    ids = [i for i in ids if i not in have and kind_of_id(i) in ok + "-"]
                     found += [f"{t}: {', '.join(dict.fromkeys(ids))}"] if ids else []
                 if field in ("io", "ops") and "label" in r:
                     found.append(f"участник «{r['label']}» не из каталога")
-                if field == "data" and "access" not in r:
+                if field == "data" and "access" not in r:  # доступ в тексте («чтение, запись») не равен слову схемы — остаётся текстом
                     found.append("доступ не распознан")
                 if found:
                     out.append(f"{rel(f)}: {field}[{n}] — " + "; ".join(found))
