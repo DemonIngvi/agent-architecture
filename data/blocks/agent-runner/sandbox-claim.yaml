@@ -16,7 +16,7 @@ io:
 - [→, Run supervisor, адрес среды]
 data:
 - [sandbox_profile, 'чтение через I4: профиль агента (владелец Platform module)']
-reqs: [R-SBX-01, R-SBX-02, R-SBX-11, R-RUN-14]
+reqs: [R-SBX-01, R-SBX-02, R-SBX-11, R-RUN-14, R-RUN-13]
 tasks: ['2.2', '4.1']
 failures:
 - Docker или пул недоступен — запуск остаётся в `queued`, повтор, событие оператору (FMEA «Docker / пул недоступен», R-RUN-14)

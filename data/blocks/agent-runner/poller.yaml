@@ -14,7 +14,7 @@ io:
 - [→, Scheduler, '`Run` в статусе `queued`']
 data:
 - [agent_run, 'чтение через I1 (`POST /agent-runs/claim`): таблица ICPlan, напрямую не читает']
-reqs: [R-RUN-01, R-ICP-02, R-ICP-03, R-ICP-09, R-RUN-14, R-RUN-15]
+reqs: [R-RUN-01, R-ICP-02, R-ICP-03, R-ICP-09, R-RUN-14, R-RUN-15, R-RUN-13]
 tasks: ['2.1']
 failures:
 - ICPlan недоступен — опрос с backoff до 60 с, активные запуски продолжаются, события буферизуются (FMEA «ICPlan недоступен», R-RUN-14)

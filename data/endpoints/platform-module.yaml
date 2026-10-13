@@ -5,7 +5,7 @@ GET /platform/agents/:agentId/settings:
 PATCH /platform/agents/:agentId/settings:
   request: AgentSettings (часть полей)
   response: 200 · AgentSettings (новая version)
-  note: со следующего запуска
+  note: 'со следующего запуска; ошибки: 400 — недопустимое значение с указанием поля и причины, значение выше потолка L0 — с названием потолка (R-CP-01); 403 — нет права `ai_agents` (R-CP-07); 503 — БД платформы недоступна, сохранение отклонено'
 GET /platform/agents/:agentId/export:
   request: —
   response: 200 · YAML определения агента
@@ -13,15 +13,15 @@ GET /platform/agents/:agentId/export:
 POST /platform/agents/import:
   request: YAML определения агента
   response: 200 · {agentId, version}
-  note: ''
+  note: 'ошибки: 400 — схема не `agent/v1` или ссылка на несуществующий объект (MCP-сервер и др.) с указанием ссылки (R-CP-05); 403 — нет права `ai_agents`'
 PUT /platform/projects/:projectKey/guidance:
   request: '{guidance: string}'
   response: '204'
-  note: ''
+  note: 'со следующего запуска (R-CP-14); ошибки: 400 — длиннее `prompt.guidance_max_chars` с указанием границы; 403 — нет права на изменение настроек (R-CP-07)'
 PUT /platform/projects/:projectKey/budget:
   request: '{monthUsd: number}'
   response: '204'
-  note: ''
+  note: 'ошибки: 400 — отрицательное значение или выше потолка с указанием поля (R-CP-01); 403 — нет права на изменение настроек (R-CP-07)'
 GET /platform/projects/:projectKey/access:
   request: —
   response: 200 · {agentId, resourceId, right}[]
@@ -29,7 +29,7 @@ GET /platform/projects/:projectKey/access:
 PUT /platform/projects/:projectKey/access:
   request: '{agentId, resourceId, right}[]'
   response: '204'
-  note: ''
+  note: 'ошибки: 400 — несуществующий агент или ресурс с указанием поля; 403 — нет права на изменение настроек (R-CP-07)'
 GET /platform/agents/:agentId/settings/versions:
   request: —
   response: 200 · {version, by, at}[]

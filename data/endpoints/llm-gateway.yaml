@@ -1,7 +1,7 @@
 POST /v1/chat/completions:
   request: ChatCompletionRequest
   response: 200 · ответ OpenAI Chat Completions (`choices`, `usage`)
-  note: mock — тот же формат
+  note: 'mock — тот же формат; ошибки: ошибка алиаса — несуществующий алиас; ошибка лимита — бюджет ключа исчерпан или превышен RPM / TPM; `all_providers_failed` — основная и резервная модели недоступны; вызов без `metadata.run_id` отклонён (R-LLM-03)'
 GET /model/info:
   request: —
   response: '200 · {data: {model_name, litellm_params, model_info}[]}'

@@ -437,12 +437,18 @@ def main():
         import review as RV
         mx = int(args[args.index("--max") + 1]) if "--max" in args else 40
         comp = next(x for x in args if not x.startswith("--") and not x.isdigit())
+        lg = LN.lint()
+        dirty = [c for c in comp.split(",") if lg.get(c)]
+        if dirty and "--force" not in args:  # механика — до ролей: роли не платят за то, что ловит lint (approval-methodology.md#economy)
+            print("\n".join(f"⛔ {c}: пробелов lint {len(lg[c])} — сначала закрыть (python html-view/doctool.py lint {c}); --force — взять всё равно" for c in dirty))
+            comp = ",".join(c for c in comp.split(",") if c not in dirty)
+            if not comp:
+                sys.exit(1)
         res = RV.batch(comp, mx)
         OVH = 19500  # накладные агента без тяжёлых инструментов (Explore / doc-batch-reviewer), замер 2026-10-13
         print("\n".join(f"{p.relative_to(ROOT).as_posix()}: страниц {n}, пар {k}, символов {c}, ≈{int(c / 1.6)} ток. карточек "
                         f"(кириллица ≈1,6 симв./ток.); с накладными агента ≈{(int(c / 1.6) + OVH + 100 * n) // max(n, 1)} на страницу"
                         for p, n, k, c, _ in res) or f"{comp}: ⏳ нет")
-        lg = LN.lint()
         for cc in comp.split(","):
             if lg.get(cc):
                 print(f"⚠️ lint {cc}: пробелов {len(lg[cc])} — роли их не повторяют (python html-view/doctool.py lint {cc})")

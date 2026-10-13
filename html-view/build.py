@@ -912,7 +912,7 @@ def block_card(slug: str, title: str, s: dict):
         "истории": bool(s.get("stories")),
         "вид и экраны / операции / схема": bool(s.get("kind")) and bool(s.get({"ui": "screens", "service": "ops", "store": "schema"}.get(s.get("kind"), "-"))),
         "входы и выходы": bool(s.get("io")),
-        "данные": bool(s.get("data")),
+        "данные": (isinstance(s.get("data"), str) and s["data"].startswith("нет: ")) or (bool(s.get("data")) and not isinstance(s.get("data"), str)),
         "параметры с именами из interfaces.md": (isinstance(s.get("params"), str) and s["params"].startswith("нет: "))
         or (bool(s.get("params")) and not isinstance(s["params"], str) and all(a in names for a, _ in s["params"])),
         "требования": bool(s.get("reqs")),
@@ -933,7 +933,7 @@ def block_check() -> list:
         where = f"блок «{title}» ({slug})"
         for w, x, y in s.get("io", []):
             issues += [f"{where}: I-код {i} нет в INTEG" for i in re.findall(r"\bI\d+\b", y + " " + x) if i not in DMx.INTEG]
-        for x, _ in s.get("data", []):
+        for x, _ in ([] if isinstance(s.get("data"), str) else s.get("data", [])):
             tname = x.split(" ")[0].strip("`")
             if not re.match(r"S\d+", tname) and tname not in tables:
                 issues.append(f"{where}: таблицы `{tname}` нет в модели данных")
@@ -1273,7 +1273,9 @@ def write_component_pages():
             L += ["", "## Схема", "", s["schema"]]
         if s.get("io"):
             L += ["", "## Входы и выходы", "", "| | С кем | Что |", "|---|---|---|"] + [f"| {cell(w)} | {cell(x)} | {cell(y)} |" for w, x, y in s["io"]]
-        if s.get("data"):
+        if isinstance(s.get("data"), str):
+            L += ["", "## Данные", "", "Таблиц " + s["data"]]
+        elif s.get("data"):
             L += ["", "## Данные", "", "| Таблица или хранилище | Как |", "|---|---|"] + [f"| `{cell(x)}` | {cell(y)} |" for x, y in s["data"]]
         if isinstance(s["params"], str):
             L += ["", "## Параметры", "", "Параметров " + s["params"]]

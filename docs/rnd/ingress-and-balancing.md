@@ -23,6 +23,9 @@ stack HAProxy Ingress: 4 ok, 2 part, 0 no
 bar Traefik: 0/2 ничего ok
 bar Envoy Gateway: 2/2 контроллер + cert-manager part
 bar HAProxy Ingress: 2/2 контроллер + cert-manager part
+# Объём доработки
+> у Traefik вход — одна подзадача 4.6.3 из 55 ч задачи 4.6; у остальных кандидатов оценок задач нет
+bar 4.6.3 Traefik, TLS ACME, маршруты HTTPRoute: 4/55 ч ok
 # Позиции ролей
 side Traefik | Envoy Gateway
 pos DevOps: -2 | уже в k3s, ACME встроен

@@ -9,7 +9,7 @@
 | Процесс | Методология | Единица | Ожидание на единицу | Последний замер на единицу | Статус | Дата |
 |---|---|---|---|---|---|---|
 | [Проверка ролями (пакет review-pack)](#review-pack) | [approval-methodology.md#economy](approval-methodology.md#economy) | пара документ×роль | 2,0 тыс. – 4,0 тыс. | 4,2 тыс. | ✅ | 2026-10-13 |
-| [Партия правок компонента по замечаниям](#bulk-edit) | [change-process.md#bulk](change-process.md#bulk) | компонент | 150,0 тыс. – 250,0 тыс. | 80,0 тыс. | ✅ | 2026-10-13 |
+| [Партия правок компонента по замечаниям](#bulk-edit) | [change-process.md#bulk](change-process.md#bulk) | компонент | 50,0 тыс. – 80,0 тыс. | 38,0 тыс. | ✅ | 2026-10-13 |
 | [Перевод отказов в lint](#lint-conversion) | [approval-methodology.md#economy](approval-methodology.md#economy) | замечание | 1,2 тыс. – 1,6 тыс. | 1,5 тыс. | ✅ | 2026-10-13 |
 | [Перенос данных в YAML](#yaml-migration) | [data-methodology.md#yaml](data-methodology.md#yaml) | файл | 900 – 1,3 тыс. | 1,1 тыс. | ✅ | 2026-10-13 |
 | [Перенос правил в методологию и «Справку»](#rules-transfer) | [change-process.md#rules-change](change-process.md#rules-change) | документ | — | 282,0 тыс. | — | 2026-10-13 |
@@ -47,6 +47,9 @@
 | 2026-10-13 | 1 | компонент | 158,0 тыс. | 158,0 тыс. | Opus | — | ✅ | ICPlan раунд 2, партия K: 13 замечаний |
 | 2026-10-13 | 1 | компонент | 188,0 тыс. | 188,0 тыс. | Opus | — | ✅ | Agent Runner |
 | 2026-10-13 | 2 | компонент | 160,0 тыс. | 80,0 тыс. | Opus | — | ✅ | Harness + Sandbox |
+| 2026-10-13 | 2 | компонент | 121,4 тыс. | 60,7 тыс. | sonnet | 4 | ✅ | lint-fix A: platform-module 28→0, icplan 14→0 по YAML-единицам |
+| 2026-10-13 | 3 | компонент | 185,1 тыс. | 61,7 тыс. | sonnet | 8 | ✅ | lint-fix B: memory 14→0, llm-gateway 14→0, infrastructure 18→4 ложных (данные нет); прерван лимитом |
+| 2026-10-13 | 6 | компонент | 228,3 тыс. | 38,0 тыс. | sonnet | 6 | ✅ | lint-fix C: agent-runner, observability, guardrails, harness, sandbox, mcp-tools → 0; прерван лимитом |
 
 ### Перевод отказов в lint {#lint-conversion}
 

@@ -166,7 +166,7 @@ def rule_block_refs(sub, tables):
         miss = sorted(set(re.findall(r"R-[A-Z]+-\d+", txt)) - set(s.get("reqs", [])))
         if miss and s.get("reqs"):  # пустые reqs / data — уже «карточка не заполнена»
             yield slug, f"блок «{title}»: {', '.join(miss)} названы в карточке, но не в «Требованиях» (reqs) → добавить"
-        data = {x.split(" ")[0].strip("`") for x, _ in s.get("data", [])}
+        data = {x.split(" ")[0].strip("`") for x, _ in ([] if isinstance(s.get("data"), str) else s.get("data", []))}
         tbl = sorted((set(re.findall(r"`([a-z][a-z0-9_]+)(?:\.[a-z0-9_]+)?`", txt)) & tables) - data)
         if tbl and data:
             yield slug, f"блок «{title}»: таблицы {', '.join(tbl)} названы в карточке, но не в «Данных» → добавить с доступом (чтение / запись)"
@@ -213,7 +213,7 @@ def lint() -> dict:
         for sc in s.get("screens", []):
             if sc[3] in ("новое", "доработка") and not ENDPOINT.search(sc[2]) and "не решено" not in sc[1]:
                 add(slug, f"блок «{title}», экран «{sc[0]}» ({sc[3]}): нет эндпоинта для действий")
-        for d, _ in s.get("data", []):
+        for d, _ in ([] if isinstance(s.get("data"), str) else s.get("data", [])):
             if re.match(r"S\d+\b", d):
                 add(slug, f"блок «{title}»: в «Данных» S-код «{d[:30]}» вместо имён таблиц")
     # API: изменяющие эндпоинты 🆕 / 🛠 без кодов ошибок (api-methodology.md)

@@ -1,8 +1,21 @@
 title: Spend log
 tech: LiteLLM spend logs (Postgres)
-params:
-- [Поля, 'ключ, модель, токены, $, metadata']
+kind: store
+stories: [US-LLM-03, US-LLM-05]
+params: 'нет: параметров у журнала затрат в interfaces.md нет, политика хранения — по LiteLLM'
 does:
 - Записывает расход каждого вызова
+- Учитывает токены и стоимость с привязкой к агенту и `run_id`
+io:
+- [←, Harness, 'вызовы модели с `metadata.run_id` (I8)']
+- [→, PostgreSQL 17, 'запись строки затрат в БД `litellm` (I14)']
+data:
+- [LiteLLM_SpendLogs, 'запись при каждом вызове, чтение для отчёта затрат (владелец — LiteLLM)']
+schema: 'Таблица `LiteLLM_SpendLogs`: ключ запроса, virtual key, модель, токены, стоимость, время и `metadata` (`run_id`, `issue_key`, агент). Стрим учитывается по завершении; неуспешный вызов — отдельно, без стоимости ответа.'
+reqs: [R-LLM-02, R-LLM-03]
+tasks: ['1.1', '4.5']
+failures:
+- Провайдер вернул ошибку — неуспешный вызов учитывается отдельно, без стоимости ответа (R-LLM-02)
+- БД `litellm` недоступна — проверка бюджетов невозможна, вызовы отклоняются (FMEA llm-gateway)
 why: Источник затрат по задаче и агенту.
 rnd: observability.md

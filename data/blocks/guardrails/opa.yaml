@@ -1,12 +1,34 @@
 title: OPA
 tech: Open Policy Agent v1.21.1 (Apache-2.0)
+kind: service
+stories: [US-GRD-01, US-GRD-02, US-GRD-06]
 params:
 - [engine, opa]
 - [on_engine_error, deny]
-- [Rego, git + opa test]
-- [Данные, Platform module]
+- [opa.cache_ttl_s, '60']
+- [bundles.<name>.resource, 'бандл `opa-bundle` (Rego из git + данные Platform module)']
 does:
-- Решения allow / deny / confirm для G1 и G2
-- Журнал решений
-why: Правила как код, тесты, аудит; CNCF graduated.
+- Решения allow / deny / confirm для G1 (допуск, бюджет) и G2 (действие агента) по `PolicyInput`
+- Загружает бандл (Rego из git и данные агентов из Platform module) опросом раз в 30 с; при битом бандле остаётся на прежнем
+- Кэширует решение для одинакового входа в запуске на `opa.cache_ttl_s`; каждое решение попадает в аудит с `run_id`
+io:
+- [←, Agent Runner (Admission), '`PolicyInput` G1 (I5)']
+- [←, Harness (hooks), '`PolicyInput` G2 (I10)']
+- [←, Platform module и git (Rego), 'bundle: правила и данные агентов (I16)']
+- [→, Agent Runner и Harness, '`PolicyDecision`: allow / deny / confirm с причиной и правилом']
+data:
+- [agent_settings, 'чтение через бандл: `tools_allow`, `approval_tools`, `autonomy_level`, бюджеты агента (владелец — Platform module)']
+- [kill_switch, 'чтение через бандл: аварийная остановка платформы и агентов (владелец — Platform module)']
+reqs: [R-GRD-01, R-GRD-02, R-GRD-03, R-GRD-07, R-GRD-08, R-GRD-11, R-GRD-15, R-GRD-16]
+tasks: ['4.3']
+failures:
+- 'OPA недоступен или ответил медленнее 200 мс — решение по `on_engine_error`: deny (`policy_unavailable`) по умолчанию, allow с пометкой «без проверки» только в dev (R-GRD-07, FMEA «OPA недоступен»)'
+- Битый Rego — OPA остаётся на прежнем бандле, ошибка загрузки видна (FMEA «Битый Rego»)
+- Нет данных правил агента — deny всех тулов, кроме явно разрешённых в L0 (FMEA «Нет данных правил агента»)
+- Хранилище правил недоступно — OPA работает на последнем загруженном бандле, без бандла — `on_engine_error` (FMEA «Хранилище правил недоступно»)
+why: Правила как код, тесты, аудит; CNCF graduated (решение D6).
 rnd: guardrails-engine.md
+ops:
+- ['`POST /v1/data/agent/g1` — решение допуска и бюджета', Agent Runner перед созданием sandbox, I5]
+- ['`POST /v1/data/agent/g2` — решение по вызову тула или записи в память', Harness hooks и MCP-прокси Runner, I10]
+- ['bundles API: загрузка `opa-bundle` раз в 30 с', OPA, I16]

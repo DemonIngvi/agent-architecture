@@ -20,7 +20,7 @@ io:
 data:
 - [run_checkpoint, 'запись, чтение: checkpoint цикла']
 - [agent_run, 'через I4: версия запуска `agent_version` закрепляется Platform module (таблица ICPlan)']
-reqs: [R-RUN-01, R-RUN-07, R-RUN-09, R-RUN-17, R-GRD-10, R-HRN-05, R-ICP-07]
+reqs: [R-RUN-01, R-RUN-07, R-RUN-09, R-RUN-17, R-GRD-10, R-HRN-05, R-ICP-07, R-RUN-14]
 tasks: ['2.1', '2.6']
 failures:
 - Нет настроек агента или агент выключен — запуск `agent_unavailable`, sandbox не создаётся (R-RUN-01, FMEA)

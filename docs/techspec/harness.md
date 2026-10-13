@@ -50,3 +50,18 @@
 ## Проверка после развёртывания
 
 - [ ] Сценарий mock-LLM проходит: шаги, вызов тула, итог
+
+## Пример конфигурации
+
+Как настройки лежат в развёртывании. Значения и границы параметров — в `interfaces.md` спеки (здесь новых не вводится); поля контрактов — в [Модели данных](../../data-model.md).
+
+Параметры уровня L0 (S9, `values.yaml` Agent Runner, в git, без секретов):
+
+```yaml
+harness:
+  image: "agent-harness:<версия>"    # HARNESS_IMAGE; prompt.platform_version = версия образа
+  prompt: { cache: true }            # false — если провайдер не поддерживает кэш префикса
+  request: { timeout_s: 120 }        # 10–600
+  hooks: [G2]                        # G2 | аудит | маскирование
+  checkpoint: { ttl: 7d }            # от approval_timeout (24 ч) до 30 дней
+```

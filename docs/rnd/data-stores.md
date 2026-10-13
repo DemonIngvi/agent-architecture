@@ -24,6 +24,15 @@ stack StatefulSet ICPlan + RustFS: 4 ok, 1 part, 2 no
 bar RustFS: 1/1 как в ICPlan ok
 bar pgvector: 1/1 стандартный образ CNPG ok
 bar Postgres: 0/1 StatefulSet → кластер CNPG part
+# Объём доработки
+> CloudNativePG + RustFS — задача 4.7, 30 ч по подзадачам; у остальных кандидатов оценок задач нет
+bar 4.7.1 CloudNativePG и кластер: 6/30 ч ok
+bar 4.7.2 PgBouncer и session-клиенты: 4/30 ч ok
+bar 4.7.3 роли и схемы: 3/30 ч ok
+bar 4.7.4 RustFS: 3/30 ч ok
+bar 4.7.5 бэкап вне узла: 6/30 ч ok
+bar 4.7.6 проверка восстановления (PITR): 4/30 ч ok
+bar 4.7.7 очистка запусков и тредов чата: 4/30 ч ok
 # Позиции ролей
 side CloudNativePG | Crunchy PGO
 pos DevOps: -1 | бэкап WAL и пулер — ресурсы оператора

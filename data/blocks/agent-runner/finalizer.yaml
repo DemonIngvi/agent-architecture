@@ -17,7 +17,7 @@ io:
 data:
 - [agent_run, 'запись через I2: итог (таблица ICPlan, M2 пишет ICPlan)']
 - [scheduler_slot, 'запись: освобождение слотов']
-reqs: [R-RUN-07, R-RUN-08, R-RUN-10, R-SBX-02]
+reqs: [R-RUN-07, R-RUN-08, R-RUN-10, R-SBX-02, R-ICP-13]
 tasks: ['2.1', '2.2', '2.6']
 failures:
 - Контейнер не удалился — повтор удаления (destroy идемпотентен), событие; слот не занимается (R-RUN-10)

@@ -25,6 +25,11 @@ stack Прямые вызовы: 1 ok, 1 part, 6 no
 bar LiteLLM: 0/3 соседей меняется ok
 bar Bifrost: 3/3 ключи, бюджеты, затраты no
 bar Envoy AI Gateway: 3/3 плюс Redis и Gateway API no
+# Объём доработки
+> LiteLLM: mock, бюджеты, fallback, G4 и замер накладных расходов — 45 ч по подзадачам; у остальных кандидатов оценок задач нет
+bar 1.1 mock-LLM и LiteLLM для разработки: 16/45 ч ok
+bar 4.5 бюджеты, fallback, G4-хуки, атрибуция: 27/45 ч ok
+bar 4.8.4 накладные расходы шлюза на профиле: 2/45 ч ok
 # Позиции ролей
 side LiteLLM | Bifrost
 pos Архитектор: -2 | I14, I15 и сводка затрат уже на LiteLLM

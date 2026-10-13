@@ -1,11 +1,22 @@
 title: PgBouncer
 tech: PgBouncer 1.26 (пулер CloudNativePG), ISC
+kind: service
+stories: [US-INF-03]
 params:
-- [pool_mode, transaction]
-- [default_pool_size, '30']
-- [session-клиенты, по списку]
+- [pgbouncer.pool_mode / size, 'режим и размер пула: transaction / 30 по умолчанию']
 does:
 - Держит пул серверных соединений
 - Защищает Postgres от роста числа клиентов
+io:
+- [←, '«сервисы» (ICPlan, LiteLLM, Memory API, Runner)', SQL по роли на схему (I22)]
+- [→, PostgreSQL 17 + pgvector, не более 30 серверных соединений (I22)]
+data: 'нет: пул соединений без состояния — таблиц модели не хранит, проксирует запросы к PostgreSQL'
+reqs: [R-INF-06, R-INF-16]
+tasks: ['4.7']
+failures:
+- PgBouncer исчерпал пул — запросы ждут до таймаута, ошибка с причиной; восстановление — увеличить пул, найти утечку соединений (FMEA platform-infrastructure; R-INF-16)
+- Клиенту нужна функция уровня сессии (LISTEN / NOTIFY) — подключение к session-пулу или напрямую, по согласованному списку (R-INF-06)
 why: Агенты, Runner и LiteLLM множат соединения.
 rnd: ingress-and-balancing.md
+ops:
+- ['пул соединений transaction pooling: 60 клиентских → не более 30 серверных', «сервисы», I22]

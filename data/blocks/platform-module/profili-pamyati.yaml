@@ -1,11 +1,29 @@
 title: Профили памяти
 tech: Профили Memory
+kind: service
+stories: [US-PM-01]
 params:
-- [read, 'M2, M3, M5, M6']
-- [write, M3]
-- [m2_last_runs, '3']
-- [retention, 'M1 30 д, M2 180 д, M3 до закрытия задачи, M4 до замены факта']
+- [memory_profile.read, 'M2, M3, M5, M6']
+- [memory_profile.write, M3]
+- [memory.m2_last_runs, '3']
+- [memory.retention, 'M1 30 д, M2 180 д, M3 до закрытия задачи, M4 до замены факта']
 does:
 - Какие уровни памяти агент читает и пишет, сколько хранить; для M1 и M2 срок — фильтр чтения, строки форка удаляет ICPlan (D25)
+io:
+- [←, ICPlan UI, 'профили памяти и выбор профиля агента (I20)']
+- [→, Agent Runner, 'профиль памяти агента в настройках запуска (I4)']
+data:
+- [memory_profile, 'запись, чтение: уровни чтения и записи, сроки']
+- [agent_settings, 'запись, чтение: `memory_profile_id` агента']
+reqs: [R-CP-01, R-CP-03]
+tasks: ['4.4']
+failures:
+- Недопустимое значение профиля — 400 с названием поля (R-CP-01)
+- Удаление профиля, который используется, — отклоняется
+- Смена профиля во время запуска — активный запуск идёт по прежнему (R-CP-03)
+ops:
+- ['`GET /platform/memory-profiles`, `PUT`, `DELETE /platform/memory-profiles/:name` — профили', Владелец экземпляра, I20]
+- ['Профиль агента — `memory_profile` в настройках агента', Администратор, I20]
+- ['Отдать профиль запуска', Agent Runner, I4]
 why: Баланс преемственности и токенов на агента.
 rnd: memory-model.md

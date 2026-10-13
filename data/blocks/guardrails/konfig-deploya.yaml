@@ -1,9 +1,29 @@
 title: Конфиг деплоя
-tech: YAML деплоя
+tech: YAML деплоя (`values.yaml`, S9)
+kind: store
+stories: [US-GRD-01, US-GRD-02]
 params:
-- [g1…g4.enabled, 'g1–g3 вкл, g4 выкл']
+- [g1.enabled / g2.enabled / g3.enabled / g4.enabled, 'g1–g3 вкл, g4 выкл']
 - [on_engine_error, deny]
+- [opa.cache_ttl_s, '60']
+- [loop.repeat_calls, '3']
+- [circuit.max_errors, '3']
 does:
-- Включает и выключает точки независимо
+- Включает и выключает точки G1–G4 независимо; выключенная точка не проверяется, в логе старта запись
+- 'Задаёт поведение при недоступности OPA (`on_engine_error`): deny по умолчанию, allow — только dev'
+- Задаёт пороги защиты запуска от зацикливания и ошибок
+io:
+- [←, Эксплуатация, 'values.yaml в git (изменение — после перезапуска модуля)']
+- [→, Agent Runner (Admission), 'переключатель G1 и `on_engine_error`']
+- [→, Harness, 'переключатель G2 и пороги зацикливания']
+data:
+- [kill_switch, 'косвенно: аварийная остановка хранится в Platform module (L1), в конфиге деплоя её нет']
+reqs: [R-GRD-06, R-GRD-07, R-GRD-09, R-GRD-13, R-GRD-17]
+tasks: ['4.3']
+failures:
+- Неизвестная точка (`g5`) — сервис не стартует с понятной ошибкой (R-GRD-06 «Неверный конфиг»)
+- Точка выключена — проверка не выполняется, в логе старта «G2 disabled» (FMEA «Точка выключена»)
+- Значение вне границ — отклоняется с именем параметра и границами (R-GRD-17)
 why: Можно начать без guardrails и включать по мере готовности.
 rnd: guardrails-engine.md
+schema: 'Секция `guardrails` в `values.yaml` (S9, git, без секретов): `g1…g4.enabled`, `on_engine_error`, `engine`, `opa.cache_ttl_s`, `loop.*`, `circuit.max_errors`, `anomaly.step_x_median`. Пример — Deploy Guardrails, «Пример конфигурации».'

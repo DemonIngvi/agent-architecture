@@ -54,3 +54,29 @@
 
 - [ ] Runner «в сети» в ICPlan
 - [ ] Тестовый запуск на mock-LLM доходит до итога
+
+## Пример конфигурации
+
+Как настройки лежат в развёртывании. Значения и границы параметров — в `interfaces.md` спеки (здесь новых не вводится); поля контрактов — в [Модели данных](../../data-model.md).
+
+Параметры уровня L0 (S9, `values.yaml` в git, без секретов; ключи агентов — в Secret `runner-agents`):
+
+```yaml
+agentRunner:
+  poll_interval_ms: 3000        # 1000–30000
+  retry: 0                      # 0–3, без повтора по умолчанию
+  scheduling:
+    mode: parallel              # sequential | parallel
+    global_max: 4
+    per_issue: 1
+    order: fifo                 # fifo | priority
+    aging_s: 600                # 60–3600, действует при order: priority
+    models:
+      team-default: { max: 3 }
+  guardrails: { g1: { enabled: true } }
+  on_engine_error: deny
+  setup: { cache_ttl_h: 168 }
+  provider: docker              # docker | k8s
+  events: { level: "всё" }       # итоги | всё
+  # agents — ключи из Secret runner-agents (ITSAPLAN_AGENT_KEYS), не в values
+```

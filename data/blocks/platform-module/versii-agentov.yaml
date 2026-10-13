@@ -1,11 +1,29 @@
 title: Версии агентов
 tech: Таблица версий + экспорт / импорт YAML
+kind: service
+stories: [US-PM-02, US-PM-03, US-PM-07]
 params:
-- [Формат, '`agent/v1`']
-- [Пин версии, в запуске можно указать версию; иначе версия на старте пишется в `agent_run.agent_version` при первом вызове I4 (D23)]
+- [version, последняя]
 does:
 - История изменений агента
 - Перенос dev → prod
 - Ревью через YAML
+io:
+- [←, ICPlan UI, 'история, откат, экспорт и импорт YAML (I20)']
+- [←, Agent Runner, 'запрос версии запуска; новая версия по хешу определения (I4, D26)']
+data:
+- [agent_settings_version, 'запись, чтение: снимок определения и настроек, автор, время']
+- [agent_settings, 'запись: текущая версия при откате']
+- [ai_agent, 'чтение: определение для хеша и экспорта']
+reqs: [R-CP-04, R-CP-05, R-REG-03, R-REG-04]
+tasks: ['4.4']
+failures:
+- Импорт с неверной схемой или ссылкой на несуществующий объект — 400, импорт отклоняется с указанием ссылки (R-CP-05)
+- Откат без права `ai_agents` — 403 (R-CP-04)
+- БД платформы (S2) недоступна — версии не читаются и не создаются, запуск не стартует (FMEA control-plane)
+ops:
+- ['`GET /platform/agents/:agentId/settings/versions`, `POST …/settings/rollback` — история и откат', Администратор, I20]
+- ['`GET /platform/agents/:agentId/export`, `POST /platform/agents/import` — YAML `agent/v1`', Администратор, I20]
+- ['Новая версия при отличии хеша определения (D26)', Agent Runner, I4]
 why: Воспроизводимость запусков и ревью без Config Repo.
 rnd: config-storage.md

@@ -159,3 +159,33 @@ costs:
   minutes: 2
   expected: [1000, 1500]
   note: пачка 40 страниц Harness+Sandbox+MCP (114 пар, ✅106 ❌8), агент Explore (накладные 19,4 тыс.); кириллица ≈2 симв./ток.
+- date: '2026-10-13'
+  process: bulk-edit
+  methodology: change-process.md#bulk
+  units: 2
+  unit: компонент
+  tokens: 121400
+  model: sonnet
+  minutes: 4
+  expected: [50000, 80000]
+  note: 'lint-fix A: platform-module 28→0, icplan 14→0 по YAML-единицам'
+- date: '2026-10-13'
+  process: bulk-edit
+  methodology: change-process.md#bulk
+  units: 3
+  unit: компонент
+  tokens: 185100
+  model: sonnet
+  minutes: 8
+  expected: [50000, 80000]
+  note: 'lint-fix B: memory 14→0, llm-gateway 14→0, infrastructure 18→4 ложных (данные нет); прерван лимитом'
+- date: '2026-10-13'
+  process: bulk-edit
+  methodology: change-process.md#bulk
+  units: 6
+  unit: компонент
+  tokens: 228300
+  model: sonnet
+  minutes: 6
+  expected: [50000, 80000]
+  note: 'lint-fix C: agent-runner, observability, guardrails, harness, sandbox, mcp-tools → 0; прерван лимитом'

@@ -388,7 +388,7 @@ SCHEMAS = {
         ("params", OneOf(S, Lst(Tup(S, S, names=("параметр", "значение"))), hint="строка «нет: …» или список [параметр, значение]"), "opt"),
         ("does", Lst(S), "opt"),
         ("io", Lst(Tup(Str(choices=("→", "←", "↔")), Str(ref="irefs"), Str(ref="irefs"), names=("→|←", "с кем", "что (I-код)"))), "opt"),
-        ("data", Lst(Tup(Str(ref="table"), S, names=("таблица", "доступ"))), "opt"),
+        ("data", OneOf(S, Lst(Tup(Str(ref="table"), S, names=("таблица", "доступ"))), hint="строка «нет: …» или список [таблица, доступ]"), "opt"),
         ("reqs", Lst(REQ, flow=True), "opt"), ("tasks", Lst(TASK, flow=True), "opt"),
         ("failures", Lst(S), "opt"), ("why", S, "opt"), ("rnd", Str(ref="rnd"), "opt"),
         ("ops", Lst(Tup(S, S, S)), "opt"), ("schema", S, "opt"), ("iface", Lst(S), "opt")),
@@ -964,7 +964,7 @@ def related(kind, v, key=None) -> list:
         ids += sorted(set(re.findall(rx, txt)), key=lambda x: [int(n) if n.isdigit() else n for n in re.split(r"(\d+)", x)])
     if kind == "block":
         ids += [f"задача {t}" for t in v.get("tasks", [])]
-        ids += [f"таблица {d[0].split(' ')[0].strip('`')}" for d in v.get("data", [])]
+        ids += [f"таблица {d[0].split(' ')[0].strip('`')}" for d in v.get("data", []) if not isinstance(v.get("data"), str)]
     if kind == "story" and key:
         ids += [f"блок {c}/{t}" for (c, t), s in sub().items() if key in s.get("stories", [])]
         ids += [f"процесс «{p['title']}»" for lst in stories()["BPMN"].values() for p in lst if key in p["stories"]]
@@ -980,7 +980,7 @@ def related(kind, v, key=None) -> list:
             ids += [f"интерфейс {i}" for i, r in dm["INTEG"].items() if key in r[4]]
             ids += [f"эндпоинт «{k}»" for k, r in dm["ENDPOINT_IO"].items() if re.search(rf"\b{key}\b", " ".join(r[:2]))]
         else:
-            ids += [f"блок {c}/{t}" for (c, t), s in sub().items() for d in s.get("data", []) if d[0].split(" ")[0].strip("`") == key]
+            ids += [f"блок {c}/{t}" for (c, t), s in sub().items() if not isinstance(s.get("data"), str) for d in s.get("data", []) if d[0].split(" ")[0].strip("`") == key]
     return ids
 
 

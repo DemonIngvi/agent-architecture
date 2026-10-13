@@ -1,10 +1,27 @@
 title: Бюджеты, rate limit
 tech: LiteLLM budgets, RPM / TPM
+kind: service
+stories: [US-LLM-03]
 params:
-- [max_budget, из Platform module]
-- [rpm, '60']
-- [tpm, по провайдеру]
+- [key.max_budget, 'бюджет ключа из Platform module']
+- [key.rpm / tpm, 'запросы и токены в минуту']
 does:
 - Отклоняет вызов до траты при превышении
+- Ограничивает запросы и токены в минуту на модель и на агента (RPM / TPM)
+io:
+- [←, Harness, 'вызов модели с virtual key (I8)']
+- [←, Platform module, 'бюджет и лимиты ключа (I15)']
+- [→, PostgreSQL 17, 'расход и бюджеты в БД `litellm` (I14)']
+data:
+- [LiteLLM_VerificationToken, 'чтение и запись: расход, бюджет, лимиты ключа (владелец — LiteLLM)']
+- [LiteLLM_BudgetTable, 'чтение: бюджеты и лимиты (владелец — LiteLLM)']
+reqs: [R-LLM-05, R-GRD-11, R-GRD-14]
+tasks: ['4.5']
+failures:
+- Бюджет virtual key исчерпан — отказ до обращения к провайдеру (R-LLM-05)
+- Превышен TPM модели — вызовы ждут или отклоняются с ошибкой лимита (R-GRD-14)
+- БД `litellm` недоступна — проверка бюджетов невозможна, вызовы отклоняются (FMEA llm-gateway)
 why: Жёсткий стоп перерасхода на уровне шлюза (G4).
 rnd: runaway-protection.md
+ops:
+- ['отказ вызова при исчерпанном бюджете или лимите частоты', Harness, I8]

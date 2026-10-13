@@ -1,11 +1,28 @@
 title: Профили sandbox
 tech: Профили Sandbox (образ, ресурсы, сеть, пул)
+kind: service
+stories: [US-PM-01]
 params:
-- [image, 'agent-harness:<версия>']
-- [resources, 1 CPU / 1 ГБ / 2 ГБ]
-- [egress_allow, только платформа]
-- [pool.size, '2']
+- [sandbox_profile, light]
+- [sandbox.egress_allow, только платформа]
+- [sandbox.pool.size, '2']
 does:
 - Определяет, что агент может запускать и куда ходить
+io:
+- [←, ICPlan UI, 'профили и выбор профиля агента (I20)']
+- [→, Agent Runner, 'профиль агента в настройках запуска (I4)']
+data:
+- [sandbox_profile, 'запись, чтение: образ, runtime, CPU, RAM, диск, egress, пул']
+- [agent_settings, 'запись, чтение: `sandbox_profile_id` агента']
+reqs: [R-CP-01, R-CP-03]
+tasks: ['4.4']
+failures:
+- Недопустимое значение профиля — 400 с названием поля (R-CP-01)
+- Удаление профиля, который используется, — 409, в ответе агенты с этим профилем
+- Смена профиля во время запуска — активный запуск идёт по прежнему, следующий по новому (R-CP-03)
+ops:
+- ['`GET /platform/sandbox-profiles`, `PUT`, `DELETE /platform/sandbox-profiles/:name` — профили', Владелец экземпляра, I20]
+- ['Профиль агента — `sandbox_profile` в настройках агента', Администратор, I20]
+- ['Отдать профиль запуска', Agent Runner, I4]
 why: Разным агентам — разная среда без изменения кода.
 rnd: sandbox-isolation.md

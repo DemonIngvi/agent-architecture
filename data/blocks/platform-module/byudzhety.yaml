@@ -1,12 +1,30 @@
 title: Бюджеты
 tech: Бюджеты virtual key LiteLLM + проверка G1 в Runner
+kind: service
+stories: [US-PM-01, US-PM-06]
 params:
-- [budget.run, 1 $]
-- [budget.agent_day, 5 $]
-- [budget.project_month, задаётся]
-- [Пороги, 80% / 100%]
+- [budget.per_run_tokens, "200 000"]
+- [budget.daily_usd, 5 $]
 does:
 - Задаёт лимиты трат агента, проекта, команды
-- Отказ до траты, а не после
+- Отказ до траты, а не после; пороги 80% (предупреждение) и 100% (отказ G1)
+io:
+- [←, ICPlan UI, 'бюджеты агента и проекта (I20)']
+- [→, LiteLLM, 'лимит бюджета ключа — `/key/update`, действует сразу (I15)']
+data:
+- [agent_settings, 'запись, чтение: `budget_run_usd`, `budget_day_usd`']
+- [project_platform, 'запись, чтение: `budget_month_usd`']
+- [LiteLLM_VerificationToken, 'запись через admin API: лимит ключа (I15)']
+- [LiteLLM_BudgetTable, 'запись через admin API: бюджеты (I15)']
+reqs: [R-CP-01, R-CP-03, R-CP-06]
+tasks: ['4.4']
+failures:
+- LiteLLM не отвечает при сохранении бюджета — изменение «не применено», повтор (R-CP-06 «LiteLLM недоступен»)
+- Бюджет в модуле и в LiteLLM различается — предупреждение администратору (R-CP-06 «Рассинхронизация»)
+- Отрицательный бюджет или выше потолка — 400 с названием поля (R-CP-01)
+ops:
+- ['`PATCH /platform/agents/:agentId/settings` — бюджет агента', Администратор, I20]
+- ['`PUT /platform/projects/:projectKey/budget` — бюджет проекта', Администратор, I20]
+- ['Применить лимит к ключу LiteLLM', Platform module, I15]
 why: Иерархия бюджетов — стандарт (LiteLLM, облачные биллинги).
 rnd: runaway-protection.md
