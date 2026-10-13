@@ -193,9 +193,9 @@
 | `components/sandbox/egress-proksi/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 07885620 | достаточно |
 | `components/sandbox/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | a6c9f995 | достаточно |
 | `components/sandbox/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | a6c9f995 | достаточно |
-| `components/sandbox/profil/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 4f79208c | Профиль: sandbox_profile в схеме platform, владелец Platform module, приходит через Runner (I4), выход в SandboxProvider; изоляция относится к Deploy Sandbox. |
-| `components/sandbox/profil/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 4f79208c | Дана schema sandbox_profile (image, runtime, cpu, memory_mb, disk_gb, egress_allow, pool_size), значения resources 1 CPU/1 ГБ/2 ГБ, runtime runc, задача 2.2. |
-| `components/sandbox/profil/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 4f79208c | Сбои: профиль не найден — отказ до создания контейнера (R-SBX-05), runsc отсутствует на узле — «runtime недоступен», превышение RAM останавливает контейнер. |
+| `components/sandbox/profil/index.md` | А | — | — | — | ⏳ | 3d710cf5 | текст изменён после решения «✅» от Claude, роль Архитектор |
+| `components/sandbox/profil/index.md` | Р | — | — | — | ⏳ | 3d710cf5 | текст изменён после решения «✅» от Claude, роль Разработчик |
+| `components/sandbox/profil/index.md` | Т | — | — | — | ⏳ | 3d710cf5 | текст изменён после решения «✅» от Claude, роль Тестировщик |
 | `components/sandbox/sandboxprovider/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | f4bd6ecd | SandboxProvider: интерфейс create/claim/exec/destroy над Docker (этапы 1–3) и K8s (этап 4, I23), вход I6 от Runner, sandbox_profile читается через Runner. |
 | `components/sandbox/sandboxprovider/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | f4bd6ecd | Операции create/exec/destroy через Docker Engine API и Pod в namespace itsaplan-agents, параметры provider=docker, runtime=runc, задачи 2.2 и 4.6. |
 | `components/sandbox/sandboxprovider/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | f4bd6ecd | Сбой: API не ответил за 30 с — прерывание, повтор 1 раз, create не повторяется (R-SBX-10); R-SBX-01 изоляция запусков и R-SBX-13 пересоздание пула проверяемы. |
@@ -509,9 +509,9 @@
 | `docs/techspec/platform-module.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | a4a5dd02 | Миграции platform_* до старта api, пока не прошла — api не стартует; LITELLM_ADMIN_URL в Secret litellm-admin; проверка «бюджет → ключ LiteLLM обновлён» (R-CP-02, S2) |
 | `docs/techspec/platform-module.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-13 | ✅ | a4a5dd02 | LITELLM_MASTER_KEY только в Secret litellm-admin; версии настроек agent_settings_version фиксируют кто и когда менял (R-CP-04); доступы и kill switch в схеме |
 | `docs/techspec/platform-module.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-13 | ✅ | a4a5dd02 | Код в apps/api/src/modules/platform форка, миграции packages/db/drizzle/platform_*, собирается вместе с itsaplan-api, обновление upstream схему не трогает (R-CP-02) |
-| `docs/techspec/sandbox.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | 4e939442 | Постоянных данных нет, /workspace удаляется с контейнером, результаты в ветке/PR и RustFS (S7); новый HARNESS_IMAGE пересоздаёт пул (R-SBX-13) |
-| `docs/techspec/sandbox.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-13 | ✅ | 4e939442 | read-only rootfs, drop ALL capabilities, no-new-privileges, seccomp RuntimeDefault, NetworkPolicy deny all кроме прокси, ключ подставляет прокси (R-SBX-07) |
-| `docs/techspec/sandbox.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-13 | ✅ | 4e939442 | Образ среды совпадает с образом Harness (agent-harness, uid 10001, порт 8090), allowlist Squid генерируется из политики доступа, не вручную (R-SBX-13) |
+| `docs/techspec/sandbox.md` | Д | — | — | — | ⏳ | 225366fd | текст изменён после решения «✅» от Claude, роль DevOps-инженер |
+| `docs/techspec/sandbox.md` | Б | — | — | — | ⏳ | 225366fd | текст изменён после решения «✅» от Claude, роль Безопасность |
+| `docs/techspec/sandbox.md` | С | — | — | — | ⏳ | 225366fd | текст изменён после решения «✅» от Claude, роль Инженер сборки и поставки |
 | `index.md` | В | — | — | — | ⏳ | 42b2b191 | Главная |
 | `index.md` | А | — | — | — | ⏳ | 42b2b191 | Главная |
 | `openspec/changes/define-agent-platform/design.md` | В | — | — | — | ⏳ | f1c09b02 | Решения (design) |

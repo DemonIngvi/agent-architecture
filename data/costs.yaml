@@ -325,3 +325,15 @@ costs:
   calls: 10
   context: 79408
   note: 'повторная проверка после пилота: 2 пачки (40+14), 162 пары, ✅158 ❌4; ожидание пересмотрено 13.10 по замеру из журналов вызовов (факт 3,7–7,2 тыс.)'
+- date: '2026-10-13'
+  process: finding-fix
+  methodology: review-methodology.md#findings
+  units: 1
+  unit: замечание
+  tokens: 631119
+  model: sonnet-5-5
+  expected: [250000, 500000]
+  agents: [a452ae74e398915e3]
+  calls: 14
+  context: 53430
+  note: 'Z-SBX-1: тип resources (cpu, memory_mb, disk_gb) в interfaces.md и профиле sandbox; исследование + правка'

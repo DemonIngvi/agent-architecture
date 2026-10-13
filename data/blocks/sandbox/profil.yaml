@@ -3,7 +3,9 @@ tech: Ограничения контейнера
 kind: store
 stories: [US-SBX-01, US-SBX-03]
 params:
-- {name: resources, value: '1 CPU, 1 ГБ, 2 ГБ'}
+- {name: resources.cpu, value: '1'}
+- {name: resources.memory_mb, value: '1024'}
+- {name: resources.disk_gb, value: '2'}
 - {name: image, value: 'agent-harness:<версия>'}
 - {name: runtime, value: runc}
 does:
