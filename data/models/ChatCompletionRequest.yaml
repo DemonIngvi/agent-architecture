@@ -5,7 +5,7 @@ fields:
 - {name: tools, type: '{type, function: {name, parameters}}[]', required: false, desc: ''}
 - {name: tool_choice / parallel_tool_calls, type: enum / bool, required: false, desc: 'Harness: `auto`, без параллельных вызовов'}
 - {name: temperature / max_tokens / reasoning_effort, type: number / enum, required: false, desc: '`model.*`; неподдерживаемое отбрасывает `drop_params`'}
-- {name: metadata, type: '{run_id, issue_key, agent}', required: true, desc: 'наши ключи для атрибуции затрат (R-LLM-03): `run_id` = `Run.id`, `issue_key` = `issueIdentifier`, `agent` = `username`'}
+- {name: metadata, type: '{run_id, issue_key, agent}', required: true, desc: 'наши ключи для атрибуции затрат (R-LLM-03): `run_id` = `Run.id`, `issue_key` = `issueIdentifier`, `agent` = `username`', reqs: [R-LLM-03]}
 - {name: stream, type: bool, required: false, desc: ''}
 source:
   kind: ext

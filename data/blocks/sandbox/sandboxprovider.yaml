@@ -10,8 +10,8 @@ does:
 - 'Создаёт среду по профилю: образ, runtime, ресурсы, свой `/workspace`'
 - Уничтожает среду вместе с `/workspace`; общих томов между запусками нет
 io:
-- {dir: ←, with: Agent Runner, what: '`SandboxClaim`, `RepoGrant` (I6; этап 4 — I23)'}
-- {dir: →, with: Harness, what: контейнер со средой запуска (I7 идёт внутри него)}
+- {dir: ←, with: Agent Runner, model: [SandboxClaim, RepoGrant], what: '`SandboxClaim`, `RepoGrant` (I6; этап 4 — I23)', via: [I6, I23]}
+- {dir: →, with: Harness, what: контейнер со средой запуска (I7 идёт внутри него), via: [I7]}
 data:
 - {table: sandbox_profile, access: read, why: 'через Runner: `image`, `runtime`, `cpu`, `memory_mb`, `disk_gb` (владелец — Platform module)'}
 reqs: [R-SBX-01, R-SBX-09, R-SBX-10, R-SBX-13]

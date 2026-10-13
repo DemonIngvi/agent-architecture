@@ -12,7 +12,7 @@ does:
 - 'Собирает артефакты итога: файлы, ветку, PR'
 io:
 - {dir: ←, with: LLM client, what: запросы вызова тулов}
-- {dir: →, with: mcp-tools, what: '`McpToolCall` через MCP-прокси Runner', via: [I9]}
+- {dir: →, with: mcp-tools, model: [McpToolCall], what: '`McpToolCall` через MCP-прокси Runner', via: [I9]}
 - {dir: →, with: Context Manager, what: результаты тулов в следующий шаг}
 data:
 - {table: setup_cache, access: indirect, why: '`install_dependencies` → Runner обновляет кэш шага подготовки (владелец — Agent Runner, D19)'}
@@ -21,11 +21,11 @@ reqs: [R-HRN-02, R-HRN-12, R-HRN-13, R-HRN-17]
 tasks: ['1.4']
 failures:
 - {when: MCP-сервер недоступен, then: 'ошибка тула возвращается агенту, цикл продолжается', fmea: agent-harness}
-- {when: Запись через I9 прервалась сбоем сети, then: автоматического повтора нет, reqs: [R-HRN-12]}
+- {when: Запись через I9 прервалась сбоем сети, then: автоматического повтора нет, via: [I9], reqs: [R-HRN-12]}
 - {when: Путь вне `/workspace`, then: вызов отклонён с причиной}
 why: Стандарт MCP; вызовы идут через MCP-прокси Runner, ключи — у Runner (D19).
 rnd: mcp-vs-direct.md
 ops:
-- {op: 'узел `tools`: `tools/list`, `tools/call` через MCP-прокси Runner — `POST /runs/:runId/mcp/:server`', label: граф LangGraph, via: [I9]}
-- {op: 'тул `install_dependencies` — `POST /runs/:runId/deps`, повтор шага подготовки', label: агент, via: [I7], decisions: [D19]}
+- {op: 'узел `tools`: `tools/list`, `tools/call` через MCP-прокси Runner — `POST /runs/:runId/mcp/:server`', endpoint: 'POST /runs/:runId/mcp/:server', label: граф LangGraph, via: [I9]}
+- {op: 'тул `install_dependencies` — `POST /runs/:runId/deps`, повтор шага подготовки', endpoint: 'POST /runs/:runId/deps', label: агент, via: [I7], decisions: [D19]}
 - {op: файловые тулы в пределах `/workspace`; список артефактов в `RunResult`, label: агент, internal: true}

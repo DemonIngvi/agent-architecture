@@ -6,7 +6,7 @@ columns:
 - {name: agent_id, type: int, pk: true, fk: agent_settings}
 - {name: version, type: int, pk: true}
 - {name: data, type: jsonb, desc: снимок определения агента и настроек, decisions: [D26]}
-- {name: definition_hash, type: text, desc: 'хеш определения ICPlan: при вызове I4 отличие от последней версии создаёт новую', decisions: [D26]}
+- {name: definition_hash, type: text, desc: 'хеш определения ICPlan: при вызове I4 отличие от последней версии создаёт новую', via: [I4], decisions: [D26]}
 - {name: created_by, type: text}
 - {name: created_at, type: timestamptz}
 policy:

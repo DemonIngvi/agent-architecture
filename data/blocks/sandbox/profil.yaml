@@ -11,7 +11,7 @@ does:
 - Задаёт образ и runtime среды (runc; runsc — после проверки 2.2.8)
 - Отклоняет значения вне границ `resources` с именем параметра
 io:
-- {dir: ←, with: Platform module, what: 'профиль агента через Runner (I4, `sandbox_profile`)'}
+- {dir: ←, with: Platform module, what: 'профиль агента через Runner (I4, `sandbox_profile`)', via: [I4]}
 - {dir: →, with: SandboxProvider, what: параметры создания среды}
 data:
 - {table: sandbox_profile, access: read, why: профиль среды агента (владелец — Platform module)}

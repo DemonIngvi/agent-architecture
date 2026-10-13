@@ -9,8 +9,8 @@ does:
 - Агент записывает состояние работы по задаче
 - Следующий агент получает его в контексте
 io:
-- {dir: ←, with: Memory API, what: 'запись `M3Record` (`PUT /m3/:issueId`, I11)'}
-- {dir: →, with: Memory API, what: 'M3 для контекста следующего запуска (`GET /context`, I11)'}
+- {dir: ←, with: Memory API, model: [M3Record], what: 'запись `M3Record` (`PUT /m3/:issueId`, I11)', via: [I11]}
+- {dir: →, with: Memory API, what: 'M3 для контекста следующего запуска (`GET /context`, I11)', via: [I11]}
 data:
 - {table: memory_m3, why: 'чтение и запись через Memory API (владелец — Memory, роль `memory`)'}
 reqs: [R-MEM-04, R-MEM-15]

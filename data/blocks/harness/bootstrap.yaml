@@ -9,10 +9,10 @@ does:
 - Даёт агенту только тулы и навыки из определения
 - Проверяет параметры по границам «Мин»–«Макс» с именем параметра в ошибке (R-HRN-10)
 io:
-- {dir: ←, with: Agent Runner, what: '`RunBundle`: определение версии запуска, задание, память на старте, манифест, MCP', via: [I7]}
+- {dir: ←, with: Agent Runner, model: [RunBundle], what: '`RunBundle`: определение версии запуска, задание, память на старте, манифест, MCP', via: [I7]}
 - {dir: →, with: Context Manager, what: 'собранный агент: инструкция, навыки, тулы, лимиты'}
 data:
-- {table: ai_agent, access: read, why: 'через Runner: определение агента в `RunBundle` (владелец — ICPlan; источник — Platform module, I4)'}
+- {table: ai_agent, access: read, via: [I4], why: 'через Runner: определение агента в `RunBundle` (владелец — ICPlan; источник — Platform module, I4)'}
 - {table: agent_settings_version, access: read, why: 'через Runner: версия определения запуска (владелец — Platform module, D23)'}
 reqs: [R-HRN-01, R-HRN-10]
 tasks: ['1.3']

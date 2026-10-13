@@ -4,10 +4,10 @@ fields:
 - {name: output, type: string | null, required: false, desc: итог для истории; ICPlan обрезает до 10 000 символов}
 - {name: error, type: string | null, required: false, desc: причина при `failed`; ICPlan обрезает до 500 символов}
 - {name: usage, type: '{inputTokens, outputTokens, reasoningTokens, costUsd, iterations}', required: false, desc: 'расход; `reasoningTokens`, `costUsd`, `iterations` (итерации цикла) — добавляем', decisions: [D18]}
-- {name: reason, type: 'enum: done · limit · gate_failed · error', required: false, desc: 'причина Harness (R-RUN-07): `done` → `status = success`; `limit`, `gate_failed`, `error` → `failed`'}
-- {name: artifacts, type: '{name, url}[]', required: false, desc: 'опубликованное для человека: файл в RustFS (`s3://…`), ветка или PR (D20); в M3 — рабочие ссылки `{path, ref}`'}
-- {name: gate, type: '{passed: bool, failed: Criterion[]}', required: false, desc: 'проверка по критериям (R-HRN-08, D20): не выполненные критерии'}
-- {name: criteriaNext, type: 'Criterion[]', required: false, desc: 'критерии, предложенные следующему шагу (D20, D26): Runner берёт их из итога Harness; ICPlan при приёме итога создаёт пункты чек-листа задачи с `origin = agent:<username>` и `status` по `criteriaApproval` шага'}
+- {name: reason, type: 'enum: done · limit · gate_failed · error', required: false, desc: 'причина Harness (R-RUN-07): `done` → `status = success`; `limit`, `gate_failed`, `error` → `failed`', reqs: [R-RUN-07]}
+- {name: artifacts, type: '{name, url}[]', required: false, desc: 'опубликованное для человека: файл в RustFS (`s3://…`), ветка или PR (D20); в M3 — рабочие ссылки `{path, ref}`', decisions: [D20]}
+- {name: gate, type: '{passed: bool, failed: Criterion[]}', required: false, desc: 'проверка по критериям (R-HRN-08, D20): не выполненные критерии', reqs: [R-HRN-08], decisions: [D20]}
+- {name: criteriaNext, type: 'Criterion[]', required: false, desc: 'критерии, предложенные следующему шагу (D20, D26): Runner берёт их из итога Harness; ICPlan при приёме итога создаёт пункты чек-листа задачи с `origin = agent:<username>` и `status` по `criteriaApproval` шага', decisions: [D20, D26]}
 source:
   kind: fork
   ref: POST /agent-runs/{runId}/result

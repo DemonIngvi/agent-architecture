@@ -10,7 +10,7 @@ does:
 - Может изменить аргументы или отклонить вызов; изменение видно в событии
 io:
 - {dir: ←, with: LLM client, what: действие перед вызовом тула}
-- {dir: ↔, with: guardrails, what: '`PolicyInput` / `PolicyDecision`', via: [I10]}
+- {dir: ↔, with: guardrails, model: [PolicyInput, PolicyDecision], what: '`PolicyInput` / `PolicyDecision`', via: [I10]}
 - {dir: →, with: Pause / resume, what: решение «нужно подтверждение»}
 - {dir: →, with: Event stream, what: решение G2 событием}
 data:
@@ -24,4 +24,4 @@ why: Правила применяются на каждом шаге детер
 rnd: runaway-protection.md
 ops:
 - {op: '`before_tool` / `after_tool`, `before_llm` / `after_llm`, `on_stop` — узлы графа', label: граф LangGraph, internal: true}
-- {op: проверка действия G2 — `POST /v1/data/agent/g2`, label: hook `before_tool`, via: [I10]}
+- {op: проверка действия G2 — `POST /v1/data/agent/g2`, endpoint: POST /v1/data/agent/g2, label: hook `before_tool`, via: [I10]}

@@ -28,4 +28,4 @@ rnd: guardrails-engine.md
 ops:
 - {op: Собрать bundle данных правил из настроек агентов, who: Platform module, via: [I16]}
 - {op: '`GET /platform/kill-switch`, `PUT /platform/kill-switch/:scope` — аварийная остановка', label: 'Администратор, владелец экземпляра', via: [I20]}
-- {op: '`GET`, `PUT /platform/projects/:projectKey/access` — доступы агентов к ресурсам', label: Администратор, via: [I20]}
+- {op: '`GET`, `PUT /platform/projects/:projectKey/access` — доступы агентов к ресурсам', endpoint: 'PUT /platform/projects/:projectKey/access', label: Администратор, via: [I20]}

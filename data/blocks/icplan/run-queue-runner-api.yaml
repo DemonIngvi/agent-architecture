@@ -16,7 +16,7 @@ does:
 - Отдаёт решения и указания пользователя в ответе heartbeat (доработка, R-ICP-16); отмену — ответом 404 на heartbeat, как в форке
 - Запуск, выданный `AGENT_RUN_MAX_ATTEMPTS` = 3 раза без итога, при следующем claim завершается `failed` с `last_error` «Runner did not report a result» и записью в истории задачи (`expireExhaustedRuns` форка)
 io:
-- {dir: ←, with: Автоподхват, what: '`Run` (pending)'}
+- {dir: ←, with: Автоподхват, model: [Run], what: '`Run` (pending)'}
 - {dir: →, with: Agent Runner, model: [Run], what: выдача с арендой, via: [I1]}
 - {dir: ←, with: Agent Runner, model: [RunEvent, RunResult], via: [I2]}
 - {dir: ↔, with: Agent Runner, what: 'heartbeat: продление аренды, решения, указания; отмена — 404', via: [I3]}

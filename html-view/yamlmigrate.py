@@ -129,6 +129,9 @@ def leftovers() -> list:
                     ids = re.findall(r"\bI\d+\b|\bR-[A-Z]+-\d+\b|\bD\d+\b|\bUS-[A-Z]+-\d+\b", s)
                     ids += [f"`{m}`" for m in re.findall(r"`([A-Za-z_]\w*)`", s) if m in models or m in tables]
                     ids += [f"`{m}`" for m in re.findall(r"`((?:GET|POST|PUT|PATCH|DELETE) [^`]+)`", s)]
+                    have = {str(x) for k in ("via", "reqs", "decisions", "model") for x in (r.get(k) or [])}
+                    have |= {f"`{r[k]}`" for k in ("endpoint", "table") if r.get(k)} | {f"`{x}`" for x in (r.get("model") or [])}
+                    ids = [i for i in ids if i not in have]
                     found += [f"{t}: {', '.join(dict.fromkeys(ids))}"] if ids else []
                 if field in ("io", "ops") and "label" in r:
                     found.append(f"участник «{r['label']}» не из каталога")

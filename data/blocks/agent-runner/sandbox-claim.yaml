@@ -11,7 +11,7 @@ does:
 - 'Вызывается только после слотов Scheduler и допуска G1: пул слотов не занимает, слот занимает запуск; `pool.size` не больше `scheduling.global_max`'
 io:
 - {dir: ←, with: Admission, what: допущенный запуск}
-- {dir: →, label: Sandbox (SandboxProvider), what: '`SandboxClaim`, `RepoGrant` (I6; этап 4 — I23)'}
+- {dir: →, label: Sandbox (SandboxProvider), model: [SandboxClaim, RepoGrant], what: '`SandboxClaim`, `RepoGrant` (I6; этап 4 — I23)', via: [I6, I23]}
 - {dir: →, with: Шаг подготовки, what: контейнер запуска}
 - {dir: →, with: Run supervisor, what: адрес среды}
 data:
@@ -19,10 +19,10 @@ data:
 reqs: [R-SBX-01, R-SBX-02, R-SBX-11, R-RUN-14, R-RUN-13]
 tasks: ['2.2', '4.1']
 failures:
-- {when: Docker или пул недоступен, then: 'запуск остаётся в `queued`, повтор, событие оператору (FMEA «Docker / пул недоступен», R-RUN-14)'}
-- {when: Пул пуст, then: 'контейнер создаётся на лету, старт дольше (R-SBX-02 «Пул пуст»)'}
+- {when: Docker или пул недоступен, then: 'запуск остаётся в `queued`, повтор, событие оператору (FMEA «Docker / пул недоступен», R-RUN-14)', reqs: [R-RUN-14]}
+- {when: Пул пуст, then: 'контейнер создаётся на лету, старт дольше (R-SBX-02 «Пул пуст»)', reqs: [R-SBX-02]}
 - {when: Образ профиля недоступен, then: 'профиль помечен недоступным, запуски отклоняются', reqs: [R-SBX-11]}
-- {when: Сбой сети при `create`, then: 'автоматического повтора нет: create неидемпотентен, решает Run supervisor (R-RUN-13 «Неидемпотентный вызов I6»)'}
+- {when: Сбой сети при `create`, then: 'автоматического повтора нет: create неидемпотентен, решает Run supervisor (R-RUN-13 «Неидемпотентный вызов I6»)', via: [I6], reqs: [R-RUN-13]}
 why: Старт < 1 с без потери изоляции; пул за `SandboxProvider` меняется на K8s без переделки Runner (D1).
 rnd: sandbox-isolation.md
 ops:

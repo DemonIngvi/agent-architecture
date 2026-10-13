@@ -12,17 +12,17 @@ does:
 - Загружает бандл (Rego из git и данные агентов из Platform module) опросом раз в 30 с; при битом бандле остаётся на прежнем
 - Кэширует решение для одинакового входа в запуске на `opa.cache_ttl_s`; каждое решение попадает в аудит с `run_id`
 io:
-- {dir: ←, label: Agent Runner (Admission), what: '`PolicyInput` G1', via: [I5]}
-- {dir: ←, label: Harness (hooks), what: '`PolicyInput` G2', via: [I10]}
+- {dir: ←, label: Agent Runner (Admission), model: [PolicyInput], what: '`PolicyInput` G1', via: [I5]}
+- {dir: ←, label: Harness (hooks), model: [PolicyInput], what: '`PolicyInput` G2', via: [I10]}
 - {dir: ←, label: Platform module и git (Rego), what: 'bundle: правила и данные агентов', via: [I16]}
-- {dir: →, label: Agent Runner и Harness, what: '`PolicyDecision`: allow / deny / confirm с причиной и правилом'}
+- {dir: →, label: Agent Runner и Harness, model: [PolicyDecision], what: '`PolicyDecision`: allow / deny / confirm с причиной и правилом'}
 data:
 - {table: agent_settings, access: read, why: 'через бандл: `tools_allow`, `approval_tools`, `autonomy_level`, бюджеты агента (владелец — Platform module)'}
 - {table: kill_switch, access: read, why: 'через бандл: аварийная остановка платформы и агентов (владелец — Platform module)'}
 reqs: [R-GRD-01, R-GRD-02, R-GRD-03, R-GRD-07, R-GRD-08, R-GRD-11, R-GRD-15, R-GRD-16]
 tasks: ['4.3']
 failures:
-- {when: OPA недоступен или ответил медленнее 200 мс, then: 'решение по `on_engine_error`: deny (`policy_unavailable`) по умолчанию, allow с пометкой «без проверки» только в dev (R-GRD-07, FMEA «OPA недоступен»)'}
+- {when: OPA недоступен или ответил медленнее 200 мс, then: 'решение по `on_engine_error`: deny (`policy_unavailable`) по умолчанию, allow с пометкой «без проверки» только в dev (R-GRD-07, FMEA «OPA недоступен»)', reqs: [R-GRD-07]}
 - {when: Битый Rego, then: 'OPA остаётся на прежнем бандле, ошибка загрузки видна (FMEA «Битый Rego»)'}
 - {when: Нет данных правил агента, then: 'deny всех тулов, кроме явно разрешённых в L0 (FMEA «Нет данных правил агента»)'}
 - {when: Хранилище правил недоступно, then: 'OPA работает на последнем загруженном бандле, без бандла — `on_engine_error` (FMEA «Хранилище правил недоступно»)'}

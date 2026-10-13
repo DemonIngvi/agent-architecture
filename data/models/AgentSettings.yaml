@@ -1,7 +1,7 @@
 purpose: настройки агента из Platform module (I4)
 fields:
 - {name: agentId, type: int, required: true, desc: агент}
-- {name: version, type: int, required: true, desc: 'единая версия агента: растёт при любой правке определения или настроек (R-CP-04); та же в `AgentDefinition.version` и `RunBundle.agent.version`'}
+- {name: version, type: int, required: true, desc: 'единая версия агента: растёт при любой правке определения или настроек (R-CP-04); та же в `AgentDefinition.version` и `RunBundle.agent.version`', reqs: [R-CP-04]}
 - {name: autonomy, type: 'enum: R0–R5', required: true, desc: 'уровень автономии: R0 — каждое действие с подтверждением … R5 — без подтверждений'}
 - {name: budget, type: '{runUsd, dayUsd}', required: true, desc: 'лимиты агента в $: на запуск и на день'}
 - {name: sandboxProfile, type: string, required: true, desc: имя профиля среды (`sandbox_profile.name`)}

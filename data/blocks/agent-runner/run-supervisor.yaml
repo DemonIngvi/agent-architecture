@@ -13,7 +13,7 @@ does:
 - 'Хранит checkpoint цикла Harness в схеме `harness_ckpt` (I12): учётных данных БД в sandbox нет'
 io:
 - {dir: ←, with: Platform module, model: [AgentDefinition, AgentSettings, WorkspaceSource], via: [I4]}
-- {dir: →, with: Harness, what: '`RunBundle`, отмена', via: [I7]}
+- {dir: →, with: Harness, model: [RunBundle], what: '`RunBundle`, отмена', via: [I7]}
 - {dir: ↔, with: ICPlan, what: 'heartbeat: аренда, отмена — 404', via: [I3]}
 - {dir: ←, with: Harness, model: [Checkpoint], via: [I12]}
 - {dir: →, with: Finalizer, what: итог или причина остановки}
@@ -23,7 +23,7 @@ data:
 reqs: [R-RUN-01, R-RUN-07, R-RUN-09, R-RUN-17, R-GRD-10, R-HRN-05, R-ICP-07, R-RUN-14]
 tasks: ['2.1', '2.6']
 failures:
-- {when: Нет настроек агента или агент выключен, then: 'запуск `agent_unavailable`, sandbox не создаётся (R-RUN-01, FMEA)'}
+- {when: Нет настроек агента или агент выключен, then: 'запуск `agent_unavailable`, sandbox не создаётся (R-RUN-01, FMEA)', reqs: [R-RUN-01]}
 - {when: Platform module недоступен, then: 'новые запуски не стартуют, кэш настроек не используется (FMEA)'}
 - {when: Превышен `timeout_s` или простой `limits.idle_s`, then: '`limit_exceeded`, частичный итог, слот освобождается', reqs: [R-GRD-10]}
 - {when: Heartbeat вернул 404, then: 'Harness останавливается, итог не шлётся', reqs: [R-ICP-07]}
@@ -35,4 +35,4 @@ ops:
 - {op: манифест рабочего пространства, endpoint: 'GET /platform/runs/:runId/manifest', who: Run supervisor, via: [I4]}
 - {op: '`GET /ready`, затем `POST /run` с `RunBundle`; отмена — `POST /run/cancel`', who: Run supervisor, via: [I7]}
 - {op: продление аренды; 404 — отмена, endpoint: 'POST /agent-runs/:runId/heartbeat', who: Run supervisor, via: [I3]}
-- {op: '`PUT`, `GET /runs/:runId/checkpoint` — приём checkpoint цикла в `run_checkpoint`', label: 'Harness, токен запуска', via: [I12]}
+- {op: '`PUT`, `GET /runs/:runId/checkpoint` — приём checkpoint цикла в `run_checkpoint`', endpoint: 'GET /runs/:runId/checkpoint', label: 'Harness, токен запуска', via: [I12]}

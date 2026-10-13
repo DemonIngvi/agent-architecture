@@ -13,7 +13,7 @@ does:
 - Добавляет указания пользователя и описание `/workspace` в контекст
 io:
 - {dir: ←, with: Bootstrap, what: агент и задание}
-- {dir: ↔, with: Memory, what: '`M3Record`, контекст памяти', via: [I11]}
+- {dir: ↔, with: Memory, model: [M3Record], what: '`M3Record`, контекст памяти', via: [I11]}
 - {dir: ←, with: Agent Runner, model: [UserMessage], via: [I7]}
 - {dir: →, with: LLM client, what: запрос к модели по слоям}
 data:

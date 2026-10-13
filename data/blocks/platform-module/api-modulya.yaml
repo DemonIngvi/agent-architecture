@@ -32,7 +32,7 @@ failures:
 why: Одна БД и одна авторизация с ICPlan.
 rnd: config-storage.md
 ops:
-- {op: '`GET`, `PATCH /platform/agents/:agentId/settings` — настройки агента', label: Администратор, via: [I20]}
-- {op: '`PUT /platform/projects/:projectKey/guidance`, `/budget`, `/access` — настройки проекта', label: Администратор, via: [I20]}
+- {op: '`GET`, `PATCH /platform/agents/:agentId/settings` — настройки агента', endpoint: 'PATCH /platform/agents/:agentId/settings', label: Администратор, via: [I20]}
+- {op: '`PUT /platform/projects/:projectKey/guidance`, `/budget`, `/access` — настройки проекта', endpoint: 'PUT /platform/projects/:projectKey/guidance', label: Администратор, via: [I20]}
 - {op: определение и настройки версии запуска, endpoint: 'GET /platform/runs/:runId/agent', who: Agent Runner, via: [I4]}
 - {op: журнал изменений, endpoint: GET /platform/audit, who: Безопасность, via: [I20]}

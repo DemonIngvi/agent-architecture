@@ -5,7 +5,7 @@ POST /v1/chat/completions:
 GET /model/info:
   request: —
   response: '200 · {data: {model_name, litellm_params, model_info}[]}'
-  note: 'проверка алиаса модели при сохранении агента (R-REG-06); вызывает Platform module master key (I15)'
+  note: проверка алиаса модели при сохранении агента (R-REG-06); вызывает Platform module master key (I15)
 POST /key/generate:
   request: VirtualKey
   response: 200 · {key, key_alias, expires}
@@ -13,4 +13,4 @@ POST /key/generate:
 GET /spend/logs:
   request: 'query: request_id или start_date / end_date'
   response: 200 · LiteLLM_SpendLogs[]
-  note: 'отбор по `metadata.run_id`'
+  note: отбор по `metadata.run_id`

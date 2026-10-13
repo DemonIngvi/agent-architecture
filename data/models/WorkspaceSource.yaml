@@ -4,7 +4,7 @@ fields:
 - {name: type, type: 'enum: git · folder', required: true, desc: вид}
 - {name: url / prefix, type: string, required: true, desc: при `type = git` — `url` репозитория; при `folder` — `prefix` папки в объектном хранилище RustFS (S3)}
 - {name: branch, type: string, required: false, desc: ветка агента `agent/<задача>`}
-- {name: right, type: 'enum: read · write', required: true, desc: 'право по политике (D18): `read` — вся папка и ветка задачи; `write` — только своя подпапка шага и ветка агента'}
+- {name: right, type: 'enum: read · write', required: true, desc: 'право по политике (D18): `read` — вся папка и ветка задачи; `write` — только своя подпапка шага и ветка агента', decisions: [D18]}
 source:
   kind: ours
   refs: [D18]

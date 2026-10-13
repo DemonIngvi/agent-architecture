@@ -14,7 +14,7 @@ io:
 - {dir: ↔, with: Agent Runner, model: [Checkpoint], via: [I12]}
 - {dir: →, with: Event stream, what: '`CUSTOM` `approval_request`, `question`'}
 data:
-- {table: run_checkpoint, access: read-write, why: 'через Runner (I12, владелец — Agent Runner; учётных данных БД в sandbox нет)'}
+- {table: run_checkpoint, access: read-write, via: [I12], why: 'через Runner (I12, владелец — Agent Runner; учётных данных БД в sandbox нет)'}
 - {table: agent_run_delivery, access: indirect, why: решения и ответы доставляет Runner из ICPlan (владелец — ICPlan)}
 reqs: [R-HRN-05, R-HRN-11]
 tasks: ['1.5']

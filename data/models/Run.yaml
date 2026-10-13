@@ -4,10 +4,10 @@ fields:
 - {name: trigger, type: 'enum: mention · delegation · field · schedule · manual · process_step', required: true, desc: 'что создало запуск: упоминание агента в комментарии, назначение делегатом, изменение поля задачи, расписание, ручной запуск; `process_step` — шаг процесса', decisions: [D17]}
 - {name: prompt, type: string, required: true, desc: 'задание, собранное ICPlan'}
 - {name: systemPrompt, type: string, required: true, desc: правила самого запуска от ICPlan}
-- {name: attempts, type: int, required: true, desc: 'сколько раз запуск уже выдавался: аренда `AGENT_RUN_LEASE_SECONDS` = 300 с, Runner продлевает её heartbeat-ом (I3); не продлил — запуск выдаётся снова; после `AGENT_RUN_MAX_ATTEMPTS` = 3 выдач без итога следующий claim завершает его `failed` с `lastError` «Runner did not report a result» (`expireExhaustedRuns` форка)'}
+- {name: attempts, type: int, required: true, desc: 'сколько раз запуск уже выдавался: аренда `AGENT_RUN_LEASE_SECONDS` = 300 с, Runner продлевает её heartbeat-ом (I3); не продлил — запуск выдаётся снова; после `AGENT_RUN_MAX_ATTEMPTS` = 3 выдач без итога следующий claim завершает его `failed` с `lastError` «Runner did not report a result» (`expireExhaustedRuns` форка)', via: [I3]}
 - {name: issueId, type: int | null, required: true, desc: задача; `null` — запуск без задачи (расписание)}
 - {name: issueIdentifier, type: string | null, required: true, desc: 'читаемый ключ задачи, `MKT-42`'}
-- {name: rule, type: '{process, stepId}', required: false, desc: 'шаг процесса, создавший запуск, при `trigger = process_step` (D17): `process` — название типа задачи (= процесса), `stepId` — `ProcessStep.id`; иначе поля нет'}
+- {name: rule, type: '{process, stepId}', required: false, desc: 'шаг процесса, создавший запуск, при `trigger = process_step` (D17): `process` — название типа задачи (= процесса), `stepId` — `ProcessStep.id`; иначе поля нет', decisions: [D17]}
 source:
   kind: fork
   ref: POST /agent-runs/claim

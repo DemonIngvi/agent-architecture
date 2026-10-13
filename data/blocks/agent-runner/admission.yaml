@@ -13,7 +13,7 @@ does:
 - Недоступна OPA — решение по `on_engine_error` (по умолчанию deny)
 io:
 - {dir: ←, with: Scheduler, what: запуск со слотами}
-- {dir: →, label: Guardrails (OPA), what: '`PolicyInput` → `PolicyDecision`', via: [I5]}
+- {dir: →, label: Guardrails (OPA), model: [PolicyInput, PolicyDecision], what: '`PolicyInput` → `PolicyDecision`', via: [I5]}
 - {dir: →, with: Sandbox claim, what: допущенный запуск}
 - {dir: →, with: Event relay, what: решение G1 с причиной — в события запуска}
 data:

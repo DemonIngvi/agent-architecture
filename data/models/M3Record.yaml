@@ -1,7 +1,7 @@
 purpose: состояние задачи и передача следующему шагу (R-MEM-04, D20)
 fields:
 - {name: issueId, type: int, required: true, desc: 'задача, = `issue.id`; ключ записи — (задача, область)'}
-- {name: scope, type: 'enum: issue · agent · project · team', required: true, desc: 'кто видит запись (R-MEM-02): агенты этой задачи, этот агент в других задачах, проект, команда'}
+- {name: scope, type: 'enum: issue · agent · project · team', required: true, desc: 'кто видит запись (R-MEM-02): агенты этой задачи, этот агент в других задачах, проект, команда', reqs: [R-MEM-02]}
 - {name: agentId, type: int, required: true, desc: автор записи}
 - {name: done, type: 'string[]', required: true, desc: сделано}
 - {name: next, type: 'string[]', required: true, desc: дальше}

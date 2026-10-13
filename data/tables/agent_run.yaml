@@ -2,7 +2,7 @@ kind: fork
 written: true
 columns:
 - {name: process_step_id, type: int, fk: process_step, desc: 🛠 шаг процесса запуска — `Run.rule.stepId`, decisions: [D17]}
-- {name: agent_version, type: int, desc: '🛠 версия определения агента запуска (R-REG-03): задаёт задача или Platform module при первом вызове `GET /platform/runs/:runId/agent`', decisions: [D23]}
+- {name: agent_version, type: int, desc: '🛠 версия определения агента запуска (R-REG-03): задаёт задача или Platform module при первом вызове `GET /platform/runs/:runId/agent`', reqs: [R-REG-03], decisions: [D23]}
 - {name: reason, type: text, desc: 🛠 причина итога — `RunResult.reason`, reqs: [R-RUN-07]}
 - {name: artifacts, type: jsonb, desc: 🛠 опубликованное — `RunResult.artifacts`, decisions: [D20]}
 - {name: gate, type: jsonb, desc: 🛠 проверка по критериям — `RunResult.gate`, decisions: [D20]}

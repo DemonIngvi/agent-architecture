@@ -24,6 +24,6 @@ failures:
 why: Воспроизводимость запусков и ревью без Config Repo.
 rnd: config-storage.md
 ops:
-- {op: '`GET /platform/agents/:agentId/settings/versions`, `POST …/settings/rollback` — история и откат', label: Администратор, via: [I20]}
+- {op: '`GET /platform/agents/:agentId/settings/versions`, `POST …/settings/rollback` — история и откат', endpoint: 'GET /platform/agents/:agentId/settings/versions', label: Администратор, via: [I20]}
 - {op: '`GET /platform/agents/:agentId/export`, `POST /platform/agents/import` — YAML `agent/v1`', label: Администратор, via: [I20]}
 - {op: Новая версия при отличии хеша определения, who: Agent Runner, via: [I4], decisions: [D26]}

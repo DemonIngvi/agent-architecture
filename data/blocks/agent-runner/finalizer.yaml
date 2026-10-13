@@ -9,7 +9,7 @@ does:
 - Освобождает слоты
 - Уничтожает контейнер после любого терминального статуса, пул доливается (R-RUN-10)
 io:
-- {dir: ←, with: Run supervisor, what: '`RunResult` или причина остановки'}
+- {dir: ←, with: Run supervisor, model: [RunResult], what: '`RunResult` или причина остановки'}
 - {dir: →, with: ICPlan, model: [RunResult], via: [I2]}
 - {dir: →, with: RustFS, what: вложения, via: [I19]}
 - {dir: →, with: Sandbox, what: destroy, via: [I6]}
@@ -23,7 +23,7 @@ failures:
 - {when: Контейнер не удалился, then: 'повтор удаления (destroy идемпотентен), событие; слот не занимается', reqs: [R-RUN-10]}
 - {when: ICPlan не принял итог, then: повтор отправки; переход задачи — когда итог принят, reqs: [R-ICP-13]}
 - {when: Итог не по формату определения, then: '`gate_failed` или пометка несоответствия', reqs: [R-RUN-08]}
-- {when: RustFS недоступно, then: повтор 3 раза (I19); сценарий отказа итога — задача 2.6.6}
+- {when: RustFS недоступно, then: повтор 3 раза (I19); сценарий отказа итога — задача 2.6.6, via: [I19]}
 why: Каждый запуск заканчивается чисто, без хвостов.
 rnd: sandbox-isolation.md
 ops:

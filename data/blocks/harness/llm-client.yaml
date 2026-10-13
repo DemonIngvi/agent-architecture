@@ -26,7 +26,7 @@ reqs: [R-HRN-03, R-HRN-12, R-HRN-13, R-HRN-18]
 tasks: ['1.3']
 failures:
 - {when: LiteLLM недоступен, then: повтор с backoff; после `circuit.max_errors` — `failed`, fmea: agent-harness}
-- {when: Учётные данные отклонены по I8, then: 'без повтора, событие с причиной', reqs: [R-HRN-12]}
+- {when: Учётные данные отклонены по I8, then: 'без повтора, событие с причиной', via: [I8], reqs: [R-HRN-12]}
 - {when: Параметр не поддерживается моделью, then: 'LiteLLM отбрасывает его (`drop_params`), событие с именем параметра'}
 why: Одна точка выхода к моделям и учёт затрат по задаче.
 rnd: llm-gateway.md

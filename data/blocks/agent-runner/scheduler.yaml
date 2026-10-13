@@ -17,7 +17,7 @@ does:
 - Общие слоты для нескольких Runner через Postgres
 - Освобождает глобальный и модельный слоты на время `waiting_approval`
 io:
-- {dir: ←, with: Poller, what: '`Run` в `queued`'}
+- {dir: ←, with: Poller, model: [Run], what: '`Run` в `queued`'}
 - {dir: →, with: Admission, what: 'запуск, получивший слоты'}
 - {dir: ←, with: Event relay, what: '`waiting_approval` и решение по approve'}
 - {dir: ↔, label: Postgres, what: слоты `scheduler_slot`, via: [I22]}
@@ -26,7 +26,7 @@ data:
 reqs: [R-RUN-02, R-RUN-03, R-RUN-04, R-RUN-05, R-RUN-06, R-RUN-11, R-RUN-12]
 tasks: ['2.7']
 failures:
-- {when: Таблица слотов недоступна, then: 'новые запуски не стартуют (fail-closed), активные продолжаются; после восстановления слоты пересчитываются по активным запускам (R-RUN-06, FMEA «Postgres платформы»)'}
+- {when: Таблица слотов недоступна, then: 'новые запуски не стартуют (fail-closed), активные продолжаются; после восстановления слоты пересчитываются по активным запускам (R-RUN-06, FMEA «Postgres платформы»)', reqs: [R-RUN-06]}
 - {when: Экземпляр Runner упал с занятыми слотами, then: слоты освобождаются по истечении аренды `lease_until`, reqs: [R-RUN-06]}
 - {when: Конфиг `scheduling` вне границ, then: 'значение отклоняется с именем параметра и границами, без обязательных параметров Runner не стартует', reqs: [R-RUN-11]}
 why: Учитывает общие модели и агентов, которые нельзя параллелить; режим платформы — одной настройкой.

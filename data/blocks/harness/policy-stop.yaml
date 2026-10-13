@@ -12,7 +12,7 @@ does:
 io:
 - {dir: ←, with: Context Manager, what: 'ход цикла: шаги, токены'}
 - {dir: ←, with: Agent Runner, what: отмена, via: [I7]}
-- {dir: →, with: Agent Runner, what: '`RunResult` с частичным итогом', via: [I7]}
+- {dir: →, with: Agent Runner, model: [RunResult], what: '`RunResult` с частичным итогом', via: [I7]}
 data:
 - {table: agent_run, access: indirect, why: статус и итог `RunResult` пишет Runner в ICPlan (владелец — ICPlan)}
 reqs: [R-HRN-08, R-HRN-09, R-RUN-07]

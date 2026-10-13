@@ -519,6 +519,7 @@ def split_ids(text):
 
 
 def join_ids(body, fmea=None, ids=()):
+    ids = [i for i in ids if not re.search(rf"(?<![\w-]){re.escape(i)}(?![\w-])", body or "")]  # ID уже в тексте — не повторять
     groups = ([f"FMEA {fmea}"] if fmea else []) + ([", ".join(ids)] if ids else [])
     if not groups:
         return body

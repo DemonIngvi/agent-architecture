@@ -40,7 +40,7 @@ data:
 - {table: agent_schedule, access: write, why: регулярная работа агента}
 - {table: team, access: write, why: '`mcp_enabled` — доступ команды к MCP ICPlan'}
 - {table: project, access: write, why: '`mcp_enabled` — проекты, которые охватывает доступ к MCP'}
-- {table: agent_settings, access: write, why: 'через API Platform module: наши настройки (I20)'}
+- {table: agent_settings, access: write, via: [I20], why: 'через API Platform module: наши настройки (I20)'}
 - {table: agent_settings_version, why: 'чтение, запись: история и откат настроек'}
 - {table: kill_switch, access: write, why: '`agent:<id>` — карточка, `platform` — God mode'}
 - {table: project_platform, access: write, why: 'руководство, бюджет, шаг подготовки'}
@@ -52,8 +52,8 @@ reqs: [R-ICP-01, R-REG-02, R-ICP-08, R-ICP-17, R-ICP-18, R-REG-06, R-AP-03, R-AP
 tasks: ['2.3', '3.1', '3.5', '3.8']
 failures:
 - {when: БД ICPlan недоступна, then: 'настройки не сохраняются, определения не читаются, запуски не стартуют', fmea: agent-registry}
-- {when: Модель не настроена в LiteLLM, then: 'сохранение агента отклоняется с указанием модели, 400 (R-REG-06 «Модель без доступа»)'}
-- {when: LiteLLM недоступен при проверке модели, then: 'смена модели не сохраняется, 503 и сообщение «проверить модель нельзя, повторите»; правка без смены модели сохраняется (R-REG-06 «Шлюз недоступен»)'}
+- {when: Модель не настроена в LiteLLM, then: 'сохранение агента отклоняется с указанием модели, 400 (R-REG-06 «Модель без доступа»)', reqs: [R-REG-06]}
+- {when: LiteLLM недоступен при проверке модели, then: 'смена модели не сохраняется, 503 и сообщение «проверить модель нельзя, повторите»; правка без смены модели сохраняется (R-REG-06 «Шлюз недоступен»)', reqs: [R-REG-06]}
 - {when: Platform module работает внутри api ICPlan, then: 'отдельного отказа нет: недоступен api — недоступен весь экран'}
 why: 'UI уже есть — не пишем свою консоль; наши настройки добавляются экранами Platform module у своего объекта: агент — в карточке, проект — в проекте, экземпляр — в God mode (D24).'
 rnd: tracker-choice.md

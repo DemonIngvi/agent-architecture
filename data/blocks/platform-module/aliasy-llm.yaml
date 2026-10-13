@@ -13,12 +13,12 @@ io:
 - {dir: →, label: LiteLLM, what: алиас и резервная модель ключа, via: [I15]}
 data:
 - {table: ai_agent, access: read, why: '`model` — алиас агента'}
-- {table: LiteLLM_VerificationToken, access: write, why: 'через admin API: алиас ключа агента (I15)'}
+- {table: LiteLLM_VerificationToken, access: write, via: [I15], why: 'через admin API: алиас ключа агента (I15)'}
 reqs: [R-CP-06, R-CP-11, R-REG-02, R-REG-06]
 tasks: ['4.4']
 failures:
 - {when: LiteLLM admin API недоступен, then: 'изменение помечено «не применено», автоповтор', reqs: [R-CP-11]}
-- {when: Алиаса нет в `model_list`, then: сохранение агента отклоняется с указанием модели (R-REG-06 «Модель без доступа»)}
+- {when: Алиаса нет в `model_list`, then: сохранение агента отклоняется с указанием модели (R-REG-06 «Модель без доступа»), reqs: [R-REG-06]}
 why: Модель меняется в одном месте.
 rnd: llm-gateway.md
 ops:

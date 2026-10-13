@@ -12,20 +12,20 @@ does:
 - Запись — только в ветку с префиксом агента; push в защищённую ветку отклоняется
 - Учётные данные держит MCP-сервер и MCP-прокси Runner, в sandbox и контекст агента они не попадают
 io:
-- {dir: ←, label: MCP-прокси Agent Runner, what: '`McpToolCall`: `tools/list`, `tools/call`', via: [I9]}
+- {dir: ←, label: MCP-прокси Agent Runner, model: [McpToolCall], what: '`McpToolCall`: `tools/list`, `tools/call`', via: [I9]}
 - {dir: →, label: «git-провайдер», what: вызов API провайдера с короткоживущим токеном от Runner, via: [I18]}
-- {dir: →, with: Harness, what: ссылка на ветку и PR для `RunResult`}
+- {dir: →, with: Harness, model: [RunResult], what: ссылка на ветку и PR для `RunResult`}
 data:
 - {table: project_resource, access: read, via: [I4], why: 'репозитории проекта (`kind = git`) и MCP-серверы агента (`kind = mcp`, владелец Platform module)'}
 - {table: access_policy, access: read, via: [I4], why: права агента на репозитории и ветки (владелец Platform module)}
 reqs: [R-MCP-01, R-MCP-02, R-MCP-03, R-MCP-04, R-MCP-09, R-SBX-04]
 tasks: ['4.2']
 failures:
-- {when: Провайдер недоступен, then: 'ошибка тула агенту, цикл продолжается; чтение повторяется 2 раза, запись — нет (FMEA «MCP-сервер недоступен», R-MCP-09)'}
+- {when: Провайдер недоступен, then: 'ошибка тула агенту, цикл продолжается; чтение повторяется 2 раза, запись — нет (FMEA «MCP-сервер недоступен», R-MCP-09)', reqs: [R-MCP-09]}
 - {when: Секрет сервера не задан, then: 'тулы сервера недоступны агенту, предупреждение (FMEA «Секрет MCP не задан»)'}
-- {when: Тул вне allowlist, then: вызов отклонён MCP-прокси без обращения к серверу (R-MCP-02 «Тул вне списка»)}
+- {when: Тул вне allowlist, then: вызов отклонён MCP-прокси без обращения к серверу (R-MCP-02 «Тул вне списка»), reqs: [R-MCP-02]}
 - {when: Репозиторий вне манифеста запуска или защищённая ветка, then: 'токен не выдан, запись отклонена', reqs: [R-SBX-04]}
-- {when: Ответ длиннее `max_result_kb`, then: обрезается с пометкой (R-MCP-03 «Большой ответ»)}
+- {when: Ответ длиннее `max_result_kb`, then: обрезается с пометкой (R-MCP-03 «Большой ответ»), reqs: [R-MCP-03]}
 why: Агент-разработчик отдаёт код через PR, без прямого push. Тул нужен нескольким агентам и держит секрет вне агента — значит MCP-сервер (R3, R-MCP-04).
 rnd: mcp-vs-direct.md
 ops:

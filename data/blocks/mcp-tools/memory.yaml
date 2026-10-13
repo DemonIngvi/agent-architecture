@@ -10,17 +10,17 @@ does:
 - Проверки записи делает Memory (профиль, область, схема, размер, секреты); тулу возвращается причина отказа
 - Используется только Harness, поэтому не MCP-сервер (R4, R-MCP-04)
 io:
-- {dir: ←, with: Harness · Tool Executor, what: вызов тула памяти с `M3Record`}
-- {dir: →, with: Memory API, model: [M3Record], what: 'запись M3 (I11, `PUT /m3/:issueId`)'}
+- {dir: ←, with: Harness · Tool Executor, model: [M3Record], what: вызов тула памяти с `M3Record`}
+- {dir: →, with: Memory API, model: [M3Record], what: 'запись M3 (I11, `PUT /m3/:issueId`)', via: [I11]}
 data:
-- {table: memory_m3, access: write, why: 'через Memory API (I11, владелец — Memory); тул в БД не ходит'}
+- {table: memory_m3, access: write, via: [I11], why: 'через Memory API (I11, владелец — Memory); тул в БД не ходит'}
 reqs: [R-MEM-04, R-MEM-15, R-MCP-04]
 tasks: ['2.5']
 failures:
 - {when: Memory API недоступен, then: 'тулу возвращается ошибка, запуск продолжается; запись M3 повторяется в конце', fmea: agent-harness, reqs: [R-MEM-04]}
 - {when: Запись больше `m3_max_kb` или с секретом, then: 'отклонена с причиной, агент исправляет или продолжает без записи', reqs: [R-MEM-15]}
-- {when: Два запуска пишут M3 одновременно, then: 'сохраняется последняя версия, прежняя остаётся в истории (R-MEM-04 «Конфликт записи»)'}
+- {when: Два запуска пишут M3 одновременно, then: 'сохраняется последняя версия, прежняя остаётся в истории (R-MEM-04 «Конфликт записи»)', reqs: [R-MEM-04]}
 why: Используется только Harness — MCP не нужен, лишний прыжок и описания тула в контексте (R4).
 rnd: mcp-vs-direct.md
 ops:
-- {op: 'тул памяти: запись `M3Record` — `PUT /m3/:issueId` (Memory API)', who: Harness · Tool Executor, via: [I11]}
+- {op: 'тул памяти: запись `M3Record` — `PUT /m3/:issueId` (Memory API)', endpoint: 'PUT /m3/:issueId', who: Harness · Tool Executor, via: [I11]}

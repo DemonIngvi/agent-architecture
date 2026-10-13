@@ -14,13 +14,13 @@ io:
 data:
 - {table: agent_settings, access: read-write, why: '`budget_run_usd`, `budget_day_usd`'}
 - {table: project_platform, access: read-write, why: '`budget_month_usd`'}
-- {table: LiteLLM_VerificationToken, access: write, why: 'через admin API: лимит ключа (I15)'}
-- {table: LiteLLM_BudgetTable, access: write, why: 'через admin API: бюджеты (I15)'}
+- {table: LiteLLM_VerificationToken, access: write, via: [I15], why: 'через admin API: лимит ключа (I15)'}
+- {table: LiteLLM_BudgetTable, access: write, via: [I15], why: 'через admin API: бюджеты (I15)'}
 reqs: [R-CP-01, R-CP-03, R-CP-06]
 tasks: ['4.4']
 failures:
-- {when: LiteLLM не отвечает при сохранении бюджета, then: 'изменение «не применено», повтор (R-CP-06 «LiteLLM недоступен»)'}
-- {when: Бюджет в модуле и в LiteLLM различается, then: предупреждение администратору (R-CP-06 «Рассинхронизация»)}
+- {when: LiteLLM не отвечает при сохранении бюджета, then: 'изменение «не применено», повтор (R-CP-06 «LiteLLM недоступен»)', reqs: [R-CP-06]}
+- {when: Бюджет в модуле и в LiteLLM различается, then: предупреждение администратору (R-CP-06 «Рассинхронизация»), reqs: [R-CP-06]}
 - {when: Отрицательный бюджет или выше потолка, then: 400 с названием поля, reqs: [R-CP-01]}
 why: Иерархия бюджетов — стандарт (LiteLLM, облачные биллинги).
 rnd: runaway-protection.md
