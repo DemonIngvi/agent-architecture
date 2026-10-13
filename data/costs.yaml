@@ -189,3 +189,33 @@ costs:
   minutes: 6
   expected: [50000, 80000]
   note: 'lint-fix C: agent-runner, observability, guardrails, harness, sandbox, mcp-tools → 0; прерван лимитом'
+- date: '2026-10-13'
+  process: tooling
+  methodology: data-methodology.md#yaml
+  units: 1
+  unit: инструмент
+  tokens: 290700
+  model: opus
+  minutes: 22
+  expected: [200000, 300000]
+  note: строгая структура YAML, 232 файла, JSON Schema
+- date: '2026-10-13'
+  process: review-batch
+  methodology: approval-methodology.md#economy
+  units: 104
+  unit: документ
+  tokens: 125000
+  model: sonnet
+  minutes: 1
+  expected: [1000, 1900]
+  note: 'БРАК: 3 пачки, 295 пар, один шаблонный комментарий; решения откачены, добавлена защита approve-batch'
+- date: '2026-10-13'
+  process: review-batch
+  methodology: approval-methodology.md#economy
+  units: 104
+  unit: документ
+  tokens: 168100
+  model: sonnet
+  minutes: 6
+  expected: [1000, 1900]
+  note: '3 пачки (40+40+24 страниц), 295 пар: ✅285 ❌10; агент doc-batch-reviewer; уникальные комментарии ~140 симв.'

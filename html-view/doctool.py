@@ -458,7 +458,16 @@ def main():
     elif cmd == "approve-batch":  # решения пачки из JSON одним захватом блокировки реестра
         sys.path.insert(0, str(HERE))
         import approvals as AP
-        done, errs = AP.set_decisions(json.loads(Path(args[0]).read_text(encoding="utf-8")), human="--human" in args)
+        from collections import Counter
+        dec = json.loads(Path(args[0]).read_text(encoding="utf-8"))
+        # защита от шаблонных решений (approval-methodology.md#economy): у каждой пары — свой проверенный факт
+        top = Counter(d.get("comment", "") for d in dec).most_common(1)
+        short = [f"{d.get('page')} × {d.get('role')}" for d in dec if len(d.get("comment", "")) < 40 or not re.search(r"[A-Z]{1,4}-?[A-Z]*-?\d|`|\b[IDS]\d+|\d+\.\d+", d.get("comment", ""))]
+        if len(dec) >= 5 and top and top[0][1] > max(2, len(dec) // 10):
+            sys.exit(f"⛔ шаблонные решения: комментарий «{top[0][0][:60]}» у {top[0][1]} из {len(dec)} пар — у каждой пары свой проверенный факт; ничего не применено")
+        if short:
+            sys.exit(f"⛔ {len(short)} решений без проверенного факта (нужно ≥ 40 символов и ID / поле / номер из карточки), например: {', '.join(short[:5])}; ничего не применено")
+        done, errs = AP.set_decisions(dec, human="--human" in args)
         print("\n".join(done + [f"⚠️ {e}" for e in errs]))
         print(f"применено {len(done)}: ✅ {sum(d.endswith('✅') for d in done)}, ❌ {sum(d.endswith('❌') for d in done)}; ошибок {len(errs)}")
         sys.exit(1 if errs else 0)
