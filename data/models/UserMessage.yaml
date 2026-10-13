@@ -1,0 +1,10 @@
+purpose: указание пользователя во время работы
+fields:
+- [id, string, true, 'идентификатор сообщения ICPlan, ключ от повторной доставки']
+- [text, string, true, текст указания]
+- [by, string, true, '`username` автора']
+- [at, timestamp, true, когда написано]
+source:
+  kind: ours
+  ref: D17, R-ICP-16
+  why: Указание пользователя во время запуска; доставляется в ответе heartbeat и попадает в ленту задачи.

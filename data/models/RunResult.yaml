@@ -1,0 +1,21 @@
+purpose: итог запуска (`POST /agent-runs/:runId/result`)
+fields:
+- [status, 'enum: success · failed', true, 'отмену фиксирует ICPlan сам, раннер её не сообщает']
+- [output, string | null, false, итог для истории; ICPlan обрезает до 10 000 символов]
+- [error, string | null, false, причина при `failed`; ICPlan обрезает до 500 символов]
+- [usage, '{inputTokens, outputTokens, reasoningTokens, costUsd, iterations}', false, 'расход; `reasoningTokens`, `costUsd`, `iterations` (итерации цикла) — добавляем (D18)']
+- [reason, 'enum: done · limit · gate_failed · error', false, 'причина Harness (R-RUN-07): `done` → `status = success`; `limit`, `gate_failed`, `error` → `failed`']
+- [artifacts, '{name, url}[]', false, 'опубликованное для человека: файл в RustFS (`s3://…`), ветка или PR (D20); в M3 — рабочие ссылки `{path, ref}`']
+- [gate, '{passed: bool, failed: Criterion[]}', false, 'проверка по критериям (R-HRN-08, D20): не выполненные критерии']
+- [criteriaNext, 'Criterion[]', false, 'критерии, предложенные следующему шагу (D20, D26): Runner берёт их из итога Harness; ICPlan при приёме итога создаёт пункты чек-листа задачи с `origin = agent:<username>` и `status` по `criteriaApproval` шага']
+source:
+  kind: fork
+  ref: POST /agent-runs/{runId}/result
+  part: request
+  why: 'Тело, которое форк уже принимает от раннера: `status`, `output`, `error`, `usage` с `inputTokens` и `outputTokens`. Добавляем то, без чего не работают D18 и D20: причину Harness, артефакты, проверку по критериям, стоимость и токены размышлений.'
+planned:
+  usage: D18 (`reasoningTokens`, `costUsd`, `iterations`)
+  reason: R-RUN-07
+  artifacts: D20
+  gate: D20
+  criteriaNext: D26

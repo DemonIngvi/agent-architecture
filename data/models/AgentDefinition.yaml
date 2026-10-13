@@ -1,0 +1,17 @@
+purpose: определение агента в YAML `agent/v1` — экспорт и импорт (R-REG-04, R-CP-05)
+fields:
+- [apiVersion, 'const: agent/v1', true, версия формата]
+- [id, string, true, имя агента (`username` в ICPlan)]
+- [version, int, true, версия определения]
+- [model, string, true, алиас LiteLLM]
+- [instructions, string, true, инструкция агента]
+- [skills, 'string[]', false, навыки]
+- [mcp, '{server, tools[]}[]', false, 'MCP-серверы и разрешённые тулы; источник — `project_resource` (`mcp`) и `access_policy` Platform module: MCP-серверов агента в форке нет (D23)']
+- [limits, '{max_steps, timeout_s, max_tokens}', false, параметры `limits.*`]
+- [approval, '{tools[]}', false, тулы с подтверждением]
+- [memory, '{profile, read[], write[]}', false, профиль памяти]
+- [sandbox, '{profile}', false, профиль среды]
+source:
+  kind: ours
+  ref: R-REG-04, R-CP-05, задача 1.2
+  why: 'Файл для ревью и переноса агента между окружениями: снимок `ai_agent` (ICPlan) и `AgentSettings` (Platform module), источник правды — они, файл только читается и импортируется. Агент в файле — `id` = `username`, потому что числовой `agentId` в другом окружении другой. Имена — как у параметров конфигурации: YAML snake_case (`limits.max_steps`, `memory.read` — уровни памяти M0–M6), единицы — суффиксом `_s`. Исключение — `apiVersion`: заголовок формата, как в манифестах Kubernetes.'

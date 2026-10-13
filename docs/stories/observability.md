@@ -2,7 +2,7 @@
 
 ← [Все истории](README.md) · [как работает](../how/observability.md)
 
-> Сгенерировано из `html-view/stories.py` — правьте там.
+> Сгенерировано из `data/stories/observability/` (история — файл `<US-ID>.yaml`) и `data/processes/observability.yaml` — правьте там.
 
 ## Процесс 1. События и чат запуска
 

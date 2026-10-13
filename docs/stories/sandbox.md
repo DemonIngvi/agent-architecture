@@ -2,7 +2,7 @@
 
 ← [Все истории](README.md) · [как работает](../how/sandbox.md)
 
-> Сгенерировано из `html-view/stories.py` — правьте там.
+> Сгенерировано из `data/stories/sandbox/` (история — файл `<US-ID>.yaml`) и `data/processes/sandbox.yaml` — правьте там.
 
 ## Процесс 1. Среда запуска и сеть
 

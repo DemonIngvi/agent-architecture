@@ -1,0 +1,16 @@
+title: itsaplan-core
+tech: MCP-сервер ICPlan (`POST /mcp` в api ICPlan), весь REST API как тулы
+params:
+- [Включение, 'на проект, по умолчанию выкл']
+- [Ключ, API-ключ агента; подставляет MCP-прокси Runner]
+- [Allowlist, 'get_issue, add_comment, update_issue…']
+does:
+- Агент читает задачу, пишет комментарий, меняет поля задачи; колонку задачи в процессе меняет ICPlan по итогу запуска (D17)
+- Доступ к документам проекта (M6)
+reqs: [R-MCP-13, R-AP-16]
+tasks: ['2.4']
+why: 'Уже есть в ICPlan; стандарт MCP: тот же сервер используют и наши агенты, и внешние CLI.'
+rnd: mcp-vs-direct.md
+iface:
+- I9
+- I24

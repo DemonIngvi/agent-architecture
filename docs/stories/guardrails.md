@@ -2,7 +2,7 @@
 
 ← [Все истории](README.md) · [как работает](../how/guardrails.md)
 
-> Сгенерировано из `html-view/stories.py` — правьте там.
+> Сгенерировано из `data/stories/guardrails/` (история — файл `<US-ID>.yaml`) и `data/processes/guardrails.yaml` — правьте там.
 
 ## Процесс 1. Проверка действия
 

@@ -1,0 +1,10 @@
+title: События запуска
+tech: Таблица `run_event` в БД ICPlan
+params:
+- [events.level, всё]
+- [retention_days, '90']
+does:
+- Хранит шаги запуска
+- Источник чата запуска и аудита
+why: Самый дешёвый способ дать чат запуска в MVP.
+rnd: observability.md

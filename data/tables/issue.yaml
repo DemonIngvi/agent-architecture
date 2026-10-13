@@ -1,0 +1,3 @@
+kind: fork
+columns:
+- [review_with_me, bool, '', '🛠 проверять со мной все шаги (D17, R-AP-18)']

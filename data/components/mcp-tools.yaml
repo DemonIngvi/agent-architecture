@@ -1,0 +1,46 @@
+name: MCP / Tools
+status: part
+guardrails: ''
+desc: 'Тулы и MCP-серверы агента; правила R1–R7: MCP или прямой вызов.'
+specs:
+- [Спека, openspec/changes/define-agent-platform/specs/tool-integration/spec.md]
+- [Схема, openspec/changes/define-agent-platform/specs/tool-integration/architecture.md]
+tasks: ['2.4']
+about:
+  chain:
+  - [Harness, harness]
+  - [MCP / Tools, mcp-tools]
+  - [ICPlan, icplan]
+  purpose: 'Руки агента: действия во внешних системах — задачи, документы, git.'
+  does:
+  - 'MCP ICPlan: читать задачу, писать комментарий, менять статус'
+  - 'MCP git-провайдера: ветки и PR'
+  - Тул памяти для записи M3
+  - Allowlist в MCP-прокси Runner вне sandbox (D19), таймауты
+  - 'Правила R1–R7: когда MCP, когда прямой вызов'
+stores: [S1]
+icplan_tables:
+- [aiAgent, '']
+- [agentTool, '']
+- [agentToolLink, '']
+- [agentSkill, '']
+- [agentSkillLink, '']
+- [integrationCredential, '']
+- [project, '`mcp_enabled`']
+- [gitProviderConnection, '']
+- [gitManagedRepository, '']
+blocks:
+- - {title: Harness · Tool Executor, desc: вызывает тулы, kind: ext, to: harness}
+- ↓ решает модель → тул · детерминированное → прямой вызов
+- - {title: Правила R1–R7, desc: 'MCP, нативный тул или прямой вызов', kind: core, st: todo}
+- ↓
+- zone: MCP-серверы и тулы
+  rows:
+  - - {title: itsaplan-core, desc: 'задачи, комментарии, документы', kind: core, st: done}
+    - {title: git-провайдер, desc: 'PR, ревью (Gitea / GitHub)', kind: core, st: todo}
+    - {title: memory, desc: запись M3, kind: core, st: todo}
+  - - {title: web-research, desc: интернет, kind: back}
+    - {title: Админ-MCP, desc: 'бюджеты, политики — не для рабочих агентов', kind: back}
+- ↓
+- - {title: ICPlan, desc: MCP itsaplan-core, kind: ext, to: icplan}
+  - {title: Agent Runner, desc: 'MCP-прокси: allowlist, G2, ключи', kind: ext, to: agent-runner}

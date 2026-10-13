@@ -2,7 +2,7 @@
 
 ← [Все истории](README.md) · [методика](../rules/us-methodology.md) · [персоны](personas.md)
 
-> Сгенерировано при сборке из `html-view/stories.py`.
+> Сгенерировано при сборке из `data/stories/` (YAML по единице).
 
 ## Персона × компонент
 

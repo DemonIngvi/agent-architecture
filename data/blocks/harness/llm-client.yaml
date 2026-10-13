@@ -1,0 +1,34 @@
+title: LLM client
+tech: OpenAI-совместимый клиент → LiteLLM
+kind: service
+stories: [US-HAR-01]
+params:
+- [model.temperature, '0.2']
+- [model.top_p, '1.0']
+- [model.max_output_tokens, '8192']
+- [model.reasoning_effort, medium]
+- [model.reasoning_budget_tokens, '8000']
+- [model.tool_choice, auto]
+- [model.response_format, text]
+- [request.timeout_s, '120']
+does:
+- Вызывает модель только через LiteLLM
+- Передаёт метаданные для учёта
+- Повторяет вызов с backoff (2 раза); токены повтора учитываются в бюджете
+io:
+- [←, Context Manager, запрос по слоям]
+- [→, llm-gateway, '`ChatCompletionRequest` (I8)']
+- [→, Tool Executor, запросы вызова тулов из ответа модели]
+data:
+- [LiteLLM_SpendLogs, 'косвенно: LiteLLM пишет расход вызова с `metadata.run_id` (владелец — LLM Gateway)']
+- [LiteLLM_VerificationToken, 'косвенно: virtual key агента проверяет LiteLLM; ключ подставляет egress-прокси (владелец — LLM Gateway)']
+reqs: [R-HRN-03, R-HRN-12, R-HRN-13, R-HRN-18]
+tasks: ['1.3']
+failures:
+- LiteLLM недоступен — повтор с backoff; после `circuit.max_errors` — `failed` (FMEA agent-harness)
+- Учётные данные отклонены по I8 — без повтора, событие с причиной (R-HRN-12)
+- Параметр не поддерживается моделью — LiteLLM отбрасывает его (`drop_params`), событие с именем параметра
+why: Одна точка выхода к моделям и учёт затрат по задаче.
+rnd: llm-gateway.md
+ops:
+- ['узел `llm`: OpenAI Chat Completions к LiteLLM по алиасу модели агента, SSE-стрим, `metadata.run_id`', граф LangGraph, I8]

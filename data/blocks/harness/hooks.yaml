@@ -1,0 +1,27 @@
+title: Hooks
+tech: Узлы графа before/after llm и tool, on_stop
+kind: service
+stories: [US-HAR-02, US-HAR-04]
+params:
+- [hooks, G2]
+does:
+- Проверяет каждое действие (G2)
+- Ловит зацикливание и серию ошибок (R-GRD-09, R-GRD-13)
+- Может изменить аргументы или отклонить вызов; изменение видно в событии
+io:
+- [←, LLM client, действие перед вызовом тула]
+- [↔, guardrails, '`PolicyInput` / `PolicyDecision` (I10)']
+- [→, Pause / resume, решение «нужно подтверждение»]
+- [→, Event stream, решение G2 событием]
+data:
+- [run_event, 'косвенно: решение G2 — событие `CUSTOM` `guardrail_decision`, пишет Runner (владелец — Observability)']
+reqs: [R-HRN-04, R-GRD-09, R-GRD-13]
+tasks: ['1.5', '1.6']
+failures:
+- Hook упал с исключением — действие отклоняется (fail-closed), событие об ошибке hook (R-HRN-04)
+- OPA не ответил за 200 мс — без повтора, по `on_engine_error` (I10)
+why: Правила применяются на каждом шаге детерминированно.
+rnd: runaway-protection.md
+ops:
+- ['`before_tool` / `after_tool`, `before_llm` / `after_llm`, `on_stop` — узлы графа', граф LangGraph, внутри]
+- [проверка действия G2 — `POST /v1/data/agent/g2`, hook `before_tool`, I10]

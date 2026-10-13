@@ -1,0 +1,12 @@
+title: Traefik
+tech: Traefik v3.7 (в составе k3s), MIT
+params:
+- [entrypoints, web → websecure (HTTPS)]
+- [TLS, ACME / свой сертификат]
+- [маршруты, 'web, api, /mcp']
+does:
+- Принимает внешний трафик по HTTPS
+- Маршрутизирует на сервисы ICPlan
+- Не публикует админки
+why: Встроен в k3s, ingress-nginx архивирован.
+rnd: ingress-and-balancing.md

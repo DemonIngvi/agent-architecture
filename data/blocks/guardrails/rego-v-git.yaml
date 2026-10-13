@@ -1,0 +1,9 @@
+title: Rego в git
+tech: Rego-политики
+params:
+- [Тесты, opa test в CI]
+- [Ревью, через PR]
+does:
+- 'Логика: что разрешено, что требует подтверждения'
+why: Безопасник ревьюит политику, а не код сервисов.
+rnd: guardrails-engine.md

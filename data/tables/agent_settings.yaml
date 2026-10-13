@@ -1,0 +1,24 @@
+kind: platform
+store: S2
+owner: platform-module
+schema: itsaplan.platform
+columns:
+- [agent_id, int, 'PK, FK ai_agent', '']
+- [version, int, '', текущая версия]
+- [autonomy_level, text, '', R0–R5]
+- [budget_run_usd, numeric, '', '']
+- [budget_day_usd, numeric, '', '']
+- [sandbox_profile_id, int, FK sandbox_profile, '']
+- [memory_profile_id, int, FK memory_profile, '']
+- [tools_allow, jsonb, '', '']
+- [approval_tools, jsonb, '', '']
+- [scheduling, jsonb, '', 'parallel, max']
+- [updated_by, text, '', '']
+- [updated_at, timestamptz, '', '']
+policy:
+  indexes:
+  - [index, sandbox_profile_id, FK]
+  - [index, memory_profile_id, FK]
+  retention: пока жив агент
+  cleanup: каскадно с агентом
+  migrate: cp

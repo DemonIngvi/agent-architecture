@@ -1,0 +1,20 @@
+kind: platform
+store: S2
+owner: platform-module
+schema: itsaplan.platform
+columns:
+- [id, serial, PK, '']
+- [name, text, '', 'light, coder…']
+- [image, text, '', '']
+- [runtime, text, '', runc / runsc]
+- [cpu, numeric, '', '']
+- [memory_mb, int, '', '']
+- [disk_gb, int, '', '']
+- [egress_allow, jsonb, '', '']
+- [pool_size, int, '', '']
+policy:
+  indexes:
+  - [unique, name, профиль по имени]
+  retention: бессрочно (справочник)
+  cleanup: удаление запрещено, пока профиль используется
+  migrate: cp

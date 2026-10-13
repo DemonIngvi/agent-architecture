@@ -2,7 +2,7 @@
 
 ← [Все истории](README.md) · [как работает](../how/memory.md)
 
-> Сгенерировано из `html-view/stories.py` — правьте там.
+> Сгенерировано из `data/stories/memory/` (история — файл `<US-ID>.yaml`) и `data/processes/memory.yaml` — правьте там.
 
 ## Процесс 1. Память на всех уровнях M0–M6: кто пишет и кто читает
 

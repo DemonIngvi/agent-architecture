@@ -1,0 +1,17 @@
+kind: platform
+store: S3
+owner: agent-runner
+schema: itsaplan.runner
+columns:
+- [slot_key, text, PK, 'global:N / agent:<id> / model:<alias> / issue:<id>']
+- [run_id, int, FK agent_run, '']
+- [runner_id, text, '', экземпляр Runner]
+- [lease_until, timestamptz, '', аренда слота]
+- [acquired_at, timestamptz, '', '']
+policy:
+  indexes:
+  - [index, run_id, FK; освобождение по запуску]
+  - [index, lease_until, забор просроченных аренд]
+  retention: на время аренды
+  cleanup: строка удаляется при освобождении; просроченная аренда (`lease_until`) забирается
+  migrate: runner

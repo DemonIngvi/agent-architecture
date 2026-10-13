@@ -1,0 +1,30 @@
+title: Pause / resume
+tech: LangGraph `interrupt` + свой checkpointer через API Runner (I12, D18)
+kind: service
+stories: [US-HAR-02, US-HAR-05, US-HAR-07, US-ICP-11]
+params:
+- [approval.tools, из guardrails]
+- [checkpoint.ttl, 7 дней]
+does:
+- Останавливается на approve или вопросе
+- Продолжает с того же шага без повтора предыдущих
+- Восстанавливается после падения процесса из checkpoint Runner
+io:
+- [←, Agent Runner, '`ApprovalDecision` (I7)']
+- [↔, Agent Runner, '`Checkpoint` (I12)']
+- [→, Event stream, '`CUSTOM` `approval_request`, `question`']
+data:
+- [run_checkpoint, 'запись, чтение через Runner (I12, владелец — Agent Runner; учётных данных БД в sandbox нет)']
+- [agent_run_delivery, 'косвенно: решения и ответы доставляет Runner из ICPlan (владелец — ICPlan)']
+reqs: [R-HRN-05, R-HRN-11]
+tasks: ['1.5']
+failures:
+- Checkpointer недоступен — пауза невозможна, опасные действия отклоняются (FMEA agent-harness)
+- Подтверждение не пришло за `approval_timeout` — действие отклонено, запуск продолжается без него или завершается по политике
+- Процесс упал — новый процесс продолжает с последнего сохранённого шага
+why: Ключевое преимущество LangGraph перед своим циклом.
+rnd: harness-framework.md
+ops:
+- ['`interrupt` перед тулом из `approval.tools` или на вопрос пользователю', 'Hooks, агент', внутри]
+- ['`POST /run/approval` — решение пользователя или ответ на вопрос', Agent Runner, I7]
+- ['`PUT /runs/:runId/checkpoint` — состояние после шага; `GET /runs/:runId/checkpoint` — восстановление', Pause / resume → Agent Runner, I12]

@@ -2,7 +2,7 @@
 
 ← [Все истории](README.md) · [как работает](../how/mcp-tools.md)
 
-> Сгенерировано из `html-view/stories.py` — правьте там.
+> Сгенерировано из `data/stories/mcp-tools/` (история — файл `<US-ID>.yaml`) и `data/processes/mcp-tools.yaml` — правьте там.
 
 ## Процесс 1. Вызов тула
 

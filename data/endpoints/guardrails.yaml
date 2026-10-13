@@ -1,0 +1,12 @@
+POST /v1/data/agent/g1:
+  request: PolicyInput
+  response: 200 · PolicyDecision
+  note: конверт `{input}` → `{result}` — REST API OPA
+POST /v1/data/agent/g2:
+  request: PolicyInput
+  response: 200 · PolicyDecision
+  note: ''
+GET /health?bundles:
+  request: —
+  response: 200 · {}
+  note: 200 — бандл загружен (OPA)

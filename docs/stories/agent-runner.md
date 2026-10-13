@@ -2,7 +2,7 @@
 
 ← [Все истории](README.md) · [как работает](../how/agent-runner.md)
 
-> Сгенерировано из `html-view/stories.py` — правьте там.
+> Сгенерировано из `data/stories/agent-runner/` (история — файл `<US-ID>.yaml`) и `data/processes/agent-runner.yaml` — правьте там.
 
 ## Процесс 1. Запуск из очереди
 

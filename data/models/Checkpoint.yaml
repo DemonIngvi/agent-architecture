@@ -1,0 +1,10 @@
+purpose: состояние цикла (I12)
+fields:
+- [runId, int, true, запуск]
+- [iteration, int, true, номер итерации цикла Harness; ключ идемпотентности — `runId` + `iteration`]
+- [parentIteration, int, false, предыдущая итерация]
+- [state, string (base64), true, сериализованное состояние графа LangGraph]
+source:
+  kind: ours
+  ref: D2, D18, R-HRN-05
+  why: Состояние графа LangGraph между шагами; Harness пишет его через Runner, потому что в sandbox нет учётных данных БД.

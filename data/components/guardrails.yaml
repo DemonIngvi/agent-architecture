@@ -1,0 +1,37 @@
+name: Guardrails
+status: todo
+guardrails: G1–G4
+desc: 'Единая политика: Rego в git, данные в БД ICPlan, OPA для G1/G2; каждая точка включается в конфиге деплоя.'
+specs:
+- [Спека, openspec/changes/define-agent-platform/specs/guardrails/spec.md]
+- [Схема, openspec/changes/define-agent-platform/specs/guardrails/architecture.md]
+tasks: ['4.3']
+about:
+  chain:
+  - [Platform module, platform-module]
+  - [Guardrails, guardrails]
+  - [Agent Runner, agent-runner]
+  purpose: 'Ограничения: что агенту можно и что нельзя — в четырёх точках, каждая включается отдельно.'
+  does:
+  - G1 — допуск и бюджет до запуска (Runner)
+  - G2 — проверка каждого действия и approve (Harness)
+  - G3 — изоляция сети, файлов, ресурсов (Sandbox)
+  - G4 — проверка запросов к модели (LiteLLM)
+  - OPA как движок, Rego в git, аудит каждого решения
+stores: [S11, S8, S2]
+blocks:
+- - {title: Rego в git, desc: 'логика правил, opa test', kind: store, st: todo}
+  - {title: Данные правил, desc: 'allowlist, лимиты · Platform module', kind: ext, to: platform-module}
+  - {title: Конфиг деплоя, desc: 'guardrails.gN.enabled, on_engine_error', kind: store, st: todo}
+- ↓
+- - {title: OPA, desc: движок решений G1 / G2, kind: core, st: part}
+- ↓ решения allow / deny / confirm
+- zone: Точки применения
+  rows:
+  - - {title: G1 Admission, desc: 'Agent Runner: допуск, бюджет', kind: ext, g: G1, to: agent-runner}
+    - {title: G2 Action, desc: 'Harness hooks: тулы, память, approve', kind: ext, g: G2, to: harness}
+    - {title: G3 Isolation, desc: 'Sandbox: сеть, ФС, ресурсы', kind: ext, g: G3, to: sandbox}
+    - {title: G4 LLM, desc: 'LiteLLM: PII, injection, модерация', kind: ext, g: G4, to: llm-gateway}
+  cls: sandbox
+- ↓
+- - {title: Аудит, desc: каждое срабатывание с run_id, kind: ext, to: observability}

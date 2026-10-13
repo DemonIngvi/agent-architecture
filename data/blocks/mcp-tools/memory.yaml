@@ -1,0 +1,8 @@
+title: memory
+tech: Нативный тул Harness (R4)
+params:
+- [Уровень, M3]
+does:
+- Запись состояния задачи
+why: Используется только Harness — MCP не нужен.
+rnd: mcp-vs-direct.md

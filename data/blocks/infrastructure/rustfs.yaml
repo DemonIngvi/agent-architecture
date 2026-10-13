@@ -1,0 +1,9 @@
+title: RustFS
+tech: RustFS 1.0 (S3 API), Apache-2.0
+params:
+- [бакет, planner-attachments]
+- [доступ, ключи сервисов из Secret]
+does:
+- Хранит вложения, артефакты, копии
+why: Уже в стеке ICPlan; MinIO архивирован.
+rnd: data-stores.md

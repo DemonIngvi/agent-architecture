@@ -1,0 +1,11 @@
+title: PgBouncer
+tech: PgBouncer 1.26 (пулер CloudNativePG), ISC
+params:
+- [pool_mode, transaction]
+- [default_pool_size, '30']
+- [session-клиенты, по списку]
+does:
+- Держит пул серверных соединений
+- Защищает Postgres от роста числа клиентов
+why: Агенты, Runner и LiteLLM множат соединения.
+rnd: ingress-and-balancing.md

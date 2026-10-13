@@ -1,0 +1,80 @@
+POST /mcp:
+  request: McpToolCall
+  response: 200 · McpToolCall (result)
+  note: MCP-сервер ICPlan, не в OpenAPI
+PATCH /teams/:teamId/ai-agents/:agentId:
+  request: '+ {enabled: bool, onDisable: finish · cancel}'
+  response: как в форке
+  note: 'к телу форка добавляем выключение агента (D17) и проверку модели у агента платформы (`kind = external`, R-REG-06): Platform module внутри api спрашивает LiteLLM `GET /model/info` (master key, I15), алиас `model` должен быть в `model_list`; ошибки: 400 — модель не настроена в LiteLLM `{field: model, reason}` (R-REG-06 «Модель без доступа»); 503 — LiteLLM недоступен, проверить модель нельзя: агент не сохраняется, прочие поля без смены модели сохраняются (R-REG-06 «Шлюз недоступен»); 403 — не администратор команды; 404 — агента нет'
+POST /agent-runs/:runId/heartbeat:
+  request: —
+  response: 200 · Heartbeat (сейчас 204)
+  note: 'тело ответа — доработка (D17, R-ICP-16); ошибки: 404 — запуск не найден, завершён или отменён (как в форке): это единственный сигнал отмены, Runner останавливает Harness и итог не шлёт (R-ICP-07)'
+POST /agent-runs/:runId/events:
+  request: '{events: RunEvent[]}'
+  response: '204'
+  note: 'по образцу `POST /agent-chats/:messageId/events` форка (D21), но без `{canceled}`: отмену Runner узнаёт по 404 на heartbeat; ошибки: 404 — запуск не найден, не выдан этому ключу или уже завершён (отменён)'
+POST /agent-runs/:runId/result:
+  request: RunResult (форк + `reason`, `artifacts`, `gate`, `criteriaNext`, `usage.reasoningTokens`, `usage.costUsd`, `usage.iterations`)
+  response: 204 (как в форке)
+  note: 'ошибки (как в форке): 404 — запуск не найден, выдан другому агенту или уже завершён: `finishRun` обновляет только `pending`, поэтому повторная отправка итога и итог отменённого запуска — 404; Runner считает 404 на повтор доставленным итогом и не повторяет (R-ICP-13); 400 — тело не по схеме'
+GET /agent-runs/:runId/stream:
+  request: —
+  response: '200 · SSE: `data: AgUiEvent`'
+  note: как `…/chat/:messageId/stream` форка (D21)
+GET /issues/:issueId/agent-feed:
+  request: —
+  response: '200 · {runs: {run: RunSummary, step, events: RunEvent[], result: RunResult}[]}'
+  note: история ленты по шагам процесса (D21)
+POST /issues/:issueId/agent-verdict:
+  request: Verdict
+  response: '204'
+  note: 'ошибки: 403 — нет права на задачу; 409 — нет итога, ждущего вердикта (R-AP-19)'
+PATCH /issues/:issueId:
+  request: '+ {reviewWithMe: bool}'
+  response: как в форке
+  note: 'к телу форка добавляем флаг (R-AP-18); ошибки: 403 — нет права на задачу; смену колонки агентом в процессе ICPlan не применяет без ошибки, остальные поля обновляет (R-AP-16)'
+POST /issues/:issueId/process/pause:
+  request: —
+  response: '204'
+  note: 'также `/resume`; ошибки: 403 — нет права; 409 — у задачи нет процесса или он уже в этом состоянии (R-AP-20)'
+POST /issues/:issueId/process/retry:
+  request: '{fromStep?: string}'
+  response: '204'
+  note: 'ошибки: 403 — нет права; 409 — превышен `step.max_runs` или процесс остановлен (R-AP-21)'
+GET /issues/:issueId/agent-status:
+  request: —
+  response: 200 · {state, queuePosition, waitReason}
+  note: '`state`: queued · running · waiting · paused · idle; `waitReason`: slot · approval · answer · runner_offline · agent_disabled (R-AP-07, R-AP-17)'
+GET /projects/:projectKey/processes:
+  request: —
+  response: 200 · Process[]
+  note: ''
+POST /projects/:projectKey/actions:
+  request: 'как в форке: {name, icon?, condition?, effect?}; `effect` — частичная правка задачи (`columnId`, `assigneeUserId`, `priority`, `typeId`, `startDate`, `dueDate`, `labelIds`) + {delegateUserId: string}'
+  response: 201 · Action (как в форке)
+  note: '«делегировать агенту» (R-AP-03) — ключ `delegateUserId` = `user.id` бот-пользователя агента; API хранит `effect` как есть (`apps/api/src/modules/actions`), применяет его web одним `PATCH /issues/:issueId` (`apps/web/src/utils/actions.ts`), а делегат по коду форка ставит запуск `delegation`; доработка — ключ в `EFFECT_FIELD_KEYS` и редакторе эффекта, проверка агента при сохранении; ошибки: 400 — `delegateUserId` не агент проекта; 403 — нет права `actions.create`; при применении к выключенному агенту запуск не создаётся, запись в истории задачи (R-AP-03)'
+PUT /projects/:projectKey/processes/:issueTypeId:
+  request: Process
+  response: 200 · Process (новая версия)
+  note: 'ошибки: 400 — ошибка структуры `{step, reason}` (R-AP-15); 403 — не администратор проекта'
+POST /agent-runs/:runId/decisions:
+  request: ApprovalDecision
+  response: '204'
+  note: 'решение пользователя по `seq` события; доставляется Runner в ответе heartbeat (R-ICP-05, R-ICP-16); ошибки: 403 — нет права `work_items.edit` в проекте задачи (D26); 409 — запуск завершён или решение уже есть'
+POST /agent-runs/:runId/messages:
+  request: UserMessage
+  response: '204'
+  note: 'указание пользователя активному запуску; доставка — через heartbeat (R-ICP-16); ошибки: 403; 409 — запуск завершён'
+POST /agent-runs/:runId/cancel:
+  request: —
+  response: '204'
+  note: 'отмена запуска по задаче; Runner узнаёт по 404 на heartbeat (R-ICP-07); ошибки: 403; 409 — запуск уже завершён; для запусков по расписанию в форке есть `…/agent-schedules/:scheduleId/runs/:runId/cancel`'
+GET /issues/:issueId/costs:
+  request: —
+  response: 200 · CostAggregate[] (по агентам задачи)
+  note: 'журнал затрат LiteLLM по `run_id` (I14, роль `litellm_read`); `costUsd = null`, если цена не задана; журнал недоступен — тоже 200: `runs` из `agent_run`, токены и `costUsd` = `null`, экран показывает «неизвестно» (R-OBS-05)'
+GET /me/agent-summary:
+  request: —
+  response: '200 · {working, queued, waitingMe: {issueId, issueIdentifier, agentId, since}[], costUsd}'
+  note: ''

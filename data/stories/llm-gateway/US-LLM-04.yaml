@@ -1,0 +1,11 @@
+role: Э
+want: чтобы сбой провайдера не останавливал работу
+so_that: не терять задачи
+accept:
+- Провайдер недоступен → fallback-модель
+- Fallback тоже недоступен → `failed` с причиной
+- Rate limit → повтор с задержкой
+reqs:
+- 'llm-gateway: Fallback'
+- 'llm-gateway: Несколько провайдеров'
+entry: —

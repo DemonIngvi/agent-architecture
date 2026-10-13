@@ -1,0 +1,33 @@
+naming: 'Имена полей: JSON наших контрактов — camelCase, как в API ICPlan (OpenAPI 1.3.0: `issueId`, `systemPrompt`, `inputTokens`, `lastError`); задача — парой `issueId` (ключ БД) и `issueIdentifier` (`MKT-42`), как в форке; единица измерения — суффиксом (`readyMs`, `memoryMb`, `costUsd`, `ttlSec`, как `durationMs`, `delaySec` в ICPlan). Внешние протоколы — в их стиле без перевода: OpenAI и LiteLLM (`max_tokens`, `key_alias`), MCP (`jsonrpc`, `params.arguments`), AG-UI (`toolCallId`), OPA (`input`, `result`). Колонки БД — snake_case, как в схеме Drizzle форка (поле JSON `criteriaNext` ↔ колонка `criteria_next`). Параметры конфигурации L0–L3 (YAML) — snake_case с точками, единица — суффиксом `_s`, `_mb` (`limits.max_steps`, `timeout_s`, `guardrails.tools_allow`); данные, выгружаемые из конфигурации как есть (бандл OPA), сохраняют эти имена. Агент в JSON — `agentId` (int, `ai_agent.id`); человек и агент как автор — `username` (строка); `<username>` в `origin` и `by` — тот же `username`.'
+litellm_ref: schema.prisma LiteLLM v1.104.2 (тег, fc3920bf)
+s1_domains:
+- [Задачи и процесс, [project, project_column, issue_type, issue, issue_checklist, issue_checklist_item, project_action, process, process_step, issue_process_state]]
+- ['Агенты, запуски, доступ', [ai_agent, agent_run, agent_schedule, agent_chat_thread, agent_chat_message, user, apikey]]
+- ['Активность, документы, вложения', [issue_activity, project_document, issue_attachment]]
+trees:
+  S7:
+    title: RustFS, бакет `planner-attachments`
+    lines:
+    - issues/<issue_id>/<public_id>        — вложения задач (issue_attachment)
+    - projects/<проект>/tasks/<задача>/<шаг>/v<N>/  — артефакты шагов, неизменяемые версии (D18)
+    - backups/postgres/                   — базовые копии и WAL (копия вне площадки)
+  S10:
+    title: '`/workspace` в контейнере запуска'
+    lines:
+    - /workspace/repo/      — клон репозитория, ветка agent/<задача>
+    - /workspace/task/      — папка задачи (read), своя подпапка шага (write)
+    - /workspace/.deps/     — зависимости из шага подготовки (D19)
+  S8:
+    title: git
+    lines:
+    - репозитории продукта — ветки agent/<задача>, PR
+    - репозиторий политик — Rego + тесты opa test
+  S9:
+    title: конфиг деплоя
+    lines:
+    - values.yaml (git, без секретов) — параметры L0
+    - Secret / .env (вне git) — ключи, пароли
+  S11:
+    title: OPA в памяти
+    lines:
+    - bundle = Rego (S8) + data.json из Platform module (OpaBundleData)

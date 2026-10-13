@@ -1,0 +1,11 @@
+purpose: сводка затрат по задаче и агенту (экран «Затраты», R-OBS-05)
+fields:
+- [issueId, int, true, 'задача: `run_id` из журнала LiteLLM → `agent_run.issue_id`']
+- [agentId, int, true, 'агент: `agent_run.agent_id`']
+- [runs, int, true, число запусков за всё время задачи; запуски без задачи — в сводке агента (задача 3.9)]
+- [inputTokens / outputTokens, int | null, true, 'токены из журнала LiteLLM; `null` — журнал недоступен, «неизвестно» (R-OBS-05)']
+- [costUsd, float | null, true, 'затраты; `null` — цена модели не задана или журнал недоступен, стоимость неизвестна (R-OBS-05)']
+source:
+  kind: ours
+  ref: R-OBS-05, R-LLM-03
+  why: 'Сводка для экрана затрат: Observability читает журнал LiteLLM (I14) и группирует по `metadata.run_id` → `agent_run`; токены названы как в ICPlan (`inputTokens`, `outputTokens`). `RunResult.usage` — расход одного запуска, сводка — сумма по журналу.'

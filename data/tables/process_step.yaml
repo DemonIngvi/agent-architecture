@@ -1,0 +1,26 @@
+kind: platform
+store: S1
+owner: icplan
+schema: itsaplan.public
+columns:
+- [id, serial, PK, '']
+- [key, text, '', ключ шага в процессе (`sdd`) — `ProcessStep.id`]
+- [process_id, int, FK process, '']
+- [column_id, int, FK project_column, колонка]
+- [agent_id, int, FK ai_agent, нет — ручной шаг]
+- [on_success, jsonb, '', шаг / процесс / завершить]
+- [on_failure, jsonb, '', '']
+- [max_runs, int, '', '3']
+- [require_review, bool, '', '']
+- [deliverable, text, '', результат шага (D20)]
+- [done_criteria, jsonb, '', готовность шага (D20)]
+- [criteria_approval, text, '', auto / review / always]
+policy:
+  indexes:
+  - [unique, 'process_id, key', ключ шага уникален в процессе]
+  - [unique, 'process_id, column_id', одна колонка — один шаг]
+  - [index, column_id, FK; переход по колонке]
+  - [index, agent_id, FK; шаги агента]
+  retention: пока жив процесс
+  cleanup: каскадно с процессом
+  migrate: fork

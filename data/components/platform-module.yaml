@@ -1,0 +1,40 @@
+name: Platform module
+status: todo
+guardrails: ''
+desc: 'Модуль ICPlan (своя схема в БД ICPlan): алиасы LLM, бюджеты, профили sandbox и памяти, данные guardrails, версии агентов.'
+specs:
+- [Спека (control-plane), openspec/changes/define-agent-platform/specs/control-plane/spec.md]
+- [Схема, openspec/changes/define-agent-platform/specs/control-plane/architecture.md]
+tasks: ['4.4']
+about:
+  chain:
+  - [ICPlan, icplan]
+  - [Platform module, platform-module]
+  - [Agent Runner, agent-runner]
+  purpose: Хранит внутри ICPlan наши настройки, которых в ICPlan нет, и отдаёт их исполнителям.
+  does:
+  - Алиасы моделей и бюджеты агентов
+  - Профили sandbox и памяти
+  - Данные правил guardrails (allowlist, лимиты)
+  - Версии определений агентов, экспорт и импорт YAML
+stores: [S2]
+blocks:
+- - {title: Control Plane UI, desc: экраны настроек в ICPlan, kind: ext, to: icplan}
+- ↓ CRUD
+- zone: Platform module (модуль ICPlan)
+  rows:
+  - - {title: API модуля, desc: 'проверка прав, валидация, версии', kind: core, st: todo}
+  - ↓
+  - - {title: Алиасы LLM, desc: алиас → модель, kind: core, st: todo}
+    - {title: Бюджеты, desc: лимиты токенов и $ на агента, kind: core, st: todo}
+    - {title: Профили sandbox, desc: 'образ, CPU/RAM, сеть', kind: core, st: todo}
+  - - {title: Профили памяти, desc: 'уровни, области, сроки', kind: core, st: todo}
+    - {title: Данные guardrails, desc: 'allowlist, лимиты для OPA', kind: core, st: todo}
+    - {title: Версии агентов, desc: 'история, экспорт/импорт YAML', kind: core, st: todo}
+  - ↓
+  - - {title: Схема platform в БД ICPlan, desc: отдельная схема — проще слияние с upstream, kind: store, st: todo}
+  cls: icplan
+- ↓ читают настройки
+- - {title: Agent Runner, desc: 'профили, бюджеты (G1)', kind: ext, to: agent-runner}
+  - {title: LiteLLM gateway, desc: 'алиасы, virtual keys', kind: ext, to: llm-gateway}
+  - {title: Guardrails, desc: данные правил, kind: ext, to: guardrails}

@@ -1,0 +1,12 @@
+title: Бюджеты
+tech: Бюджеты virtual key LiteLLM + проверка G1 в Runner
+params:
+- [budget.run, 1 $]
+- [budget.agent_day, 5 $]
+- [budget.project_month, задаётся]
+- [Пороги, 80% / 100%]
+does:
+- Задаёт лимиты трат агента, проекта, команды
+- Отказ до траты, а не после
+why: Иерархия бюджетов — стандарт (LiteLLM, облачные биллинги).
+rnd: runaway-protection.md

@@ -1,0 +1,7 @@
+kind: fork
+written: true
+policy:
+  indexes: null
+  retention: пока жива задача (D25)
+  cleanup: каскадно с задачей; комментарий удаляется по одному; по времени не чистится — журнал задачи живёт с задачей (D25)
+  migrate: fork

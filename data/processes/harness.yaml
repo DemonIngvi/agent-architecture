@@ -1,0 +1,38 @@
+processes:
+- title: Агентский цикл
+  stories: [US-HAR-01, US-HAR-02, US-HAR-03]
+  lanes: [Пользователь, Harness, LiteLLM / MCP / OPA]
+  steps:
+  - [s, 1, start, RunBundle, [[t1, '']]]
+  - [t1, 1, task, Собрать контекст, [[t2, '']]]
+  - [t2, 2, task, Вызов модели, [[g1, '']]]
+  - [g1, 1, gateway, 'Тулы?', [[g2, да], [g3, нет]]]
+  - [g2, 2, gateway, G2 решение, [[t3, allow], [t4, confirm], [t1, deny]]]
+  - [t4, 0, task, Подтверждение, [[t3, да], [t1, нет]]]
+  - [t3, 2, task, Вызов тула, [[t1, '']]]
+  - [g3, 1, gateway, 'Quality gate?', [[e1, пройден], [x1, не пройден]]]
+  - [x1, 1, error, gate_failed, []]
+  - [e1, 1, end, RunResult, []]
+  artifacts:
+    t1: [контекст (M0)]
+    t2: [chat.completions, spend log]
+    g2: [PolicyDecision]
+    t4: [ApprovalDecision]
+    t3: [результат тула]
+    x1: [отчёт gate]
+    e1: [RunResult]
+- title: Пауза, указания, лимиты, восстановление
+  stories: [US-HAR-04, US-HAR-05, US-HAR-06, US-HAR-07]
+  lanes: [Пользователь, Harness, Guardrails / checkpoint]
+  steps:
+  - [s, 1, start, Шаг цикла, [[g, '']]]
+  - [g, 1, gateway, 'Что случилось?', [[q, нужен ответ], [m, указание], [l, лимит / цикл], [c, падение]]]
+  - [q, 0, task, Вопрос → ответ пользователя, [[e, '']]]
+  - [m, 0, task, Указание в контекст, [[e, '']]]
+  - [l, 2, error, 'Стоп: limit / цикл', []]
+  - [c, 2, task, Продолжить с checkpoint, [[e, '']]]
+  - [e, 1, end, Цикл продолжается, []]
+  artifacts:
+    q: [вопрос и ответ в M1]
+    m: [сообщение в контексте]
+    c: [checkpoint]

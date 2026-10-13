@@ -1,0 +1,16 @@
+POST /v1/chat/completions:
+  request: ChatCompletionRequest
+  response: 200 · ответ OpenAI Chat Completions (`choices`, `usage`)
+  note: mock — тот же формат
+GET /model/info:
+  request: —
+  response: '200 · {data: {model_name, litellm_params, model_info}[]}'
+  note: проверка алиаса модели при сохранении агента (R-REG-06); вызывает Platform module master key (I15)
+POST /key/generate:
+  request: VirtualKey
+  response: 200 · {key, key_alias, expires}
+  note: также `/key/update`
+GET /spend/logs:
+  request: 'query: request_id или start_date / end_date'
+  response: 200 · LiteLLM_SpendLogs[]
+  note: отбор по `metadata.run_id`

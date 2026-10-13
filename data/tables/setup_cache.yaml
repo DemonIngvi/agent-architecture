@@ -1,0 +1,17 @@
+kind: platform
+store: S3
+owner: agent-runner
+schema: itsaplan.runner
+columns:
+- [lock_hash, text, PK, хеш lock-файлов]
+- [project_id, int, FK project, '']
+- [path, text, '', том кэша]
+- [created_at, timestamptz, '', '']
+- [expires_at, timestamptz, '', '`setup.cache_ttl_h`']
+policy:
+  indexes:
+  - [index, project_id, FK]
+  - [index, expires_at, очистка]
+  retention: '`setup.cache_ttl_h` = 168 (agent-sandbox)'
+  cleanup: очистка по `expires_at` вместе с томом кэша
+  migrate: runner

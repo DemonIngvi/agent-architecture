@@ -1,0 +1,13 @@
+kind: litellm
+columns:
+- [request_id, String, PK, '']
+- [api_key, String, '', virtual key]
+- [model, String, '', '']
+- [spend, Float, '', $]
+- [prompt_tokens, Int, '', '']
+- [completion_tokens, Int, '', '']
+- [total_tokens, Int, '', '']
+- [startTime, DateTime, '', '']
+- [endTime, DateTime, '', '']
+- [metadata, Json, '', 'run_id, issue_key, agent']
+- [status, String, '', '']

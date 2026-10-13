@@ -1,0 +1,5 @@
+- traefik
+- pgbouncer
+- postgresql-17-pgvector
+- rustfs
+- rezervnoe-hranilische-s3-vne-uzla

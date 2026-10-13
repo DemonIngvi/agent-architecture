@@ -1,0 +1,19 @@
+kind: platform
+store: S2
+owner: platform-module
+schema: itsaplan.platform
+columns:
+- [id, serial, PK, '']
+- [project_id, int, FK project, '']
+- [agent_id, int, FK ai_agent, '']
+- [resource_id, int, FK project_resource, '']
+- [right, text, '', read / write (D18)]
+- [template_role, text, '', шаблон по роли агента]
+policy:
+  indexes:
+  - [unique, 'agent_id, resource_id', одно право агента на ресурс]
+  - [index, project_id, FK]
+  - [index, resource_id, FK]
+  retention: пока живы агент и ресурс
+  cleanup: каскадно
+  migrate: cp

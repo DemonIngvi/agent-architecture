@@ -1,0 +1,12 @@
+title: API модуля
+tech: Модуль форка ICPlan (TypeScript), схема `platform` в Postgres
+params:
+- [Права, роли ICPlan]
+- [Валидация, ссылки и диапазоны]
+- [Версии, каждое изменение — версия]
+does:
+- CRUD наших настроек агента
+- Отдаёт настройки Runner, LiteLLM, OPA
+- Отдаёт Runner определение и настройки версии запуска одним ответом — `GET /platform/runs/:runId/agent` (I4, D23); таблицы Registry читает той же ролью `itsaplan`
+why: Одна БД и одна авторизация с ICPlan.
+rnd: config-storage.md

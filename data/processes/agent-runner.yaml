@@ -1,0 +1,40 @@
+processes:
+- title: Запуск из очереди
+  stories: [US-RUN-01, US-RUN-03]
+  lanes: [ICPlan, Agent Runner, Sandbox / Harness]
+  steps:
+  - [s, 0, start, Запуск в очереди, [[t1, '']]]
+  - [t1, 1, task, 'Опрос, аренда', [[g1, '']]]
+  - [g1, 1, gateway, 'Слоты свободны?', [[g2, да], [t1, ждать]]]
+  - [g2, 1, gateway, 'G1 допуск?', [[t2, да], [x1, нет]]]
+  - [x1, 0, error, 'Отказ: бюджет / kill', []]
+  - [t2, 2, task, 'Среда из пула, Harness', [[g3, '']]]
+  - [g3, 2, gateway, 'Итог?', [[t3, done], [x2, error / limit]]]
+  - [x2, 1, error, failed / limit, []]
+  - [t3, 1, task, 'Итог в ICPlan, destroy', [[e1, '']]]
+  - [e1, 0, end, Задача обновлена, []]
+  artifacts:
+    t1: [аренда запуска]
+    g2: [PolicyDecision]
+    x1: [RunEvent (отказ)]
+    t2: [SandboxClaim, RepoGrant, RunBundle]
+    t3: [RunResult, запись M2, комментарий]
+- title: 'Эксплуатация: режим, ожидание, падение, вывод из работы'
+  stories: [US-RUN-02, US-RUN-04, US-RUN-05, US-RUN-06]
+  lanes: [Эксплуатация, Agent Runner, ICPlan]
+  steps:
+  - [s, 1, start, Runner работает, [[g, '']]]
+  - [g, 1, gateway, Событие, [[md, смена режима], [ap, ждёт approve], [cr, падение], [dr, обновление], [sx, слоты недоступны]]]
+  - [md, 0, task, sequential / parallel, [[e, '']]]
+  - [ap, 1, task, Освободить глобальный и модельный слоты, [[e, '']]]
+  - [cr, 2, task, Аренда истекла → запуск снова в очереди, [[e, '']]]
+  - [dr, 0, task, 'Не брать новые, доделать активные', [[dg, '']]]
+  - [dg, 0, gateway, 'Активные завершились до таймаута вывода?', [[e, да], [dx, нет]]]
+  - [dx, 0, error, 'Таймаут вывода: оставшиеся запуски возвращаются в очередь', []]
+  - [sx, 2, error, 'Хранилище слотов недоступно: новые не стартуют, активные идут', []]
+  - [e, 1, end, Очередь разбирается, []]
+  artifacts:
+    md: [конфиг деплоя]
+    ap: [освобождённые слоты]
+    cr: [запуск pending]
+    dr: [Runner готов к остановке]

@@ -1,0 +1,14 @@
+purpose: настройки агента из Platform module (I4)
+fields:
+- [agentId, int, true, агент]
+- [version, int, true, 'единая версия агента: растёт при любой правке определения или настроек (R-CP-04); та же в `AgentDefinition.version` и `RunBundle.agent.version`']
+- [autonomy, 'enum: R0–R5', true, 'уровень автономии: R0 — каждое действие с подтверждением … R5 — без подтверждений']
+- [budget, '{runUsd, dayUsd}', true, 'лимиты агента в $: на запуск и на день']
+- [sandboxProfile, string, true, имя профиля среды (`sandbox_profile.name`)]
+- [memoryProfile, string, true, имя профиля памяти]
+- [toolsAllow / approvalTools, 'string[]', true, разрешённые тулы и тулы с подтверждением; в бандл OPA уходят как `tools_allow` и `approval`]
+- [scheduling, '{parallel, max}', false, '`parallel` — сколько запусков агента идёт одновременно; `max` — сколько запусков агента может ждать в очереди']
+source:
+  kind: ours
+  ref: D9, R-CP-04
+  why: 'Наши настройки агента, которых нет в ICPlan; источник правды для автономии, бюджета, тулов и профилей. Включён ли агент — не здесь: источник правды один, `ai_agent.enabled` ICPlan (D17, R-ICP-17); аварийная остановка — `kill_switch` (`agent:<id>`). Из них собираются бандл OPA (`OpaBundleData`, имена конфигурации) и файл экспорта (`AgentDefinition`). Версия нужна для отката и для того, чтобы запуск видел настройки версии, закреплённой при первом вызове I4 (D23).'

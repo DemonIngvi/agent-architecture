@@ -1,0 +1,31 @@
+title: Admission
+tech: 'Клиент OPA (G1, D6): `POST /v1/data/agent/g1`'
+kind: service
+stories: [US-GRD-03, US-RUN-01]
+params:
+- [guardrails.g1.enabled, 'true']
+- [on_engine_error, deny]
+- [kill_switch, выкл]
+- [budget.run / agent_day / project_month, 1 $ / 5 $ / задаётся]
+does:
+- Проверяет допуск агента к задаче, бюджет и kill switch до создания sandbox (R-GRD-02)
+- Отказ — статус `limit_exceeded` или отказ с причиной, sandbox не создаётся, слоты освобождаются
+- Недоступна OPA — решение по `on_engine_error` (по умолчанию deny)
+io:
+- [←, Scheduler, запуск со слотами]
+- [→, Guardrails (OPA), '`PolicyInput` → `PolicyDecision` (I5)']
+- [→, Sandbox claim, допущенный запуск]
+- [→, Event relay, решение G1 с причиной — в события запуска]
+data:
+- [kill_switch, 'чтение через данные OPA (владелец Platform module), напрямую не читает']
+- [agent_settings, 'чтение через данные OPA: бюджеты и допуск (владелец Platform module)']
+reqs: [R-GRD-02, R-GRD-06, R-GRD-07, R-GRD-15]
+tasks: ['4.3']
+failures:
+- Бюджет исчерпан — запуск `limit_exceeded`, sandbox не создаётся (R-GRD-02)
+- Kill switch агента или платформы — запуск отклонён до создания sandbox (R-GRD-02, R-GRD-15)
+- 'OPA не ответила за 200 мс — решение по `on_engine_error`: deny — запуск не стартует (I5, R-GRD-07)'
+why: Дешевле всего остановить трату до запуска.
+rnd: guardrails-engine.md
+ops:
+- ['`POST /v1/data/agent/g1` — допуск агента к задаче, бюджет, лимит параллельных запусков, kill switch', 'Scheduler после занятия слотов, до создания sandbox', I5]

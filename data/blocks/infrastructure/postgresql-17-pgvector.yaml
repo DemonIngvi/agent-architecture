@@ -1,0 +1,10 @@
+title: PostgreSQL 17 + pgvector
+tech: PostgreSQL 17 под CloudNativePG v1.30, образ с pgvector
+params:
+- [БД, 'itsaplan, litellm']
+- [схемы, 'public, platform, harness_ckpt']
+- [бэкап, базовые копии + WAL в S3 вне узла]
+does:
+- Хранит данные ICPlan, платформы, LiteLLM, checkpoint
+why: Одна СУБД на всё; оператор даёт бэкап и восстановление.
+rnd: data-stores.md

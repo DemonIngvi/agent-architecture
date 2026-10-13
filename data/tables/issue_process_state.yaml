@@ -1,0 +1,20 @@
+kind: platform
+store: S1
+owner: icplan
+schema: itsaplan.public
+columns:
+- [issue_id, int, 'PK, FK issue', '']
+- [process_id, int, FK process, '']
+- [process_version, int, '', 'составной FK (`process_id`, `process_version`) → `process_version`, индекс по этой паре; версия процесса, с которой задача вошла в текущий шаг: шаг дорабатывается по снимку этой версии (R-AP-22)']
+- [step_id, int, FK process_step, текущий шаг]
+- [runs_on_step, int, '', счётчик для `max_runs`]
+- [state, text, '', running / waiting_review / paused / done]
+- [last_verdict, text, '', accepted / rejected]
+- [updated_at, timestamptz, '', '']
+policy:
+  indexes:
+  - [index, 'process_id, process_version', FK; задачи на версии процесса]
+  - [index, 'step_id, state', задачи на шаге — доска и подхват]
+  retention: пока жива задача
+  cleanup: каскадно с задачей
+  migrate: fork

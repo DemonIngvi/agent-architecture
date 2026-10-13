@@ -1,4 +1,4 @@
-"""Схемы architecture.md спек define-agent-platform из components.py и R&D (правило: docs/rules/change-process.md). Запуск: python html-view/archgen.py"""
+"""Схемы architecture.md спек define-agent-platform из data/components (через components.py) и R&D (правило: docs/rules/change-process.md). Запуск: python html-view/archgen.py"""
 import sys, re, os
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))

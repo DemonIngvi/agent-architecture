@@ -1,0 +1,9 @@
+title: Конфиг деплоя
+tech: YAML деплоя
+params:
+- [g1…g4.enabled, 'g1–g3 вкл, g4 выкл']
+- [on_engine_error, deny]
+does:
+- Включает и выключает точки независимо
+why: Можно начать без guardrails и включать по мере готовности.
+rnd: guardrails-engine.md

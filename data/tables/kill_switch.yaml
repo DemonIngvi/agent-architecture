@@ -1,0 +1,15 @@
+kind: platform
+store: S2
+owner: platform-module
+schema: itsaplan.platform
+columns:
+- [scope, text, PK, 'platform / agent:<id>']
+- [enabled, bool, '', '']
+- [reason, text, '', '']
+- [by, text, '', '']
+- [at, timestamptz, '', '']
+policy:
+  indexes: []
+  retention: бессрочно (текущее состояние)
+  cleanup: история переключений — в аудите guardrails
+  migrate: cp

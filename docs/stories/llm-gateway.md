@@ -2,7 +2,7 @@
 
 ← [Все истории](README.md) · [как работает](../how/llm-gateway.md)
 
-> Сгенерировано из `html-view/stories.py` — правьте там.
+> Сгенерировано из `data/stories/llm-gateway/` (история — файл `<US-ID>.yaml`) и `data/processes/llm-gateway.yaml` — правьте там.
 
 ## Процесс 1. Вызов модели
 

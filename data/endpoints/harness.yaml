@@ -1,0 +1,24 @@
+POST /run:
+  request: RunBundle
+  response: 202 · {runId}
+  note: 'запуск цикла; ответ сразу, ход — в `/run/events`; ошибки: 401 — токен не этого запуска, без повтора (R-RUN-13 «Аутентификация»); 400 — `RunBundle` не проходит схему: цикл не стартует, `invalid_definition` (R-HRN-01)'
+GET /run/events:
+  request: 'query: seq — с какого события продолжить'
+  response: '200 · NDJSON: RunEvent по строке'
+  note: переподключение без потерь по `seq`
+POST /run/approval:
+  request: ApprovalDecision
+  response: '204'
+  note: 'ошибки: 401 — токен не этого запуска; 409 — запуск не ждёт подтверждения по этому `seq`: решение уже применено или истёк `approval_timeout` (R-HRN-05)'
+POST /run/message:
+  request: UserMessage
+  response: '204'
+  note: 'во время тула — учитывается после него (R-HRN-16); ошибки: 401 — токен не этого запуска; 409 — цикл уже завершён'
+POST /run/cancel:
+  request: '{reason}'
+  response: '204'
+  note: 'Harness завершает шаг и отдаёт `RUN_FINISHED`; повторная отмена — 204, не ошибка (R-RUN-09); ошибки: 401 — токен не этого запуска'
+GET /ready:
+  request: —
+  response: 200 · {ready, version}
+  note: Runner ждёт готовности перед `POST /run`

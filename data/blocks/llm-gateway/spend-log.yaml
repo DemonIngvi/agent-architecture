@@ -1,0 +1,8 @@
+title: Spend log
+tech: LiteLLM spend logs (Postgres)
+params:
+- [Поля, 'ключ, модель, токены, $, metadata']
+does:
+- Записывает расход каждого вызова
+why: Источник затрат по задаче и агенту.
+rnd: observability.md

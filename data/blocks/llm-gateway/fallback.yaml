@@ -1,0 +1,8 @@
+title: Fallback
+tech: LiteLLM router fallbacks
+params:
+- [fallbacks, team-default → резервная]
+does:
+- При сбое основной модели отвечает резервная
+why: Агент работает при недоступности провайдера.
+rnd: llm-gateway.md

@@ -1,0 +1,9 @@
+title: Алиасы
+tech: LiteLLM model_list
+params:
+- [team-default, → mock (разработка)]
+- [Смена, одна строка конфига]
+does:
+- Связывает алиас с моделью провайдера
+why: Смена модели без изменения агентов.
+rnd: llm-gateway.md

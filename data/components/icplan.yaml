@@ -1,0 +1,66 @@
+name: ICPlan
+status: part
+guardrails: ''
+desc: 'Таск-трекер It''s a Plan: доска, процессы, настройка агентов, очередь запусков, UI задачи. Уже есть, дорабатываем.'
+specs:
+- [Registry — спека, openspec/changes/define-agent-platform/specs/agent-registry/spec.md]
+- [Registry — схема, openspec/changes/define-agent-platform/specs/agent-registry/architecture.md]
+- [Интеграция — proposal, openspec/changes/add-icplan-integration/proposal.md]
+- [Интеграция — спека, openspec/changes/add-icplan-integration/specs/icplan-integration/spec.md]
+- [Интеграция — схема и user flow, openspec/changes/add-icplan-integration/specs/icplan-integration/architecture.md]
+- [Автоподхват — proposal, openspec/changes/icplan-agent-autopickup/proposal.md]
+- [Автоподхват — спека, openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/spec.md]
+- [Автоподхват — схема, openspec/changes/icplan-agent-autopickup/specs/icplan-agent-autopickup/architecture.md]
+tasks: ['1.2', '2.3', '3.1', '3.2', '3.4', '3.5', '3.6', '3.7', '3.8', '3.9']
+about:
+  chain:
+  - [Пользователь, null]
+  - [ICPlan, icplan]
+  - [Agent Runner, agent-runner]
+  purpose: 'Рабочее место людей: задачи, доска и процесс. Отсюда агенты получают работу и сюда возвращают результат.'
+  does:
+  - Доска и статусы — процесс, который пользователь настраивает сам
+  - Настройка агентов (Control Plane UI) и их каталог (Registry)
+  - 'Процесс задачи: шаг = колонка + агент + переход по итогу запуска (D17) — доработка'
+  - Очередь запусков и протокол внешнего раннера
+  - Показ хода работы агента, approve и затрат в задаче
+stores: [S1, S7]
+icplan_tables:
+- [project, '']
+- [projectColumn, '']
+- [issueType, '']
+- [issue, + `review_with_me` (D17)]
+- [issueChecklist, '']
+- [issueChecklistItem, '+ `origin`, `status` (D20)']
+- [issueActivity, '']
+- [aiAgent, + `enabled` (D17)]
+- [agentRun, '']
+- [agentSchedule, '']
+- [agentChatThread, '']
+- [agentChatMessage, '']
+- [projectAction, + ключ `delegateUserId` в `effect` (R-AP-03)]
+- [projectDocument, '']
+- [issueAttachment, '']
+- [user, Better Auth; у агента — бот-пользователь]
+- [apikey, 'ключ агента: Bearer для I1–I3; `reference_id` → `user.id`']
+blocks:
+- - {title: Пользователь, desc: 'задачи, доска, чат', kind: user}
+  - {title: Администратор, desc: 'агенты, процесс', kind: user}
+- ↓ работает с задачами · настраивает ↓
+- zone: ICPlan
+  rows:
+  - - {title: Task UI, desc: 'доска, статусы, комментарии, чат агента; нужны чат запуска, approve, затраты', kind: core, st: part}
+    - {title: Control Plane UI, desc: 'настройка агента: модель, инструкция, тулы, навыки, MCP, проекты', kind: core, st: done}
+  - ↓ статус / делегат задачи · сохранение настроек ↓
+  - - {title: Автоподхват, desc: 'процесс типа задачи: шаг = колонка + агент + переход по итогу (D17)', kind: core, st: todo}
+    - {title: Registry, desc: 'агенты, тулы, навыки, ключи; версии и YAML — Platform module (D9, D26)', kind: core, st: part}
+  - ↓ запуск
+  - - {title: Run Queue + runner API, desc: 'очередь запусков, протокол внешнего раннера, стрим', kind: core, st: part}
+    - {title: MCP itsaplan-core, desc: весь REST API ICPlan как тулы агента, kind: core, st: done}
+    - {title: БД ICPlan (Postgres), desc: 'база `itsaplan`: задачи, агенты, запуски, M1, M2; M3 — схема `memory` (Memory API, D22)', kind: store, st: done}
+  - встроены в api ICPlan (HOST)
+  - - {title: Platform module, desc: 'встроен: наши настройки, схема `platform`', kind: ext, to: platform-module}
+    - {title: Observability, desc: 'встроен: события → чат запуска', kind: ext, to: observability}
+  cls: icplan
+- ↓ запуск из очереди · стрим и итог ↑
+- - {title: Agent Runner, desc: исполняет запуск, kind: ext, to: agent-runner}

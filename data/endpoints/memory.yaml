@@ -1,0 +1,16 @@
+GET /context:
+  request: 'query: issueId, agentId'
+  response: '200 · {m1: UserMessage[], m2: RunSummary[], m3: M3Record, m5, m6}'
+  note: по профилю памяти агента
+PUT /m3/:issueId:
+  request: M3Record
+  response: 200 · M3Record (новая version)
+  note: 409 — запись изменилась (конкурентная запись)
+DELETE /records/:level/:id:
+  request: —
+  response: '204'
+  note: ''
+POST /retention/run:
+  request: —
+  response: '200 · {deleted: {m3}}'
+  note: CronJob; M4 — после MVP; M1 и M2 в таблицах форка не удаляет — фильтр чтения, строки удаляет ICPlan (D25)

@@ -1,0 +1,10 @@
+title: G4 хуки
+tech: LiteLLM guardrail hooks pre_call / post_call
+params:
+- [enabled, 'false']
+- [Проверки, 'PII, injection, модерация']
+does:
+- Маскирует секреты и PII во входе
+- Модерирует ответ
+why: Весь трафик к модели проходит через одну точку.
+rnd: guardrails-engine.md

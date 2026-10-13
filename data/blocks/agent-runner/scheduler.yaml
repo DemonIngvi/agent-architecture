@@ -1,0 +1,38 @@
+title: Scheduler
+tech: Go + таблица слотов `scheduler_slot` в схеме `runner` (вариант B, D14, D22)
+kind: service
+stories: [US-RUN-02, US-RUN-03, US-RUN-04, US-RUN-05]
+params:
+- [scheduling.mode, parallel]
+- [scheduling.global_max, '4']
+- [scheduling.per_issue, '1']
+- [scheduling.models.<alias>.max, '3']
+- [scheduling.agents.<id>.parallel / max, нет / 1]
+- [concurrency, '1']
+- [scheduling.order, fifo]
+- [scheduling.aging_s, '600']
+does:
+- 'Стартует запуск, только когда свободны все слоты: глобальный, агента, модели, задачи'
+- Держит запуск в `queued` с причиной ожидания; порядок `fifo` или `priority` со старением `scheduling.aging_s`
+- Общие слоты для нескольких Runner через Postgres
+- Освобождает глобальный и модельный слоты на время `waiting_approval`
+io:
+- [←, Poller, '`Run` в `queued`']
+- [→, Admission, 'запуск, получивший слоты']
+- [←, Event relay, '`waiting_approval` и решение по approve']
+- [↔, Postgres, слоты `scheduler_slot` (I22)]
+data:
+- [scheduler_slot, 'запись, чтение: слоты и аренды']
+reqs: [R-RUN-02, R-RUN-03, R-RUN-04, R-RUN-05, R-RUN-06, R-RUN-11, R-RUN-12]
+tasks: ['2.7']
+failures:
+- Таблица слотов недоступна — новые запуски не стартуют (fail-closed), активные продолжаются; после восстановления слоты пересчитываются по активным запускам (R-RUN-06, FMEA «Postgres платформы»)
+- Экземпляр Runner упал с занятыми слотами — слоты освобождаются по истечении аренды `lease_until` (R-RUN-06)
+- Конфиг `scheduling` вне границ — значение отклоняется с именем параметра и границами, без обязательных параметров Runner не стартует (R-RUN-11)
+why: Учитывает общие модели и агентов, которые нельзя параллелить; режим платформы — одной настройкой.
+rnd: runner-and-scheduling.md
+ops:
+- ['занять слоты запуска — глобальный, агента, модели, задачи — одной транзакцией в `scheduler_slot` с арендой `lease_until`', Poller после claim; Event relay после решения по approve, внутри]
+- ['освободить глобальный слот и слот модели при `waiting_approval`, слот задачи держать (R-RUN-04)', Event relay, внутри]
+- [забрать просроченные аренды слотов упавшего экземпляра, Scheduler по `lease_until`, внутри]
+- [причина ожидания («ждёт слот модели») — в события запуска, Scheduler → Event relay, внутри]

@@ -1,0 +1,12 @@
+title: OPA
+tech: Open Policy Agent v1.21.1 (Apache-2.0)
+params:
+- [engine, opa]
+- [on_engine_error, deny]
+- [Rego, git + opa test]
+- [Данные, Platform module]
+does:
+- Решения allow / deny / confirm для G1 и G2
+- Журнал решений
+why: Правила как код, тесты, аудит; CNCF graduated.
+rnd: guardrails-engine.md

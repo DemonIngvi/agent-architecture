@@ -1,0 +1,38 @@
+title: Run supervisor
+tech: Go
+kind: service
+stories: [US-RUN-01, US-ICP-04, US-RUN-06, US-HAR-05]
+params:
+- [timeout_s, '1800']
+- [limits.idle_s, '300']
+- [retry, '0']
+does:
+- На старте после слотов берёт определение и настройки версии запуска — `GET /platform/runs/:runId/agent` (I4, D23)
+- Запускает Harness с `RunBundle`
+- Следит за таймаутом, простоем, отменой
+- 'Хранит checkpoint цикла Harness в схеме `harness_ckpt` (I12): учётных данных БД в sandbox нет'
+io:
+- [←, Platform module, '`AgentDefinition`, `AgentSettings`, `WorkspaceSource` (I4)']
+- [→, Harness, '`RunBundle`, отмена (I7)']
+- [↔, ICPlan, 'heartbeat: аренда, отмена — 404 (I3)']
+- [←, Harness, '`Checkpoint` (I12)']
+- [→, Finalizer, итог или причина остановки]
+data:
+- [run_checkpoint, 'запись, чтение: checkpoint цикла']
+- [agent_run, 'через I4: версия запуска `agent_version` закрепляется Platform module (таблица ICPlan)']
+reqs: [R-RUN-01, R-RUN-07, R-RUN-09, R-RUN-17, R-GRD-10, R-HRN-05, R-ICP-07]
+tasks: ['2.1', '2.6']
+failures:
+- Нет настроек агента или агент выключен — запуск `agent_unavailable`, sandbox не создаётся (R-RUN-01, FMEA)
+- Platform module недоступен — новые запуски не стартуют, кэш настроек не используется (FMEA)
+- Превышен `timeout_s` или простой `limits.idle_s` — `limit_exceeded`, частичный итог, слот освобождается (R-GRD-10)
+- Heartbeat вернул 404 — Harness останавливается, итог не шлётся (R-ICP-07)
+- Runner упал — аренда истекает, запуск возвращается в очередь; при повторной выдаче Harness продолжает с последнего checkpoint (R-RUN-14, R-HRN-05)
+why: Зависшие запуски не держат слоты.
+rnd: runaway-protection.md
+ops:
+- ['`GET /platform/runs/:runId/agent` — определение и настройки версии запуска', Run supervisor после слотов, I4]
+- ['`GET /platform/runs/:runId/manifest` — манифест рабочего пространства', Run supervisor, I4]
+- ['`GET /ready`, затем `POST /run` с `RunBundle`; отмена — `POST /run/cancel`', Run supervisor, I7]
+- ['`POST /agent-runs/:runId/heartbeat` — продление аренды; 404 — отмена', Run supervisor, I3]
+- ['`PUT`, `GET /runs/:runId/checkpoint` — приём checkpoint цикла в `run_checkpoint`', 'Harness, токен запуска', I12]

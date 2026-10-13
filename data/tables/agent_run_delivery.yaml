@@ -1,0 +1,19 @@
+kind: platform
+store: S1
+owner: icplan
+schema: itsaplan.public
+columns:
+- [id, serial, PK, '']
+- [run_id, int, FK agent_run, запуск]
+- [kind, text, '', approval · message]
+- [seq, int, '', событие запроса подтверждения (для approval)]
+- [payload, jsonb, '', '`ApprovalDecision` или `UserMessage`']
+- [created_at, timestamptz, '', '']
+- [delivered_at, timestamptz, '', 'Runner подтвердил получение: `decision_applied` · `message_received` (R-ICP-16)']
+policy:
+  indexes:
+  - [index, run_id, FK; недоставленное по запуску]
+  - [index, delivered_at, выборка недоставленного]
+  retention: пока жив запуск
+  cleanup: каскадно с `agent_run`; доставленное — со сроком `agent_run`
+  migrate: fork

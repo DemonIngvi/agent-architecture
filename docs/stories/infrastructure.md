@@ -2,7 +2,7 @@
 
 ← [Все истории](README.md) · [как работает](../how/infrastructure.md)
 
-> Сгенерировано из `html-view/stories.py` — правьте там.
+> Сгенерировано из `data/stories/infrastructure/` (история — файл `<US-ID>.yaml`) и `data/processes/infrastructure.yaml` — правьте там.
 
 ## Процесс 1. Обновление без простоя
 

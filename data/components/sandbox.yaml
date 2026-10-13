@@ -1,0 +1,41 @@
+name: Sandbox
+status: todo
+guardrails: G3
+desc: Одноразовый изолированный контейнер из тёплого пула; эфемерный /workspace, egress-прокси, доступ к репозиториям.
+specs:
+- [Спека, openspec/changes/define-agent-platform/specs/agent-sandbox/spec.md]
+- [Схема, openspec/changes/define-agent-platform/specs/agent-sandbox/architecture.md]
+tasks: ['2.2', '4.1', '4.2']
+about:
+  chain:
+  - [Agent Runner, agent-runner]
+  - [Sandbox, sandbox]
+  - [Harness, harness]
+  purpose: 'Изоляция: каждый запуск агента идёт в своём одноразовом контейнере и не видит другие запуски и хост.'
+  does:
+  - Держит тёплый пул готовых контейнеров
+  - Ограничивает CPU, память, диск по профилю (G3)
+  - Даёт эфемерный /workspace и клон нужных репозиториев
+  - Пускает трафик только через egress-прокси; реестры пакетов — только шагу подготовки
+  - 'Секретов в среде нет: ключи подставляют egress-прокси и MCP-прокси Runner'
+stores: [S10, S7]
+blocks:
+- - {title: Agent Runner, desc: claim / destroy, kind: ext, to: agent-runner}
+- ↓
+- - {title: Тёплый пул, desc: N готовых контейнеров на профиль, kind: core, st: todo}
+  - {title: SandboxProvider, desc: Docker сейчас · K8s позже, kind: core, st: todo}
+- ↓ один контейнер = один запуск
+- zone: Контейнер запуска
+  rows:
+  - - {title: Harness, desc: агентский цикл, kind: ext, to: harness}
+    - {title: /workspace, desc: 'эфемерный, клон репозиториев', kind: store, st: todo}
+  - - {title: Профиль, desc: 'CPU, RAM, диск, без privileged', kind: core, st: todo}
+    - {title: Credential helper, desc: токены git без env, kind: core, st: todo}
+  cls: sandbox
+  g: G3
+- ↓ весь исходящий трафик
+- - {title: Egress-прокси, desc: 'Squid: allowlist по подсети — среда агента и шаг подготовки', kind: core, st: todo, g: G3}
+- ↓ MCP — только через Agent Runner (D19)
+- - {title: LiteLLM gateway, kind: ext, to: llm-gateway}
+  - {title: Memory, kind: ext, to: memory}
+  - {title: Реестры пакетов, desc: только шаг подготовки, kind: ext}

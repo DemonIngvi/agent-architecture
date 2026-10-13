@@ -1,0 +1,33 @@
+title: Finalizer
+tech: Go
+kind: service
+stories: [US-RUN-01, US-ICP-04]
+params:
+- [pool.size, '2']
+does:
+- Пишет итог в задачу, частичный — с пометкой «не завершено» (R-RUN-08)
+- Освобождает слоты
+- Уничтожает контейнер после любого терминального статуса, пул доливается (R-RUN-10)
+io:
+- [←, Run supervisor, '`RunResult` или причина остановки']
+- [→, ICPlan, '`RunResult` (I2)']
+- [→, RustFS, вложения (I19)]
+- [→, Sandbox, destroy (I6)]
+- [→, Scheduler, освобождённые слоты]
+data:
+- [agent_run, 'запись через I2: итог (таблица ICPlan, M2 пишет ICPlan)']
+- [scheduler_slot, 'запись: освобождение слотов']
+reqs: [R-RUN-07, R-RUN-08, R-RUN-10, R-SBX-02]
+tasks: ['2.1', '2.2', '2.6']
+failures:
+- Контейнер не удалился — повтор удаления (destroy идемпотентен), событие; слот не занимается (R-RUN-10)
+- ICPlan не принял итог — повтор отправки; переход задачи — когда итог принят (R-ICP-13)
+- Итог не по формату определения — `gate_failed` или пометка несоответствия (R-RUN-08)
+- RustFS недоступно — повтор 3 раза (I19); сценарий отказа итога — задача 2.6.6
+why: Каждый запуск заканчивается чисто, без хвостов.
+rnd: sandbox-isolation.md
+ops:
+- ['`POST /agent-runs/:runId/result` — итог `RunResult`, терминальный статус', Finalizer, I2]
+- [вложения итога в объектное хранилище (S3 API), Finalizer, I19]
+- ['`SandboxProvider.destroy` и долив пула', Finalizer, I6]
+- [освободить слоты запуска в `scheduler_slot`, Finalizer, внутри]

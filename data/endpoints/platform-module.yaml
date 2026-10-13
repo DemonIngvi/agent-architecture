@@ -1,0 +1,100 @@
+GET /platform/agents/:agentId/settings:
+  request: —
+  response: 200 · AgentSettings
+  note: ''
+PATCH /platform/agents/:agentId/settings:
+  request: AgentSettings (часть полей)
+  response: 200 · AgentSettings (новая version)
+  note: со следующего запуска
+GET /platform/agents/:agentId/export:
+  request: —
+  response: 200 · YAML определения агента
+  note: ''
+POST /platform/agents/import:
+  request: YAML определения агента
+  response: 200 · {agentId, version}
+  note: ''
+PUT /platform/projects/:projectKey/guidance:
+  request: '{guidance: string}'
+  response: '204'
+  note: ''
+PUT /platform/projects/:projectKey/budget:
+  request: '{monthUsd: number}'
+  response: '204'
+  note: ''
+GET /platform/projects/:projectKey/access:
+  request: —
+  response: 200 · {agentId, resourceId, right}[]
+  note: ''
+PUT /platform/projects/:projectKey/access:
+  request: '{agentId, resourceId, right}[]'
+  response: '204'
+  note: ''
+GET /platform/agents/:agentId/settings/versions:
+  request: —
+  response: 200 · {version, by, at}[]
+  note: история настроек (R-CP-04)
+POST /platform/agents/:agentId/settings/rollback:
+  request: '{version: int}'
+  response: 200 · AgentSettings (новая version)
+  note: 'новая версия с содержимым выбранной, со следующего запуска (R-CP-04); ошибки: 403 — нет права `ai_agents`'
+GET /platform/kill-switch:
+  request: —
+  response: 200 · {scope, enabled, reason, by, at}[]
+  note: '`scope`: `platform` · `agent:<id>` (`kill_switch`)'
+PUT /platform/kill-switch/:scope:
+  request: '{enabled: bool, reason}'
+  response: '204'
+  note: 'действует сразу (R-CP-03, R-GRD-15); `agent:<id>` — право `ai_agents`, `platform` — владелец экземпляра; API — и для эксплуатации (D24); ошибки: 403 — нет права на эту область'
+GET /platform/sandbox-profiles:
+  request: —
+  response: 200 · {id, name, image, runtime, cpu, memoryMb, diskGb, egressAllow, poolSize}[]
+  note: '`sandbox_profile`'
+PUT /platform/sandbox-profiles/:name:
+  request: '{image, runtime, cpu, memoryMb, diskGb, egressAllow, poolSize}'
+  response: '204'
+  note: 'владелец экземпляра (D24); удаление — `DELETE`, запрещено, пока профиль используется; ошибки: 400 — недопустимое значение с указанием поля (R-CP-01); 403 — не владелец экземпляра'
+DELETE /platform/sandbox-profiles/:name:
+  request: —
+  response: '204'
+  note: 'ошибки: 403 — не владелец экземпляра; 404 — профиля нет; 409 — профиль используется: в ответе агенты с этим профилем (`agent_settings.sandbox_profile_id`)'
+GET /platform/memory-profiles:
+  request: —
+  response: 200 · {id, name, read, write, m2LastRuns, retention, scope}[]
+  note: '`memory_profile`'
+PUT /platform/memory-profiles/:name:
+  request: '{read, write, m2LastRuns, retention, scope}'
+  response: '204'
+  note: 'владелец экземпляра (D24); удаление — `DELETE`, запрещено, пока профиль используется; ошибки: 400 — недопустимое значение с указанием поля (R-CP-01); 403 — не владелец экземпляра'
+DELETE /platform/memory-profiles/:name:
+  request: —
+  response: '204'
+  note: 'ошибки: 403 — не владелец экземпляра; 404 — профиля нет; 409 — профиль используется: в ответе агенты с этим профилем (`agent_settings.memory_profile_id`)'
+GET /platform/projects/:projectKey:
+  request: —
+  response: 200 · {guidance, budgetMonthUsd, setupScript, lockFiles}
+  note: '`project_platform`; строки нет — пустые значения; ошибки: 403 — нет права `ai_agents` в проекте; 404 — проекта нет'
+GET /platform/projects/:projectKey/resources:
+  request: —
+  response: 200 · {id, kind, ref, name}[]
+  note: '`project_resource`: `kind` — git · folder · document · mcp'
+PUT /platform/projects/:projectKey/resources:
+  request: '{kind, ref, name}[]'
+  response: '204'
+  note: 'право `ai_agents` в разделе проекта (D24); ошибки: 403 — нет права (R-CP-07)'
+PUT /platform/projects/:projectKey/setup:
+  request: '{setupScript: string, lockFiles: string[]}'
+  response: '204'
+  note: 'шаг подготовки (D19), `project_platform`; ошибки: 403 — нет права `ai_agents` (R-CP-07)'
+GET /platform/runs/:runId/manifest:
+  request: —
+  response: 200 · WorkspaceSource[]
+  note: для Runner
+GET /platform/runs/:runId/agent:
+  request: —
+  response: '200 · {version, definition: AgentDefinition, settings: AgentSettings}'
+  note: 'для Runner (I4, D23): вызов при старте после слотов; версию пишет в `agent_run.agent_version` при первом вызове, повтор — та же; ошибки: 404 — запуск не `pending` или агент не `external`; 409 — версии нет (R-REG-03)'
+GET /platform/audit:
+  request: 'query: from, to, entity'
+  response: 200 · {at, by, entity, change}[]
+  note: чтение — владелец экземпляра и Безопасность (US-PM-07, D24)

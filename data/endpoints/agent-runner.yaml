@@ -1,0 +1,20 @@
+PUT /runs/:runId/checkpoint:
+  request: Checkpoint
+  response: '204'
+  note: 'одноразовый токен запуска; идемпотентно по (run_id, step), Harness повторяет 3 раза (I12); ошибки: 401 — токен не этого запуска; 503 — схема `harness_ckpt` недоступна, Harness повторяет'
+GET /runs/:runId/checkpoint:
+  request: 'query: iteration (нет — последняя)'
+  response: 200 · Checkpoint
+  note: при повторной выдаче запуска Harness продолжает с последней итерации
+POST /runs/:runId/mcp/:server:
+  request: McpToolCall
+  response: 200 · McpToolCall (result)
+  note: 'allowlist запуска и G2 проверяются до вызова сервера; ошибки: 401 — токен не этого запуска; 403 — тул вне allowlist или отказ G2, сервер не вызывается, решение в событиях (R-RUN-13 «MCP-прокси запуска», R-MCP-02); 404 — сервера нет среди MCP-серверов агента; 502 — MCP-сервер недоступен: агент получает ошибку тула, чтение повторяется 2 раза (FMEA «MCP-сервер недоступен»)'
+POST /runs/:runId/deps:
+  request: '{lockFiles?: string[]}'
+  response: '200 · {status: ok · failed, log}'
+  note: 'повтор шага подготовки (D19); ошибки: 401 — токен не этого запуска; скрипт упал или превысил `setup.timeout_s` — 200 `{status: failed, log}`, агент получает ошибку тула, цикл продолжается (R-HRN-17, FMEA «Шаг подготовки упал»)'
+GET /healthz:
+  request: —
+  response: 200 · {status}
+  note: ''

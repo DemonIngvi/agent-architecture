@@ -1,0 +1,7 @@
+kind: fork
+written: true
+policy:
+  indexes: null
+  retention: тред — `chat.retention_days` = 90 по `updated_at` (icplan-integration, D25)
+  cleanup: каскадно с тредом и агентом; задача worker форка удаляет треды старше срока, сообщения и события — каскадом (R-ICP-19); для памяти M1 — фильтр чтения по `retention`
+  migrate: fork

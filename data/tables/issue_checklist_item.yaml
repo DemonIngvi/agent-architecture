@@ -1,0 +1,4 @@
+kind: fork
+columns:
+- [origin, text, '', '🛠 кто задал критерий: process · user:<username> · agent:<username> · reviewer:<username> (D20)']
+- [status, text, '', 🛠 active · pending_approval (D20)]

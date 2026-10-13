@@ -324,14 +324,14 @@
 | `docs/rnd/us-analogs-agent-tracker.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-12 | ✅ | f6b5a75d | повторная проверка: Z-ICP-53 закрыт |
 | `docs/rules/api-methodology.md` | В | — | — | — | ⏳ | d2ea729f | Методология |
 | `docs/rules/api-methodology.md` | А | — | — | — | ⏳ | d2ea729f | Методология |
-| `docs/rules/approval-methodology.md` | В | — | — | — | ⏳ | 7367c015 | Методология |
-| `docs/rules/approval-methodology.md` | А | — | — | — | ⏳ | 7367c015 | Методология |
+| `docs/rules/approval-methodology.md` | В | — | — | — | ⏳ | 9ee3caad | Методология |
+| `docs/rules/approval-methodology.md` | А | — | — | — | ⏳ | 9ee3caad | Методология |
 | `docs/rules/architecture-methodology.md` | В | — | — | — | ⏳ | 03347175 | Методология |
 | `docs/rules/architecture-methodology.md` | А | — | — | — | ⏳ | 03347175 | Методология |
-| `docs/rules/block-methodology.md` | В | — | — | — | ⏳ | 83b069ff | Методология |
-| `docs/rules/block-methodology.md` | А | — | — | — | ⏳ | 83b069ff | Методология |
-| `docs/rules/data-methodology.md` | В | — | — | — | ⏳ | 9b5795c0 | Методология |
-| `docs/rules/data-methodology.md` | А | — | — | — | ⏳ | 9b5795c0 | Методология |
+| `docs/rules/block-methodology.md` | В | — | — | — | ⏳ | 09b05810 | Методология |
+| `docs/rules/block-methodology.md` | А | — | — | — | ⏳ | 09b05810 | Методология |
+| `docs/rules/data-methodology.md` | В | — | — | — | ⏳ | b56fd05c | Методология |
+| `docs/rules/data-methodology.md` | А | — | — | — | ⏳ | b56fd05c | Методология |
 | `docs/rules/decision-methodology.md` | В | — | — | — | ⏳ | 0af1d5d9 | Методология |
 | `docs/rules/decision-methodology.md` | А | — | — | — | ⏳ | 0af1d5d9 | Методология |
 | `docs/rules/review-methodology.md` | В | — | — | — | ⏳ | 00fb603f | Методология |
@@ -340,49 +340,49 @@
 | `docs/rules/rnd-methodology.md` | А | — | — | — | ⏳ | d2ff1c00 | Методология |
 | `docs/rules/sdd-methodology.md` | В | — | — | — | ⏳ | 56577938 | Методология |
 | `docs/rules/sdd-methodology.md` | А | — | — | — | ⏳ | 56577938 | Методология |
-| `docs/rules/structure-methodology.md` | В | — | — | — | ⏳ | 67cb2cfa | Методология |
-| `docs/rules/structure-methodology.md` | А | — | — | — | ⏳ | 67cb2cfa | Методология |
+| `docs/rules/structure-methodology.md` | В | — | — | — | ⏳ | 3236614f | Методология |
+| `docs/rules/structure-methodology.md` | А | — | — | — | ⏳ | 3236614f | Методология |
 | `docs/rules/support-docs-methodology.md` | В | — | — | — | ⏳ | ebbf9293 | Методология |
 | `docs/rules/support-docs-methodology.md` | А | — | — | — | ⏳ | ebbf9293 | Методология |
-| `docs/rules/task-methodology.md` | В | — | — | — | ⏳ | 9da93e83 | Методология |
-| `docs/rules/task-methodology.md` | А | — | — | — | ⏳ | 9da93e83 | Методология |
-| `docs/rules/tech-spec.md` | В | — | — | — | ⏳ | ed1fbe4c | Методология |
-| `docs/rules/tech-spec.md` | А | — | — | — | ⏳ | ed1fbe4c | Методология |
+| `docs/rules/task-methodology.md` | В | — | — | — | ⏳ | 54fbc54b | Методология |
+| `docs/rules/task-methodology.md` | А | — | — | — | ⏳ | 54fbc54b | Методология |
+| `docs/rules/tech-spec.md` | В | — | — | — | ⏳ | ca2d288e | Методология |
+| `docs/rules/tech-spec.md` | А | — | — | — | ⏳ | ca2d288e | Методология |
 | `docs/rules/us-methodology.md` | В | — | — | — | ⏳ | 2ab78054 | Методология |
 | `docs/rules/us-methodology.md` | А | — | — | — | ⏳ | 2ab78054 | Методология |
-| `docs/stories/agent-runner.md` | В | — | — | — | ⏳ | f9be66c7 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/stories/agent-runner.md` | И | — | — | — | ⏳ | f9be66c7 | текст изменён после решения «✅» от Claude, роль Аналитик историй |
-| `docs/stories/agent-runner.md` | П | — | — | — | ⏳ | f9be66c7 | текст изменён после решения «✅» от Claude, роль Пользователь |
-| `docs/stories/guardrails.md` | В | — | — | — | ⏳ | 8a854a19 | User Stories |
-| `docs/stories/guardrails.md` | И | — | — | — | ⏳ | 8a854a19 | User Stories |
-| `docs/stories/guardrails.md` | П | — | — | — | ⏳ | 8a854a19 | User Stories |
-| `docs/stories/harness.md` | В | — | — | — | ⏳ | 51c3ca9e | User Stories |
-| `docs/stories/harness.md` | И | — | — | — | ⏳ | 51c3ca9e | User Stories |
-| `docs/stories/harness.md` | П | — | — | — | ⏳ | 51c3ca9e | User Stories |
-| `docs/stories/icplan.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 1618a917 | повтор: Z-ICP-46/47/49/104/105 закрыты в тексте (ветки ошибок процессов 1-3, развилка Действия в 4); Z-ICP-106 ждёт владельца |
-| `docs/stories/icplan.md` | И | Claude, роль Аналитик историй | 🤖 | 2026-10-13 | ✅ | 1618a917 | повтор: ветки отмены, повторной выдачи, таймаута, 403/409, активных запусков при удалении агента есть в BPMN процессов 1-3 |
-| `docs/stories/icplan.md` | П | Claude, роль Пользователь | 🤖 | 2026-10-13 | ✅ | 1618a917 | повтор: ход задачи, указания, вердикт, повтор, отмена и удаление агента описаны для пользователя; ошибки видны |
-| `docs/stories/infrastructure.md` | В | — | — | — | ⏳ | a7095c7f | User Stories |
-| `docs/stories/infrastructure.md` | И | — | — | — | ⏳ | a7095c7f | User Stories |
-| `docs/stories/infrastructure.md` | П | — | — | — | ⏳ | a7095c7f | User Stories |
-| `docs/stories/llm-gateway.md` | В | — | — | — | ⏳ | e9e8f3e9 | User Stories |
-| `docs/stories/llm-gateway.md` | И | — | — | — | ⏳ | e9e8f3e9 | User Stories |
-| `docs/stories/llm-gateway.md` | П | — | — | — | ⏳ | e9e8f3e9 | User Stories |
-| `docs/stories/mcp-tools.md` | В | — | — | — | ⏳ | fe344816 | User Stories |
-| `docs/stories/mcp-tools.md` | И | — | — | — | ⏳ | fe344816 | User Stories |
-| `docs/stories/mcp-tools.md` | П | — | — | — | ⏳ | fe344816 | User Stories |
-| `docs/stories/memory.md` | В | — | — | — | ⏳ | f48e55d8 | User Stories |
-| `docs/stories/memory.md` | И | — | — | — | ⏳ | f48e55d8 | User Stories |
-| `docs/stories/memory.md` | П | — | — | — | ⏳ | f48e55d8 | User Stories |
-| `docs/stories/observability.md` | В | — | — | — | ⏳ | b398ddc2 | User Stories |
-| `docs/stories/observability.md` | И | — | — | — | ⏳ | b398ddc2 | User Stories |
-| `docs/stories/observability.md` | П | — | — | — | ⏳ | b398ddc2 | User Stories |
-| `docs/stories/platform-module.md` | В | — | — | — | ⏳ | a97775d8 | User Stories |
-| `docs/stories/platform-module.md` | И | — | — | — | ⏳ | a97775d8 | User Stories |
-| `docs/stories/platform-module.md` | П | — | — | — | ⏳ | a97775d8 | User Stories |
-| `docs/stories/sandbox.md` | В | — | — | — | ⏳ | 6c9950b9 | User Stories |
-| `docs/stories/sandbox.md` | И | — | — | — | ⏳ | 6c9950b9 | User Stories |
-| `docs/stories/sandbox.md` | П | — | — | — | ⏳ | 6c9950b9 | User Stories |
+| `docs/stories/agent-runner.md` | В | — | — | — | ⏳ | 59c7108a | текст изменён после решения «✅» от Claude, роль Владелец продукта |
+| `docs/stories/agent-runner.md` | И | — | — | — | ⏳ | 59c7108a | текст изменён после решения «✅» от Claude, роль Аналитик историй |
+| `docs/stories/agent-runner.md` | П | — | — | — | ⏳ | 59c7108a | текст изменён после решения «✅» от Claude, роль Пользователь |
+| `docs/stories/guardrails.md` | В | — | — | — | ⏳ | 15468243 | User Stories |
+| `docs/stories/guardrails.md` | И | — | — | — | ⏳ | 15468243 | User Stories |
+| `docs/stories/guardrails.md` | П | — | — | — | ⏳ | 15468243 | User Stories |
+| `docs/stories/harness.md` | В | — | — | — | ⏳ | d62dc5a0 | User Stories |
+| `docs/stories/harness.md` | И | — | — | — | ⏳ | d62dc5a0 | User Stories |
+| `docs/stories/harness.md` | П | — | — | — | ⏳ | d62dc5a0 | User Stories |
+| `docs/stories/icplan.md` | В | — | — | — | ⏳ | d854644a | текст изменён после решения «✅» от Claude, роль Владелец продукта |
+| `docs/stories/icplan.md` | И | — | — | — | ⏳ | d854644a | текст изменён после решения «✅» от Claude, роль Аналитик историй |
+| `docs/stories/icplan.md` | П | — | — | — | ⏳ | d854644a | текст изменён после решения «✅» от Claude, роль Пользователь |
+| `docs/stories/infrastructure.md` | В | — | — | — | ⏳ | 5d4c8aee | User Stories |
+| `docs/stories/infrastructure.md` | И | — | — | — | ⏳ | 5d4c8aee | User Stories |
+| `docs/stories/infrastructure.md` | П | — | — | — | ⏳ | 5d4c8aee | User Stories |
+| `docs/stories/llm-gateway.md` | В | — | — | — | ⏳ | c68ad1fa | User Stories |
+| `docs/stories/llm-gateway.md` | И | — | — | — | ⏳ | c68ad1fa | User Stories |
+| `docs/stories/llm-gateway.md` | П | — | — | — | ⏳ | c68ad1fa | User Stories |
+| `docs/stories/mcp-tools.md` | В | — | — | — | ⏳ | 5bc875c3 | User Stories |
+| `docs/stories/mcp-tools.md` | И | — | — | — | ⏳ | 5bc875c3 | User Stories |
+| `docs/stories/mcp-tools.md` | П | — | — | — | ⏳ | 5bc875c3 | User Stories |
+| `docs/stories/memory.md` | В | — | — | — | ⏳ | 0f40fd7c | User Stories |
+| `docs/stories/memory.md` | И | — | — | — | ⏳ | 0f40fd7c | User Stories |
+| `docs/stories/memory.md` | П | — | — | — | ⏳ | 0f40fd7c | User Stories |
+| `docs/stories/observability.md` | В | — | — | — | ⏳ | 0f715453 | User Stories |
+| `docs/stories/observability.md` | И | — | — | — | ⏳ | 0f715453 | User Stories |
+| `docs/stories/observability.md` | П | — | — | — | ⏳ | 0f715453 | User Stories |
+| `docs/stories/platform-module.md` | В | — | — | — | ⏳ | cde57b9f | User Stories |
+| `docs/stories/platform-module.md` | И | — | — | — | ⏳ | cde57b9f | User Stories |
+| `docs/stories/platform-module.md` | П | — | — | — | ⏳ | cde57b9f | User Stories |
+| `docs/stories/sandbox.md` | В | — | — | — | ⏳ | 3ec8d662 | User Stories |
+| `docs/stories/sandbox.md` | И | — | — | — | ⏳ | 3ec8d662 | User Stories |
+| `docs/stories/sandbox.md` | П | — | — | — | ⏳ | 3ec8d662 | User Stories |
 | `docs/tasks/1.1-mock-llm-litellm.md` | В | — | — | — | ⏳ | 024accb2 | Задача |
 | `docs/tasks/1.1-mock-llm-litellm.md` | Р | — | — | — | ⏳ | 024accb2 | Задача |
 | `docs/tasks/1.1-mock-llm-litellm.md` | Т | — | — | — | ⏳ | 024accb2 | Задача |

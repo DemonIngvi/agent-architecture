@@ -2,7 +2,7 @@
 
 ← [Все истории](README.md) · [как работает](../how/harness.md)
 
-> Сгенерировано из `html-view/stories.py` — правьте там.
+> Сгенерировано из `data/stories/harness/` (история — файл `<US-ID>.yaml`) и `data/processes/harness.yaml` — правьте там.
 
 ## Процесс 1. Агентский цикл
 

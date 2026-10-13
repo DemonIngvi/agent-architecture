@@ -1,0 +1,181 @@
+I1:
+  from: agent-runner
+  to: icplan
+  via: ''
+  what: Runner забирает запуск из очереди (`POST /agent-runs/claim`, pull, аренда 300 с); в ответе — `Run`
+  models: [Run]
+  types: Т6, Т1 (задание)
+  data_in_response: true
+I2:
+  from: agent-runner
+  to: icplan
+  via: ''
+  what: шаги запуска и итог
+  models: [RunEvent, RunResult]
+  types: Т7, Т8 (итог), Т3 (ссылки на артефакты)
+  also: [observability, memory]
+I3:
+  from: agent-runner
+  to: icplan
+  via: ''
+  what: Runner продлевает аренду (`POST /agent-runs/:runId/heartbeat`); сейчас ответ 204 без тела, отмена — ответом 404; после доработки (R-ICP-16) в ответе — отмена, решения по approve и указания пользователя
+  models: [Heartbeat, ApprovalDecision, UserMessage]
+  types: Т6, Т1 (указания)
+  data_in_response: true
+I4:
+  from: agent-runner
+  to: platform-module
+  via: ''
+  what: настройки, определение версии запуска (`GET /platform/runs/:runId/agent`, D23), манифест
+  models: [AgentSettings, AgentDefinition, WorkspaceSource]
+  types: Т4
+  also: [icplan]
+  data_in_response: true
+I5:
+  from: agent-runner
+  to: guardrails
+  via: ''
+  what: допуск запуска G1
+  models: [PolicyInput, PolicyDecision]
+  types: Т6, Т4
+I6:
+  from: agent-runner
+  to: sandbox
+  via: ''
+  what: Runner создаёт и уничтожает среду (Docker API) по `SandboxClaim`; `RepoGrant` задаёт правила git-прокси этой среды (какие репозитории и ветки), сам токен в среду не попадает
+  models: [SandboxClaim, RepoGrant]
+  types: Т4 (профиль среды), Т6
+I7:
+  from: agent-runner
+  to: harness
+  via: ''
+  what: 'Runner вызывает Harness: задание, подтверждения, указания и отмена → Harness; события и итог ← Harness'
+  models: [RunBundle, UserMessage, RunEvent, ApprovalDecision, RunResult]
+  types: Т6 (`RunBundle`), Т1, Т2, Т4, Т7, Т8
+  also: [sandbox]
+I8:
+  from: harness
+  to: llm-gateway
+  via: ''
+  what: вызов модели
+  models: [ChatCompletionRequest]
+  types: Т1, Т2, Т8, Т7 (`metadata`), Т5 (virtual key)
+  also: [guardrails]
+I9:
+  from: harness
+  to: mcp-tools
+  via: agent-runner
+  what: вызов тулов MCP через MCP-прокси Runner (D19)
+  models: [McpToolCall]
+  types: Т6 (вызов), Т8 (вывод), Т3
+I10:
+  from: harness
+  to: guardrails
+  via: agent-runner
+  what: проверка действия G2 (для MCP — повторно в Runner)
+  models: [PolicyInput, PolicyDecision]
+  types: Т6, Т4
+I11:
+  from: harness
+  to: memory
+  via: ''
+  what: запись и чтение M3, контекст памяти
+  models: [M3Record]
+  types: Т2
+I12:
+  from: harness
+  to: agent-runner
+  via: ''
+  what: checkpoint цикла
+  models: [Checkpoint]
+  types: Т2 (состояние цикла)
+I13:
+  from: llm-gateway
+  to: «провайдеры моделей / mock»
+  via: ''
+  what: запросы к моделям
+  models: [ChatCompletionRequest]
+  types: Т1, Т2, Т8, Т5 (ключ провайдера)
+I14:
+  from: llm-gateway
+  to: infrastructure
+  via: ''
+  what: ключи, бюджеты, журнал затрат в БД `litellm`
+  models: []
+  types: Т7 (затраты), Т4 (ключи, бюджеты)
+  also: [observability]
+I15:
+  from: platform-module
+  to: llm-gateway
+  via: ''
+  what: выдача virtual key, бюджеты
+  models: [VirtualKey]
+  types: Т4, Т5 (virtual keys)
+I16:
+  from: platform-module
+  to: guardrails
+  via: ''
+  what: 'бандл правил: данные из Platform module + Rego из git'
+  models: [OpaBundleData]
+  types: Т4 (правила, данные)
+I17:
+  from: sandbox
+  to: «внешние хосты»
+  via: ''
+  what: исходящий трафик через egress-прокси (allowlist)
+  models: []
+  types: Т3, Т5 (подстановка токена)
+  also: [sandbox, mcp-tools]
+I18:
+  from: agent-runner
+  to: «git-провайдер»
+  via: ''
+  what: короткоживущие токены репозиториев
+  models: [RepoGrant]
+  types: Т5
+  also: [sandbox]
+I19:
+  from: agent-runner
+  to: infrastructure
+  via: ''
+  what: файлы задачи и артефакты в RustFS (S3 API)
+  models: []
+  types: Т3
+  also: [sandbox, icplan]
+I20:
+  from: icplan
+  to: icplan
+  via: ''
+  what: интерфейс ICPlan ↔ API (в том числе экраны Platform module, чат запуска, сводка)
+  models: [Process, Verdict, CostAggregate, AgentDefinition, AgentSettings]
+  types: Т1, Т3, Т4, Т7
+  also: [platform-module, observability]
+I21:
+  from: «пользователи»
+  to: icplan
+  via: infrastructure
+  what: 'вход по HTTPS через Traefik: web, api, mcp'
+  models: []
+  types: Т1, Т3, Т4
+I22:
+  from: «сервисы»
+  to: infrastructure
+  via: ''
+  what: Postgres через PgBouncer
+  models: []
+  types: Т1–Т7 (хранение)
+  also: [icplan, platform-module, agent-runner, memory, observability, llm-gateway]
+I24:
+  from: agent-runner
+  to: icplan
+  via: ''
+  what: MCP-прокси Runner вызывает MCP-сервер itsaplan-core в api ICPlan (`POST /mcp`) с ключом агента из Secret (D19); дальше I9 — к Harness
+  models: [McpToolCall]
+  types: Т6 (вызов), Т8 (вывод), Т3
+I23:
+  from: agent-runner
+  to: sandbox
+  via: infrastructure
+  what: среды запусков через Kubernetes API (этап 4)
+  models: [SandboxClaim]
+  types: Т4 (манифесты), Т6

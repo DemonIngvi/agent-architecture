@@ -1,0 +1,10 @@
+role: П
+want: открывать ICPlan по HTTPS
+so_that: безопасно работать из браузера
+accept:
+- HTTPS с действующим сертификатом
+- HTTP → перенаправление на HTTPS
+- Админки сервисов снаружи недоступны
+reqs:
+- 'platform-infrastructure: Ingress и TLS'
+entry: браузер

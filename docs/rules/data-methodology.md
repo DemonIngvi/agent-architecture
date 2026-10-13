@@ -15,7 +15,7 @@
 | Контракт данных (data contract), JSON Schema | у модели — поля, типы, обязательность, описание, владелец |
 | OpenAPI 3 | структура существующих API ICPlan — из OpenAPI работающего форка, не по памяти |
 | ER-модель | таблицы, ключи, связи; индексы на внешних ключах; срок хранения и очистка |
-| Один источник ([single source](change-process.md#single-source)) | всё описано в `html-view/datamodel.py`, страницы генерируются |
+| Один источник ([single source](change-process.md#single-source)) | всё описано в YAML по единице в `data/` ([ниже](#yaml)), страницы генерируются |
 | [Проверка двумя читателями](dual-read.md) | понятность имён и описаний проверяется независимыми читателями |
 
 ## Из чего состоит
@@ -27,7 +27,31 @@
 | База данных и схема | `DATABASES`: кластер → база → схема; у схемы — владелец (компонент), роль БД сервиса, кто мигрирует, S-код; у базы — пул PgBouncer, бэкап; доступ к чужим таблицам — только явным `GRANT` (`grants`) | вкладка «Данные» Инфраструктуры — «Базы данных»; «Данные» компонента — строка «Где лежит»; схема развёртывания на главной |
 | Таблица БД | `PLATFORM_TABLES`, `TABLE_POLICY` (индексы, срок, очистка, миграции); таблицы форка — импорт схемы | вкладка «Данные»: ER-диаграммы, таблицы полей, политика |
 | Тип данных Т1–Т8 | `docs/data-types.md` (типы), `INTEG_TYPES` (по интерфейсам) | матрица интерфейсов |
-| Имена | `NAMING` в `datamodel.py` | раздел «Правило имён» |
+| Имена | `naming` в `data/datamodel.yaml` (`NAMING`) | раздел «Правило имён» |
+
+Имена в «Где задаётся» — значения модулей сборки (`datamodel.INTEG` и т. д.); файл, в котором они правятся, — по таблице [ниже](#yaml).
+
+## Источник данных — YAML по единице {#yaml}
+
+Все данные сайта лежат в `data/` в корне репозитория (на сайт не попадает): **один файл — одна единица** (1–3 КБ), читается и правится целиком. Модули `html-view/datamodel.py`, `subcomponents.py`, `stories.py`, `components.py` только загружают значения (`html-view/yamldata.py`), Python-литералов данных в них нет.
+
+| Единица | Файл | Значения модулей |
+|---|---|---|
+| Компонент | `data/components/<slug>.yaml` (порядок — `_order.yaml`) | `COMPONENTS`, `ABOUT` (`about`), `BLOCKS` (`blocks`), `STORES` (`stores`), `ICPLAN_TABLES` (`icplan_tables`) |
+| Блок компонента | `data/blocks/<компонент>/<slug>.yaml`, имя = адрес страницы блока | `SUB[(компонент, title)]` |
+| Встроенные | `data/hosts.yaml` | `HOST` |
+| Модель | `data/models/<Имя>.yaml` | `MODELS`, `MODEL_META` (`source`), `FIELD_SRC`, `PLANNED` |
+| Таблица | `data/tables/<имя>.yaml`, `kind`: platform / fork / litellm | `PLATFORM_TABLES`, `SCHEMA_OF`, `TABLE_POLICY` (`policy`), `FORK_COLUMNS`, `FORK_WRITTEN` (`written`), `LITELLM_TABLES` |
+| Эндпоинты страницы API | `data/endpoints/<страница docs/api>.yaml` | `ENDPOINT_IO` |
+| Интерфейсы | `data/integrations.yaml` (запись на I-код) | `INTEG`, `INTEG_TYPES` (`types`), `ALSO` (`also`), `DATA_IN_RESPONSE` |
+| Базы и общее | `data/databases.yaml`, `data/datamodel.yaml` | `DB_CLUSTER`, `DATABASES`, `DB_GRANTS`, `MIGRATE`; `NAMING`, `LITELLM_REF`, `S1_DOMAINS`, `TREES` |
+| История, процесс, персоны | `data/stories/<компонент>/<US-ID>.yaml` (`chain` — сквозная цепочка), `data/processes/<компонент>.yaml`, `data/personas.yaml` | `STORIES`, `CHAINS`, `BPMN`, `ARTIFACTS`, `ROLES`, `PERSONAS` |
+
+- **Правится только YAML.** Строки таблиц — `[a, b, c]` в одну строку, записи — словари; поля, типы и допустимые значения — схема `yamldata.SCHEMAS`, проверка — `doctool yaml-check`.
+- **Сгенерированные страницы руками не правятся**: `doctool generated <файл>` называет источник, хук до правки не даёт изменить такой файл.
+- Читать единицу — `doctool unit <ID>` (YAML без пустых полей + связанные ID), а не страницу и не весь файл данных.
+- Формат — `doctool yaml-fmt [путь]` (порядок ключей по схеме, `_order.yaml`); новый файл без строки в `_order.yaml` — замечание `yaml-check`.
+- Сборка (`python html-view/build.py`) — **один раз в конце пути изменений**, не после каждой единицы ([порядок](change-process.md#yaml-path)).
 
 **Правило имён (кратко):** JSON наших контрактов — camelCase, как в API ICPlan; задача — `issueId` + `issueIdentifier`; агент — `agentId`, автор — `username`; единица — суффиксом (`readyMs`, `ttlSec`); внешние протоколы (OpenAI, LiteLLM, MCP, AG-UI, OPA) — в их стиле; колонки БД и параметры конфигурации — snake_case. Полностью — [ниже](#naming).
 

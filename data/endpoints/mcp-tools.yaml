@@ -1,0 +1,8 @@
+POST tools/list:
+  request: McpToolCall (method tools/list)
+  response: '200 · {tools: {name, description, inputSchema}[]}'
+  note: JSON-RPC 2.0
+POST tools/call:
+  request: McpToolCall
+  response: 200 · McpToolCall (result)
+  note: ''

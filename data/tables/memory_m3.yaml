@@ -1,0 +1,21 @@
+kind: platform
+store: S4
+owner: memory
+schema: itsaplan.memory
+columns:
+- [issue_id, int, 'PK, FK issue', '']
+- [scope, text, PK, '']
+- [agent, text, '', автор]
+- [done, jsonb, '', '']
+- [next, jsonb, '', '']
+- [blockers, jsonb, '', '']
+- [artifacts, jsonb, '', D20]
+- [questions, jsonb, '', D20]
+- [criteria_next, jsonb, '', D20]
+- [version, int, '', '']
+- [updated_at, timestamptz, '', '']
+policy:
+  indexes: []
+  retention: '`memory.retention`: M3 до закрытия задачи (agent-memory)'
+  cleanup: удаляется по профилю после закрытия задачи; M2 остаётся
+  migrate: memory

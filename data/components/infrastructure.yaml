@@ -1,0 +1,53 @@
+name: Инфраструктура
+status: part
+guardrails: G3
+desc: Кластер k3s, Helm, Traefik ingress, PostgreSQL (CloudNativePG) с PgBouncer, RustFS, секреты, бэкапы, сетевые политики, профиль нагрузки.
+specs:
+- [Спека, openspec/changes/define-agent-platform/specs/platform-infrastructure/spec.md]
+- [Схема развёртывания, openspec/changes/define-agent-platform/specs/platform-infrastructure/architecture.md]
+tasks: ['4.6', '4.7', '4.8']
+about:
+  chain:
+  - [Пользователи, null]
+  - [Инфраструктура, infrastructure]
+  - [ICPlan, icplan]
+  - [Agent Runner, agent-runner]
+  purpose: 'Основание платформы: где и как всё запущено, как распределяется нагрузка, где лежат данные и как они сохраняются.'
+  does:
+  - Кластер k3s на одном узле, namespaces по зонам
+  - Вход только через Traefik по HTTPS
+  - Балансировка между репликами — Service
+  - PostgreSQL 17 под CloudNativePG, пул PgBouncer
+  - RustFS (S3) для вложений и копий
+  - Секреты, сетевые политики, бэкапы вне узла
+stores: [S1, S2, S3, S4, S5, S6, S7, S9]
+blocks:
+- - {title: Пользователи, desc: HTTPS, kind: user}
+- ↓ HTTPS (I21)
+- zone: Узел k3s (8 vCPU / 32 ГБ / 400 ГБ)
+  rows:
+  - - {title: Traefik, desc: 'ingress, TLS ACME; публично web, api, mcp', kind: core, st: part}
+  - ↓ Service (ClusterIP) — балансировка по репликам
+  - zone: itsaplan-core
+    rows:
+    - - {title: ICPlan web ×1–2, kind: ext, to: icplan}
+      - {title: ICPlan api ×2, desc: '+ MCP, Platform module', kind: ext, to: icplan}
+      - {title: 'worker, bot', kind: ext, to: icplan}
+  - zone: itsaplan-agents
+    rows:
+    - - {title: Agent Runner, kind: ext, to: agent-runner}
+      - {title: LiteLLM ×2, kind: ext, to: llm-gateway}
+      - {title: OPA ×2, kind: ext, to: guardrails}
+    - - {title: Memory API, kind: ext, to: memory}
+      - {title: Egress-прокси, kind: ext, to: sandbox}
+      - {title: Запуски (Pod / Docker), kind: ext, to: sandbox}
+  - ↓ PostgreSQL через PgBouncer (I22) · S3 API (I19)
+  - zone: itsaplan-data
+    rows:
+    - - {title: PgBouncer, desc: transaction pool ≤ 30, kind: core, st: todo}
+      - {title: PostgreSQL 17 + pgvector, desc: 'CloudNativePG; БД itsaplan, litellm', kind: store, st: part}
+      - {title: RustFS, desc: 'S3: вложения, артефакты, копии', kind: store, st: part}
+  cls: icplan
+- ↓ копии вне узла
+- - {title: Резервное хранилище S3 вне узла, desc: 'базовые копии + WAL, копия RustFS', kind: core, st: todo}
+  - {title: Prometheus / Grafana / Loki, desc: мониторинг, kind: back}

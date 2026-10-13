@@ -1,0 +1,15 @@
+kind: platform
+store: S2
+owner: platform-module
+schema: itsaplan.platform
+columns:
+- [project_id, int, 'PK, FK project', '']
+- [guidance, text, '', руководство проекта]
+- [budget_month_usd, numeric, '', '']
+- [setup_script, text, '', шаг подготовки (D19)]
+- [lock_files, jsonb, '', для кэша]
+policy:
+  indexes: []
+  retention: пока жив проект
+  cleanup: каскадно с проектом
+  migrate: cp

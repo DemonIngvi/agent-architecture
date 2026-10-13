@@ -1,0 +1,11 @@
+title: Профили sandbox
+tech: Профили Sandbox (образ, ресурсы, сеть, пул)
+params:
+- [image, 'agent-harness:<версия>']
+- [resources, 1 CPU / 1 ГБ / 2 ГБ]
+- [egress_allow, только платформа]
+- [pool.size, '2']
+does:
+- Определяет, что агент может запускать и куда ходить
+why: Разным агентам — разная среда без изменения кода.
+rnd: sandbox-isolation.md

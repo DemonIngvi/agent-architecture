@@ -1,0 +1,12 @@
+purpose: вердикт по результату шага (R-AP-19)
+fields:
+- [issueId / stepId, int / string, true, 'задача и шаг, по которому вердикт']
+- [runId, int | null, false, 'запуск, чей итог оценивается; нет — ручной шаг']
+- [verdict, 'enum: accepted · rejected', true, '`accepted` → переход `onSuccess` шага, `rejected` → `onFailure`']
+- [note, string, false, 'заметка возврата; следующий запуск шага, на который вернули задачу, получает её в `RunBundle.task.returnNote`']
+- [by, string, true, '`username` того, кто вынес вердикт']
+- [criteria, 'Criterion[]', false, критерии ревьюера при возврате (D20)]
+source:
+  kind: ours
+  ref: D20, R-AP-19
+  why: Вердикт шага из карточки итога; при возврате ревьюер может добавить критерии с происхождением `reviewer:<кто>`.

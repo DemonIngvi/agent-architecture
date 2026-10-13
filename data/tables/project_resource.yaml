@@ -1,0 +1,16 @@
+kind: platform
+store: S2
+owner: platform-module
+schema: itsaplan.platform
+columns:
+- [id, serial, PK, '']
+- [project_id, int, FK project, '']
+- [kind, text, '', git / folder / document / mcp]
+- [ref, text, '', 'адрес, префикс, id']
+- [name, text, '', '']
+policy:
+  indexes:
+  - [unique, 'project_id, kind, ref', ресурс один раз в проекте]
+  retention: пока жив проект
+  cleanup: каскадно с проектом
+  migrate: cp

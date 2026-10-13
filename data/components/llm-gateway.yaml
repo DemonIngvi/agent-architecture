@@ -1,0 +1,40 @@
+name: LiteLLM gateway
+status: part
+guardrails: G4
+desc: 'Единственный выход к моделям: алиасы, virtual key на агента, лимиты, fallback. Развёрнут, не подключён.'
+specs:
+- [Спека, openspec/changes/define-agent-platform/specs/llm-gateway/spec.md]
+- [Схема, openspec/changes/define-agent-platform/specs/llm-gateway/architecture.md]
+tasks: ['1.1', '4.5']
+about:
+  chain:
+  - [Harness, harness]
+  - [LiteLLM gateway, llm-gateway]
+  - [Модели, null]
+  purpose: 'Единственная дверь к моделям: смена модели, лимиты и учёт затрат в одном месте.'
+  does:
+  - 'Алиасы моделей: смена модели без изменения агентов'
+  - Virtual key на агента, бюджеты и rate limit
+  - Резервная модель при сбое
+  - Проверки G4 во входе и ответе
+  - Журнал токенов и стоимости
+stores: [S6]
+blocks:
+- - {title: Harness · LLM client, desc: OpenAI-совместимый API, kind: ext, to: harness}
+- ↓ virtual key агента
+- zone: LiteLLM
+  rows:
+  - - {title: Virtual keys, desc: ключ на агента, kind: core, st: part}
+    - {title: 'Бюджеты, rate limit', desc: отказ до траты, kind: core, st: todo}
+    - {title: G4 хуки, desc: 'PII, injection, модерация', kind: core, st: todo, g: G4}
+  - - {title: Алиасы, desc: team-default → модель, kind: core, st: part}
+    - {title: Fallback, desc: резервная модель, kind: core, st: todo}
+    - {title: Spend log, desc: токены и $ по ключу, kind: core, st: part}
+  g: G4
+- ↓
+- - {title: mock-LLM, desc: разработка и тесты, kind: core, st: todo}
+  - {title: Anthropic, kind: store}
+  - {title: OpenAI, kind: store}
+  - {title: Локальные модели, kind: store}
+- → spend log
+- - {title: Observability, desc: затраты, kind: ext, to: observability}

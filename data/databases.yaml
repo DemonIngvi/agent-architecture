@@ -1,0 +1,65 @@
+cluster:
+  engine: PostgreSQL 17 + pgvector
+  operator: CloudNativePG
+  namespace: itsaplan-data
+  instances: 1 (MVP, D18)
+  pooler: PgBouncer (`Pooler` CloudNativePG), режим transaction
+  backup: WAL и базовые копии в S3 вне площадки (`postgres.backup`)
+  roles: managed roles CloudNativePG (D22)
+databases:
+  itsaplan:
+    owner: icplan
+    schemas:
+      public:
+        owner: icplan
+        role: itsaplan
+        stores: S1
+        migrate: fork
+        what: таблицы форка, процесс задачи
+      platform:
+        owner: platform-module
+        role: itsaplan
+        stores: S2, S3
+        migrate: cp, obs
+        what: настройки агентов, профили, доступы (Platform module); события запуска (Observability)
+      runner:
+        owner: agent-runner
+        role: runner
+        stores: S3
+        migrate: runner
+        what: слоты планировщика, кэш подготовки
+      harness_ckpt:
+        owner: agent-runner
+        role: runner
+        stores: S5
+        migrate: runner
+        what: checkpoint агентского цикла
+      memory:
+        owner: memory
+        role: memory
+        stores: S4
+        migrate: memory
+        what: M3, позже M4
+  litellm:
+    owner: llm-gateway
+    schemas:
+      public:
+        owner: llm-gateway
+        role: litellm
+        stores: S6
+        migrate: litellm
+        what: virtual keys, бюджеты, журнал затрат
+grants:
+- [memory, SELECT, itsaplan.public.agent_run, 'M2: итоги запусков']
+- [memory, SELECT, itsaplan.public.agent_chat_message, 'M1: переписка']
+- [memory, SELECT, itsaplan.public.issue_activity, 'M1, M2: комментарии и записи «агент взял / закончил» (D25)']
+- [memory, REFERENCES, itsaplan.public.issue, FK memory_m3.issue_id]
+- [runner, REFERENCES, itsaplan.public.agent_run, 'FK run_checkpoint.run_id, scheduler_slot']
+- [litellm_read (api ICPlan), SELECT, litellm.public.LiteLLM_SpendLogs, 'Observability: затраты задачи']
+migrate:
+  fork: Drizzle в форке (`packages/db`), применяются до старта `api`
+  cp: миграции Platform module в `api` форка, своя таблица версий, только схема `platform`
+  obs: миграции Observability в `api` форка, своя таблица версий
+  runner: миграции Agent Runner при старте, своя таблица версий
+  memory: миграции Memory API при старте (Alembic), своя таблица версий
+  litellm: миграции LiteLLM (Prisma) прямым подключением, минуя PgBouncer

@@ -1,0 +1,19 @@
+kind: platform
+store: S1
+owner: icplan
+schema: itsaplan.public
+columns:
+- [id, serial, PK, '']
+- [project_id, int, FK project, '']
+- [issue_type_id, int, FK issue_type, один процесс на тип]
+- [owner_user_id, text, '', владелец]
+- [first_step_id, int, FK process_step, '']
+- [version, int, '', версия процесса]
+policy:
+  indexes:
+  - [unique, 'project_id, issue_type_id', один процесс на тип задачи]
+  - [index, issue_type_id, FK; процесс по типу задачи]
+  - [index, first_step_id, FK]
+  retention: пока жив проект
+  cleanup: каскадно с проектом; версия процесса растёт при правке
+  migrate: fork

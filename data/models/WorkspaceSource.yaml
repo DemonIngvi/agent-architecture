@@ -1,0 +1,11 @@
+purpose: источник рабочего пространства
+fields:
+- [name, string, true, имя в `/workspace/<имя>`]
+- [type, 'enum: git · folder', true, вид]
+- [url / prefix, string, true, при `type = git` — `url` репозитория; при `folder` — `prefix` папки в объектном хранилище RustFS (S3)]
+- [branch, string, false, ветка агента `agent/<задача>`]
+- [right, 'enum: read · write', true, 'право по политике (D18): `read` — вся папка и ветка задачи; `write` — только своя подпапка шага и ветка агента']
+source:
+  kind: ours
+  ref: D18
+  why: Рабочее пространство собирается из источников проекта; `right` — право агента на источник по политике, его проверяет Runner при монтировании.

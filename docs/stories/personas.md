@@ -2,7 +2,7 @@
 
 ← [Все истории](README.md) · [методика историй](../rules/us-methodology.md) · [роли документации](../rules/roles.md) · [отыгрыш](../rules/rnd-methodology.md#personas)
 
-> Сгенерировано из `html-view/stories.py` (PERSONAS) — правьте там.
+> Сгенерировано из `data/personas.yaml` (PERSONAS) — правьте там.
 
 Персоны продукта — участники процесса, от лица которых пишутся истории и разыгрываются конфликты и споры ролей в R&D.
 

@@ -1,0 +1,29 @@
+title: Шаг подготовки
+tech: Контейнер подготовки в сети `sbx-setup` (D19), кэш `setup_cache` в схеме `runner`
+kind: service
+stories: [US-SBX-05]
+params:
+- [setup.script, нет]
+- [setup.cache_ttl_h, '168']
+- [setup.timeout_s, '600']
+does:
+- Ставит зависимости проекта до старта агента
+- Кэширует по хешу lock-файлов в /workspace/.deps; кэш моложе `setup.cache_ttl_h` — шаг пропускается
+- Повторяет установку по тулу install_dependencies
+io:
+- [←, Sandbox claim, контейнер запуска]
+- [←, Harness, '`POST /runs/:runId/deps` (I7)']
+- [→, Sandbox, контейнер подготовки (I6)]
+data:
+- [setup_cache, 'запись, чтение: кэш по хешу lock-файлов']
+- [project_platform, 'чтение через I4: `setup_script`, `lock_files` (владелец Platform module)']
+reqs: [R-SBX-14, R-HRN-17]
+tasks: ['4.2']
+failures:
+- Скрипт упал или превысил `setup.timeout_s` — запуск `failed` с причиной «подготовка среды» (FMEA)
+- 'Повтор по `install_dependencies` не удался — ответ `{status: failed, log}`, агент получает ошибку тула'
+why: Агенту нужны зависимости для тестов, а доступ к реестрам — канал утечки; поэтому реестры только у подготовки.
+rnd: agent-workspace.md
+ops:
+- ['выполнить `setup.script` в контейнере подготовки, результат — в `/workspace/.deps`', Run supervisor до старта Harness при промахе кэша, I6]
+- ['`POST /runs/:runId/deps` — повтор шага подготовки (тул `install_dependencies`)', 'Harness, токен запуска', I7]

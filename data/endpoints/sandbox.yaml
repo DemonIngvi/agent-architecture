@@ -1,0 +1,12 @@
+POST Docker:
+  request: Docker Engine API `POST /containers/create` (образ, ресурсы профиля, сеть)
+  response: 201 · {Id}
+  note: через docker-socket-proxy
+DELETE Docker:
+  request: Docker Engine API `DELETE /containers/:id`
+  response: '204'
+  note: ''
+POST Kubernetes:
+  request: 'Kubernetes API: Pod из `SandboxClaim`'
+  response: 201 · Pod
+  note: этап 4

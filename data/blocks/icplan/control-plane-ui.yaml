@@ -1,0 +1,59 @@
+title: Control Plane UI
+tech: 'It''s a Plan web: Команда → ИИ-агенты, Интеграции, Инструменты, Навыки, MCP'
+kind: ui
+stories: [US-ICP-20, US-ICP-21, US-ICP-22, US-ICP-23, US-ICP-24, US-ICP-28, US-ICP-19, US-ICP-06, US-ICP-05, US-ICP-25, US-ICP-26, US-ICP-27]
+screens:
+- {name: Агенты команды, where: Команда → Настройки → ИИ-агенты, what: 'список агентов, поиск, создание; у внешнего агента — в сети ли раннер', status: есть, code: 'apps/web/src/app/[teamRef]/settings/ai-agents/page.tsx', stories: 'US-ICP-20, US-ICP-06'}
+- {name: Карточка агента, where: ИИ-агенты → агент (боковая панель), what: 'модель и ключ провайдера (внутренний), инструкция, проекты, доступ (кто даёт работу), действия в проекте, триггеры (упоминание, делегат, поле), ключ API и раннер (внешний); у внешнего агента платформы — поля Registry: модель-алиас, навыки, тулы (MCP агента — ресурсы проекта, экран «Платформа: проект», D23) — `PATCH /teams/:teamId/ai-agents/:agentId`, `PUT /teams/:teamId/ai-agents/:agentId/skills`, `/tool-configs` (доработка, R-REG-02, D23, D24)', status: доработка, code: 'apps/web/src/features/teams/components/ai-agents/AgentSheetForm.tsx, TeamAiAgentFields.tsx', stories: US-ICP-21}
+- {name: Выключение агента, where: карточка агента, what: 'выключить / включить; судьба активных запусков `onDisable`: finish / cancel — `PATCH /teams/:teamId/ai-agents/:agentId`', status: доработка, code: apps/web/src/features/teams/components/ai-agents/AgentSheetForm.tsx, stories: US-ICP-22}
+- {name: История запусков агента, where: карточка агента → запуски, what: 'запуски по триггеру, новые сверху, по 25; у запуска — задача и итог', status: есть, code: apps/web/src/features/teams/components/ai-agents/TeamAiAgentRunsSheet.tsx, stories: US-ICP-28}
+- {name: Тулы и навыки команды, where: Команда → Настройки → Инструменты / Навыки, what: 'каталог тулов с учётными данными, навыки с файлами', status: есть, code: 'apps/web/src/app/[teamRef]/settings/agent-tools, agent-skills', stories: US-ICP-20}
+- {name: Доступ к MCP ICPlan, where: Команда → Настройки → MCP, what: 'переключатель: открыта ли команда MCP-клиентам (`team.mcp_enabled`) и какие проекты он охватывает (`project.mcp_enabled`); каталога MCP-серверов в форке нет — MCP агентов платформы задаются ресурсами проекта (D23)', status: есть, code: 'apps/web/src/app/[teamRef]/settings/mcp (TeamMcpSection)', stories: US-ICP-20}
+- {name: Агенты проекта и расписания, where: Проект → Агенты, what: 'агенты, работающие в проекте; чат с агентом; регулярная работа по расписанию', status: есть, code: 'apps/web/src/app/[teamRef]/(shell)/[projectKey]/agents', stories: 'US-ICP-24, US-ICP-19'}
+- {name: Редактор процесса, where: Проект → Настройки → Типы задач → процесс, what: 'шаги: колонка, агент, переходы при успехе и ошибке, лимит, проверка — `GET`, `PUT /projects/:projectKey/processes`; Действие «делегировать агенту» — `POST /projects/:projectKey/actions`', status: новое, code: рядом с apps/web/src/features/settings/SettingsIssueTypesPage.tsx, stories: 'US-ICP-05, US-ICP-25, US-ICP-26, US-ICP-27'}
+- {name: 'Платформа: агент', where: карточка агента → «Платформа», what: 'автономия, бюджеты, профили, тулы с подтверждением, kill switch агента, история и откат настроек — `GET`, `PATCH /platform/agents/:agentId/settings`, `…/settings/versions`, `…/settings/rollback`, экспорт и импорт, `PUT /platform/kill-switch/:scope` (`agent:<id>`); право `ai_agents` (D24)', status: новое, code: раздел в стеке apps/web/src/features/teams/components/ai-agents/TeamAiAgentFields.tsx; после PR в upstream — точка расширения `@/cloud`, stories: US-ICP-21}
+- {name: 'Платформа: проект', where: Проект → ИИ-команда → «Платформа», what: 'руководство, месячный бюджет, ресурсы и доступы агентов, шаг подготовки — чтение `GET /platform/projects/:projectKey`; запись `/platform/projects/:projectKey/guidance`, `/budget`, `/access`, `/resources`, `/setup`; право `ai_agents` (D24)', status: новое, code: 'раздел в apps/web/src/utils/settingsSections.ts (`SETTINGS_SECTIONS`), сообщения messages/*/sections.json', stories: US-ICP-21}
+- {name: 'Платформа: экземпляр', where: God mode → «Платформа», what: 'профили среды и памяти (удаление запрещено, пока профиль используется — 409), глобальный kill switch, журнал изменений — `/platform/sandbox-profiles`, `/platform/memory-profiles` (`GET`, `PUT`, `DELETE`), `PUT /platform/kill-switch/:scope` (`platform`), `GET /platform/audit`; владелец экземпляра (D24)', status: новое, code: 'точка расширения `@/cloud` (как godSections.ts), новая страница маршрута', stories: US-ICP-21}
+params:
+- [agent.model, —]
+- [agent.instruction, —]
+- [agent.tools, нет]
+- [agent.skills, нет]
+- [agent.projects, нет]
+- [agent.kind, internal]
+- [agent.enabled, да]
+does:
+- Создание и настройка агентов
+- Подключение тулов и навыков; доступ команды к MCP ICPlan
+- Проверка агента в чате, выключение агента (3.8)
+- Ключи провайдеров команды — только для внутренних агентов ICPlan; агенты платформы ходят к моделям через virtual key LiteLLM (D5)
+io:
+- [→, Registry, 'определение агента: модель, инструкция, тулы, навыки']
+- [→, Platform module, '`AgentSettings` — наши настройки агента (I20)']
+- [←, Registry, 'каталог агентов, тулов, навыков']
+data:
+- [ai_agent, 'запись: определение агента, `enabled`']
+- [apikey, 'запись: ключ агента, показывается один раз']
+- [agent_tool_link, 'запись: тулы агента']
+- [agent_skill_link, 'запись: навыки агента']
+- [integration_credential, 'запись: учётные данные тулов']
+- [agent_schedule, 'запись: регулярная работа агента']
+- [team, 'запись: `mcp_enabled` — доступ команды к MCP ICPlan']
+- [project, 'запись: `mcp_enabled` — проекты, которые охватывает доступ к MCP']
+- [agent_settings, 'запись через API Platform module: наши настройки (I20)']
+- [agent_settings_version, 'чтение, запись: история и откат настроек']
+- [kill_switch, 'запись: `agent:<id>` — карточка, `platform` — God mode']
+- [project_platform, 'запись: руководство, бюджет, шаг подготовки']
+- [project_resource, 'запись: ресурсы проекта, в том числе MCP (`kind = mcp`)']
+- [access_policy, 'запись: доступы агентов к ресурсам']
+- [sandbox_profile, 'запись: профили среды (God mode)']
+- [memory_profile, 'запись: профили памяти (God mode)']
+reqs: [R-ICP-01, R-ICP-08, R-ICP-17, R-ICP-18, R-REG-06, R-AP-03, R-AP-15, R-AP-22]
+tasks: ['2.3', '3.1', '3.5', '3.8']
+failures:
+- БД ICPlan недоступна — настройки не сохраняются, определения не читаются, запуски не стартуют (FMEA agent-registry)
+- Модель не настроена в LiteLLM — сохранение агента отклоняется с указанием модели, 400 (R-REG-06 «Модель без доступа»)
+- LiteLLM недоступен при проверке модели — смена модели не сохраняется, 503 и сообщение «проверить модель нельзя, повторите»; правка без смены модели сохраняется (R-REG-06 «Шлюз недоступен»)
+- 'Platform module работает внутри api ICPlan — отдельного отказа нет: недоступен api — недоступен весь экран'
+why: 'UI уже есть — не пишем свою консоль; наши настройки добавляются экранами Platform module у своего объекта: агент — в карточке, проект — в проекте, экземпляр — в God mode (D24).'
+rnd: tracker-choice.md

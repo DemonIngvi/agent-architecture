@@ -1,0 +1,10 @@
+role: QA
+want: поднять локальную среду, как в prod, для тестов
+so_that: проверять до выпуска
+accept:
+- Локальная среда (compose / k3d) с mock-LLM
+- Те же чарты и версии
+- Сброс среды к исходному состоянию одной командой
+reqs:
+- 'platform-infrastructure: Локальная среда'
+entry: compose / k3d

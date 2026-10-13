@@ -1,0 +1,10 @@
+title: Бюджеты, rate limit
+tech: LiteLLM budgets, RPM / TPM
+params:
+- [max_budget, из Platform module]
+- [rpm, '60']
+- [tpm, по провайдеру]
+does:
+- Отклоняет вызов до траты при превышении
+why: Жёсткий стоп перерасхода на уровне шлюза (G4).
+rnd: runaway-protection.md

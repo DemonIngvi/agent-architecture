@@ -1,0 +1,18 @@
+kind: platform
+store: S3
+owner: observability
+schema: itsaplan.platform
+columns:
+- [run_id, int, 'PK, FK agent_run', 'целое, как `agent_run.id`']
+- [seq, int, PK, '']
+- [ts, timestamptz, '', '']
+- [type, text, '', '`event.type` AG-UI, для отбора']
+- [event, jsonb, '', 'событие AG-UI целиком, маскированное; дельты собраны в сообщение']
+- [issue_id, int, FK issue, лента задачи]
+policy:
+  indexes:
+  - [index, ts, очистка по сроку]
+  - [index, 'issue_id, ts', лента задачи]
+  retention: '`retention_days` = 90 (observability)'
+  cleanup: ночная пакетная очистка по `ts`; при медленной очистке (этап 4) — секции по дням
+  migrate: obs

@@ -1,0 +1,31 @@
+title: Tool Executor
+tech: Адаптер MCP → тулы LangGraph
+kind: service
+stories: [US-HAR-01, US-SBX-05]
+params:
+- [model.parallel_tool_calls, 'false']
+- [workspace.publish, вложения + PR]
+does:
+- Вызывает тулы MCP и нативные
+- Ошибки и таймауты возвращает агенту
+- Отклоняет путь вне `/workspace`
+- 'Собирает артефакты итога: файлы, ветку, PR'
+io:
+- [←, LLM client, запросы вызова тулов]
+- [→, mcp-tools, '`McpToolCall` через MCP-прокси Runner (I9)']
+- [→, Context Manager, результаты тулов в следующий шаг]
+data:
+- [setup_cache, 'косвенно: `install_dependencies` → Runner обновляет кэш шага подготовки (владелец — Agent Runner, D19)']
+- [issue_attachment, 'косвенно: артефакты из `RunResult` публикует Runner во вложения задачи (владелец — ICPlan)']
+reqs: [R-HRN-02, R-HRN-12, R-HRN-13, R-HRN-17]
+tasks: ['1.4']
+failures:
+- MCP-сервер недоступен — ошибка тула возвращается агенту, цикл продолжается (FMEA agent-harness)
+- Запись через I9 прервалась сбоем сети — автоматического повтора нет (R-HRN-12)
+- Путь вне `/workspace` — вызов отклонён с причиной
+why: Стандарт MCP; вызовы идут через MCP-прокси Runner, ключи — у Runner (D19).
+rnd: mcp-vs-direct.md
+ops:
+- ['узел `tools`: `tools/list`, `tools/call` через MCP-прокси Runner — `POST /runs/:runId/mcp/:server`', граф LangGraph, I9]
+- ['тул `install_dependencies` — `POST /runs/:runId/deps`, повтор шага подготовки (D19)', агент, I7]
+- [файловые тулы в пределах `/workspace`; список артефактов в `RunResult`, агент, внутри]

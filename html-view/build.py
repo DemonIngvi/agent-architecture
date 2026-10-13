@@ -139,10 +139,10 @@ def _write_if_changed(path: Path, text: str):
 
 
 def sync_stories():
-    """docs/stories/*.md генерируются из html-view/stories.py (источник — stories.py)."""
+    """docs/stories/*.md генерируются из YAML: data/stories/<компонент>/<US-ID>.yaml, data/processes, data/personas.yaml (через stories.py)."""
     d = ROOT / "docs/stories"
     idx = ["# User Stories", "", "← [README](../../README.md) · [правила](../rules/README.md)", "",
-           "> Сгенерировано из `html-view/stories.py` — правьте там.", "",
+           "> Сгенерировано из `data/stories/`, `data/processes/`, `data/personas.yaml` (YAML по единице) — правьте там.", "",
            "Истории пользователей по компонентам: роль, цель, критерии приёмки (включая ошибки), связанные требования спек и процесс в нотации BPMN.", "",
            "| Роль | Кто |", "|---|---|"] + [f"| {k} | {v} |" for k, v in ROLES.items()] + ["", "| Компонент | Историй | Процессов BPMN |", "|---|---|---|"]
     for slug, name, *_ in COMPONENTS:
@@ -152,7 +152,7 @@ def sync_stories():
         procs = BPMN.get(slug, [])
         idx.append(f"| [{name}]({slug}.md) | {len(lst)} | {len(procs) or '—'} |")
         L = [f"# User Stories: {name}", "", "← [Все истории](README.md) · [как работает](../how/" + slug + ".md)", "",
-             "> Сгенерировано из `html-view/stories.py` — правьте там.", ""]
+             f"> Сгенерировано из `data/stories/{slug}/` (история — файл `<US-ID>.yaml`) и `data/processes/{slug}.yaml` — правьте там.", ""]
         typ = {"start": "начало", "task": "задача", "gateway": "развилка", "end": "конец", "error": "ошибка"}
         for i, pr in enumerate(procs):
             L += [f"## Процесс {i + 1}. {pr['title']}", "", "Покрывает истории: " + ", ".join(f"[{s}](#{s.lower()})" for s in pr["stories"]), "",
@@ -202,9 +202,9 @@ def persona_anchor(role: str, pname: str) -> str:
 
 
 def personas_page() -> str:
-    """docs/stories/personas.md из PERSONAS (stories.py): кто что может, хочет, с кем конфликт, промпт для отыгрыша."""
+    """docs/stories/personas.md из PERSONAS (data/personas.yaml): кто что может, хочет, с кем конфликт, промпт для отыгрыша."""
     L = ["# Персоны", "", "← [Все истории](README.md) · [методика историй](../rules/us-methodology.md) · [роли документации](../rules/roles.md) · [отыгрыш](../rules/rnd-methodology.md#personas)", "",
-         "> Сгенерировано из `html-view/stories.py` (PERSONAS) — правьте там.", "",
+         "> Сгенерировано из `data/personas.yaml` (PERSONAS) — правьте там.", "",
          "Персоны продукта — участники процесса, от лица которых пишутся истории и разыгрываются конфликты и споры ролей в R&D.", "",
          "| Код | Персона | Историй |", "|---|---|---|"]
     n = {k: sum(1 for l in STORIES.values() for s in l if s[1] == k) for k in PERSONAS}
@@ -269,7 +269,7 @@ def stories_coverage() -> str:
     roles = list(dict.fromkeys(list(ROLES) + list(PERSONAS)))
     name = lambda k: (PERSONAS.get(k) or (ROLES.get(k),))[0]
     L = ["# Покрытие историй", "", "← [Все истории](README.md) · [методика](../rules/us-methodology.md) · [персоны](personas.md)", "",
-         "> Сгенерировано при сборке из `html-view/stories.py`.", "",
+         "> Сгенерировано при сборке из `data/stories/` (YAML по единице).", "",
          "## Персона × компонент", "", "Число историй; «·» — проверить, нет ли у персоны цели в этом компоненте ([методика, шаг 1](../rules/us-methodology.md)).", "",
          "| Персона | " + " | ".join(n for _, n in comps) + " | Всего |", "|---|" + "---|" * (len(comps) + 1)]
     for r in roles:
@@ -1427,7 +1427,7 @@ def write_config(serve: bool = False):
         # Локально сайт в корне, а не под /agent-architecture/ (путь GitHub Pages)
         cfg = re.sub(r"(?m)^site_url:.*$", "site_url: http://127.0.0.1:8000/", cfg)
         # Пересобирать при правке исходных .md: hook копирует их перед каждой сборкой
-        watched = [ROOT / s for s in SOURCES] + [HERE / "home.md", HERE / "assets", HERE / "components.py", HERE / "stories.py"]
+        watched = [ROOT / s for s in SOURCES] + [HERE / "home.md", HERE / "assets", ROOT / "data"]
         watch = "\n".join(f"  - {q(p.as_posix())}" for p in watched)
         cfg += f"\nwatch:\n{watch}\n"
     hooks = [HERE / "pagebar.py"] + ([HERE / "hooks.py"] if serve else [])

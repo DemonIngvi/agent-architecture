@@ -8,7 +8,11 @@
     python html-view/doctool.py approve <страница> <буква> ok|no <комментарий> [--human]  решение роли по документу
     python html-view/doctool.py review-queue [буква]  что ждёт решения роли
     python html-view/doctool.py generated <файл>  если файл генерируется — откуда и чем; иначе пусто
-    python html-view/doctool.py check             все проверки сборки без сборки сайта (секунды)
+    python html-view/doctool.py check             все проверки сборки без сборки сайта (секунды), включая yaml-check
+    python html-view/doctool.py unit <ID|путь>    карточка единицы данных (блок, история US-…, I-код, модель, таблица, «МЕТОД путь»)
+    python html-view/doctool.py yaml-check [путь] схема единиц data/: поля, типы, значения, ссылки, _order.yaml
+    python html-view/doctool.py yaml-fmt [путь]   нормализовать формат единиц data/ (порядок ключей по схеме, _order.yaml)
+    python html-view/doctool.py yaml-export       разовая выгрузка Python-данных в data/ (идемпотентна)
     python html-view/doctool.py rnd <slug|путь.md> <тема>  заготовка R&D v3.2 (docs/rnd/<slug>.md или указанный путь)
     python html-view/doctool.py rnd-check <файл.md>...  структура R&D v3.2: Э1–Э10, «Вывод этапа», ворота G1–G10, источники
     python html-view/doctool.py pre <файл>         до правки: код 2 и источник, если файл генерируется (любой агент)
@@ -32,14 +36,14 @@ RULES = ROOT / "docs/rules"
 
 # Генерируемые файлы: шаблон пути → (чем генерируется, что править)
 GENERATED = [
-    ("docs/stories/*.md", "html-view/build.py (sync_stories)", "html-view/stories.py"),
+    ("docs/stories/*.md", "html-view/build.py (sync_stories)", "data/stories/<компонент>/<US-ID>.yaml, data/processes/*.yaml, data/personas.yaml"),
     ("openspec/changes/*/tasks.md", "python html-view/tasksmd.py", "docs/ROADMAP.md и docs/tasks/*.md"),
-    ("openspec/changes/define-agent-platform/specs/*/architecture.md", "python html-view/archgen.py", "html-view/components.py, R&D «Риски и пересмотр»"),
+    ("openspec/changes/define-agent-platform/specs/*/architecture.md", "python html-view/archgen.py", "data/components/*.yaml, data/blocks/*/*.yaml, R&D «Риски и пересмотр»"),
     ("html-view/icplan_schema.json", "python html-view/schema_import.py", "схема форка ICPlan"),
     ("html-view/icplan_schema.meta.json", "python html-view/schema_import.py", "схема форка ICPlan"),
     ("html-view/icplan_openapi.json", "python html-view/openapi_import.py", "OpenAPI работающего ICPlan"),
-    ("html-view/.build/*", "python html-view/build.py", "исходники в docs/, openspec/, html-view/*.py"),
-    ("html-view/site/*", "python html-view/build.py", "исходники в docs/, openspec/, html-view/*.py"),
+    ("html-view/.build/*", "python html-view/build.py", "исходники в docs/, openspec/, data/ (YAML по единице), html-view/*.py"),
+    ("html-view/site/*", "python html-view/build.py", "исходники в docs/, openspec/, data/ (YAML по единице), html-view/*.py"),
 ]
 
 
@@ -148,7 +152,8 @@ def next_docs(path) -> str:
     node = node_of(path)
     if not node:
         return f"{rel(path)}: нет узла в графе связности (html-view/docgraph.py PATHS) — проверь doc-types.md «Синхронизировать»."
-    L = [f"Узел `{rel(path)}`: {node}. Дальше — по одному документу, в этом порядке:"]
+    import yamldata as Y
+    L = ([Y.regen(path)] if Y.regen(path) else []) + [f"Узел `{rel(path)}`: {node}. Дальше — по одному документу, в этом порядке:"]
     for a, b, what in G.EDGES:
         if a != node:
             continue
@@ -163,7 +168,7 @@ def next_docs(path) -> str:
         for t in _rows(RULES / "doc-types.md", "| Тип |"):
             if f"]({name}" in t.get("Методология", ""):
                 L.append(f"- затем документы типа «{_plain(t.get('Тип', ''))}»: {', '.join(_patterns(t.get('Где', ''))) or '—'} — привести к новой методологии")
-    if len(L) == 1:
+    if not L[-1].startswith("- "):
         L.append("- исходящих связей нет: цепочка на этом узле заканчивается")
     L.append("Для каждого: прочитай методологию → устарела — сначала поправь её → правка → doctool check → doctool next <файл>. "
              "Документ не изменился по смыслу — дальше по его стрелкам не идёшь.")
@@ -208,8 +213,12 @@ def tooling_check() -> list:
 
 
 def check() -> list:
-    """Проверки сборки без сборки сайта + соответствие инструментов правилам."""
+    """Проверки сборки без сборки сайта + схема данных data/ (yaml-check) + соответствие инструментов правилам."""
     sys.path.insert(0, str(HERE))
+    import yamldata as Y
+    yissues = Y.check()
+    if yissues:  # с ошибкой в YAML модули данных не загрузятся — сначала она
+        return yissues + tooling_check()
     with contextlib.redirect_stdout(io.StringIO()):
         import build as B
         issues = B.check_docs() + B.check_req_tasks()
@@ -462,6 +471,28 @@ def main():
         for slug, title, ok, miss in rows:
             if miss:
                 print(f"- {slug} / {title}: {len(ok)}/{len(ok) + len(miss)}, нет: {', '.join(miss)}")
+    elif cmd == "yaml-export":  # разовая выгрузка Python-данных в data/ (идемпотентна; data-methodology.md#yaml)
+        sys.path.insert(0, str(HERE))
+        import importlib
+        import yamldata as Y
+        mods = {m: importlib.import_module(m) for m in ("datamodel", "subcomponents", "stories", "components")}
+        ch = Y.export(mods)
+        print(f"data/: изменено файлов {len(ch)}" + "".join(f"\n- {c}" for c in ch[:50]) + ("\n…" if len(ch) > 50 else ""))
+    elif cmd == "yaml-check":  # схема единиц data/ (обязательные поля, типы, значения, ссылки, _order.yaml)
+        sys.path.insert(0, str(HERE))
+        import yamldata as Y
+        iss = Y.check(args[0] if args else None)
+        print("\n".join(f"⚠️ {i}" for i in iss) or "yaml: замечаний нет")
+        sys.exit(1 if iss else 0)
+    elif cmd == "yaml-fmt":  # нормализовать формат единиц data/ (порядок ключей по схеме, стиль)
+        sys.path.insert(0, str(HERE))
+        import yamldata as Y
+        ch = Y.fmt(args[0] if args else None)
+        print(f"отформатировано: {len(ch)}" + "".join(f"\n- {c}" for c in ch))
+    elif cmd == "unit":  # карточка единицы: YAML без пустых полей + связанные ID — читать вместо страницы
+        sys.path.insert(0, str(HERE))
+        import yamldata as Y
+        print(Y.card(" ".join(args)))
     elif cmd == "move":
         ch = move(args[0], args[1])
         print(f"перенесено: {args[0]} → {args[1]}; ссылки обновлены в {len(ch)} файлах" + ("".join(f"\n- {c}" for c in ch)))
@@ -521,7 +552,7 @@ def main():
         ctx = route(f)
         if ctx and node_of(f):
             ctx += "\n\n" + next_docs(f)
-        issues = check() if re.search(r"\.(md|py)$", f) else []
+        issues = check() if re.search(r"\.(md|py|yaml)$", f) else []
         if issues:
             ctx += "\n\nЗамечания проверок после правки:\n" + "\n".join(f"- {i}" for i in issues[:15])
         if ctx:

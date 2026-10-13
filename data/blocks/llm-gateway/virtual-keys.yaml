@@ -1,0 +1,9 @@
+title: Virtual keys
+tech: LiteLLM virtual keys
+params:
+- [Ключ, на агента]
+- [metadata, 'run_id, issue_key']
+does:
+- Отделяет агентов друг от друга по учёту и лимитам
+why: Учёт и бюджет на агента без своего биллинга.
+rnd: llm-gateway.md

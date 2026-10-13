@@ -2,7 +2,7 @@
 
 ← [Все истории](README.md) · [как работает](../how/icplan.md)
 
-> Сгенерировано из `html-view/stories.py` — правьте там.
+> Сгенерировано из `data/stories/icplan/` (история — файл `<US-ID>.yaml`) и `data/processes/icplan.yaml` — правьте там.
 
 ## Процесс 1. Задача идёт по процессу
 

@@ -1,0 +1,17 @@
+kind: platform
+store: S5
+owner: agent-runner
+schema: itsaplan.harness_ckpt
+columns:
+- [run_id, int, 'PK, FK agent_run', '']
+- [iteration, int, PK, итерация цикла]
+- [parent_iteration, int, '', '']
+- [state, bytea, '', состояние LangGraph]
+- [created_at, timestamptz, '', '']
+- [expires_at, timestamptz, '', '`checkpoint.ttl`']
+policy:
+  indexes:
+  - [index, expires_at, очистка]
+  retention: '`checkpoint.ttl` = 7 дней (agent-harness)'
+  cleanup: очистка по `expires_at`
+  migrate: runner

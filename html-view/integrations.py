@@ -745,7 +745,7 @@ def api_examples_check() -> list:
             names = [n for n in re.findall(r"`(\w+)`", cap) if n in DM.MODELS]
             where = f"docs/how/{f.name}:{i + 1}"
             if not names:
-                issues.append(f"{where}: пример JSON без модели в подписи — модель в datamodel.py, пример в docs/api/README.md")
+                issues.append(f"{where}: пример JSON без модели в подписи — модель в data/models/<Имя>.yaml, пример в docs/api/README.md")
             else:
                 issues += example_issues(where, names, "\n".join(L[i + 1:j]))
     return issues
@@ -880,7 +880,7 @@ def connectivity_check(components) -> list:
             b = SUB.get(owner, {})
             for f in ("reqs", "tasks", "iface"):
                 if not b.get(f):
-                    issues.append(f"блок «{name}» ({o}): встроенный — нет поля {f} в subcomponents.py")
+                    issues.append(f"блок «{name}» ({o}): встроенный — нет поля {f} в data/blocks/{o}/<slug>.yaml")
             for i in b.get("iface", []):
                 if i not in DM.INTEG:
                     issues.append(f"блок «{name}»: I-код {i} не найден в INTEG")
@@ -934,10 +934,10 @@ def check(components) -> list:
         for c in v["cols"]:
             if c["ref"] and c["ref"] not in SCHEMA:
                 issues.append(f"{v['table']}.{c['name']}: FK на неизвестную таблицу {c['ref']}")
-    # таблицы описываются только в datamodel.py; SQL-черновики в документах расходятся (О-43)
+    # таблицы описываются только в data/tables/; SQL-черновики в документах расходятся (О-43)
     for f in [*ROOT.glob("docs/**/*.md"), *ROOT.glob("openspec/**/*.md")]:
         if re.search(r"(?i)^\s*create table", f.read_text(encoding="utf-8"), re.M):
-            issues.append(f"{f.relative_to(ROOT).as_posix()}: SQL-описание таблицы — перенести в datamodel.py, в документе ссылка на «Модель данных»")
+            issues.append(f"{f.relative_to(ROOT).as_posix()}: SQL-описание таблицы — перенести в data/tables/<имя>.yaml, в документе ссылка на «Модель данных»")
     # карточка компонента = «Интерфейсы обмена» его спеки (О-41, О-42)
     for c in components:
         m = re.search(r"/specs/([\w-]+)/spec\.md", str(c))

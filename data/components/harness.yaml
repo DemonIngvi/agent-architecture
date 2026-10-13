@@ -1,0 +1,44 @@
+name: Harness
+status: todo
+guardrails: G2
+desc: 'Агентский цикл на LangGraph: контекст → LLM → тулы, hooks, пауза на approve, возобновление, стрим шагов.'
+specs:
+- [Спека, openspec/changes/define-agent-platform/specs/agent-harness/spec.md]
+- [Схема, openspec/changes/define-agent-platform/specs/agent-harness/architecture.md]
+tasks: ['1.3', '1.4', '1.5', '1.6', '1.7']
+about:
+  chain:
+  - [Agent Runner, agent-runner]
+  - [Harness, harness]
+  - [LiteLLM gateway, llm-gateway]
+  purpose: 'Агентский цикл: делает из модели агента и заставляет его работать по правилам платформы.'
+  does:
+  - 'Собирает агента из определения: промпт, навыки, тулы, лимиты'
+  - Крутит цикл контекст → модель → тулы
+  - Проверяет действия через hooks (G2)
+  - Останавливается на approve и продолжает с того же шага
+  - Соблюдает лимиты, сжимает историю, стримит шаги
+stores: [S10, S5]
+blocks:
+- - {title: Agent Runner, desc: задание + определение агента, kind: ext, to: agent-runner}
+- ↓
+- zone: Harness (LangGraph)
+  rows:
+  - - {title: Bootstrap, desc: 'определение агента (YAML / ICPlan), скиллы, лимиты', kind: core, st: todo}
+  - ↓
+  - - {title: Context Manager, desc: 'промпт, сжатие истории, M0 + M2/M3', kind: core, st: todo}
+    - {title: LLM client, desc: 'только через LiteLLM, алиас модели', kind: core, st: todo}
+    - {title: Tool Executor, desc: 'MCP через прокси Runner, allowlist, таймауты', kind: core, st: todo}
+  - '↺ цикл: context → llm → tools → context'
+  - - {title: Hooks, desc: 'before/after llm и tool, on_stop', kind: core, st: todo, g: G2}
+    - {title: Pause / resume, desc: 'interrupt на approve и вопрос, checkpoint через Runner (I12)', kind: core, st: todo}
+    - {title: Policy / stop, desc: 'лимиты шагов, времени, токенов', kind: core, st: todo}
+  - ↓
+  - - {title: Event stream, desc: шаги для чата запуска, kind: core, st: todo}
+  cls: sandbox
+  g: G2
+- ↓
+- - {title: LiteLLM gateway, desc: модели, kind: ext, to: llm-gateway}
+  - {title: MCP / Tools, desc: действия, kind: ext, to: mcp-tools}
+  - {title: Memory, desc: M1–M6, kind: ext, to: memory}
+  - {title: Guardrails, desc: OPA для G2, kind: ext, to: guardrails}

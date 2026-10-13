@@ -2,7 +2,7 @@
 
 ← [Все истории](README.md) · [как работает](../how/platform-module.md)
 
-> Сгенерировано из `html-view/stories.py` — правьте там.
+> Сгенерировано из `data/stories/platform-module/` (история — файл `<US-ID>.yaml`) и `data/processes/platform-module.yaml` — правьте там.
 
 ## Процесс 1. Изменение настроек агента
 

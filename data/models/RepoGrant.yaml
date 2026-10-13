@@ -1,0 +1,11 @@
+purpose: доступ к репозиторию на один запуск
+fields:
+- [repo, string, true, репозиторий `org/name`]
+- [access, 'enum: read · write', true, право на репозиторий]
+- [branchPrefix, string, true, 'в какие ветки можно писать: `agent/`']
+- [protected, 'string[]', true, ветки без записи]
+- [ttlSec, int, true, срок токена; сам токен в модель не входит — его подставляет прокси (R-SBX-04)]
+source:
+  kind: ours
+  ref: D18, R-SBX-04
+  why: 'Короткоживущий доступ к репозиторию на запуск: только ветки с префиксом агента, защищённые ветки без записи.'

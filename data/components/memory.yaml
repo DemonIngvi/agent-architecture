@@ -1,0 +1,45 @@
+name: Memory
+status: part
+guardrails: ''
+desc: 'Память M0–M6: M1, M2, M5, M6 уже есть в ICPlan; M3 — первой; M4 — вместе с RAG.'
+specs:
+- [Спека, openspec/changes/define-agent-platform/specs/agent-memory/spec.md]
+- [Схема, openspec/changes/define-agent-platform/specs/agent-memory/architecture.md]
+tasks: ['2.5']
+about:
+  chain:
+  - [Harness, harness]
+  - [Memory, memory]
+  - [ICPlan, icplan]
+  purpose: 'Память агента: чтобы следующий этап продолжал работу, а не начинал заново, и агент учился на прошлых запусках.'
+  does:
+  - Уровни M0–M6 по видам знания
+  - Сама пишет переписку (M1) и итоги запусков (M2)
+  - Принимает от агента состояние задачи (M3)
+  - Подаёт нужную память в контекст запуска
+  - Следит за правами и сроками хранения
+stores: [S4, S1]
+icplan_tables:
+- [agentChatMessage, M1]
+- [agentRun, M2]
+- [issueActivity, 'M1, M2']
+- [projectDocument, M6]
+- [aiAgent, M5]
+blocks:
+- - {title: Harness, desc: 'чтение в контекст, запись через тул', kind: ext, to: harness}
+- ↓
+- - {title: Memory API, desc: 'профиль памяти, области видимости, сроки', kind: core, st: todo}
+- ↓
+- zone: Уровни M0–M6
+  rows:
+  - - {title: M0 рабочая, desc: контекст запуска · Harness, kind: core, st: done}
+    - {title: M1 сессионная, desc: тред · БД ICPlan, kind: core, st: done}
+    - {title: M2 эпизодическая, desc: запуски · agent_run, kind: core, st: done}
+  - - {title: M3 задачная, desc: сделано / дальше · БД ICPlan · первой, kind: core, st: todo}
+    - {title: M4 семантическая, desc: pgvector · с RAG, kind: back}
+    - {title: M5 процедурная, desc: 'инструкция, навыки', kind: core, st: done}
+  - - {title: M6 организационная, desc: документы проекта · get_document, kind: core, st: done}
+- ↓
+- - {title: БД ICPlan, desc: 'M1, M2, M3, M5', kind: store, st: done}
+  - {title: Документы ICPlan, desc: M6, kind: store, st: done}
+  - {title: pgvector, desc: 'M4, позже', kind: back}

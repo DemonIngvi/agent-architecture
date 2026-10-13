@@ -1,0 +1,8 @@
+kind: litellm
+columns:
+- [budget_id, String, PK, '']
+- [max_budget, Float, '', '']
+- [soft_budget, Float, '', '']
+- [budget_duration, String, '', '']
+- [rpm_limit, BigInt, '', '']
+- [tpm_limit, BigInt, '', '']

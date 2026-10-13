@@ -1,0 +1,39 @@
+name: Observability
+status: part
+guardrails: ''
+desc: События запуска → чат запуска в задаче, затраты. Langfuse и метрики — в бэклоге.
+specs:
+- [Спека, openspec/changes/define-agent-platform/specs/observability/spec.md]
+- [Схема, openspec/changes/define-agent-platform/specs/observability/architecture.md]
+tasks: ['3.3']
+about:
+  chain:
+  - [Agent Runner, agent-runner]
+  - [Observability, observability]
+  - [ICPlan, icplan]
+  purpose: 'Прозрачность: что агент делал по шагам и сколько это стоило.'
+  does:
+  - Пишет события каждого запуска
+  - Строит чат запуска в задаче ICPlan
+  - Считает затраты по запуску, задаче, агенту, модели
+  - Хранит аудит guardrails
+  - Удаляет старые события по сроку
+stores: [S3, S6, S1]
+icplan_tables:
+- [agentRun, 'итоги, токены']
+- [issue, '']
+blocks:
+- - {title: Harness · Event stream, desc: шаги, kind: ext, to: harness}
+  - {title: LiteLLM · Spend log, desc: токены и $, kind: ext, to: llm-gateway}
+  - {title: Guardrails · аудит, desc: срабатывания, kind: ext, to: guardrails}
+- ↓ через Agent Runner
+- zone: Observability (MVP)
+  rows:
+  - - {title: События запуска, desc: 'таблица в БД ICPlan, срок хранения', kind: core, st: todo}
+    - {title: Агрегаты затрат, desc: 'запуск, задача, агент, модель', kind: core, st: todo}
+- ↓
+- - {title: Чат запуска в задаче, desc: ICPlan Task UI, kind: ext, to: icplan}
+  - {title: Затраты в задаче, desc: ICPlan Task UI, kind: ext, to: icplan}
+- бэклог
+- - {title: Langfuse, desc: 'evals, анализ промптов', kind: back}
+  - {title: Prometheus / Grafana / Loki, desc: метрики и логи, kind: back}

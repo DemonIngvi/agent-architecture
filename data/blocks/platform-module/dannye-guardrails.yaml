@@ -1,0 +1,11 @@
+title: Данные guardrails
+tech: Данные для OPA (bundle data)
+params:
+- [tools_allow, из определения]
+- [approval, тулы с подтверждением]
+- [approval_timeout, 24 ч]
+does:
+- Что агенту разрешено и что ждёт человека
+- Попадает в OPA без изменения Rego
+why: 'Логика — в git (Rego), данные — в БД: стандартное разделение OPA.'
+rnd: guardrails-engine.md

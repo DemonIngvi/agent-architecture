@@ -1,0 +1,16 @@
+kind: fork
+written: true
+columns:
+- [process_step_id, int, FK process_step, 🛠 шаг процесса запуска — `Run.rule.stepId` (D17)]
+- [agent_version, int, '', '🛠 версия определения агента запуска (R-REG-03): задаёт задача или Platform module при первом вызове `GET /platform/runs/:runId/agent` (D23)']
+- [reason, text, '', 🛠 причина итога — `RunResult.reason` (R-RUN-07)]
+- [artifacts, jsonb, '', 🛠 опубликованное — `RunResult.artifacts` (D20)]
+- [gate, jsonb, '', 🛠 проверка по критериям — `RunResult.gate` (D20)]
+- [reasoning_tokens, int, '', 🛠 `RunResult.usage.reasoningTokens` (D18)]
+- [iterations, int, '', 🛠 `RunResult.usage.iterations` (D18)]
+- [cost_usd, numeric, '', 🛠 `RunResult.usage.costUsd`; null — неизвестна (R-OBS-05)]
+policy:
+  indexes: null
+  retention: завершённые — `runs.retention_days` = 365 по `finished_at` (icplan-integration, D25)
+  cleanup: каскадно с агентом, проектом, задачей; задача worker форка удаляет завершённые старше срока, запуски с `run_event` пропускает (R-ICP-19); для памяти M2 — фильтр чтения по `retention`, Memory не удаляет
+  migrate: fork

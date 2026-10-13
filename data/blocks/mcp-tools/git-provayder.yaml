@@ -1,0 +1,9 @@
+title: git-провайдер
+tech: MCP Gitea / GitHub
+params:
+- [tools, 'branch, commit, pr.create']
+- [Токен, короткоживущий от Runner]
+does:
+- Ветки, PR, ревью
+why: Агент-разработчик отдаёт код через PR, без прямого push.
+rnd: mcp-vs-direct.md

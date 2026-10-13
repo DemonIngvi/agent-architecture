@@ -1,0 +1,8 @@
+GET https://<домен>/:
+  request: —
+  response: 200 · web ICPlan
+  note: ''
+GET https://<домен>/api/*:
+  request: —
+  response: как api ICPlan
+  note: ''

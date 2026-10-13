@@ -38,12 +38,12 @@ flowchart TD
 
 | Вкладка | Страница | Формируется из | Генерируется | Методология |
 |---|---|---|---|---|
-| Архитектура | `components/<к>/` | `components.py` (BLOCKS, ABOUT, HOST), `rationale.py`, `docs/how/<к>.md`, `subcomponents.py` (блоки) | да | [архитектура](architecture-methodology.md), [блоки](block-methodology.md) |
-| User Stories | `docs/stories/<к>.md` | `stories.py`, `stories_extra/<к>.md` | да | [User Stories](us-methodology.md) |
-| Спеки | `specs-by-component/<к>/` → `openspec/changes/*/specs/*/` | `components.py` (список спек), `spec.md`, `interfaces.md`, RTM, вопросы, подтверждения | список — да, спеки — нет | [SDD](sdd-methodology.md), [критерии](spec-criteria.md) |
-| Задачи | `tasks-by-component/<к>/` → `docs/tasks/` | `components.py` (tids), `docs/tasks/*.md` | список — да | [задачи](task-methodology.md) |
-| Интеграции | `docs/api/<к>.md` | `datamodel.py` (C1, карточки, контракты), `docs/api/<к>.md` (эндпоинты), OpenAPI форка | частично | [API](api-methodology.md), [данные](data-methodology.md) |
-| Данные | `data-by-component/<к>/` | `datamodel.py` (таблицы, политика, `DATABASES`), схема форка | да | [данные](data-methodology.md) |
+| Архитектура | `components/<к>/` | `data/components/<к>.yaml` (blocks, about), `data/hosts.yaml`, `rationale.py`, `docs/how/<к>.md`, `data/blocks/<к>/*.yaml` (блоки) | да | [архитектура](architecture-methodology.md), [блоки](block-methodology.md) |
+| User Stories | `docs/stories/<к>.md` | `data/stories/<к>/*.yaml`, `data/processes/<к>.yaml`, `stories_extra/<к>.md` | да | [User Stories](us-methodology.md) |
+| Спеки | `specs-by-component/<к>/` → `openspec/changes/*/specs/*/` | `data/components/<к>.yaml` (specs), `spec.md`, `interfaces.md`, RTM, вопросы, подтверждения | список — да, спеки — нет | [SDD](sdd-methodology.md), [критерии](spec-criteria.md) |
+| Задачи | `tasks-by-component/<к>/` → `docs/tasks/` | `data/components/<к>.yaml` (tasks), `docs/tasks/*.md` | список — да | [задачи](task-methodology.md) |
+| Интеграции | `docs/api/<к>.md` | `data/integrations.yaml` (C1, карточки), `data/models/` (контракты), `data/endpoints/<к>.yaml` (структура), `docs/api/<к>.md` (эндпоинты), OpenAPI форка | частично | [API](api-methodology.md), [данные](data-methodology.md) |
+| Данные | `data-by-component/<к>/` | `data/tables/` (таблицы, политика), `data/databases.yaml`, схема форка | да | [данные](data-methodology.md) |
 | Deploy | `docs/techspec/<к>.md` | файл + «Конфигурация» из `interfaces.md` | частично | [Deploy](tech-spec.md) |
 | R&D | `rnd-by-component/<к>/` → `docs/rnd/` | `rationale.REFS` | список — да | [R&D](rnd-methodology.md) |
 | Замечания | `docs/reviews/findings/<к>.md` | проверка ролями, реестр подтверждений | нет | [ревью](review-methodology.md#findings) |
@@ -67,20 +67,22 @@ flowchart TD
 | Подтверждения документов | реестр `docs/approvals.md` (генерируется), список «Замечаний» | [подтверждения](approval-methodology.md) |
 | Roadmap | `docs/ROADMAP.md` — этапы и задачи | [задачи и план](task-methodology.md) |
 | Сводная таблица задач | `docs/TASKS.md` — по компонентам: сделано → нужно | [задачи и план](task-methodology.md) |
-| Задачи по компонентам | `components.py` (tids) | [задачи и план](task-methodology.md) |
+| Задачи по компонентам | `data/components/<к>.yaml` (tasks) | [задачи и план](task-methodology.md) |
 | Бэклог | `docs/BACKLOG.md` | [задачи и план](task-methodology.md) |
 | Технологии | `docs/TECHNOLOGIES.md` | [сопровождающие](support-docs-methodology.md) |
 | План документации | `docs/PLAN.md` | [сопровождающие](support-docs-methodology.md) |
 | Задачи изменений (OpenSpec) | `tasks.md` изменений — генерируется из Roadmap | [задачи и план](task-methodology.md) |
 | Ревью | `docs/reviews/*.md` | [ревью](review-methodology.md) |
 
-**Справка** — только общее для всех: правила, [путь изменения](agent-workflow.md), [формат схем](../../FORMAT.md), термины и коды (генерируются из `integrations.GLOSSARY`), [типы данных](../data-types.md), персоны (из `stories.py`), методологии.
+**Справка** — только общее для всех: правила, [путь изменения](agent-workflow.md), [формат схем](../../FORMAT.md), термины и коды (генерируются из `integrations.GLOSSARY`), [типы данных](../data-types.md), персоны (из `data/personas.yaml`), методологии.
+
+Все источники `data/…` — YAML по единице: правится только YAML, страницы генерируются сборкой один раз в конце пути изменений ([данные](data-methodology.md#yaml), [порядок](change-process.md#yaml-path)).
 
 ## Как вести
 
 | Когда | Шаги |
 |---|---|
-| Новый компонент | все 10 вкладок сразу: строка в `components.py`, `docs/how`, `docs/techspec`, `docs/api`, истории, спека, задачи, R&D; проверка `connectivity_check` |
+| Новый компонент | все 10 вкладок сразу: `data/components/<к>.yaml` и строка в `_order.yaml`, `docs/how`, `docs/techspec`, `docs/api`, истории, спека, задачи, R&D; проверка `connectivity_check` |
 | Новая вкладка компонента | решение владельца → строка в таблице вкладок здесь и в [doc-types](doc-types.md#tabs) → `pagebar.TYPES` и навигация → у всех компонентов |
 | Новая страница общего раздела | строка в таблице раздела здесь (источник и методология) → навигация в `build.py` |
 | Изменилось место или источник страницы | сначала эта методология, затем инструменты ([изменение правил](change-process.md#rules-change)) |

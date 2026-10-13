@@ -1,0 +1,50 @@
+name: Agent Runner
+status: todo
+guardrails: G1
+desc: Берёт запуск из очереди ICPlan, выдаёт sandbox из тёплого пула, следит за лимитами, возвращает итог.
+specs:
+- [Спека, openspec/changes/define-agent-platform/specs/agent-runner/spec.md]
+- [Схема, openspec/changes/define-agent-platform/specs/agent-runner/architecture.md]
+tasks: ['2.1', '2.7', '2.6']
+about:
+  chain:
+  - [ICPlan, icplan]
+  - [Agent Runner, agent-runner]
+  - [Sandbox, sandbox]
+  - [Harness, harness]
+  purpose: 'Исполнитель: превращает запуск из очереди ICPlan в работу агента в изолированной среде и возвращает итог.'
+  does:
+  - Забирает запуск из очереди ICPlan
+  - 'Планирует старт по слотам: агент, модель, задача, глобально; режим sequential / parallel'
+  - Проверяет допуск, бюджет и лимиты (G1)
+  - Выдаёт sandbox из тёплого пула и токены репозиториев
+  - Запускает Harness, транслирует шаги в ICPlan, следит за таймаутом и отменой
+  - 'Проксирует вызовы MCP: allowlist и G2 вне sandbox, ключи серверов (D19)'
+  - 'Выполняет шаг подготовки среды: зависимости проекта (D19)'
+  - Пишет итог в задачу и уничтожает sandbox
+stores: [S3, S5]
+blocks:
+- - {title: ICPlan · Run Queue, desc: очередь запусков, kind: ext, to: icplan}
+- ↓ опрос по ключу агента · стрим и итог ↑
+- zone: Agent Runner
+  rows:
+  - - {title: Poller, desc: забирает запуск из очереди, kind: core, st: todo}
+    - {title: Scheduler, desc: 'слоты: глобальный, агента, модели, задачи; sequential / parallel', kind: core, st: todo}
+    - {title: Admission, desc: 'допуск, бюджет, kill switch', kind: core, st: todo, g: G1}
+  - ↓
+  - - {title: Sandbox claim, desc: берёт контейнер из тёплого пула, kind: core, st: todo}
+    - {title: Токены репозиториев, desc: 'короткоживущие, на запуск', kind: core, st: todo}
+  - ↓
+  - - {title: Run supervisor, desc: 'старт Harness, таймаут, отмена', kind: core, st: todo}
+    - {title: Event relay, desc: события Harness → стрим в ICPlan, kind: core, st: todo}
+  - ↓
+  - - {title: MCP-прокси, desc: 'allowlist и G2 вне sandbox, ключи серверов (D19)', kind: core, st: todo, g: G2}
+    - {title: Шаг подготовки, desc: 'зависимости проекта, кэш по lock-файлам (D19)', kind: core, st: todo}
+  - ↓
+  - - {title: Finalizer, desc: 'итог в задачу, destroy sandbox', kind: core, st: todo}
+  g: G1
+- ↓
+- - {title: Sandbox, desc: контейнер запуска, kind: ext, to: sandbox}
+  - {title: Platform module, desc: 'профили, бюджеты', kind: ext, to: platform-module}
+  - {title: Observability, desc: события запуска, kind: ext, to: observability}
+  - {title: MCP / Tools, desc: вызовы тулов через прокси (I9), kind: ext, to: mcp-tools}
