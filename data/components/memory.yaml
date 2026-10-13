@@ -1,11 +1,11 @@
 name: Memory
 status: part
 guardrails: ''
-desc: 'Память M0–M6: M1, M2, M5, M6 уже есть в ICPlan; M3 — первой; M4 — вместе с RAG.'
+desc: 'Память M0–M6: данные M1, M2, M5, M6 уже есть в ICPlan, подача M1 — 2.5, M5 — 2.3, чтение M6 (get_document) — 2.4; M3 — первой; M4 — вместе с RAG (после MVP).'
 specs:
 - {label: Спека, path: openspec/changes/define-agent-platform/specs/agent-memory/spec.md}
 - {label: Схема, path: openspec/changes/define-agent-platform/specs/agent-memory/architecture.md}
-tasks: ['2.5']
+tasks: ['2.5', '2.4', '2.3']
 about:
   chain:
   - {label: Harness, comp: harness}
@@ -33,12 +33,12 @@ blocks:
 - zone: Уровни M0–M6
   rows:
   - - {title: M0 рабочая, desc: контекст запуска · Harness, kind: core, st: done}
-    - {title: M1 сессионная, desc: тред · БД ICPlan, kind: core, st: done}
-    - {title: M2 эпизодическая, desc: запуски · agent_run, kind: core, st: done}
+    - {title: M1 сессионная, desc: тред · БД ICPlan · подача 2.5, kind: core, st: todo}
+    - {title: M2 эпизодическая, desc: запуски · agent_run · подача 2.5, kind: core, st: todo}
   - - {title: M3 задачная, desc: сделано / дальше · БД ICPlan · первой, kind: core, st: todo}
     - {title: M4 семантическая, desc: pgvector · с RAG, kind: back}
-    - {title: M5 процедурная, desc: 'инструкция, навыки', kind: core, st: done}
-  - - {title: M6 организационная, desc: документы проекта · get_document, kind: core, st: done}
+    - {title: M5 процедурная, desc: 'инструкция, навыки · RunBundle 2.3', kind: core, st: todo}
+  - - {title: M6 организационная, desc: документы проекта · get_document 2.4, kind: core, st: todo}
 - ↓
 - - {title: БД ICPlan, desc: 'M1, M2, M3, M5', kind: store, st: done}
   - {title: Документы ICPlan, desc: M6, kind: store, st: done}

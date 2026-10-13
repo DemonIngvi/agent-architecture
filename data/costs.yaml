@@ -397,3 +397,15 @@ costs:
   calls: 8
   context: 67500
   note: 'остаток yaml-migrate 89→35: 2 правки via, leftovers() без ложных (_HAS, 52 строки); 35 — решения формата (endpoint списком, синонимы access, ?query)'
+- date: '2026-10-13'
+  process: finding-fix
+  methodology: review-methodology.md#findings
+  units: 1
+  unit: замечание
+  tokens: 2307887
+  model: sonnet-5-5
+  expected: [250000, 500000]
+  agents: [a194f5779536c225b]
+  calls: 33
+  context: 86514
+  note: 'Memory: уровни M0–M6 без подзадач (замечание владельца) — 2.5.10–12, 2.4.5, статусы схемы; проверка покрытия doctool coverage (507 находок)'

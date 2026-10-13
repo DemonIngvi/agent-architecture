@@ -10,6 +10,8 @@
     python html-view/doctool.py review-batch <комп>[,<комп>…] [--max 40]  пачка ⏳-страниц: карточки для всех ролей в одном файле
     python html-view/doctool.py approve-batch <файл.json>  решения пачки [{page, role, ok, comment}] одним захватом реестра
     python html-view/doctool.py generated <файл>  если файл генерируется — откуда и чем; иначе пусто
+    python html-view/doctool.py coverage [комп] [--file]  сценарии требований без подзадачи; todo-блоки схем без задачи, back — без строки BACKLOG (предупреждения)
+    python html-view/doctool.py coverage [комп] [--file]  сценарии требований без подзадачи; todo-блоки схем без задачи, back — без строки BACKLOG (предупреждения)
     python html-view/doctool.py check             все проверки сборки без сборки сайта (секунды), включая yaml-check
     python html-view/doctool.py unit <ID|путь>    карточка единицы данных (блок, история US-…, I-код, модель, таблица, «МЕТОД путь»)
     python html-view/doctool.py yaml-check [путь] схема единиц data/: поля, типы, значения, ссылки, _order.yaml
@@ -568,7 +570,14 @@ def main():
     elif cmd == "check":
         issues = check()
         print("\n".join(f"⚠️ {i}" for i in issues) or "замечаний нет")
+        sys.path.insert(0, str(HERE))
+        import doccover as DC  # покрытие сценариев и блоков — предупреждение, код выхода не меняет
+        DC.run(to_file=True)
         sys.exit(1 if issues else 0)
+    elif cmd == "coverage":  # сценарии требований без подзадачи, todo/back-блоки схем без задачи/бэклога
+        sys.path.insert(0, str(HERE))
+        import doccover as DC
+        DC.run(args[0] if args and not args[0].startswith("--") else None, "--file" in args)
     elif cmd == "rnd":
         print(rnd(args[0], " ".join(args[1:]) or args[0]))
     elif cmd == "rnd-check":  # структура одного или нескольких R&D (в том числе в другом проекте)
