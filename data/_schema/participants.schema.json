@@ -1,0 +1,27 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "title": "Единица «participants»",
+ "description": "Единица data/ вида «participants». Генерируется: python html-view/doctool.py yaml-schema (не править руками).",
+ "type": "object",
+ "properties": {
+  "aliases": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "string"
+   },
+   "description": "подпись → канонический участник каталога (компонент, блок, «Компонент · Блок», роль)"
+  },
+  "external": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "string"
+   },
+   "description": "внешняя система или роль вне каталога → описание в одну строку"
+  }
+ },
+ "additionalProperties": false,
+ "required": [
+  "aliases",
+  "external"
+ ]
+}

@@ -9,8 +9,8 @@ does:
 - Задаёт лимиты трат агента, проекта, команды
 - Отказ до траты, а не после; пороги 80% (предупреждение) и 100% (отказ G1)
 io:
-- {dir: ←, label: ICPlan UI, what: бюджеты агента и проекта, via: [I20]}
-- {dir: →, label: LiteLLM, what: 'лимит бюджета ключа — `/key/update`, действует сразу', via: [I15]}
+- {dir: ←, with: ICPlan UI, what: бюджеты агента и проекта, via: [I20]}
+- {dir: →, with: LiteLLM, what: 'лимит бюджета ключа — `/key/update`, действует сразу', via: [I15]}
 data:
 - {table: agent_settings, access: read-write, why: '`budget_run_usd`, `budget_day_usd`'}
 - {table: project_platform, access: read-write, why: '`budget_month_usd`'}
@@ -25,6 +25,6 @@ failures:
 why: Иерархия бюджетов — стандарт (LiteLLM, облачные биллинги).
 rnd: runaway-protection.md
 ops:
-- {op: бюджет агента, endpoint: 'PATCH /platform/agents/:agentId/settings', label: Администратор, via: [I20]}
-- {op: бюджет проекта, endpoint: 'PUT /platform/projects/:projectKey/budget', label: Администратор, via: [I20]}
+- {op: бюджет агента, endpoint: 'PATCH /platform/agents/:agentId/settings', who: Администратор, via: [I20]}
+- {op: бюджет проекта, endpoint: 'PUT /platform/projects/:projectKey/budget', who: Администратор, via: [I20]}
 - {op: Применить лимит к ключу LiteLLM, who: Platform module, via: [I15]}

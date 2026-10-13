@@ -11,9 +11,9 @@ does:
 - Агент читает задачу, пишет комментарий, меняет поля задачи; колонку задачи в процессе меняет ICPlan по итогу запуска (D17)
 - Доступ к документам проекта (M6)
 io:
-- {dir: ←, label: MCP-прокси Agent Runner, model: [McpToolCall], what: '`McpToolCall`: `tools/list`, `tools/call` с ключом агента', via: [I24]}
+- {dir: ←, with: MCP-прокси Agent Runner, model: [McpToolCall], what: '`McpToolCall`: `tools/list`, `tools/call` с ключом агента', via: [I24]}
 - {dir: →, with: Harness, what: результат тула; ответ длиннее `max_result_kb` обрезает прокси, via: [I9]}
-- {dir: →, label: задача ICPlan, what: комментарий и поля задачи от имени агента}
+- {dir: →, with: задача ICPlan, what: комментарий и поля задачи от имени агента}
 data:
 - {table: issue, why: 'чтение, запись: поля задачи через `update_issue` (колонка задачи в процессе — не меняется, D17; владелец — ICPlan)'}
 - {table: issue_activity, access: write, why: комментарий агента (владелец — ICPlan)}
@@ -29,6 +29,6 @@ failures:
 why: 'Уже есть в ICPlan; стандарт MCP: тот же сервер используют и наши агенты, и внешние CLI.'
 rnd: mcp-vs-direct.md
 ops:
-- {op: '`tools/list`: тулы ICPlan, отфильтрованные allowlist запуска', endpoint: POST /mcp, label: MCP-прокси Runner, via: [I24]}
-- {op: '`tools/call` `get_issue`, `add_comment`, `update_issue`, создание задач; ключ агента в `Authorization: Bearer`', endpoint: POST /mcp, label: MCP-прокси Runner, via: [I24]}
+- {op: '`tools/list`: тулы ICPlan, отфильтрованные allowlist запуска', endpoint: POST /mcp, who: MCP-прокси Runner, via: [I24]}
+- {op: '`tools/call` `get_issue`, `add_comment`, `update_issue`, создание задач; ключ агента в `Authorization: Bearer`', endpoint: POST /mcp, who: MCP-прокси Runner, via: [I24]}
 iface: [I9, I24]

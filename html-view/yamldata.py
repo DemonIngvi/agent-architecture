@@ -18,6 +18,7 @@
     data/stories/<компонент>/<US-ID>.yaml  STORIES (история), CHAINS (chain)
     data/processes/<компонент>.yaml    BPMN, ARTIFACTS
     data/personas.yaml                 ROLES, PERSONAS
+    data/participants.yaml             aliases (подпись → участник каталога), external (внешние системы)
     data/costs.yaml                    журнал расхода токенов (html-view/cost.py, docs/rules/token-costs.md)
 """
 import json
@@ -859,6 +860,9 @@ SCHEMAS = {
         ("rnd", Ref("rnd"), "opt", "R&D: файл в docs/rnd"),
         ("ops", Lst(OP_ROW), "opt", "операции (kind: service): {op, endpoint, who, via}"), ("schema", S, "opt", "схема хранения (kind: store)"),
         ("iface", Lst(Ref("icode"), flow=True), "opt", "I-коды, которые блок реализует")),
+    "participants": Rec(
+        ("aliases", Map(S, S), "req", "подпись → канонический участник каталога (компонент, блок, «Компонент · Блок», роль)"),
+        ("external", Map(S, S), "req", "внешняя система или роль вне каталога → описание в одну строку")),
     "hosts": Lst(Rec(("owner", COMP), ("block", S, "opt"), ("host", COMP), flow=True)),
     "model": Rec(
         ("purpose", S, "req", "назначение модели"),
@@ -914,7 +918,7 @@ KIND_OF = [("components/*.yaml", "component"), ("blocks/*/*.yaml", "block"), ("h
            ("tables/*.yaml", "table"), ("endpoints/*.yaml", "endpoints"), ("integrations.yaml", "integrations"),
            ("databases.yaml", "databases"), ("datamodel.yaml", "datamodel"), ("stories/*/*.yaml", "story"),
            ("processes/*.yaml", "processes"), ("personas.yaml", "personas"),
-           ("costs.yaml", "costs")]
+           ("costs.yaml", "costs"), ("participants.yaml", "participants")]
 
 
 def kind_of(path) -> str:
@@ -1112,6 +1116,12 @@ def sub():
             out[(comp, u.pop("title"))] = u
     _CACHE["sub"] = out
     return out
+
+
+def participants_file():
+    """data/participants.yaml: aliases (подпись → участник каталога), external (внешние системы вне каталога)."""
+    f = DATA / "participants.yaml"
+    return _unit(f, "participants") if f.exists() else {"aliases": {}, "external": {}}
 
 
 def stories():
@@ -1390,6 +1400,10 @@ def _extra(f: Path, kind: str, v) -> list:
                     out.append(f"processes[{n}].steps[{k}][1] → дорожка {s[1]}: номер от 0 до {len(pr['lanes']) - 1}")
                 out += [f"processes[{n}].steps[{k}] → переход в шаг {to}, которого нет" for to, _ in s[4] if to not in ids]
             out += [f"processes[{n}].artifacts.{a} → шага {a} нет" for a in pr["artifacts"] if a not in ids]
+    if kind == "participants":
+        base = set(_cat().participants()) - set(v["aliases"]) - set(v["external"])
+        out += [f"aliases.{a} → «{t}» не участник каталога" for a, t in v["aliases"].items() if t not in base]
+        out += [f"{a} одновременно в aliases и external" for a in v["aliases"] if a in v["external"]]
     if kind == "costs":
         for n, r in enumerate(v["costs"]):
             m, _, anchor = r["methodology"].partition("#")
@@ -1455,6 +1469,7 @@ REGEN = {
     "hosts": "страницы встроенных компонентов, связи C1",
     "story": "docs/stories/{comp}.md, docs/stories/coverage.md (build: sync_stories); вкладка «Истории» компонента",
     "processes": "процессы BPMN на docs/stories/{stem}.md и вкладке компонента",
+    "participants": "ничего: подписи участников строк io/ops выводятся как есть; каталог участников (yamlcat.participants)",
     "personas": "docs/stories/personas.md, docs/stories/README.md",
     "model": "страница «Модель данных» (модель {stem}), вкладки «Интеграции» компонентов, структура эндпоинтов docs/api",
     "table": "страница «Модель данных» (ER, политика хранения), вкладка «Данные» компонентов",

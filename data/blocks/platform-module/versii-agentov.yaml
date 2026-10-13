@@ -9,7 +9,7 @@ does:
 - Перенос dev → prod
 - Ревью через YAML
 io:
-- {dir: ←, label: ICPlan UI, what: 'история, откат, экспорт и импорт YAML', via: [I20]}
+- {dir: ←, with: ICPlan UI, what: 'история, откат, экспорт и импорт YAML', via: [I20]}
 - {dir: ←, with: Agent Runner, what: запрос версии запуска; новая версия по хешу определения, via: [I4], decisions: [D26]}
 data:
 - {table: agent_settings_version, access: read-write, why: 'снимок определения и настроек, автор, время'}
@@ -24,6 +24,6 @@ failures:
 why: Воспроизводимость запусков и ревью без Config Repo.
 rnd: config-storage.md
 ops:
-- {op: '`GET /platform/agents/:agentId/settings/versions`, `POST …/settings/rollback` — история и откат', endpoint: 'GET /platform/agents/:agentId/settings/versions', label: Администратор, via: [I20]}
-- {op: '`GET /platform/agents/:agentId/export`, `POST /platform/agents/import` — YAML `agent/v1`', label: Администратор, via: [I20]}
+- {op: '`GET /platform/agents/:agentId/settings/versions`, `POST …/settings/rollback` — история и откат', endpoint: 'GET /platform/agents/:agentId/settings/versions', who: Администратор, via: [I20]}
+- {op: '`GET /platform/agents/:agentId/export`, `POST /platform/agents/import` — YAML `agent/v1`', who: Администратор, via: [I20]}
 - {op: Новая версия при отличии хеша определения, who: Agent Runner, via: [I4], decisions: [D26]}

@@ -15,9 +15,9 @@ does:
 - Пишет в историю, по какому правилу агент взял задачу
 - Не создаёт второй активный запуск на агента и задачу — главная защита (R-AP-05); слот `per_issue` Runner — страховка (D14)
 io:
-- {dir: ←, label: 'Task UI, Действия проекта', what: задача вошла в колонку шага}
-- {dir: →, label: Run Queue, model: [Run], what: '`Run` (pending) — запуск в очередь агента шага'}
-- {dir: ←, label: Run Queue, what: итог запуска → переход по `step.on_success / on_failure`}
+- {dir: ←, with: 'Task UI, Действия проекта', what: задача вошла в колонку шага}
+- {dir: →, with: Run Queue, model: [Run], what: '`Run` (pending) — запуск в очередь агента шага'}
+- {dir: ←, with: Run Queue, what: итог запуска → переход по `step.on_success / on_failure`}
 data:
 - {table: process, access: read}
 - {table: process_step, access: read}
@@ -37,8 +37,8 @@ failures:
 why: Процесс идёт сам, а переход делает трекер, а не агент — правило однозначно. Что передаётся между шагами и как подтверждаются критерии приёмки — контракт шага D20.
 rnd: autopickup-rules.md
 ops:
-- {op: 'Вход задачи в шаг: делегат = агент шага, запуск в очередь', label: ICPlan при смене колонки или переходе, internal: true}
-- {op: Переход по итогу запуска (`step.on_success / on_failure`), label: 'приём итога `POST /agent-runs/:runId/result`', via: [I2]}
-- {op: '`GET /projects/:projectKey/processes`, `PUT /projects/:projectKey/processes/:issueTypeId` — процесс типа задачи', label: Администратор (интерфейс ICPlan), via: [I20]}
-- {op: Действие «делегировать агенту», endpoint: 'POST /projects/:projectKey/actions', label: Администратор, via: [I20]}
-- {op: повтор шага, endpoint: 'POST /issues/:issueId/process/retry', label: Пользователь, via: [I20]}
+- {op: 'Вход задачи в шаг: делегат = агент шага, запуск в очередь', who: ICPlan при смене колонки или переходе, internal: true}
+- {op: Переход по итогу запуска (`step.on_success / on_failure`), who: 'приём итога `POST /agent-runs/:runId/result`', via: [I2]}
+- {op: '`GET /projects/:projectKey/processes`, `PUT /projects/:projectKey/processes/:issueTypeId` — процесс типа задачи', who: Администратор (интерфейс ICPlan), via: [I20]}
+- {op: Действие «делегировать агенту», endpoint: 'POST /projects/:projectKey/actions', who: Администратор, via: [I20]}
+- {op: повтор шага, endpoint: 'POST /issues/:issueId/process/retry', who: Пользователь, via: [I20]}

@@ -12,7 +12,7 @@ does:
 - Не даёт удалить ресурс, на который ссылаются (R-REG-05)
 io:
 - {dir: ←, with: Control Plane UI, what: 'определения агентов, тулы, навыки, MCP-серверы'}
-- {dir: →, label: Harness через Agent Runner, what: 'инструкция и навыки версии запуска, M5 (через Platform module — I4, D23; I7)', via: [I4, I7], decisions: [D23]}
+- {dir: →, what: 'инструкция и навыки версии запуска, M5 (через Platform module — I4, D23; I7)', via: [I4, I7], decisions: [D23], with: Harness через Agent Runner}
 data:
 - {table: ai_agent, access: read-write, why: определение}
 - {table: agent_tool, access: read-write, why: каталог тулов}
@@ -35,5 +35,5 @@ ops:
 - {op: '`GET`, `POST /teams/:teamId/ai-agents`; `PATCH`, `DELETE /teams/:teamId/ai-agents/:agentId` — агенты', who: Control Plane UI, via: [I20]}
 - {op: '`PUT /teams/:teamId/ai-agents/:agentId/projects`, `/skills`, `/tool-configs` — ресурсы агента', endpoint: 'PUT /teams/:teamId/ai-agents/:agentId/projects', who: Control Plane UI, via: [I20]}
 - {op: новый ключ агента, endpoint: 'POST /teams/:teamId/ai-agents/:agentId/regenerate-key', who: Control Plane UI, via: [I20]}
-- {op: 'версии и экспорт / импорт YAML — `GET /platform/agents/:agentId/export`, `POST /platform/agents/import` (Platform module)', label: Администратор, via: [I20]}
+- {op: 'версии и экспорт / импорт YAML — `GET /platform/agents/:agentId/export`, `POST /platform/agents/import` (Platform module)', who: Администратор, via: [I20]}
 - {op: 'определение агента для запуска — `GET /platform/runs/:runId/agent`: Platform module читает таблицы Registry и отдаёт `{version, definition, settings}`; claim форка не меняется', endpoint: 'GET /platform/runs/:runId/agent', who: Agent Runner, via: [I4], decisions: [D23]}

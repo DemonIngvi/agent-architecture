@@ -9,7 +9,7 @@ does:
 - Модерирует ответ
 io:
 - {dir: ←, with: Harness, what: вызов модели, via: [I8]}
-- {dir: →, label: «провайдер / mock», what: запрос после маскирования, via: [I13]}
+- {dir: →, with: «провайдер / mock», what: запрос после маскирования, via: [I13]}
 data:
 - {table: LiteLLM_SpendLogs, access: write, why: результат вызова с хуками (владелец — LiteLLM)}
 reqs: [R-GRD-05]
@@ -21,4 +21,4 @@ why: Весь трафик к модели проходит через одну 
 rnd: guardrails-engine.md
 ops:
 - {op: 'pre_call: маскирование секретов и PII, детект injection', who: Harness, via: [I8]}
-- {op: 'post_call: модерация ответа', label: провайдер / mock, via: [I13]}
+- {op: 'post_call: модерация ответа', who: провайдер / mock, via: [I13]}

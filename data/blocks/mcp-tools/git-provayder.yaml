@@ -12,8 +12,8 @@ does:
 - Запись — только в ветку с префиксом агента; push в защищённую ветку отклоняется
 - Учётные данные держит MCP-сервер и MCP-прокси Runner, в sandbox и контекст агента они не попадают
 io:
-- {dir: ←, label: MCP-прокси Agent Runner, model: [McpToolCall], what: '`McpToolCall`: `tools/list`, `tools/call`', via: [I9]}
-- {dir: →, label: «git-провайдер», what: вызов API провайдера с короткоживущим токеном от Runner, via: [I18]}
+- {dir: ←, with: MCP-прокси Agent Runner, model: [McpToolCall], what: '`McpToolCall`: `tools/list`, `tools/call`', via: [I9]}
+- {dir: →, with: «git-провайдер», what: вызов API провайдера с короткоживущим токеном от Runner, via: [I18]}
 - {dir: →, with: Harness, model: [RunResult], what: ссылка на ветку и PR для `RunResult`}
 data:
 - {table: project_resource, access: read, via: [I4], why: 'репозитории проекта (`kind = git`) и MCP-серверы агента (`kind = mcp`, владелец Platform module)'}
@@ -29,7 +29,7 @@ failures:
 why: Агент-разработчик отдаёт код через PR, без прямого push. Тул нужен нескольким агентам и держит секрет вне агента — значит MCP-сервер (R3, R-MCP-04).
 rnd: mcp-vs-direct.md
 ops:
-- {op: '`tools/list` — тулы git-провайдера, отфильтрованные allowlist запуска', label: MCP-прокси Runner, via: [I9]}
-- {op: '`tools/call` `branch` — создать ветку с префиксом агента', label: Harness через MCP-прокси Runner, via: [I9]}
-- {op: '`tools/call` `commit` — зафиксировать изменения в ветке агента', label: Harness через MCP-прокси Runner, via: [I9]}
-- {op: '`tools/call` `pr.create` — открыть PR из ветки агента; ссылка попадает в `RunResult`', label: Harness через MCP-прокси Runner, via: [I9]}
+- {op: '`tools/list` — тулы git-провайдера, отфильтрованные allowlist запуска', who: MCP-прокси Runner, via: [I9]}
+- {op: '`tools/call` `branch` — создать ветку с префиксом агента', who: Harness через MCP-прокси Runner, via: [I9]}
+- {op: '`tools/call` `commit` — зафиксировать изменения в ветке агента', who: Harness через MCP-прокси Runner, via: [I9]}
+- {op: '`tools/call` `pr.create` — открыть PR из ветки агента; ссылка попадает в `RunResult`', who: Harness через MCP-прокси Runner, via: [I9]}

@@ -14,7 +14,7 @@ does:
 - Задаёт пороги защиты запуска от зацикливания и ошибок
 io:
 - {dir: ←, with: Эксплуатация, what: values.yaml в git (изменение — после перезапуска модуля)}
-- {dir: →, label: Agent Runner (Admission), what: переключатель G1 и `on_engine_error`}
+- {dir: →, with: Agent Runner (Admission), what: переключатель G1 и `on_engine_error`}
 - {dir: →, with: Harness, what: переключатель G2 и пороги зацикливания}
 data:
 - {table: kill_switch, access: indirect, why: 'аварийная остановка хранится в Platform module (L1), в конфиге деплоя её нет'}

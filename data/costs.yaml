@@ -361,3 +361,15 @@ costs:
   calls: 13
   context: 46237
   note: 'Observability ❌×2 (R-OBS-05/13): чтение через ICPlan API (I14, I20) — таблица в docs/api/observability.md; перепроверка ролями — шаг 8'
+- date: '2026-10-13'
+  process: bulk-edit
+  methodology: change-process.md#bulk
+  units: 49
+  unit: файл
+  tokens: 847911
+  model: sonnet-5-5
+  expected: [3000, 10000]
+  agents: [a3b6f1b1ebf875266]
+  calls: 16
+  context: 61937
+  note: 'каталог участников data/participants.yaml (64 псевдонима, 8 внешних): 128 строк label → with, отрисовка без изменений; yaml-migrate остаток 194→89'

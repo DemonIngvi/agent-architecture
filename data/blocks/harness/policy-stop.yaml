@@ -24,5 +24,5 @@ failures:
 why: Предсказуемые затраты и время.
 rnd: runaway-protection.md
 ops:
-- {op: проверка лимитов после каждого шага; quality gate итога по критериям задачи, label: граф LangGraph, internal: true}
+- {op: проверка лимитов после каждого шага; quality gate итога по критериям задачи, who: граф LangGraph, internal: true}
 - {op: завершить шаг и отдать `RUN_FINISHED`, endpoint: POST /run/cancel, who: Agent Runner, via: [I7]}

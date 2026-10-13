@@ -8,7 +8,7 @@ does:
 - Учитывает токены и стоимость с привязкой к агенту и `run_id`
 io:
 - {dir: ←, with: Harness, what: вызовы модели с `metadata.run_id`, via: [I8]}
-- {dir: →, label: PostgreSQL 17, what: запись строки затрат в БД `litellm`, via: [I14]}
+- {dir: →, with: PostgreSQL 17, what: запись строки затрат в БД `litellm`, via: [I14]}
 data:
 - {table: LiteLLM_SpendLogs, access: write, why: 'при каждом вызове, чтение для отчёта затрат (владелец — LiteLLM)'}
 reqs: [R-LLM-02, R-LLM-03]

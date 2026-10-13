@@ -31,4 +31,4 @@ failures:
 why: Одна точка выхода к моделям и учёт затрат по задаче.
 rnd: llm-gateway.md
 ops:
-- {op: 'узел `llm`: OpenAI Chat Completions к LiteLLM по алиасу модели агента, SSE-стрим, `metadata.run_id`', label: граф LangGraph, via: [I8]}
+- {op: 'узел `llm`: OpenAI Chat Completions к LiteLLM по алиасу модели агента, SSE-стрим, `metadata.run_id`', who: граф LangGraph, via: [I8]}

@@ -12,10 +12,10 @@ does:
 - Загружает бандл (Rego из git и данные агентов из Platform module) опросом раз в 30 с; при битом бандле остаётся на прежнем
 - Кэширует решение для одинакового входа в запуске на `opa.cache_ttl_s`; каждое решение попадает в аудит с `run_id`
 io:
-- {dir: ←, label: Agent Runner (Admission), model: [PolicyInput], what: '`PolicyInput` G1', via: [I5]}
-- {dir: ←, label: Harness (hooks), model: [PolicyInput], what: '`PolicyInput` G2', via: [I10]}
-- {dir: ←, label: Platform module и git (Rego), what: 'bundle: правила и данные агентов', via: [I16]}
-- {dir: →, label: Agent Runner и Harness, model: [PolicyDecision], what: '`PolicyDecision`: allow / deny / confirm с причиной и правилом'}
+- {dir: ←, with: Agent Runner (Admission), model: [PolicyInput], what: '`PolicyInput` G1', via: [I5]}
+- {dir: ←, with: Harness (hooks), model: [PolicyInput], what: '`PolicyInput` G2', via: [I10]}
+- {dir: ←, with: Platform module и git (Rego), what: 'bundle: правила и данные агентов', via: [I16]}
+- {dir: →, with: Agent Runner и Harness, model: [PolicyDecision], what: '`PolicyDecision`: allow / deny / confirm с причиной и правилом'}
 data:
 - {table: agent_settings, access: read, why: 'через бандл: `tools_allow`, `approval_tools`, `autonomy_level`, бюджеты агента (владелец — Platform module)'}
 - {table: kill_switch, access: read, why: 'через бандл: аварийная остановка платформы и агентов (владелец — Platform module)'}
@@ -29,6 +29,6 @@ failures:
 why: Правила как код, тесты, аудит; CNCF graduated (решение D6).
 rnd: guardrails-engine.md
 ops:
-- {op: решение допуска и бюджета, endpoint: POST /v1/data/agent/g1, label: Agent Runner перед созданием sandbox, via: [I5]}
-- {op: решение по вызову тула или записи в память, endpoint: POST /v1/data/agent/g2, label: Harness hooks и MCP-прокси Runner, via: [I10]}
+- {op: решение допуска и бюджета, endpoint: POST /v1/data/agent/g1, who: Agent Runner перед созданием sandbox, via: [I5]}
+- {op: решение по вызову тула или записи в память, endpoint: POST /v1/data/agent/g2, who: Harness hooks и MCP-прокси Runner, via: [I10]}
 - {op: 'bundles API: загрузка `opa-bundle` раз в 30 с', who: OPA, via: [I16]}

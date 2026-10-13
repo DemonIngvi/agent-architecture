@@ -11,7 +11,7 @@ does:
 - Что агенту разрешено и что ждёт человека
 - Попадает в OPA без изменения Rego
 io:
-- {dir: ←, label: ICPlan UI, what: 'тулы агента, подтверждения, уровень автономии', via: [I20]}
+- {dir: ←, with: ICPlan UI, what: 'тулы агента, подтверждения, уровень автономии', via: [I20]}
 - {dir: →, with: OPA, what: 'данные правил — bundle, OPA забирает опросом 30 с', via: [I16]}
 data:
 - {table: agent_settings, access: read-write, why: '`tools_allow`, `approval_tools`, `autonomy_level`'}
@@ -27,5 +27,5 @@ why: 'Логика — в git (Rego), данные — в БД: стандарт
 rnd: guardrails-engine.md
 ops:
 - {op: Собрать bundle данных правил из настроек агентов, who: Platform module, via: [I16]}
-- {op: '`GET /platform/kill-switch`, `PUT /platform/kill-switch/:scope` — аварийная остановка', label: 'Администратор, владелец экземпляра', via: [I20]}
-- {op: '`GET`, `PUT /platform/projects/:projectKey/access` — доступы агентов к ресурсам', endpoint: 'PUT /platform/projects/:projectKey/access', label: Администратор, via: [I20]}
+- {op: '`GET /platform/kill-switch`, `PUT /platform/kill-switch/:scope` — аварийная остановка', who: 'Администратор, владелец экземпляра', via: [I20]}
+- {op: '`GET`, `PUT /platform/projects/:projectKey/access` — доступы агентов к ресурсам', endpoint: 'PUT /platform/projects/:projectKey/access', who: Администратор, via: [I20]}

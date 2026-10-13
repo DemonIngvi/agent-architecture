@@ -23,5 +23,5 @@ failures:
 why: Правила применяются на каждом шаге детерминированно.
 rnd: runaway-protection.md
 ops:
-- {op: '`before_tool` / `after_tool`, `before_llm` / `after_llm`, `on_stop` — узлы графа', label: граф LangGraph, internal: true}
-- {op: проверка действия G2 — `POST /v1/data/agent/g2`, endpoint: POST /v1/data/agent/g2, label: hook `before_tool`, via: [I10]}
+- {op: '`before_tool` / `after_tool`, `before_llm` / `after_llm`, `on_stop` — узлы графа', who: граф LangGraph, internal: true}
+- {op: проверка действия G2 — `POST /v1/data/agent/g2`, endpoint: POST /v1/data/agent/g2, who: hook `before_tool`, via: [I10]}

@@ -20,9 +20,9 @@ does:
 - Даёт человеку подтвердить опасное действие (3.4)
 - Показывает затраты задачи из LiteLLM (3.5)
 io:
-- {dir: ←, label: api ICPlan (SSE), model: [RunEvent], what: шаги в чате запуска, via: [I20]}
-- {dir: ←, label: api ICPlan, model: [CostAggregate], what: затраты задачи, via: [I20]}
-- {dir: →, label: api ICPlan, what: 'смена колонки, approve, указания пользователя, вердикт', via: [I20]}
+- {dir: ←, with: api ICPlan (SSE), model: [RunEvent], what: шаги в чате запуска, via: [I20]}
+- {dir: ←, with: api ICPlan, model: [CostAggregate], what: затраты задачи, via: [I20]}
+- {dir: →, with: api ICPlan, what: 'смена колонки, approve, указания пользователя, вердикт', via: [I20]}
 data:
 - {table: issue, why: 'чтение, запись: колонка, делегат, исполнитель, `review_with_me`'}
 - {table: run_event, access: read, why: чат запуска (таблица Observability)}

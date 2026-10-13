@@ -12,7 +12,7 @@ does:
 io:
 - {dir: ←, with: Platform module, what: 'создание и обновление ключа `/key/generate`, `/key/update`', via: [I15]}
 - {dir: ←, with: Harness, what: вызов модели с Bearer virtual key и `metadata.run_id`, via: [I8]}
-- {dir: →, label: PostgreSQL 17, what: ключи и бюджеты в БД `litellm`, via: [I14]}
+- {dir: →, with: PostgreSQL 17, what: ключи и бюджеты в БД `litellm`, via: [I14]}
 data:
 - {table: LiteLLM_VerificationToken, why: 'чтение и запись: ключ, бюджет, лимиты (владелец — LiteLLM)'}
 reqs: [R-LLM-03, R-LLM-05]

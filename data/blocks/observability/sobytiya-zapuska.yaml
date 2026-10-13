@@ -12,8 +12,8 @@ does:
 - Удаляет события старше `retention_days`; агрегаты затрат и срабатываний guardrails остаются
 io:
 - {dir: ←, with: Event relay, model: [RunEvent], what: пакеты `RunEvent` с `seq`, via: [I2]}
-- {dir: ←, label: Guardrails (аудит), what: решения G1–G4 как события `CUSTOM` `guardrail_decision`}
-- {dir: →, label: Task UI ICPlan, what: 'чат запуска: поток событий и история', via: [I20]}
+- {dir: ←, with: Guardrails (аудит), what: решения G1–G4 как события `CUSTOM` `guardrail_decision`}
+- {dir: →, with: Task UI ICPlan, what: 'чат запуска: поток событий и история', via: [I20]}
 data:
 - {table: run_event, why: 'запись, чтение, очистка по сроку (владелец — Observability, S3)'}
 - {table: issue, access: read, why: 'лента событий по задаче (`issue_id`, владелец — ICPlan)'}
@@ -29,6 +29,6 @@ why: Самый дешёвый способ дать чат запуска в MV
 rnd: observability.md
 ops:
 - {op: 'принять `{events: RunEvent[]}`, маскировать, записать в `run_event`', endpoint: 'POST /agent-runs/:runId/events', who: Event relay, via: [I2]}
-- {op: живой поток событий запуска (SSE), endpoint: 'GET /agent-runs/:runId/stream', label: Task UI ICPlan, via: [I20]}
-- {op: история чата запусков задачи по шагам процесса, endpoint: 'GET /issues/:issueId/agent-feed', label: Task UI ICPlan, via: [I20]}
+- {op: живой поток событий запуска (SSE), endpoint: 'GET /agent-runs/:runId/stream', who: Task UI ICPlan, via: [I20]}
+- {op: история чата запусков задачи по шагам процесса, endpoint: 'GET /issues/:issueId/agent-feed', who: Task UI ICPlan, via: [I20]}
 - {op: очистка событий старше `retention_days` по `ts` (ночная), who: Observability, internal: true}

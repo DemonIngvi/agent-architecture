@@ -10,8 +10,8 @@ does:
 - Каждое правило указывает точку G1–G4; правило без точки не принимается
 - Изменение правил — через PR с ревью безопасности и обязательным `opa test`
 io:
-- {dir: ←, label: Ревьюер безопасности, what: PR с изменением Rego}
-- {dir: →, label: CI, what: 'сборка бандла: `opa test` → `opa build`'}
+- {dir: ←, with: Ревьюер безопасности, what: PR с изменением Rego}
+- {dir: →, with: CI, what: 'сборка бандла: `opa test` → `opa build`'}
 - {dir: →, with: OPA, what: bundle `opa-bundle`, via: [I16]}
 data:
 - {table: agent_settings, access: indirect, why: 'данные правил агента (`tools_allow`, `approval_tools`) приходят в бандл из Platform module, в git их нет'}

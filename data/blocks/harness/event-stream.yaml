@@ -8,7 +8,7 @@ does:
 - Нумерует события `seq` для порядка и идемпотентности
 - Буферизует события, пока Runner их не принимает, и досылает без потерь
 io:
-- {dir: ←, label: 'Hooks, Pause / resume, Policy / stop', what: события шагов}
+- {dir: ←, with: 'Hooks, Pause / resume, Policy / stop', what: события шагов}
 - {dir: →, with: Agent Runner, model: [RunEvent], via: [I7]}
 data:
 - {table: run_event, access: indirect, why: события пишет Runner (владелец — Observability)}
@@ -20,4 +20,4 @@ failures:
 why: Чат запуска в задаче и аудит.
 rnd: observability.md
 ops:
-- {op: '`GET /run/events?seq=` — поток `RunEvent` NDJSON, переподключение с последнего `seq`', label: Agent Runner (Event relay), via: [I7]}
+- {op: '`GET /run/events?seq=` — поток `RunEvent` NDJSON, переподключение с последнего `seq`', who: Agent Runner (Event relay), via: [I7]}

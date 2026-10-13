@@ -20,7 +20,7 @@ io:
 - {dir: ←, with: Poller, model: [Run], what: '`Run` в `queued`'}
 - {dir: →, with: Admission, what: 'запуск, получивший слоты'}
 - {dir: ←, with: Event relay, what: '`waiting_approval` и решение по approve'}
-- {dir: ↔, label: Postgres, what: слоты `scheduler_slot`, via: [I22]}
+- {dir: ↔, with: Postgres, what: слоты `scheduler_slot`, via: [I22]}
 data:
 - {table: scheduler_slot, access: read-write, why: слоты и аренды}
 reqs: [R-RUN-02, R-RUN-03, R-RUN-04, R-RUN-05, R-RUN-06, R-RUN-11, R-RUN-12]
@@ -32,7 +32,7 @@ failures:
 why: Учитывает общие модели и агентов, которые нельзя параллелить; режим платформы — одной настройкой.
 rnd: runner-and-scheduling.md
 ops:
-- {op: 'занять слоты запуска — глобальный, агента, модели, задачи — одной транзакцией в `scheduler_slot` с арендой `lease_until`', label: Poller после claim; Event relay после решения по approve, internal: true}
+- {op: 'занять слоты запуска — глобальный, агента, модели, задачи — одной транзакцией в `scheduler_slot` с арендой `lease_until`', who: Poller после claim; Event relay после решения по approve, internal: true}
 - {op: 'освободить глобальный слот и слот модели при `waiting_approval`, слот задачи держать', who: Event relay, internal: true, reqs: [R-RUN-04]}
-- {op: забрать просроченные аренды слотов упавшего экземпляра, label: Scheduler по `lease_until`, internal: true}
-- {op: причина ожидания («ждёт слот модели») — в события запуска, label: Scheduler → Event relay, internal: true}
+- {op: забрать просроченные аренды слотов упавшего экземпляра, who: Scheduler по `lease_until`, internal: true}
+- {op: причина ожидания («ждёт слот модели») — в события запуска, who: Scheduler → Event relay, internal: true}

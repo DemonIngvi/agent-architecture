@@ -9,7 +9,7 @@ params:
 does:
 - Определяет, что агент может запускать и куда ходить
 io:
-- {dir: ←, label: ICPlan UI, what: профили и выбор профиля агента, via: [I20]}
+- {dir: ←, with: ICPlan UI, what: профили и выбор профиля агента, via: [I20]}
 - {dir: →, with: Agent Runner, what: профиль агента в настройках запуска, via: [I4]}
 data:
 - {table: sandbox_profile, access: read-write, why: 'образ, runtime, CPU, RAM, диск, egress, пул'}
@@ -23,6 +23,6 @@ failures:
 why: Разным агентам — разная среда без изменения кода.
 rnd: sandbox-isolation.md
 ops:
-- {op: '`GET /platform/sandbox-profiles`, `PUT`, `DELETE /platform/sandbox-profiles/:name` — профили', label: Владелец экземпляра, via: [I20]}
-- {op: Профиль агента — `sandbox_profile` в настройках агента, label: Администратор, via: [I20]}
+- {op: '`GET /platform/sandbox-profiles`, `PUT`, `DELETE /platform/sandbox-profiles/:name` — профили', who: Владелец экземпляра, via: [I20]}
+- {op: Профиль агента — `sandbox_profile` в настройках агента, who: Администратор, via: [I20]}
 - {op: Отдать профиль запуска, who: Agent Runner, via: [I4]}

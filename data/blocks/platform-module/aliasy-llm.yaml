@@ -10,7 +10,7 @@ does:
 - Смена модели — без изменения агента
 io:
 - {dir: ←, with: Registry, what: алиас модели из `ai_agent.model`, reqs: [R-REG-02], decisions: [D23]}
-- {dir: →, label: LiteLLM, what: алиас и резервная модель ключа, via: [I15]}
+- {dir: →, with: LiteLLM, what: алиас и резервная модель ключа, via: [I15]}
 data:
 - {table: ai_agent, access: read, why: '`model` — алиас агента'}
 - {table: LiteLLM_VerificationToken, access: write, via: [I15], why: 'через admin API: алиас ключа агента (I15)'}

@@ -13,7 +13,7 @@ does:
 - Недоступна OPA — решение по `on_engine_error` (по умолчанию deny)
 io:
 - {dir: ←, with: Scheduler, what: запуск со слотами}
-- {dir: →, label: Guardrails (OPA), model: [PolicyInput, PolicyDecision], what: '`PolicyInput` → `PolicyDecision`', via: [I5]}
+- {dir: →, with: Guardrails (OPA), model: [PolicyInput, PolicyDecision], what: '`PolicyInput` → `PolicyDecision`', via: [I5]}
 - {dir: →, with: Sandbox claim, what: допущенный запуск}
 - {dir: →, with: Event relay, what: решение G1 с причиной — в события запуска}
 data:
@@ -28,4 +28,4 @@ failures:
 why: Дешевле всего остановить трату до запуска.
 rnd: guardrails-engine.md
 ops:
-- {op: 'допуск агента к задаче, бюджет, лимит параллельных запусков, kill switch', endpoint: POST /v1/data/agent/g1, label: 'Scheduler после занятия слотов, до создания sandbox', via: [I5]}
+- {op: 'допуск агента к задаче, бюджет, лимит параллельных запусков, kill switch', endpoint: POST /v1/data/agent/g1, who: 'Scheduler после занятия слотов, до создания sandbox', via: [I5]}

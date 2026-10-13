@@ -9,7 +9,7 @@ does:
 - Маршрутизирует на сервисы ICPlan
 - Не публикует админки
 io:
-- {dir: ←, label: Пользователи, what: 'HTTPS-запросы к `web`, `api`, `/mcp`', via: [I21]}
+- {dir: ←, with: Пользователи, what: 'HTTPS-запросы к `web`, `api`, `/mcp`', via: [I21]}
 - {dir: →, with: ICPlan, what: 'маршрутизация на `web`, `api`, `/mcp` через Service ClusterIP', via: [I21]}
 data: 'нет: прокси без состояния — маршрутизирует HTTP(S), таблиц модели не хранит'
 reqs: [R-INF-04, R-INF-05, R-INF-16]
@@ -21,4 +21,4 @@ failures:
 why: Встроен в k3s, ingress-nginx архивирован.
 rnd: ingress-and-balancing.md
 ops:
-- {op: 'приём HTTPS, перенаправление HTTP на HTTPS, маршруты `web`, `api`, `/mcp` (Gateway API HTTPRoute)', label: Пользователи, via: [I21]}
+- {op: 'приём HTTPS, перенаправление HTTP на HTTPS, маршруты `web`, `api`, `/mcp` (Gateway API HTTPRoute)', who: Пользователи, via: [I21]}

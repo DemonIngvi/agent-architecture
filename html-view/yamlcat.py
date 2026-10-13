@@ -70,6 +70,8 @@ def participants():
             out.add(f"{names.get(c, c)} · {t}")
         st = Y.stories()
         out |= set(st["ROLES"]) | set(st["ROLES"].values())
+        pt = Y.participants_file()
+        out |= set(pt["aliases"]) | set(pt["external"])
         return sorted(out)
     return _cached("participants", build)
 

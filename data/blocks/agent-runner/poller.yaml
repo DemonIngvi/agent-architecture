@@ -10,7 +10,7 @@ does:
 - Берёт запуск с арендой и создаёт у себя запись `run_id` в статусе `queued` (R-RUN-01)
 - При ошибках ICPlan повторяет опрос с backoff до 60 с; активные запуски при этом продолжаются
 io:
-- {dir: ←, label: ICPlan Run Queue, model: [Run], what: выдача с арендой, via: [I1]}
+- {dir: ←, with: ICPlan Run Queue, model: [Run], what: выдача с арендой, via: [I1]}
 - {dir: →, with: Scheduler, model: [Run], what: '`Run` в статусе `queued`'}
 data:
 - {table: agent_run, access: read, via: [I1], why: '(`POST /agent-runs/claim`): таблица ICPlan, напрямую не читает'}
@@ -24,5 +24,5 @@ failures:
 why: 'Pull-модель: ICPlan не нужно знать адрес Runner.'
 rnd: runner-and-scheduling.md
 ops:
-- {op: взять запуск с арендой по ключу агента, endpoint: POST /agent-runs/claim, label: Poller раз в `poll_interval_ms` по каждому ключу из `agents`, via: [I1]}
+- {op: взять запуск с арендой по ключу агента, endpoint: POST /agent-runs/claim, who: Poller раз в `poll_interval_ms` по каждому ключу из `agents`, via: [I1]}
 - {op: передать взятый запуск в Scheduler (статус `queued`), who: Poller, internal: true}

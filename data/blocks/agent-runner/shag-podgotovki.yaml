@@ -25,5 +25,5 @@ failures:
 why: Агенту нужны зависимости для тестов, а доступ к реестрам — канал утечки; поэтому реестры только у подготовки.
 rnd: agent-workspace.md
 ops:
-- {op: 'выполнить `setup.script` в контейнере подготовки, результат — в `/workspace/.deps`', label: Run supervisor до старта Harness при промахе кэша, via: [I6]}
-- {op: повтор шага подготовки (тул `install_dependencies`), endpoint: 'POST /runs/:runId/deps', label: 'Harness, токен запуска', via: [I7]}
+- {op: 'выполнить `setup.script` в контейнере подготовки, результат — в `/workspace/.deps`', who: Run supervisor до старта Harness при промахе кэша, via: [I6]}
+- {op: повтор шага подготовки (тул `install_dependencies`), endpoint: 'POST /runs/:runId/deps', who: 'Harness, токен запуска', via: [I7]}

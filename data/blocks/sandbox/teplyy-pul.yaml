@@ -25,6 +25,6 @@ failures:
 why: 'Подход E2B, Copilot agent: скорость без потери изоляции.'
 rnd: sandbox-isolation.md
 ops:
-- {op: claim — выдать готовый контейнер профиля (`SandboxClaim` → `sandboxId`), label: Agent Runner (Sandbox claim), via: [I6]}
-- {op: destroy + долив — уничтожить контейнер после запуска и поднять новый до `pool.size`, label: Agent Runner (Finalizer), via: [I6]}
-- {op: пересоздание пула при смене образа профиля или нового `HARNESS_IMAGE`, label: внутри, internal: true}
+- {op: claim — выдать готовый контейнер профиля (`SandboxClaim` → `sandboxId`), who: Agent Runner (Sandbox claim), via: [I6]}
+- {op: destroy + долив — уничтожить контейнер после запуска и поднять новый до `pool.size`, who: Agent Runner (Finalizer), via: [I6]}
+- {op: пересоздание пула при смене образа профиля или нового `HARNESS_IMAGE`, who: внутри, internal: true}

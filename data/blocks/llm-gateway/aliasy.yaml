@@ -10,7 +10,7 @@ does:
 - Смена модели — переназначение алиаса, агенты не меняются
 io:
 - {dir: ←, with: Harness, what: вызов модели по алиасу, via: [I8]}
-- {dir: →, label: «провайдер / mock», what: вызов выбранной модели, via: [I13]}
+- {dir: →, with: «провайдер / mock», what: вызов выбранной модели, via: [I13]}
 data:
 - {table: LiteLLM_ProxyModelTable, access: read, why: алиас → провайдер и модель (владелец — LiteLLM)}
 reqs: [R-LLM-01, R-LLM-07]
@@ -21,5 +21,5 @@ failures:
 why: Смена модели без изменения агентов.
 rnd: llm-gateway.md
 ops:
-- {op: переназначить алиас на другую модель, label: Администратор, via: [I13]}
+- {op: переназначить алиас на другую модель, who: Администратор, via: [I13]}
 - {op: вызов по алиасу, who: Harness, via: [I8]}

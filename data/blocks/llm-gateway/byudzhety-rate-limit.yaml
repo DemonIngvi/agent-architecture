@@ -11,7 +11,7 @@ does:
 io:
 - {dir: ←, with: Harness, what: вызов модели с virtual key, via: [I8]}
 - {dir: ←, with: Platform module, what: бюджет и лимиты ключа, via: [I15]}
-- {dir: →, label: PostgreSQL 17, what: расход и бюджеты в БД `litellm`, via: [I14]}
+- {dir: →, with: PostgreSQL 17, what: расход и бюджеты в БД `litellm`, via: [I14]}
 data:
 - {table: LiteLLM_VerificationToken, why: 'чтение и запись: расход, бюджет, лимиты ключа (владелец — LiteLLM)'}
 - {table: LiteLLM_BudgetTable, access: read, why: бюджеты и лимиты (владелец — LiteLLM)}

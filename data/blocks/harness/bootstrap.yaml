@@ -23,5 +23,5 @@ failures:
 why: Агент полностью задаётся конфигом.
 rnd: harness-framework.md
 ops:
-- {op: 'принять `RunBundle`, проверить определение по схеме `agent/v1`, собрать агента и начать цикл', endpoint: POST /run, label: Agent Runner (Run supervisor), via: [I7]}
+- {op: 'принять `RunBundle`, проверить определение по схеме `agent/v1`, собрать агента и начать цикл', endpoint: POST /run, who: Agent Runner (Run supervisor), via: [I7]}
 - {op: готовность процесса и версия до `POST /run`, endpoint: GET /ready, who: Agent Runner, via: [I7]}

@@ -8,7 +8,7 @@ does:
 - Держит пул серверных соединений
 - Защищает Postgres от роста числа клиентов
 io:
-- {dir: ←, label: '«сервисы» (ICPlan, LiteLLM, Memory API, Runner)', what: SQL по роли на схему, via: [I22]}
+- {dir: ←, with: '«сервисы» (ICPlan, LiteLLM, Memory API, Runner)', what: SQL по роли на схему, via: [I22]}
 - {dir: →, with: PostgreSQL 17 + pgvector, what: не более 30 серверных соединений, via: [I22]}
 data: 'нет: пул соединений без состояния — таблиц модели не хранит, проксирует запросы к PostgreSQL'
 reqs: [R-INF-06, R-INF-16]
@@ -19,4 +19,4 @@ failures:
 why: Агенты, Runner и LiteLLM множат соединения.
 rnd: ingress-and-balancing.md
 ops:
-- {op: 'пул соединений transaction pooling: 60 клиентских → не более 30 серверных', label: «сервисы», via: [I22]}
+- {op: 'пул соединений transaction pooling: 60 клиентских → не более 30 серверных', who: «сервисы», via: [I22]}

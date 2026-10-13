@@ -26,6 +26,6 @@ failures:
 why: Стандарт MCP; вызовы идут через MCP-прокси Runner, ключи — у Runner (D19).
 rnd: mcp-vs-direct.md
 ops:
-- {op: 'узел `tools`: `tools/list`, `tools/call` через MCP-прокси Runner — `POST /runs/:runId/mcp/:server`', endpoint: 'POST /runs/:runId/mcp/:server', label: граф LangGraph, via: [I9]}
-- {op: 'тул `install_dependencies` — `POST /runs/:runId/deps`, повтор шага подготовки', endpoint: 'POST /runs/:runId/deps', label: агент, via: [I7], decisions: [D19]}
-- {op: файловые тулы в пределах `/workspace`; список артефактов в `RunResult`, label: агент, internal: true}
+- {op: 'узел `tools`: `tools/list`, `tools/call` через MCP-прокси Runner — `POST /runs/:runId/mcp/:server`', endpoint: 'POST /runs/:runId/mcp/:server', who: граф LangGraph, via: [I9]}
+- {op: 'тул `install_dependencies` — `POST /runs/:runId/deps`, повтор шага подготовки', endpoint: 'POST /runs/:runId/deps', who: агент, via: [I7], decisions: [D19]}
+- {op: файловые тулы в пределах `/workspace`; список артефактов в `RunResult`, who: агент, internal: true}

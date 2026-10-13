@@ -11,7 +11,7 @@ does:
 - 'Вызывается только после слотов Scheduler и допуска G1: пул слотов не занимает, слот занимает запуск; `pool.size` не больше `scheduling.global_max`'
 io:
 - {dir: ←, with: Admission, what: допущенный запуск}
-- {dir: →, label: Sandbox (SandboxProvider), model: [SandboxClaim, RepoGrant], what: '`SandboxClaim`, `RepoGrant` (I6; этап 4 — I23)', via: [I6, I23]}
+- {dir: →, model: [SandboxClaim, RepoGrant], what: '`SandboxClaim`, `RepoGrant` (I6; этап 4 — I23)', via: [I6, I23], with: Sandbox (SandboxProvider)}
 - {dir: →, with: Шаг подготовки, what: контейнер запуска}
 - {dir: →, with: Run supervisor, what: адрес среды}
 data:
@@ -26,5 +26,5 @@ failures:
 why: Старт < 1 с без потери изоляции; пул за `SandboxProvider` меняется на K8s без переделки Runner (D1).
 rnd: sandbox-isolation.md
 ops:
-- {op: '`SandboxProvider.claim` — готовый контейнер профиля агента из тёплого пула; пул пуст — `create`', label: Admission после допуска, via_note: I6 (этап 4 — I23)}
+- {op: '`SandboxProvider.claim` — готовый контейнер профиля агента из тёплого пула; пул пуст — `create`', who: Admission после допуска, via_note: I6 (этап 4 — I23)}
 - {op: 'передать контейнеру манифест рабочего пространства и правила git-прокси (`SandboxClaim`, `RepoGrant`)', who: Sandbox claim, via: [I6]}

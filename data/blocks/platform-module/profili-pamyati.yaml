@@ -10,7 +10,7 @@ params:
 does:
 - Какие уровни памяти агент читает и пишет, сколько хранить; для M1 и M2 срок — фильтр чтения, строки форка удаляет ICPlan (D25)
 io:
-- {dir: ←, label: ICPlan UI, what: профили памяти и выбор профиля агента, via: [I20]}
+- {dir: ←, with: ICPlan UI, what: профили памяти и выбор профиля агента, via: [I20]}
 - {dir: →, with: Agent Runner, what: профиль памяти агента в настройках запуска, via: [I4]}
 data:
 - {table: memory_profile, access: read-write, why: 'уровни чтения и записи, сроки'}
@@ -24,6 +24,6 @@ failures:
 why: Баланс преемственности и токенов на агента.
 rnd: memory-model.md
 ops:
-- {op: '`GET /platform/memory-profiles`, `PUT`, `DELETE /platform/memory-profiles/:name` — профили', label: Владелец экземпляра, via: [I20]}
-- {op: Профиль агента — `memory_profile` в настройках агента, label: Администратор, via: [I20]}
+- {op: '`GET /platform/memory-profiles`, `PUT`, `DELETE /platform/memory-profiles/:name` — профили', who: Владелец экземпляра, via: [I20]}
+- {op: Профиль агента — `memory_profile` в настройках агента, who: Администратор, via: [I20]}
 - {op: Отдать профиль запуска, who: Agent Runner, via: [I4]}

@@ -1,0 +1,74 @@
+aliases:
+  Администратор: Администратор платформы
+  Администратор, владелец экземпляра: Администратор платформы
+  Администратор (интерфейс ICPlan): Администратор платформы
+  Владелец экземпляра: Администратор платформы
+  Пользователи: Пользователь ICPlan
+  Пользователь: Пользователь ICPlan
+  Ревьюер безопасности: Безопасность
+  задача ICPlan: ICPlan
+  Task UI ICPlan: ICPlan · Task UI
+  Task UI, Действия проекта: ICPlan · Task UI
+  ICPlan UI: ICPlan · Control Plane UI
+  api ICPlan: ICPlan
+  api ICPlan (SSE): ICPlan
+  MCP itsaplan-core в api ICPlan: ICPlan · MCP itsaplan-core
+  ICPlan Run Queue: ICPlan · Run Queue + runner API
+  Run Queue: ICPlan · Run Queue + runner API
+  ICPlan при смене колонки или переходе: ICPlan · Автоподхват
+  ICPlan и Agent Runner: ICPlan
+  LiteLLM: LiteLLM gateway
+  LiteLLM (spend log): LiteLLM gateway · Spend log
+  граф LangGraph: Harness
+  Harness, токен запуска: Harness
+  Harness через MCP-прокси Runner: Harness
+  Harness через Agent Runner: Harness
+  Harness hooks и MCP-прокси Runner: Harness · Hooks
+  Harness (hooks): Harness · Hooks
+  Hooks, агент: Harness · Hooks
+  Hooks, Pause / resume, Policy / stop: Harness
+  hook `before_tool`: Harness · Hooks
+  агент: Harness · Tool Executor
+  Agent Runner и Harness: Agent Runner
+  PostgreSQL 17: Инфраструктура · PostgreSQL 17 + pgvector
+  Postgres: Инфраструктура · PostgreSQL 17 + pgvector
+  «git-провайдер»: MCP / Tools · git-провайдер
+  git в среде агента: Sandbox · Credential helper
+  MCP-прокси Runner: Agent Runner · MCP-прокси
+  MCP-прокси Agent Runner: Agent Runner · MCP-прокси
+  MCP-прокси перед вызовом сервера: Agent Runner · MCP-прокси
+  Guardrails (OPA): Guardrails · OPA
+  Guardrails (аудит): Guardrails
+  Platform module и git (Rego): Platform module
+  Agent Runner (Admission): Agent Runner · Admission
+  Admission после допуска: Agent Runner · Admission
+  Agent Runner (Sandbox claim): Agent Runner · Sandbox claim
+  Sandbox claim перед стартом среды: Agent Runner · Sandbox claim
+  Agent Runner (Run supervisor): Agent Runner · Run supervisor
+  Run supervisor после слотов: Agent Runner · Run supervisor
+  Run supervisor до старта Harness при промахе кэша: Agent Runner · Run supervisor
+  Agent Runner (Finalizer): Agent Runner · Finalizer
+  приём итога `POST /agent-runs/:runId/result`: Agent Runner · Finalizer
+  Agent Runner (Event relay): Agent Runner · Event relay
+  Scheduler → Event relay: Agent Runner · Event relay
+  Poller после claim; Event relay после решения по approve: Agent Runner · Event relay
+  Scheduler после занятия слотов, до создания sandbox: Agent Runner · Scheduler
+  Scheduler по `lease_until`: Agent Runner · Scheduler
+  Poller раз в `poll_interval_ms` по каждому ключу из `agents`: Agent Runner · Poller
+  Pause / resume → Agent Runner: Harness · Pause / resume
+  Context Manager → Memory API: Harness · Context Manager
+  Agent Runner при старте среды: Agent Runner
+  Agent Runner перед созданием sandbox: Agent Runner
+  Agent Runner в конце запуска: Agent Runner
+  Sandbox (среда агента): Sandbox
+  Sandbox (SandboxProvider): Sandbox · SandboxProvider
+  среда агента (`sbx-agent`), контейнер подготовки (`sbx-setup`): Sandbox
+external:
+  Kubernetes CronJob: 'планировщик Kubernetes: запускает периодические задания по расписанию'
+  «провайдер / mock»: внешний LLM-провайдер или mock-LLM (подпись с кавычками)
+  провайдер / mock: внешний LLM-провайдер или mock-LLM
+  «сервисы»: сервисы платформы, которые ходят в БД через PgBouncer
+  «сервисы» (ICPlan, LiteLLM, Memory API, Runner): 'сервисы платформы: ICPlan, LiteLLM, Memory API, Runner'
+  «внешние хосты»: внешние хосты в интернете, куда агент ходит через egress-прокси
+  CI: система непрерывной интеграции (сборка и проверки бандла Rego)
+  внутри: внутренняя операция блока (инициатор не внешний)

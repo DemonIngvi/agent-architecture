@@ -31,8 +31,8 @@ failures:
 why: Зависшие запуски не держат слоты.
 rnd: runaway-protection.md
 ops:
-- {op: определение и настройки версии запуска, endpoint: 'GET /platform/runs/:runId/agent', label: Run supervisor после слотов, via: [I4]}
+- {op: определение и настройки версии запуска, endpoint: 'GET /platform/runs/:runId/agent', who: Run supervisor после слотов, via: [I4]}
 - {op: манифест рабочего пространства, endpoint: 'GET /platform/runs/:runId/manifest', who: Run supervisor, via: [I4]}
 - {op: '`GET /ready`, затем `POST /run` с `RunBundle`; отмена — `POST /run/cancel`', who: Run supervisor, via: [I7]}
 - {op: продление аренды; 404 — отмена, endpoint: 'POST /agent-runs/:runId/heartbeat', who: Run supervisor, via: [I3]}
-- {op: '`PUT`, `GET /runs/:runId/checkpoint` — приём checkpoint цикла в `run_checkpoint`', endpoint: 'GET /runs/:runId/checkpoint', label: 'Harness, токен запуска', via: [I12]}
+- {op: '`PUT`, `GET /runs/:runId/checkpoint` — приём checkpoint цикла в `run_checkpoint`', endpoint: 'GET /runs/:runId/checkpoint', who: 'Harness, токен запуска', via: [I12]}

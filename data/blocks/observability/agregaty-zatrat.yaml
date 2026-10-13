@@ -10,8 +10,8 @@ does:
 - 'Историю берёт из журнала LiteLLM, а не из событий запуска: удаление событий по `retention_days` агрегаты не затрагивает (R-OBS-06)'
 - Не получает цену модели — помечает стоимость «неизвестна», токены учитывает
 io:
-- {dir: ←, label: LiteLLM (spend log), what: записи журнала с `metadata.run_id`, via: [I14]}
-- {dir: →, label: Task UI ICPlan, model: [CostAggregate], what: затраты задачи и сводка, via: [I20]}
+- {dir: ←, with: LiteLLM (spend log), what: записи журнала с `metadata.run_id`, via: [I14]}
+- {dir: →, with: Task UI ICPlan, model: [CostAggregate], what: затраты задачи и сводка, via: [I20]}
 data:
 - {table: LiteLLM_SpendLogs, access: read, why: 'токены и $ по `metadata.run_id` (роль `litellm_read`, владелец — LLM Gateway)'}
 - {table: agent_run, access: read, why: связь `run_id` → задача и агент (владелец — ICPlan)}
@@ -25,6 +25,6 @@ failures:
 why: Один источник правды по деньгам — LiteLLM; свой учёт токенов расходился бы с провайдером.
 rnd: observability.md
 ops:
-- {op: затраты задачи по агентам (`CostAggregate`), endpoint: 'GET /issues/:issueId/costs', label: Task UI ICPlan, via: [I20]}
-- {op: 'сводка по задачам с агентами: время, токены и $', endpoint: GET /me/agent-summary, label: Task UI ICPlan, via: [I20]}
-- {op: статистика запусков агентов и затраты по периодам, endpoint: 'GET /projects/:projectKey/analytics/agent-run-stats', label: Task UI ICPlan, via: [I20]}
+- {op: затраты задачи по агентам (`CostAggregate`), endpoint: 'GET /issues/:issueId/costs', who: Task UI ICPlan, via: [I20]}
+- {op: 'сводка по задачам с агентами: время, токены и $', endpoint: GET /me/agent-summary, who: Task UI ICPlan, via: [I20]}
+- {op: статистика запусков агентов и затраты по периодам, endpoint: 'GET /projects/:projectKey/analytics/agent-run-stats', who: Task UI ICPlan, via: [I20]}

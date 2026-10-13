@@ -25,6 +25,6 @@ failures:
 why: Ключевое преимущество LangGraph перед своим циклом.
 rnd: harness-framework.md
 ops:
-- {op: '`interrupt` перед тулом из `approval.tools` или на вопрос пользователю', label: 'Hooks, агент', internal: true}
+- {op: '`interrupt` перед тулом из `approval.tools` или на вопрос пользователю', who: 'Hooks, агент', internal: true}
 - {op: решение пользователя или ответ на вопрос, endpoint: POST /run/approval, who: Agent Runner, via: [I7]}
-- {op: 'состояние после шага; `GET /runs/:runId/checkpoint` — восстановление', endpoint: 'PUT /runs/:runId/checkpoint', label: Pause / resume → Agent Runner, via: [I12]}
+- {op: 'состояние после шага; `GET /runs/:runId/checkpoint` — восстановление', endpoint: 'PUT /runs/:runId/checkpoint', who: Pause / resume → Agent Runner, via: [I12]}

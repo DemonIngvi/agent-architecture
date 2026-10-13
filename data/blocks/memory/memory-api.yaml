@@ -18,9 +18,9 @@ does:
 io:
 - {dir: ←, with: Harness · Context Manager, what: запрос контекста `GET /context` по задаче и агенту, via: [I11]}
 - {dir: ←, with: Harness · Tool Executor, model: [M3Record], what: 'запись `M3Record` — `PUT /m3/:issueId`', via: [I11]}
-- {dir: ←, label: Администратор, what: 'удаление записи — `DELETE /records/:level/:id`, сервисный токен'}
-- {dir: ←, label: Kubernetes CronJob, what: 'очистка по срокам — `POST /retention/run`, сервисный токен'}
-- {dir: →, label: PostgreSQL 17, what: 'чтение M1, M2 и запись M3 через PgBouncer', via: [I22]}
+- {dir: ←, with: Администратор, what: 'удаление записи — `DELETE /records/:level/:id`, сервисный токен'}
+- {dir: ←, with: Kubernetes CronJob, what: 'очистка по срокам — `POST /retention/run`, сервисный токен'}
+- {dir: →, with: PostgreSQL 17, what: 'чтение M1, M2 и запись M3 через PgBouncer', via: [I22]}
 data:
 - {table: memory_m3, why: 'чтение и запись (владелец — Memory, роль `memory`)'}
 - {table: agent_run, why: чтение итогов запусков (M2) по GRANT (владелец — ICPlan)}
@@ -39,5 +39,5 @@ rnd: memory-model.md
 ops:
 - {op: 'контекст запуска: M1, M2, M3 по профилю памяти — `GET /context`', endpoint: GET /context, who: Harness · Context Manager, via: [I11]}
 - {op: 'запись M3 с проверками — `PUT /m3/:issueId`', endpoint: 'PUT /m3/:issueId', who: Harness · Tool Executor, via: [I11]}
-- {op: 'удаление записи M1–M4 — `DELETE /records/:level/:id`', endpoint: 'DELETE /records/:level/:id', label: Администратор, via: [I11]}
-- {op: очистка M3 по срокам — `POST /retention/run`, endpoint: POST /retention/run, label: Kubernetes CronJob, via: [I11]}
+- {op: 'удаление записи M1–M4 — `DELETE /records/:level/:id`', endpoint: 'DELETE /records/:level/:id', who: Администратор, via: [I11]}
+- {op: очистка M3 по срокам — `POST /retention/run`, endpoint: POST /retention/run, who: Kubernetes CronJob, via: [I11]}
