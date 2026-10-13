@@ -1011,9 +1011,33 @@ def comp_order() -> list:
     return [f.stem for f in ordered(DATA / "components")]
 
 
-def write_unit(path: Path, kind: str, value) -> bool:
-    """Записать единицу (в формате схемы). True — файл изменился."""
-    text = to_yaml(dump_unit(path, kind, value) if kind != "order" else value)
+def ref_ids(node) -> set:
+    """(путь строки, ID) из полей via/reqs/decisions — для проверки, что перевод их не теряет."""
+    out, stack = set(), [((), node)]
+    while stack:
+        path, n = stack.pop()
+        if isinstance(n, dict):
+            for k, x in n.items():
+                if k in ("via", "reqs", "decisions") and isinstance(x, list):
+                    out |= {f"{'.'.join(path)}:{i}" for i in x}
+                else:
+                    stack.append((path + (str(k),), x))
+        elif isinstance(n, list):
+            stack += [(path + (str(i),), x) for i, x in enumerate(n)]
+    return out
+
+
+
+def write_unit(path: Path, kind: str, value, drop_ids=False) -> bool:
+    """Записать единицу (в формате схемы). True — файл изменился.
+    ID из полей via/reqs/decisions не теряются молча: join_ids не повторяет ID, уже стоящий в тексте, и при записи поле
+    пропало бы — такая запись падает; намеренное удаление ID — drop_ids=True."""
+    data = dump_unit(path, kind, value) if kind != "order" else value
+    if path.exists() and not drop_ids and kind != "order":
+        lost = ref_ids(_read(path)) - ref_ids(data)
+        if lost:
+            raise ValueError(f"{path}: запись потеряла бы ID из полей: {', '.join(sorted(lost))} (намеренно — drop_ids=True)")
+    text = to_yaml(data)
     if path.exists():
         text = _header(path) + text
         if path.read_text(encoding="utf-8") == text:
@@ -1384,8 +1408,11 @@ def fmt(path=None) -> list:
         v, errs = load_unit(f, kind)
         if errs:
             continue  # сначала yaml-check
-        if write_unit(f, kind, v):
-            changed.append(f)
+        try:
+            if write_unit(f, kind, v):
+                changed.append(f)
+        except ValueError as e:  # формат потерял бы ID из полей — файл не трогаем
+            print(f"⚠️ {e}")
     for d in {f.parent for f in unit_files(path)}:  # новая единица без _order.yaml в папке, где он есть
         o = d / "_order.yaml"
         if o.exists() and o not in [x for x in unit_files(path)]:

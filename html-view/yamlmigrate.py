@@ -77,10 +77,14 @@ def migrate() -> tuple:
                 errors.append(f"{rel(f)}: " + "; ".join(errs[:3]))
                 continue
             vals[f] = (kind, v)
+        lossy = set()
         for f, (kind, v) in vals.items():  # каталоги (yamlcat) уже собраны из прежнего вида — пишем новый
-            Y.dump_unit(f, kind, v)  # сначала всё собрать: ошибка сборки — до записи
+            lost = Y.ref_ids(Y._read(f)) - Y.ref_ids(Y.dump_unit(f, kind, v))  # сначала всё собрать: ошибка сборки — до записи
+            if lost:  # ID из полей via/reqs/decisions пропал бы (join_ids не повторяет ID, уже стоящий в тексте)
+                lossy.add(f)
+                errors.append(f"{rel(f)}: не записан — пропали бы ID из полей: {', '.join(sorted(lost))}")
         for f, (kind, v) in vals.items():
-            if Y.write_unit(f, kind, v):
+            if f not in lossy and Y.write_unit(f, kind, v):
                 changed.append(rel(f))
     finally:
         Y.LEGACY.clear()
