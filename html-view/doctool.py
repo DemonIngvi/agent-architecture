@@ -7,7 +7,7 @@
     python html-view/doctool.py blocks             заполненность карточек блоков: чего не хватает для реализации
     python html-view/doctool.py approve <страница> <буква> ok|no <комментарий> [--human]  решение роли по документу
     python html-view/doctool.py review-queue [буква]  что ждёт решения роли
-    python html-view/doctool.py review-batch <компонент> [--max 30]  пачка ⏳-страниц: карточки для всех ролей в одном файле
+    python html-view/doctool.py review-batch <комп>[,<комп>…] [--max 40]  пачка ⏳-страниц: карточки для всех ролей в одном файле
     python html-view/doctool.py approve-batch <файл.json>  решения пачки [{page, role, ok, comment}] одним захватом реестра
     python html-view/doctool.py generated <файл>  если файл генерируется — откуда и чем; иначе пусто
     python html-view/doctool.py check             все проверки сборки без сборки сайта (секунды), включая yaml-check
@@ -435,14 +435,17 @@ def main():
         sys.path.insert(0, str(HERE))
         import lint as LN
         import review as RV
-        mx = int(args[args.index("--max") + 1]) if "--max" in args else 30
+        mx = int(args[args.index("--max") + 1]) if "--max" in args else 40
         comp = next(x for x in args if not x.startswith("--") and not x.isdigit())
         res = RV.batch(comp, mx)
-        print("\n".join(f"{p.relative_to(ROOT).as_posix()}: страниц {n}, пар {k}, символов {c}, ≈{c // 3} ток. всего, ≈{c // 3 // max(n, 1)} на страницу"
+        OVH = 19500  # накладные агента без тяжёлых инструментов (Explore / doc-batch-reviewer), замер 2026-10-13
+        print("\n".join(f"{p.relative_to(ROOT).as_posix()}: страниц {n}, пар {k}, символов {c}, ≈{int(c / 1.6)} ток. карточек "
+                        f"(кириллица ≈1,6 симв./ток.); с накладными агента ≈{(int(c / 1.6) + OVH + 100 * n) // max(n, 1)} на страницу"
                         for p, n, k, c, _ in res) or f"{comp}: ⏳ нет")
-        gaps = len(LN.lint().get(comp, []))
-        if gaps:
-            print(f"⚠️ lint {comp}: пробелов {gaps} — роли их не повторяют (python html-view/doctool.py lint {comp})")
+        lg = LN.lint()
+        for cc in comp.split(","):
+            if lg.get(cc):
+                print(f"⚠️ lint {cc}: пробелов {len(lg[cc])} — роли их не повторяют (python html-view/doctool.py lint {cc})")
     elif cmd == "approve-batch":  # решения пачки из JSON одним захватом блокировки реестра
         sys.path.insert(0, str(HERE))
         import approvals as AP

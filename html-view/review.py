@@ -348,14 +348,14 @@ def _role_questions() -> dict:
     return q
 
 
-def batch(comp: str, maxn: int = 30) -> list:
-    """Пачки ⏳-страниц компонента в .review/batch-<компонент>-<N>.md → [(путь, страниц, пар, символов, [(страница, символов)])]."""
+def batch(comp: str, maxn: int = 40) -> list:
+    """Пачки ⏳-страниц компонентов (через запятую) в .review/batch-<компоненты>-<N>.md → [(путь, страниц, пар, символов, [(страница, символов)])]."""
     import sys
     sys.path.insert(0, str(HERE))
     import approvals as A
     pages = {}
     for p, letter in A.queue():
-        if comp_of(p) == comp:
+        if comp_of(p) in comp.split(","):
             pages.setdefault(p, []).append(letter)
     order = list(A.ROLES)
     items = sorted(pages.items())
@@ -364,7 +364,7 @@ def batch(comp: str, maxn: int = 30) -> list:
     for n, i in enumerate(range(0, len(items), maxn), 1):
         chunk = items[i:i + maxn]
         letters = sorted({x for _, ls in chunk for x in ls}, key=order.index)
-        out = HERE / ".review" / f"batch-{comp}-{n}.md"
+        out = HERE / ".review" / f"batch-{comp.replace(',', '+')}-{n}.md"
         jf = out.with_suffix(".json").relative_to(ROOT).as_posix()
         H = [f"# Пачка проверки: {comp} · {n}", "", "Вопросы ролей:", *[f"- {x} {q.get(x, A.ROLES[x])}" for x in letters], "",
              "Правило: отказ (ok=false) — только за блокирующее, с фактом из карточки; ≤2 причины; механику не повторять — её ловит lint. "

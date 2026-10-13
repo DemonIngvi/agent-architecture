@@ -14,7 +14,8 @@
 | [Перенос данных в YAML](#yaml-migration) | [data-methodology.md#yaml](data-methodology.md#yaml) | файл | 900 – 1,3 тыс. | 1,1 тыс. | ✅ | 2026-10-13 |
 | [Перенос правил в методологию и «Справку»](#rules-transfer) | [change-process.md#rules-change](change-process.md#rules-change) | документ | — | 282,0 тыс. | — | 2026-10-13 |
 | [Чтение единицы для правки](#unit-read) | [data-methodology.md#yaml](data-methodology.md#yaml) | блок | — | 240 | — | 2026-10-13 |
-| [tooling](#tooling) | [approval-methodology.md#economy](approval-methodology.md#economy) | инструмент | — | 119,4 тыс. | — | 2026-10-13 |
+| [tooling](#tooling) | [token-costs.md#costs](token-costs.md#costs) | инструмент | — | 359,0 тыс. | — | 2026-10-13 |
+| [review-batch](#review-batch) | [approval-methodology.md#economy](approval-methodology.md#economy) | документ | 1,0 тыс. – 1,5 тыс. | 1,4 тыс. | ✅ | 2026-10-13 |
 
 ## Как замерять {#measure}
 
@@ -83,9 +84,19 @@
 
 ### tooling {#tooling}
 
-Методология: [approval-methodology.md#economy](approval-methodology.md#economy).
+Методология: [token-costs.md#costs](token-costs.md#costs).
 
 | Дата | Единиц | Единица | Токенов | На единицу | Модель | Минут | Статус | Примечание |
 |---|---|---|---|---|---|---|---|---|
 | 2026-10-13 | 1 | инструмент | 92,5 тыс. | 92,5 тыс. | sonnet | 3 | — | учёт расхода токенов (cost.py, data/costs.yaml, страница) |
 | 2026-10-13 | 1 | инструмент | 119,4 тыс. | 119,4 тыс. | opus | 5 | — | пакетная проверка review-batch / approve-batch |
+| 2026-10-13 | 1 | инструмент | 359,0 тыс. | 359,0 тыс. | opus | 20 | — | перенос экономии в methodology (837068b) |
+
+### review-batch {#review-batch}
+
+Методология: [approval-methodology.md#economy](approval-methodology.md#economy).
+
+| Дата | Единиц | Единица | Токенов | На единицу | Модель | Минут | Статус | Примечание |
+|---|---|---|---|---|---|---|---|---|
+| 2026-10-13 | 16 | документ | 53,9 тыс. | 3,4 тыс. | sonnet | 1 | ⚠️ расхождение >2× | пробная пачка Agent Runner: 16 страниц, 47 пар, ✅47; 4 вызова инструментов; карточки ≈9,8 тыс. |
+| 2026-10-13 | 40 | документ | 54,3 тыс. | 1,4 тыс. | sonnet | 2 | ✅ | пачка 40 страниц Harness+Sandbox+MCP (114 пар, ✅106 ❌8), агент Explore (накладные 19,4 тыс.); кириллица ≈2 симв./ток. |

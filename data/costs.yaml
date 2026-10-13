@@ -130,3 +130,32 @@ costs:
   model: opus
   minutes: 5
   note: пакетная проверка review-batch / approve-batch
+- date: '2026-10-13'
+  process: review-batch
+  methodology: approval-methodology.md#economy
+  units: 16
+  unit: документ
+  tokens: 53900
+  model: sonnet
+  minutes: 1
+  expected: [1000, 1500]
+  note: 'пробная пачка Agent Runner: 16 страниц, 47 пар, ✅47; 4 вызова инструментов; карточки ≈9,8 тыс.'
+- date: '2026-10-13'
+  process: tooling
+  methodology: token-costs.md#costs
+  units: 1
+  unit: инструмент
+  tokens: 359000
+  model: opus
+  minutes: 20
+  note: перенос экономии в methodology (837068b)
+- date: '2026-10-13'
+  process: review-batch
+  methodology: approval-methodology.md#economy
+  units: 40
+  unit: документ
+  tokens: 54300
+  model: sonnet
+  minutes: 2
+  expected: [1000, 1500]
+  note: пачка 40 страниц Harness+Sandbox+MCP (114 пар, ✅106 ❌8), агент Explore (накладные 19,4 тыс.); кириллица ≈2 симв./ток.
