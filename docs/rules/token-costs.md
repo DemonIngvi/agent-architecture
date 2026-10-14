@@ -9,14 +9,16 @@
 | Процесс | Методология | Единица | Ожидание на единицу | Последний замер на единицу | Статус | Дата |
 |---|---|---|---|---|---|---|
 | [Проверка ролями (пакет review-pack)](#review-pack) | [approval-methodology.md#economy](approval-methodology.md#economy) | пара документ×роль | 25,0 тыс. – 40,0 тыс. | 26,6 тыс. | ✅ | 2026-10-13 |
-| [Партия правок компонента по замечаниям](#bulk-edit) | [change-process.md#bulk](change-process.md#bulk) | файл | 3,0 тыс. – 10,0 тыс. | 10,5 тыс. | ✅ | 2026-10-13 |
+| [Партия правок компонента по замечаниям](#bulk-edit) | [change-process.md#bulk](change-process.md#bulk) | файл | 3,0 тыс. – 10,0 тыс. | 122,4 тыс. | ⚠️ расхождение >2× | 2026-10-14 |
 | [Перевод отказов в lint](#lint-conversion) | [approval-methodology.md#economy](approval-methodology.md#economy) | замечание | 30,0 тыс. – 60,0 тыс. | 57,6 тыс. | ✅ | 2026-10-13 |
 | [Перенос данных в YAML](#yaml-migration) | [data-methodology.md#yaml](data-methodology.md#yaml) | файл | 60,0 тыс. – 100,0 тыс. | 82,1 тыс. | ✅ | 2026-10-13 |
 | [Перенос правил в методологию и «Справку»](#rules-transfer) | [change-process.md#rules-change](change-process.md#rules-change) | документ | — | 13421,8 тыс. | — | 2026-10-13 |
 | [Чтение единицы для правки](#unit-read) | [data-methodology.md#yaml](data-methodology.md#yaml) | блок | — | 240 | — | 2026-10-13 |
 | [tooling](#tooling) | [data-methodology.md#yaml](data-methodology.md#yaml) | инструмент | 2000,0 тыс. – 20000,0 тыс. | 20079,0 тыс. | ✅ | 2026-10-13 |
 | [review-batch](#review-batch) | [approval-methodology.md#economy](approval-methodology.md#economy) | документ | 4,0 тыс. – 8,0 тыс. | 5,1 тыс. | ✅ | 2026-10-13 |
-| [finding-fix](#finding-fix) | [review-methodology.md#findings](review-methodology.md#findings) | замечание | 250,0 тыс. – 500,0 тыс. | 274,2 тыс. | ✅ | 2026-10-13 |
+| [finding-fix](#finding-fix) | [review-methodology.md#findings](review-methodology.md#findings) | замечание | 250,0 тыс. – 500,0 тыс. | 2307,9 тыс. | ⚠️ расхождение >2× | 2026-10-13 |
+| [rnd](#rnd) | [rnd-methodology.md#greenfield](rnd-methodology.md#greenfield) | документ | 800,0 тыс. – 1500,0 тыс. | 2040,6 тыс. | ✅ | 2026-10-14 |
+| [experiment](#experiment) | [rnd-methodology.md#greenfield](rnd-methodology.md#greenfield) | эксперимент | 1000,0 тыс. – 3000,0 тыс. | 5277,3 тыс. | ✅ | 2026-10-14 |
 
 ## Как замерять {#measure}
 
@@ -55,6 +57,7 @@
 | 2026-10-13 | 49 | файл | 847,9 тыс. | 17,3 тыс. | 16 | 61,9 тыс. | sonnet-5-5 | — | ✅ | каталог участников data/participants.yaml (64 псевдонима, 8 внешних): 128 строк label → with, отрисовка без изменений; yaml-migrate остаток 194→89 |
 | 2026-10-13 | 13 | файл | 632,7 тыс. | 48,7 тыс. | 12 | 60,4 тыс. | sonnet-5-5 | — | ⚠️ расхождение >2× | колонка «Тип» в таблицах параметров (8 видов грамматики), 73 параметра получили тип; parse_decl/value_ok в yamlcat; 9 пояснений из value → note (yaml-fmt) |
 | 2026-10-13 | 41 | файл | 429,0 тыс. | 10,5 тыс. | 8 | 67,5 тыс. | sonnet-5-5 | — | ✅ | остаток yaml-migrate 89→35: 2 правки via, leftovers() без ложных (_HAS, 52 строки); 35 — решения формата (endpoint списком, синонимы access, ?query) |
+| 2026-10-14 | 24 | файл | 2938,1 тыс. | 122,4 тыс. | 36 | 123,1 тыс. | sonnet-5-5 | — | ⚠️ расхождение >2× | актуализация архитектуры по R&D agent-chain: D27, R-AP-24..26, R-MEM-16, R-GRD-11, R-OBS-13, модели ProcessStep/RunResult/M3Record/Run, подзадачи 3.6/3.7/3.9/4.4/4.5, ROADMAP, BACKLOG |
 
 ### Перевод отказов в lint {#lint-conversion}
 
@@ -123,3 +126,20 @@
 | 2026-10-13 | 1 | замечание | 631,1 тыс. | 631,1 тыс. | 14 | 53,4 тыс. | sonnet-5-5 | — | ✅ | Z-SBX-1: тип resources (cpu, memory_mb, disk_gb) в interfaces.md и профиле sandbox; исследование + правка |
 | 2026-10-13 | 2 | замечание | 647,3 тыс. | 323,6 тыс. | 13 | 60,7 тыс. | sonnet-5-5 | — | ✅ | Z-ICP-86 ✅ / Z-ICP-106 📌: версии агента не в MVP (закрепление в 2.3.7, выбор — 4.4); R&D runner-agent-definition Э8/Э10 |
 | 2026-10-13 | 2 | замечание | 548,4 тыс. | 274,2 тыс. | 13 | 46,2 тыс. | sonnet-5-5 | — | ✅ | Observability ❌×2 (R-OBS-05/13): чтение через ICPlan API (I14, I20) — таблица в docs/api/observability.md; перепроверка ролями — шаг 8 |
+| 2026-10-13 | 1 | замечание | 2307,9 тыс. | 2307,9 тыс. | 33 | 86,5 тыс. | sonnet-5-5 | — | ⚠️ расхождение >2× | Memory: уровни M0–M6 без подзадач (замечание владельца) — 2.5.10–12, 2.4.5, статусы схемы; проверка покрытия doctool coverage (507 находок) |
+
+### rnd {#rnd}
+
+Методология: [rnd-methodology.md#greenfield](rnd-methodology.md#greenfield).
+
+| Дата | Единиц | Единица | Токенов | На единицу | Вызовов | Итоговый контекст | Модель | Минут | Статус | Примечание |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 2026-10-14 | 1 | документ | 2040,6 тыс. | 2040,6 тыс. | 39 | 326,9 тыс. | sonnet-5-5 | — | ✅ | R&D agent-chain v3.2: 4 веб-исследования (топологии, самообучение, отрасль, критерии) + документ; локальный эксперимент не включён (невалиден) |
+
+### experiment {#experiment}
+
+Методология: [rnd-methodology.md#greenfield](rnd-methodology.md#greenfield).
+
+| Дата | Единиц | Единица | Токенов | На единицу | Вызовов | Итоговый контекст | Модель | Минут | Статус | Примечание |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 2026-10-14 | 1 | эксперимент | 5277,3 тыс. | 5277,3 тыс. | 103 | 984,2 тыс. | sonnet-5-5 | — | ✅ | локальный эксперимент «один агент vs цепочка» — признан невалидным владельцем (не воспроизводит архитектуру, n=1); урок — valid-experiments-only |

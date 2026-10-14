@@ -325,6 +325,12 @@ def rnd_check(path) -> list:
     «Вывод этапа» и ворота ✅ или ⚠️ (у ⚠️ — 📌 и следующий шаг); раздел «Источники»: ссылка, дата, уровень."""
     t = Path(path).read_text(encoding="utf-8")
     issues = []
+    import build  # слайды deck — тем же разбором, что и при сборке сайта (иначе ошибку видно только в CI)
+    for m in re.finditer(r"^```deck\n(.*?)^```", t, flags=re.S | re.M):
+        try:
+            build.deck_html(m.group(1))
+        except Exception as e:  # noqa: BLE001 — любая ошибка разбора ломает сборку сайта
+            issues.append(f"deck (строка {t[:m.start()].count(chr(10)) + 1}): {type(e).__name__}: {e} — синтаксис deck: docs/rules/rnd-methodology.md")
     for n in range(1, 11):
         m = re.search(rf"^## Э{n}\.(.*?)(?=^## |\Z)", t, flags=re.M | re.S)
         if not m:
