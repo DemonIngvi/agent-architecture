@@ -553,3 +553,15 @@ costs:
   calls: 23
   context: 76548
   note: 'перечни: диапазоны G1…G4 в тексте задачи; 16 блоков todo → подзадачи (13 упомянуты, 3 новые в 2.1)'
+- date: '2026-10-14'
+  process: coverage-fix
+  methodology: change-process.md#bulk
+  units: 7
+  unit: находка
+  tokens: 344344
+  model: sonnet-5-5
+  expected: [3000, 10000]
+  agents: [a895ba28bd18cc7b1]
+  calls: 8
+  context: 47904
+  note: перечни R-GRD-08 (R0/R1/R3 → 4.3.10) и R-MCP-04 (G1–G4 — приёмка 2.4); RTM R-GRD-11
