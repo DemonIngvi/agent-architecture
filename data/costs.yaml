@@ -589,3 +589,15 @@ costs:
   calls: 16
   context: 77305
   note: 'Z-ICP-106: версии агента в MVP (решение владельца) — 2.3.8–2.3.10 (+14 ч), Run.settingsVersionId, R-REG-03 → 2.3'
+- date: '2026-10-14'
+  process: finding-fix
+  methodology: review-methodology.md#findings
+  units: 1
+  unit: замечание
+  tokens: 41246
+  model: sonnet-5-5
+  expected: [250000, 500000]
+  agents: [a31fa76374bae3cec]
+  calls: 4
+  context: 13987
+  note: 'параметры по решению владельца: снимки 30 д, потолок обучения 10% project_month, N=3/T=28, лимиты 8/2/95%'
