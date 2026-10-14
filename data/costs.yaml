@@ -505,3 +505,15 @@ costs:
   calls: 33
   context: 177255
   note: 'шаги 6+8: 7 пачек (правила, задачи, API, R&D, техспеки+истории, компоненты, observability) + перепроверка 3 отказов; очередь ⏳ 144 → 0; ❌ остался 1 (Z-ICP-106 — владелец)'
+- date: '2026-10-14'
+  process: rules-transfer
+  methodology: change-process.md#rules-change
+  units: 11
+  unit: документ
+  tokens: 4637609
+  model: sonnet-5-5
+  expected: [100000, 300000]
+  agents: [a29b8d7968e692e11]
+  calls: 43
+  context: 148548
+  note: 'перенос в methodology: rnd v3.3, approvals, sdd, data, tasks, token-costs, doctool (approvals, catalogs, cli, review, rnd, units, migrate), агент doc-tool-editor; 43 теста'
