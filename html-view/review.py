@@ -82,6 +82,7 @@ def pack(page: str, letter: str) -> Path:
 # ---------------------------------------------------------------- пакетная проверка (approval-methodology.md#economy)
 # Карточка страницы — то, что нужно всем ролям сразу, без ссылок, mermaid и HTML: ~1–1,5 тыс. токенов на документ за все роли.
 CARD_MAX, BLOCK_MAX = 2500, 1500
+TASK_MAX = 6000  # задача: подзадачи и приёмка «сценарий → результат» целиком — иначе роль решает по обрезанной карточке
 _SPEC = {}
 
 
@@ -318,7 +319,7 @@ def card(page: str) -> str:
     kind = rule[0] if rule else "—"
     comp = comp_of(page)
     text = _source(page)
-    budget = BLOCK_MAX if kind == "Блок" else CARD_MAX
+    budget = BLOCK_MAX if kind == "Блок" else TASK_MAX if kind == "Задача" else CARD_MAX
     ids = re.findall(r"\bR-[A-Z]+-\d+\b", text)
     if kind == "Блок":
         u = _yaml(ROOT / f"data/blocks/{comp}/{page.split('/')[2]}.yaml") or {}

@@ -565,3 +565,15 @@ costs:
   calls: 8
   context: 47904
   note: перечни R-GRD-08 (R0/R1/R3 → 4.3.10) и R-MCP-04 (G1–G4 — приёмка 2.4); RTM R-GRD-11
+- date: '2026-10-14'
+  process: review-batch
+  methodology: approval-methodology.md#economy
+  units: 28
+  unit: документ
+  tokens: 604305
+  model: sonnet-5-5
+  expected: [4000, 8000]
+  agents: [a57ae83adb57f7d9d, a69aa912a399a0c01, a34aa55bea6b776c9]
+  calls: 16
+  context: 141356
+  note: 'проверка задач после покрытия: первый прогон по обрезанным карточкам не применён (TASK_MAX 6000), повтор 81 ✅; правила 2 ✅'
