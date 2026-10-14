@@ -280,8 +280,8 @@
 | `docs/rnd/data-stores.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 09b858d0 | Э7 фиксирует I22 через PgBouncer в режиме transaction, проверенный по коду ICPlan и Prisma (D18); отсев по MUST M1–M3; решение согласовано с D18 |
 | `docs/rnd/db-roles-schemas.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | b08f9299 | Э9 сравнивает A–D по П1; выбор схемы на сервис оформлен как D22 (Э10), критерий числа ролей ≤ 4 и один бэкап удерживает стоимость |
 | `docs/rnd/db-roles-schemas.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | b08f9299 | Э6 переносит таблицы Runner и Memory в свои схемы, FK на public.agent_run и public.issue через GRANT REFERENCES; отклонён кластер на сервис как противоречащий D18 |
-| `docs/rnd/dev-deploy-monitoring.md` | В | — | — | — | ⏳ | dcf7f29b | R&D |
-| `docs/rnd/dev-deploy-monitoring.md` | А | — | — | — | ⏳ | dcf7f29b | R&D |
+| `docs/rnd/dev-deploy-monitoring.md` | В | — | — | — | ⏳ | b5c44120 | R&D |
+| `docs/rnd/dev-deploy-monitoring.md` | А | — | — | — | ⏳ | b5c44120 | R&D |
 | `docs/rnd/doc-automation.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 75904ffa | Э1 даёт масштаб (15 файлов, 232 КБ, 59 проверок), Э9 выбирает вариант D с покрытием П1–П6, Э10 отмечает внесённый doctool.py; затраты и польза для владельца понятны. |
 | `docs/rnd/doc-automation.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 75904ffa | Э6 раскладывает слои: doctool.py команды route/check/generated/rnd с источниками (doc-types.md, doc-work.md, build.py); Э7 отсев M1–M3 пройден вариантом D, генерируемое отделено. |
 | `docs/rnd/fork-run-retention.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 865e8bf3 | цена 7 ч (4.7.7 + 2.5.9), срок хранения и история/статистика сохранены, риск по ПДн с условием пересмотра |
