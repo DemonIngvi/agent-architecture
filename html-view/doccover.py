@@ -37,7 +37,7 @@ def covered(title, text):
 
 def expand(s, ranges_only=False):
     codes = set() if ranges_only else set(re.findall(r"\b([A-Z]{1,2}\d)\b", s))
-    for m in re.finditer(r"\b([A-Z]{1,2})(\d)\s*[–-]\s*(?:[A-Z]{1,2})?(\d)\b", s):
+    for m in re.finditer(r"\b([A-Z]{1,2})(\d)\s*(?:[–-]|\.{3}|…)\s*(?:[A-Z]{1,2})?(\d)\b", s):
         for k in range(int(m.group(2)), int(m.group(3)) + 1):
             codes.add(f"{m.group(1)}{k}")
     return codes
@@ -122,7 +122,8 @@ def collect():
                 res.append((comp, f"{rid}: сценарий «{sc}» без подзадачи в {', '.join(tids)}"))
         want = expand(stmt, ranges_only=True)  # перечень задан диапазоном «M0–M6»
         if len(want) >= 3:
-            have = expand(text)
+            full = "\n".join(tf[t].read_text(encoding="utf-8") for t in tids if t in tf)  # диапазон «G1–G4» может стоять в любом месте задачи
+            have = expand(text + "\n" + full)
             for c in sorted(want - have):
                 res.append((comp, f"{rid}: элемент {c} перечня без подзадачи в {', '.join(tids)}"))
     # блоки схем

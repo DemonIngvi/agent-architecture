@@ -541,3 +541,15 @@ costs:
   calls: 10
   context: 19058
   note: 246 строк приёмки «сценарий → результат (R-код)» в 26 задачах; агент упёрся в maxTurns 10 без отчёта — проверено по факту
+- date: '2026-10-14'
+  process: coverage-fix
+  methodology: change-process.md#bulk
+  units: 20
+  unit: находка
+  tokens: 739200
+  model: sonnet-5-5
+  expected: [3000, 10000]
+  agents: [aab7e3a1c6af9693a, a076d34e0a9a5a050]
+  calls: 23
+  context: 76548
+  note: 'перечни: диапазоны G1…G4 в тексте задачи; 16 блоков todo → подзадачи (13 упомянуты, 3 новые в 2.1)'
