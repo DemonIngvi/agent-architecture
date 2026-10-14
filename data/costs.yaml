@@ -613,3 +613,15 @@ costs:
   calls: 20
   context: 108019
   note: 'после переноса версий в MVP и параметров владельца: 59 пар; карточка данных показывает чужие таблицы блоков (журнал LiteLLM, agent_run); аудит guardrails — события run_event'
+- date: '2026-10-14'
+  process: rnd
+  methodology: rnd-methodology.md#layer2
+  units: 1
+  unit: документ
+  tokens: 3012312
+  model: sonnet-5-5
+  expected: [800000, 1500000]
+  agents: [a6801f5667d08e051, a253fdf9a3e06752e, a1f3d51f7c16d4089, a518fbf90ab64b151, a15769068fe713b13]
+  calls: 55
+  context: 392142
+  note: 'R&D dev-deploy-monitoring (D29): контроль токенов в три уровня, конвейер D1→D2, среды; SaaS-выборы переведены в вопросы владельцу'
