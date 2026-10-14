@@ -457,3 +457,15 @@ costs:
   calls: 21
   context: 183360
   note: 'rnd-methodology v3.3: второй слой «техническое решение» (дерево качества, сценарии с response measure, ATAM-lite, fitness, ADR), #no-method, #own-experiment, конструктивный спор; исследование и сверка методологии'
+- date: '2026-10-14'
+  process: rnd
+  methodology: rnd-methodology.md#layer2
+  units: 1
+  unit: документ
+  tokens: 1613109
+  model: sonnet-5-5
+  expected: [800000, 1500000]
+  agents: [a2d0c48a865c1b50a, afbb44e17b2d0d49b, aede7a6c4984502d7]
+  calls: 27
+  context: 227013
+  note: 'agent-chain v3.3: слой 1 — атомарная ценность самообучения, OSS, ограничения, бэкапы; слой 2 — дерево качества, 12 сценариев, варианты 0/A/B/C, ATAM/CBAM-lite, F1–F9, D28; спор ролей конструктивно'
