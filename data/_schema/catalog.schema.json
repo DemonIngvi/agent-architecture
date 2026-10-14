@@ -1463,6 +1463,7 @@
    "description": "файл в docs/rnd",
    "enum": [
     "README.md",
+    "agent-chain.md",
     "agent-workspace.md",
     "autopickup-rules.md",
     "config-storage.md",
