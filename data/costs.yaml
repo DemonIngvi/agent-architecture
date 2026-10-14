@@ -601,3 +601,15 @@ costs:
   calls: 4
   context: 13987
   note: 'параметры по решению владельца: снимки 30 д, потолок обучения 10% project_month, N=3/T=28, лимиты 8/2/95%'
+- date: '2026-10-14'
+  process: review-batch
+  methodology: approval-methodology.md#economy
+  units: 21
+  unit: документ
+  tokens: 470874
+  model: sonnet-5-5
+  expected: [4000, 8000]
+  agents: [a6a8fdc6c9a9a421e, a2b9d6ef9802b3f2c, a52c3394319e1bebc, a88e5b14e26e4e7c6]
+  calls: 20
+  context: 108019
+  note: 'после переноса версий в MVP и параметров владельца: 59 пар; карточка данных показывает чужие таблицы блоков (журнал LiteLLM, agent_run); аудит guardrails — события run_event'

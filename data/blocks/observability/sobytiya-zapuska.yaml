@@ -15,7 +15,7 @@ io:
 - {dir: ←, with: Guardrails (аудит), what: решения G1–G4 как события `CUSTOM` `guardrail_decision`}
 - {dir: →, with: Task UI ICPlan, what: 'чат запуска: поток событий и история', via: [I20]}
 data:
-- {table: run_event, why: 'запись, чтение, очистка по сроку (владелец — Observability, S3)'}
+- {table: run_event, why: 'запись, чтение, очистка по сроку (владелец — Observability, S3); аудит guardrails G1–G4 — те же строки с `type = CUSTOM`, `event.name = guardrail_decision` (точка, правило, агент, `run_id`; R-GRD-16, задача 3.3), отдельной таблицы аудита нет'}
 - {table: issue, access: read, why: 'лента событий по задаче (`issue_id`, владелец — ICPlan)'}
 reqs: [R-OBS-01, R-OBS-02, R-OBS-03, R-OBS-04, R-OBS-06, R-OBS-08, R-OBS-09, R-OBS-10, R-ICP-04, R-GRD-16]
 tasks: ['3.3']

@@ -281,6 +281,14 @@ def _table_lines(comp: str) -> list:
         out.append(f"таблица {f.stem} ({u.get('kind', '')}{', ' + str(u['store']) if u.get('store') else ''}): "
                    + ", ".join(str(c[0]) for c in u.get("columns", []))
                    + (f" · хранение: {_clean(pol['retention'])}" if pol.get("retention") else ""))
+    # чужие таблицы, которые читают или пишут блоки компонента (журнал LiteLLM, agent_run …): без них роль видит только свои
+    seen = set()
+    for f in sorted((ROOT / "data/blocks" / comp).glob("*.yaml")):
+        for r in ((_yaml(f) or {}).get("data") or []) if not f.name.startswith("_") else []:
+            t, why = (r.get("table"), r.get("why", "")) if isinstance(r, dict) else (r[0], r[1] if len(r) > 1 else "") if isinstance(r, list) and r else (None, "")
+            if t and t not in seen:  # строка данных: {table, access, why} или прежний вид [таблица, «чтение: …»]
+                seen.add(t)
+                out.append(f"{t} (блок {f.stem}): {_clean(why)}")
     return out
 
 
