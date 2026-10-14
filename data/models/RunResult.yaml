@@ -8,12 +8,18 @@ fields:
 - {name: artifacts, type: '{name, url}[]', required: false, desc: 'опубликованное для человека: файл в RustFS (`s3://…`), ветка или PR (D20); в M3 — рабочие ссылки `{path, ref}`', decisions: [D20]}
 - {name: gate, type: '{passed: bool, failed: Criterion[]}', required: false, desc: 'проверка по критериям (R-HRN-08, D20): не выполненные критерии', reqs: [R-HRN-08], decisions: [D20]}
 - {name: criteriaNext, type: 'Criterion[]', required: false, desc: 'критерии, предложенные следующему шагу (D20, D26): Runner берёт их из итога Harness; ICPlan при приёме итога создаёт пункты чек-листа задачи с `origin = agent:<username>` и `status` по `criteriaApproval` шага', decisions: [D20, D26]}
+- {name: outcome, type: string | null, required: false, desc: 'исход запуска — `reason` одного из разрешённых `ProcessStep.transitions` шага (`done`, `defect`, `spec_question`, `blocked`); вне списка ICPlan отклоняет (R-AP-24)', reqs: [R-AP-24], decisions: [D27]}
+- {name: returnTo, type: string | null, required: false, desc: 'цель возврата — `ProcessStep.id` из разрешённого перехода при исходе `defect` или `spec_question`', reqs: [R-AP-24], decisions: [D27]}
+- {name: returnNote, type: string | null, required: false, desc: 'заметка адресату возврата: что не так и что проверить; попадает в задание нового запуска, в историю задачи и в `M3Record.notesFor`', reqs: [R-AP-24], decisions: [D27]}
 source:
   kind: fork
   ref: POST /agent-runs/{runId}/result
   part: request
   why: 'Тело, которое форк уже принимает от раннера: `status`, `output`, `error`, `usage` с `inputTokens` и `outputTokens`. Добавляем то, без чего не работают D18 и D20: причину Harness, артефакты, проверку по критериям, стоимость и токены размышлений.'
 planned:
+  outcome: D27
+  returnTo: D27
+  returnNote: D27
   usage: D18 (`reasoningTokens`, `costUsd`, `iterations`)
   reason: R-RUN-07
   artifacts: D20

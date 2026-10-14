@@ -433,3 +433,15 @@ costs:
   calls: 103
   context: 984247
   note: локальный эксперимент «один агент vs цепочка» — признан невалидным владельцем (не воспроизводит архитектуру, n=1); урок — valid-experiments-only
+- date: '2026-10-14'
+  process: bulk-edit
+  methodology: change-process.md#bulk
+  units: 24
+  unit: файл
+  tokens: 2938062
+  model: sonnet-5-5
+  expected: [3000, 10000]
+  agents: [a5f71f5be60546c1a]
+  calls: 36
+  context: 123106
+  note: 'актуализация архитектуры по R&D agent-chain: D27, R-AP-24..26, R-MEM-16, R-GRD-11, R-OBS-13, модели ProcessStep/RunResult/M3Record/Run, подзадачи 3.6/3.7/3.9/4.4/4.5, ROADMAP, BACKLOG'

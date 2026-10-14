@@ -140,6 +140,9 @@
            "issue.process_paused",
            "issue.review_with_me",
            "process.issue_type",
+           "process.max_total_runs",
+           "process.no_progress_rounds",
+           "process.verify_default",
            "project.actions",
            "project.mcp_enabled",
            "protocol.version",
@@ -150,7 +153,8 @@
            "step.column",
            "step.max_runs",
            "step.on_success / on_failure",
-           "step.require_review"
+           "step.require_review",
+           "step.transitions"
           ]
          },
          {

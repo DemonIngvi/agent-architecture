@@ -9,6 +9,7 @@ fields:
 - {name: artifacts, type: '{path, ref}[]', required: false, desc: 'артефакты: путь и ветка@коммит'}
 - {name: questions, type: 'string[]', required: false, desc: открытые вопросы}
 - {name: criteriaNext, type: 'Criterion[]', required: false, desc: 'критерии, предложенные следующему шагу'}
+- {name: notesFor, type: '{step, text}[]', required: false, desc: 'заметки к исходу: адресат (`step` — шаг процесса или он же, себе) и текст; следующий запуск этого шага получает заметку в контексте (R-AP-24, D27)', reqs: [R-AP-24], decisions: [D27]}
 - {name: version, type: int, required: true, desc: версия записи для конкурентной записи}
 source:
   kind: ours

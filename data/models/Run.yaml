@@ -8,11 +8,15 @@ fields:
 - {name: issueId, type: int | null, required: true, desc: задача; `null` — запуск без задачи (расписание)}
 - {name: issueIdentifier, type: string | null, required: true, desc: 'читаемый ключ задачи, `MKT-42`'}
 - {name: rule, type: '{process, stepId}', required: false, desc: 'шаг процесса, создавший запуск, при `trigger = process_step` (D17): `process` — название типа задачи (= процесса), `stepId` — `ProcessStep.id`; иначе поля нет', decisions: [D17]}
+- {name: parentRunId, type: int | null, required: false, desc: 'запуск, после которого создан этот (возврат, повтор шага): по цепочке `parentRunId` считаются круги и стоимость на принятую задачу (R-OBS-13); у первого запуска `null`', reqs: [R-OBS-13], decisions: [D27]}
+- {name: startReason, type: 'enum: first · return · retry · manual', required: false, desc: 'причина запуска: первый вход в шаг, возврат по переходу (R-AP-24), повтор шага (R-AP-21), ручной запуск', reqs: [R-AP-24], decisions: [D27]}
 source:
   kind: fork
   ref: POST /agent-runs/claim
   part: response.run
   why: 'Это ответ форка любому внешнему раннеру: так ICPlan уже выдаёт запуски. `prompt` и `systemPrompt` разделены, потому что раннер передаёт первое как задание, второе — как системные правила. Мы добавляем только `rule` — какой шаг процесса создал запуск (D17): по нему Runner берёт критерии шага, а лента задачи — разделитель шага.'
 planned:
+  parentRunId: D27
+  startReason: D27
   rule: D17
   trigger: D17 (значение `process_step`)

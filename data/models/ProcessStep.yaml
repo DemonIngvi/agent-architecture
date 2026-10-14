@@ -5,6 +5,8 @@ fields:
 - {name: agentId, type: int, required: false, desc: агент шага; нет — ручной шаг}
 - {name: onSuccess / onFailure, type: '{step} · {process} · {done: true}', required: true, desc: 'куда переходит задача: на шаг этого процесса по `id`, на первый шаг другого процесса (тип задачи меняется) или завершается'}
 - {name: maxRuns, type: int, required: false, desc: 'сколько раз шаг может запускаться по одной задаче, 1–10, по умолчанию 3 (R-AP-16); превышен — `onFailure`', reqs: [R-AP-16]}
+- {name: transitions, type: '{reason, to}[]', required: false, desc: 'переходы по причинам (R-AP-24): `reason` из справочника `done · defect · spec_question · blocked`, `to` — шаг процесса, человек или завершение; агент выбирает исход запуска только из них; `spec_question` ведёт к шагу — владельцу знания или к человеку. `onSuccess` / `onFailure` остаются переходами по умолчанию (совместимость с линейным процессом)', reqs: [R-AP-24], decisions: [D27]}
+- {name: maxTotalRuns, type: int, required: false, desc: 'сколько запусков всего может быть по одной задаче в процессе (вся цепочка); значение по умолчанию 8, 1–30, пересмотр по замеру (agent-chain.md, ворота G9); превышен — `onFailure` с причиной «лимит задачи» (R-AP-25)', reqs: [R-AP-25], decisions: [D27]}
 - {name: requireReview, type: bool, required: true, desc: 'итог шага проверяет человек (вердикт), прежде чем задача перейдёт дальше'}
 - {name: deliverable, type: string, required: false, desc: 'что шаг сдаёт: артефакты и формат', decisions: [D20]}
 - {name: doneCriteria, type: 'Criterion[]', required: false, desc: готовность шага, decisions: [D20]}
@@ -13,3 +15,7 @@ source:
   kind: ours
   refs: [D17, D20]
   why: 'Шаг = колонка + агент + переходы (D17) и контракт шага (D20): что сдать и как проверить.'
+
+planned:
+  transitions: D27
+  maxTotalRuns: D27
