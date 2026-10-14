@@ -7,7 +7,7 @@
     python html-view/doctool.py blocks             заполненность карточек блоков: чего не хватает для реализации
     python html-view/doctool.py approve <страница> <буква> ok|no <комментарий> [--human]  решение роли по документу
     python html-view/doctool.py review-queue [буква]  что ждёт решения роли
-    python html-view/doctool.py review-batch <комп>[,<комп>…] [--max 40]  пачка ⏳-страниц: карточки для всех ролей в одном файле
+    python html-view/doctool.py review-batch <комп>[,<комп>…] | --pages <префикс>[,…] [--max 40]  пачка ⏳-страниц (компонента или документов по префиксу пути): карточки для всех ролей в одном файле
     python html-view/doctool.py approve-batch <файл.json>  решения пачки [{page, role, ok, comment}] одним захватом реестра
     python html-view/doctool.py generated <файл>  если файл генерируется — откуда и чем; иначе пусто
     python html-view/doctool.py coverage [комп] [--file]  сценарии требований без подзадачи; todo-блоки схем без задачи, back — без строки BACKLOG (предупреждения)
@@ -454,15 +454,16 @@ def main():
         import lint as LN
         import review as RV
         mx = int(args[args.index("--max") + 1]) if "--max" in args else 40
-        comp = next(x for x in args if not x.startswith("--") and not x.isdigit())
-        lg = LN.lint()
+        pref = args[args.index("--pages") + 1] if "--pages" in args else ""
+        comp = pref or next(x for x in args if not x.startswith("--") and not x.isdigit())
+        lg = {} if pref else LN.lint()  # --pages: страницы вне компонентов, lint-барьер не применяется (общая механика — doctool check)
         dirty = [c for c in comp.split(",") if lg.get(c)]
         if dirty and "--force" not in args:  # механика — до ролей: роли не платят за то, что ловит lint (approval-methodology.md#economy)
             print("\n".join(f"⛔ {c}: пробелов lint {len(lg[c])} — сначала закрыть (python html-view/doctool.py lint {c}); --force — взять всё равно" for c in dirty))
             comp = ",".join(c for c in comp.split(",") if c not in dirty)
             if not comp:
                 sys.exit(1)
-        res = RV.batch(comp, mx)
+        res = RV.batch(comp, mx, pref)
         OVH = 19500  # накладные агента без тяжёлых инструментов (Explore / doc-batch-reviewer), замер 2026-10-13
         print("\n".join(f"{p.relative_to(ROOT).as_posix()}: страниц {n}, пар {k}, символов {c}, ≈{int(c / 1.6)} ток. карточек "
                         f"(кириллица ≈1,6 симв./ток.); с накладными агента ≈{(int(c / 1.6) + OVH + 100 * n) // max(n, 1)} на страницу"
