@@ -52,6 +52,17 @@ def subtasks(path):
     return "\n".join(l for l in m.group(0).splitlines() if re.match(r"\|\s*\d+\.\d+\.\d+", l))
 
 
+def acceptance(path, rid):
+    """Строки раздела «Приёмка» с кодом rid; если код нигде не указан — весь раздел."""
+    s = path.read_text(encoding="utf-8")
+    m = re.search(r"^## Приёмка.*?(?=^## |\Z)", s, re.S | re.M)
+    if not m:
+        return ""
+    ls = [l for l in m.group(0).splitlines() if l.lstrip().startswith(("-", "|"))]
+    mine = [l for l in ls if rid in l]
+    return "\n".join(mine or ls)
+
+
 def task_files():
     d = {}
     for f in TASKS.glob("*.md"):
@@ -103,7 +114,7 @@ def collect():
         for t in tids:
             if t in tf:
                 sub_cache.setdefault(t, subtasks(tf[t]))
-                text += sub_cache[t] + "\n"
+                text += sub_cache[t] + "\n" + acceptance(tf[t], rid) + "\n"  # покрыт подзадачей или строкой приёмки + acceptance(tf[t], rid) + "\n"  # покрыт подзадачей или строкой приёмки
         if not text:
             continue
         for sc in scen:
