@@ -58,7 +58,7 @@ Registry (ICPlan) SHALL хранить ресурсы типов `model`, `skill
 - **WHEN** задача указывает версию, которой нет
 - **THEN** запуск отклоняется с ошибкой версии
 
-**ID:** `R-REG-03` · **Реализует задача:** [4.4](../../../../../docs/tasks/4.4-platform-module.md)
+**ID:** `R-REG-03` · **Реализует задача:** [2.3](../../../../../docs/tasks/2.3-config-from-icplan.md)
 
 <a id="r-reg-04"></a>
 ### Requirement: Источник правды и экспорт

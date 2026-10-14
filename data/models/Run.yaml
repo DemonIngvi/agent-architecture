@@ -10,6 +10,7 @@ fields:
 - {name: rule, type: '{process, stepId}', required: false, desc: 'шаг процесса, создавший запуск, при `trigger = process_step` (D17): `process` — название типа задачи (= процесса), `stepId` — `ProcessStep.id`; иначе поля нет', decisions: [D17]}
 - {name: parentRunId, type: int | null, required: false, desc: 'запуск, после которого создан этот (возврат, повтор шага): по цепочке `parentRunId` считаются круги и стоимость на принятую задачу (R-OBS-13); у первого запуска `null`', reqs: [R-OBS-13], decisions: [D27]}
 - {name: startReason, type: 'enum: first · return · retry · manual', required: false, desc: 'причина запуска: первый вход в шаг, возврат по переходу (R-AP-24), повтор шага (R-AP-21), ручной запуск', reqs: [R-AP-24], decisions: [D27]}
+- {name: settingsVersionId, type: int | null, required: false, desc: 'версия настроек агента, на которой запускать (R-REG-03): `null` — последняя на старте; несуществующая — запуск отклоняется с ошибкой версии; пишется в `agent_run.agent_version`', reqs: [R-REG-03], decisions: [D23]}
 source:
   kind: fork
   ref: POST /agent-runs/claim
@@ -20,3 +21,4 @@ planned:
   startReason: D27
   rule: D17
   trigger: D17 (значение `process_step`)
+  settingsVersionId: D23 (R-REG-03)

@@ -16,7 +16,7 @@ data:
 - {table: agent_settings, access: write, why: текущая версия при откате}
 - {table: ai_agent, access: read, why: определение для хеша и экспорта}
 reqs: [R-CP-04, R-CP-05, R-REG-03, R-REG-04]
-tasks: ['4.4']
+tasks: ['2.3', '4.4']
 failures:
 - {when: Импорт с неверной схемой или ссылкой на несуществующий объект, then: '400, импорт отклоняется с указанием ссылки', reqs: [R-CP-05]}
 - {when: Откат без права `ai_agents`, then: '403', reqs: [R-CP-04]}
