@@ -17,8 +17,10 @@
 | [tooling](#tooling) | [data-methodology.md#yaml](data-methodology.md#yaml) | инструмент | 2000,0 тыс. – 20000,0 тыс. | 20079,0 тыс. | ✅ | 2026-10-13 |
 | [review-batch](#review-batch) | [approval-methodology.md#economy](approval-methodology.md#economy) | документ | 4,0 тыс. – 8,0 тыс. | 5,1 тыс. | ✅ | 2026-10-13 |
 | [finding-fix](#finding-fix) | [review-methodology.md#findings](review-methodology.md#findings) | замечание | 250,0 тыс. – 500,0 тыс. | 2307,9 тыс. | ⚠️ расхождение >2× | 2026-10-13 |
-| [rnd](#rnd) | [rnd-methodology.md#greenfield](rnd-methodology.md#greenfield) | документ | 800,0 тыс. – 1500,0 тыс. | 2040,6 тыс. | ✅ | 2026-10-14 |
+| [rnd](#rnd) | [rnd-methodology.md#layer2](rnd-methodology.md#layer2) | документ | 800,0 тыс. – 1500,0 тыс. | 1613,1 тыс. | ✅ | 2026-10-14 |
 | [experiment](#experiment) | [rnd-methodology.md#greenfield](rnd-methodology.md#greenfield) | эксперимент | 1000,0 тыс. – 3000,0 тыс. | 5277,3 тыс. | ✅ | 2026-10-14 |
+| [rules-change](#rules-change) | [change-process.md#rules-change](change-process.md#rules-change) | документ | 200,0 тыс. – 500,0 тыс. | 999,2 тыс. | ✅ | 2026-10-14 |
+| [arch-change](#arch-change) | [rnd-methodology.md#layer2](rnd-methodology.md#layer2) | последствие | 100,0 тыс. – 300,0 тыс. | 328,2 тыс. | ✅ | 2026-10-14 |
 
 ## Как замерять {#measure}
 
@@ -130,11 +132,12 @@
 
 ### rnd {#rnd}
 
-Методология: [rnd-methodology.md#greenfield](rnd-methodology.md#greenfield).
+Методология: [rnd-methodology.md#layer2](rnd-methodology.md#layer2).
 
 | Дата | Единиц | Единица | Токенов | На единицу | Вызовов | Итоговый контекст | Модель | Минут | Статус | Примечание |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 2026-10-14 | 1 | документ | 2040,6 тыс. | 2040,6 тыс. | 39 | 326,9 тыс. | sonnet-5-5 | — | ✅ | R&D agent-chain v3.2: 4 веб-исследования (топологии, самообучение, отрасль, критерии) + документ; локальный эксперимент не включён (невалиден) |
+| 2026-10-14 | 1 | документ | 1613,1 тыс. | 1613,1 тыс. | 27 | 227,0 тыс. | sonnet-5-5 | — | ✅ | agent-chain v3.3: слой 1 — атомарная ценность самообучения, OSS, ограничения, бэкапы; слой 2 — дерево качества, 12 сценариев, варианты 0/A/B/C, ATAM/CBAM-lite, F1–F9, D28; спор ролей конструктивно |
 
 ### experiment {#experiment}
 
@@ -143,3 +146,19 @@
 | Дата | Единиц | Единица | Токенов | На единицу | Вызовов | Итоговый контекст | Модель | Минут | Статус | Примечание |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 2026-10-14 | 1 | эксперимент | 5277,3 тыс. | 5277,3 тыс. | 103 | 984,2 тыс. | sonnet-5-5 | — | ✅ | локальный эксперимент «один агент vs цепочка» — признан невалидным владельцем (не воспроизводит архитектуру, n=1); урок — valid-experiments-only |
+
+### rules-change {#rules-change}
+
+Методология: [change-process.md#rules-change](change-process.md#rules-change).
+
+| Дата | Единиц | Единица | Токенов | На единицу | Вызовов | Итоговый контекст | Модель | Минут | Статус | Примечание |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 2026-10-14 | 1 | документ | 999,2 тыс. | 999,2 тыс. | 21 | 183,4 тыс. | sonnet-5-5 | — | ✅ | rnd-methodology v3.3: второй слой «техническое решение» (дерево качества, сценарии с response measure, ATAM-lite, fitness, ADR), #no-method, #own-experiment, конструктивный спор; исследование и сверка методологии |
+
+### arch-change {#arch-change}
+
+Методология: [rnd-methodology.md#layer2](rnd-methodology.md#layer2).
+
+| Дата | Единиц | Единица | Токенов | На единицу | Вызовов | Итоговый контекст | Модель | Минут | Статус | Примечание |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 2026-10-14 | 11 | последствие | 3610,6 тыс. | 328,2 тыс. | 40 | 142,3 тыс. | sonnet-5-5 | — | ✅ | D28: AgentSettings learning/snapshots/toolsmith/guardrails, R-CP-15/16, R-MEM-17/18, R-REG-13/14, R-GRD-23..25, R-OBS-14, адаптеры, подзадачи 4.4.23–33, 4.3.8–9, 4.5.8, 3.9.9 |

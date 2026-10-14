@@ -481,3 +481,15 @@ costs:
   calls: 40
   context: 142292
   note: 'D28: AgentSettings learning/snapshots/toolsmith/guardrails, R-CP-15/16, R-MEM-17/18, R-REG-13/14, R-GRD-23..25, R-OBS-14, адаптеры, подзадачи 4.4.23–33, 4.3.8–9, 4.5.8, 3.9.9'
+- date: '2026-10-14'
+  process: finding-fix
+  methodology: review-methodology.md#findings
+  units: 1
+  unit: замечание
+  tokens: 53241
+  model: sonnet-5-5
+  expected: [250000, 500000]
+  agents: [abe52348d2d93457a]
+  calls: 5
+  context: 13115
+  note: 'шаг 5: ошибки API и откат Deploy уже внесены ранее; карточка проверки не видела коды (разбор «ошибки:» → «ошибк\w*»), lint memory 2→0'

@@ -262,7 +262,8 @@ def _endpoint_lines(comp: str) -> list:
     out = []
     for k, e in (_yaml(ROOT / f"data/endpoints/{comp}.yaml") or {}).items():
         note = _clean((e or {}).get("note", ""))
-        err = re.findall(r"\b([45]\d\d)\b", note.split("ошибки:", 1)[1]) if "ошибки:" in note else []
+        m = re.search(r"ошибк\w*", note)  # «ошибки: 401 …», «ошибки в формате …: 401 …», «ошибки (…): 401 …»
+        err = re.findall(r"\b([45]\d\d)\b", note[m.end():]) if m else []
         out.append(f"{k} · {st.get(k, '—')} · {_clean((e or {}).get('response', ''))} · ошибки: {', '.join(dict.fromkeys(err)) or '—'}")
     return out
 
