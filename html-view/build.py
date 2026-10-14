@@ -605,7 +605,8 @@ def check_links() -> list:
     """Битые относительные ссылки в собранных исходниках сайта (О-40)."""
     bad = []
     for f in SRC.rglob("*.md"):
-        t = re.sub(r"```.*?```|`[^`\n]*`", "", f.read_text(encoding="utf-8"), flags=re.S)
+        t = re.sub(r"<!--.*?-->", "", f.read_text(encoding="utf-8"), flags=re.S)
+        t = re.sub(r"```.*?```|`[^`\n]*`", "", t, flags=re.S)
         for m in re.finditer(r"\]\(([^)\s]+)\)", t):
             u = m.group(1).split("#")[0]
             if not u or re.match(r"^(https?:|mailto:)", u):
@@ -617,7 +618,8 @@ def check_links() -> list:
     nav = set(re.findall(r":\s*([^\s'\"]+\.md)", nav_yaml()))
     linked = set()
     for f in SRC.rglob("*.md"):
-        t = re.sub(r"```.*?```|`[^`\n]*`", "", f.read_text(encoding="utf-8"), flags=re.S)
+        t = re.sub(r"<!--.*?-->", "", f.read_text(encoding="utf-8"), flags=re.S)
+        t = re.sub(r"```.*?```|`[^`\n]*`", "", t, flags=re.S)
         for m in re.finditer(r"\]\(([^)\s]+)\)|href=\"([^\"#]+)", t):
             u = (m.group(1) or m.group(2) or "").split("#")[0]
             if u and not re.match(r"^(https?:|mailto:)", u):
@@ -635,6 +637,25 @@ def check_links() -> list:
 
 def write_rnd_consequences():
     """Сводка последствий R&D (Э10): что из исследований внесено, предложено, не требуется (О-35)."""
+    page_file = SRC / "rnd-consequences.md"
+
+    def rewrite_links(text: str, source_file: Path) -> str:
+        return re.sub(r"\]\((?!https?:|#)([^)#]+)(#[^)]*)?\)",
+                      lambda m: "](" + site_link(source_file, m.group(1) + (m.group(2) or "")) + ")",
+                      text)
+
+    def site_link(source_file: Path, raw: str) -> str:
+        if re.match(r"^(https?:|mailto:|#)", raw):
+            return raw
+        path, _, anchor = raw.partition("#")
+        if not path:
+            return raw
+        target = (source_file.parent / path).resolve()
+        root_rel = os.path.relpath(target, ROOT).replace("\\", "/")
+        site_target = (SRC / root_rel).resolve()
+        rel_path = os.path.relpath(site_target, page_file.parent).replace("\\", "/")
+        return rel_path + (f"#{anchor}" if anchor else "")
+
     rows = []
     for f in sorted((ROOT / "docs/rnd").glob("*.md")):
         t = f.read_text(encoding="utf-8")
@@ -648,9 +669,9 @@ def write_rnd_consequences():
             c = [x.strip() for x in re.split(r"(?<!\\)\|", l)[1:-1]]
             if len(c) < 3:
                 continue
-            doc = re.sub(r"\]\((?!https?:|#)([^)#]+)(#[^)]*)?\)",
-                         lambda m: "](" + rel(".", os.path.normpath(os.path.join("docs/rnd", m.group(1)))) + (m.group(2) or "") + ")", c[1])
-            rows.append((c[2][:1], f"[{title}](docs/rnd/{f.name}#e10)", c[0], doc, c[2]))
+            doc = rewrite_links(c[1], f)
+            status = rewrite_links(c[2], f)
+            rows.append((status[:1], f"[{title}](docs/rnd/{f.name}#e10)", c[0], doc, status))
     order = {"📌": 0, "✅": 1}
     rows.sort(key=lambda r: order.get(r[0], 2))
     n = lambda s: sum(1 for r in rows if r[0] == s)
@@ -660,7 +681,7 @@ def write_rnd_consequences():
          f"**Предложено:** {n('📌')} · **внесено или подтверждено:** {n('✅')} · **не требуется:** {len(rows) - n('📌') - n('✅')}", "",
          "| R&D | Изменение | Документ | Статус |", "|---|---|---|---|"]
     L += [f"| {r[1]} | {r[2]} | {r[3]} | {r[4]} |" for r in rows]
-    (SRC / "rnd-consequences.md").write_text("\n".join(L) + "\n", encoding="utf-8")
+    page_file.write_text("\n".join(L) + "\n", encoding="utf-8")
 
 
 def write_pagebar_map():

@@ -7,7 +7,7 @@
 ## 2. Агент работает из ICPlan
 
 - [ ] 2.1 Agent Runner как внешний раннер ICPlan: Первая связь с ICPlan: задачи из очереди ICPlan выполняет наш Harness, а не CLI на машине оператора. Требования: R-ICP-01, R-ICP-02, R-ICP-03, R-ICP-04, R-ICP-07, R-ICP-09 и др.. Подробно: [docs/tasks/2.1-runner-external.md](../../../docs/tasks/2.1-runner-external.md)
-- [ ] 2.3 Конфиг агента из ICPlan + YAML: Пользователь настраивает агента в UI ICPlan; Harness должен брать модель, инструкцию и тулы оттуда, а недостающее (лимиты, approve) — из YAML до появления Platform module. Требования: R-ICP-08, R-REG-02, R-REG-06, R-REG-07, R-REG-08, R-REG-09 и др.. Подробно: [docs/tasks/2.3-config-from-icplan.md](../../../docs/tasks/2.3-config-from-icplan.md)
+- [ ] 2.3 Конфиг агента из ICPlan + YAML: Пользователь настраивает агента в UI ICPlan; Harness должен брать модель, инструкцию и тулы оттуда, а недостающее (лимиты, approve) — из YAML до появления Platform module. Требования: R-ICP-08, R-REG-02, R-REG-03, R-REG-06, R-REG-07, R-REG-08 и др.. Подробно: [docs/tasks/2.3-config-from-icplan.md](../../../docs/tasks/2.3-config-from-icplan.md)
 - [ ] 2.6 E2E: от задачи до итога: Фиксирует, что этап 2 работает целиком и не ломается при следующих доработках. Требования: R-ICP-13, R-RUN-08, R-RUN-14. Подробно: [docs/tasks/2.6-e2e-icplan.md](../../../docs/tasks/2.6-e2e-icplan.md)
 - [ ] 2.7 Планировщик запусков (слоты, режимы): Агентов несколько, они делят модели и могут работать параллельно или только по одному. Требования: R-ICP-03, R-RUN-02, R-RUN-03, R-RUN-04, R-RUN-05, R-RUN-06 и др.. Подробно: [docs/tasks/2.7-runner-scheduler.md](../../../docs/tasks/2.7-runner-scheduler.md)
 

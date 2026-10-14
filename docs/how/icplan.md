@@ -11,7 +11,7 @@
 | 3 | Запуск в очередь | ICPlan → БД ICPlan | `Run` (pending) | — | С1 |
 | 4 | Runner забирает запуск | Agent Runner → ICPlan | `Run` | I1 | С1 |
 | 4а | Runner берёт определение и настройки версии запуска (D23) | Agent Runner → Platform module (в api ICPlan) | `{version, definition: AgentDefinition, settings: AgentSettings}` | I4 | С1 |
-| 5 | Ход работы агента в чат задачи | Agent Runner → ICPlan → Task UI | `RunEvent` → [чат запуска](#agent-feed) | I2 | С1 |
+| 5 | Ход работы агента в чат задачи | Agent Runner → ICPlan → Task UI | `RunEvent` → [чат запуска](../stories/icplan.md#agent-feed) | I2 | С1 |
 | 6 | Подтверждение действия | Пользователь → Task UI → ICPlan → Agent Runner (ответ heartbeat) | `ApprovalDecision` | I20, I3 | С1 |
 | 7 | Итог в задачу | Agent Runner → ICPlan | `RunResult` | I2 | С1 |
 | 8 | Переход задачи по итогу запуска | ICPlan → ICPlan | `process_step.on_success / on_failure` | — | С1 |
