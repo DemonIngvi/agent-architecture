@@ -517,3 +517,27 @@ costs:
   calls: 43
   context: 148548
   note: 'перенос в methodology: rnd v3.3, approvals, sdd, data, tasks, token-costs, doctool (approvals, catalogs, cli, review, rnd, units, migrate), агент doc-tool-editor; 43 теста'
+- date: '2026-10-14'
+  process: coverage-fix
+  methodology: change-process.md#bulk
+  units: 9
+  unit: находка
+  tokens: 38104
+  model: sonnet-5-5
+  expected: [3000, 10000]
+  agents: [a26e786a047acf599]
+  calls: 4
+  context: 12167
+  note: 'пилот: control-plane 9 сценариев → строки приёмки 4.4/4.8'
+- date: '2026-10-14'
+  process: coverage-fix
+  methodology: change-process.md#bulk
+  units: 231
+  unit: находка
+  tokens: 141289
+  model: sonnet-5-5
+  expected: [3000, 10000]
+  agents: [a7e55ff282553d614]
+  calls: 10
+  context: 19058
+  note: 246 строк приёмки «сценарий → результат (R-код)» в 26 задачах; агент упёрся в maxTurns 10 без отчёта — проверено по факту
