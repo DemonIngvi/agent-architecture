@@ -13,6 +13,10 @@ columns:
 - {name: tools_allow, type: jsonb}
 - {name: approval_tools, type: jsonb}
 - {name: scheduling, type: jsonb, desc: 'parallel, max'}
+- {name: learning, type: jsonb, desc: 'режимы обучения по видам (off|suggest|apply_gated), по умолчанию off'}
+- {name: snapshots, type: jsonb, desc: 'снимки: enabled, schedule, retentionDays'}
+- {name: toolsmith, type: bool, desc: агент-инструментальщик вкл/выкл}
+- {name: guardrails, type: jsonb, desc: 'набор О1–О15: включение и параметры'}
 - {name: updated_by, type: text}
 - {name: updated_at, type: timestamptz}
 policy:

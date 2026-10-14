@@ -122,8 +122,10 @@
          {
           "type": "string",
           "enum": [
+           "learning_ttl_days",
            "m2_last_runs",
            "m3_max_kb",
+           "quarantine_n",
            "read",
            "retention",
            "scope",

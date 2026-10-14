@@ -8,7 +8,11 @@ fields:
 - {name: memoryProfile, type: string, required: true, desc: имя профиля памяти}
 - {name: toolsAllow / approvalTools, type: 'string[]', required: true, desc: разрешённые тулы и тулы с подтверждением; в бандл OPA уходят как `tools_allow` и `approval`}
 - {name: scheduling, type: '{parallel, max}', required: false, desc: '`parallel` — сколько запусков агента идёт одновременно; `max` — сколько запусков агента может ждать в очереди'}
+- {name: learning, type: '{facts, playbook, skills, prompt_opt: off|suggest|apply_gated}', required: false, desc: 'режимы самообучения по видам, по умолчанию `off` для всех; эффективное значение — самое строгое из агента, проекта, команды и политики администратора (R-CP-15); выше `suggest` — только при включённых О4, О12, О14; выключение не удаляет накопленное (R-MEM-18, D28)', reqs: [R-MEM-18, R-CP-15]}
+- {name: snapshots, type: '{enabled, schedule, retentionDays}', required: false, desc: 'снимки агента: включены перед каждым применением изменения, расписание, срок хранения (задаёт человек); откат — перенос указателя версии (R-REG-13)', reqs: [R-REG-13]}
+- {name: toolsmith, type: bool, required: false, desc: 'агент-инструментальщик вкл/выкл (по умолчанию выкл); применять созданный тул может только человек (D28, R-GRD-23)', reqs: [R-GRD-23]}
+- {name: guardrails, type: '{O1…O15: {enabled, params}}', required: false, desc: 'каталог ограничений против деградации обучения с параметрами: порог регрессии (О4), TTL (О11), лимит плейбука (О13), карантин N (О12) и др.; администратор может зафиксировать (R-GRD-23)', reqs: [R-GRD-23]}
 source:
   kind: ours
-  refs: [D9, R-CP-04]
+  refs: [D9, D28, R-CP-04]
   why: 'Наши настройки агента, которых нет в ICPlan; источник правды для автономии, бюджета, тулов и профилей. Включён ли агент — не здесь: источник правды один, `ai_agent.enabled` ICPlan (D17, R-ICP-17); аварийная остановка — `kill_switch` (`agent:<id>`). Из них собираются бандл OPA (`OpaBundleData`, имена конфигурации) и файл экспорта (`AgentDefinition`). Версия нужна для отката и для того, чтобы запуск видел настройки версии, закреплённой при первом вызове I4 (D23).'

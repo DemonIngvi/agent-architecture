@@ -130,6 +130,7 @@
            "guardrails.approval",
            "guardrails.approval_timeout",
            "guardrails.tools_allow",
+           "learning.<вид>",
            "limits.max_steps",
            "limits.timeout_s",
            "memory.m2_last_runs",
@@ -144,6 +145,9 @@
            "sandbox.egress_allow",
            "sandbox.pool.size",
            "sandbox_profile",
+           "snapshots.retention_days",
+           "snapshots.schedule",
+           "toolsmith",
            "version"
           ]
          },

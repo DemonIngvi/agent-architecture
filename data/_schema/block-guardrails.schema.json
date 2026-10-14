@@ -130,6 +130,8 @@
            "engine",
            "g1.enabled / g2.enabled / g3.enabled / g4.enabled",
            "kill_switch",
+           "learning.cost_ceiling_usd",
+           "learning.regression_threshold",
            "limits.idle_s",
            "loop.no_progress_steps",
            "loop.repeat_calls",

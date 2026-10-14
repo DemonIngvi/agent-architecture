@@ -469,3 +469,15 @@ costs:
   calls: 27
   context: 227013
   note: 'agent-chain v3.3: слой 1 — атомарная ценность самообучения, OSS, ограничения, бэкапы; слой 2 — дерево качества, 12 сценариев, варианты 0/A/B/C, ATAM/CBAM-lite, F1–F9, D28; спор ролей конструктивно'
+- date: '2026-10-14'
+  process: arch-change
+  methodology: rnd-methodology.md#layer2
+  units: 11
+  unit: последствие
+  tokens: 3610590
+  model: sonnet-5-5
+  expected: [100000, 300000]
+  agents: [addd73bada319dfc6]
+  calls: 40
+  context: 142292
+  note: 'D28: AgentSettings learning/snapshots/toolsmith/guardrails, R-CP-15/16, R-MEM-17/18, R-REG-13/14, R-GRD-23..25, R-OBS-14, адаптеры, подзадачи 4.4.23–33, 4.3.8–9, 4.5.8, 3.9.9'
