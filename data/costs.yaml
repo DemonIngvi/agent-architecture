@@ -493,3 +493,15 @@ costs:
   calls: 5
   context: 13115
   note: 'шаг 5: ошибки API и откат Deploy уже внесены ранее; карточка проверки не видела коды (разбор «ошибки:» → «ошибк\w*»), lint memory 2→0'
+- date: '2026-10-14'
+  process: review-batch
+  methodology: approval-methodology.md#economy
+  units: 76
+  unit: документ
+  tokens: 607880
+  model: sonnet-5-5
+  expected: [4000, 8000]
+  agents: [ac7aa3da2ddbacb35, aa71415f1845eb8d7, a58122c5a2c775f96, a9b7a73ce4ed9c443, a103f82f642e9e8f1, a4c7d0184f824861f, a66805c9b5811f543, a9fc0ac488b3699b1]
+  calls: 33
+  context: 177255
+  note: 'шаги 6+8: 7 пачек (правила, задачи, API, R&D, техспеки+истории, компоненты, observability) + перепроверка 3 отказов; очередь ⏳ 144 → 0; ❌ остался 1 (Z-ICP-106 — владелец)'

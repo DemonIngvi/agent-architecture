@@ -83,9 +83,9 @@
 | `components/icplan/control-plane-ui/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | b13768e0 | Сбой: БД ICPlan недоступна — настройки не сохраняются; проверяемы R-ICP-17 выключение агента, R-ICP-18 проверка в чате, R-REG-06 смена модели. |
 | `components/icplan/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | dc437139 | Повтор: Z-ICP-34/63 закрыты (встроенные в зоне, I4 и decisions в С1), порядок работы с данными и I-кодами |
 | `components/icplan/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | dc437139 | Повтор: Z-ICP-1/71 закрыты (С1 с I4, decisions); потоки, данные, I-коды определены |
-| `components/icplan/registry/index.md` | А | — | — | — | ⏳ | af5bc066 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `components/icplan/registry/index.md` | Р | — | — | — | ⏳ | af5bc066 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `components/icplan/registry/index.md` | Т | — | — | — | ⏳ | af5bc066 | текст изменён после решения «❌» от Claude, роль Тестировщик |
+| `components/icplan/registry/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | af5bc066 | Registry: данные ai_agent, agent_tool, agent_skill заданы, связи Control Plane UI → Registry → Harness через Runner указаны, версии R-REG-03 отделены от Platform module. |
+| `components/icplan/registry/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | af5bc066 | Есть ops (GET/POST/PATCH/DELETE /teams/:teamId/ai-agents), io со входами и выходами, params agent.version, задачи 1.2; 2.3; 4.4 — реализацию можно начинать. |
+| `components/icplan/registry/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | af5bc066 | Шесть требований R-REG-01..06 даны парами «условие→результат»; failures описывает недоступность БД ICPlan и удаление связанного ресурса, R-REG-05 — отказ с указанием. |
 | `components/icplan/run-queue-runner-api/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | d9d4be33 | Run Queue: вход Run от Автоподхвата, выдача Agent Runner по I1 с арендой, agent_run и доработанные поля RunResult принадлежат ICPlan; протокол @itsaplan/runner. |
 | `components/icplan/run-queue-runner-api/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | d9d4be33 | Параметры AGENT_RUN_LEASE_SECONDS=300, AGENT_RUN_MAX_ATTEMPTS=3, runner.offline_after_s; операции POST /agent-runs/claim и events/result; задачи 2.1, 3.3, 3.6. |
 | `components/icplan/run-queue-runner-api/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | d9d4be33 | Сбой: Runner не в сети дольше runner.offline_after_s — агенты «не в сети», запуск ждёт (R-AP-12); R-ICP-03 однократная выдача, R-ICP-09 версия протокола. |
@@ -122,7 +122,7 @@
 | `components/llm-gateway/g4-huki/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 17a9b9e0 | Параметр guardrails (PII, injection, модерация; по умолчанию выключены), операции pre_call и post_call, задача 4.5, R-GRD-05 |
 | `components/llm-gateway/g4-huki/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 17a9b9e0 | Сценарии R-GRD-05: строка похожая на ключ API маскируется до отправки; нарушение модерации — ответ блокируется; чистый промпт без изменений |
 | `components/llm-gateway/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | a0eea543 | Единственный выход к моделям, 11 блоков с хранилищем S6, таблицы LiteLLM_* в БД litellm; статус part «развёрнут, не подключён» честно указан |
-| `components/llm-gateway/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ❌ | a0eea543 | У POST /v1/chat/completions и POST /key/generate ошибки: —, хотя блоки описывают отказы по алиасу (R-LLM-01), лимиту (R-LLM-05), run_id (R-LLM-03) → добавить коды ошибок в interfaces |
+| `components/llm-gateway/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | a0eea543 | Есть 4 операции с кодом и ошибками (POST /v1/chat/completions: 401/400/429; POST /key/generate: 401/400/404), форматы ответов и 4 таблицы LiteLLM с полями; задачи 1.1, 4.5. |
 | `components/llm-gateway/mock-llm/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | d8909a26 | mock подключён только как алиас team-default в model_list (I13), своих данных нет, ссылка на LiteLLM_ProxyModelTable; граница с Алиасами ясна |
 | `components/llm-gateway/mock-llm/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | d8909a26 | Операция /v1/chat/completions со стримом, сценарии YAML (текст, tool_calls, ошибка, задержка), задача 1.1; параметров нет — явно указано |
 | `components/llm-gateway/mock-llm/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | d8909a26 | R-LLM-04: сценарий с tool_call даёт корректный tool_calls, нет совпадения — ответ по умолчанию и запись в логе; сценарий «ошибка» вызывает повтор Harness |
@@ -146,8 +146,8 @@
 | `components/mcp-tools/pravila-r1-r7/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 0fbe3bba | Правила R1–R7: store, таблица в design.md (D2), решение MCP или прямой вызов по R1–R7; связь с itsaplan-core (R3) и project_resource (kind=mcp) названа. |
 | `components/mcp-tools/pravila-r1-r7/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 0fbe3bba | Дана schema таблицы R1–R7 с условиями выбора (R2 тул агента, R3 MCP, R4 нативный Harness), параметры servers/tools, задача 2.4, R-MCP-04, R-MCP-05. |
 | `components/mcp-tools/pravila-r1-r7/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 0fbe3bba | Сбои: интеграция выбрана не по правилам — задача возвращается на ревью; админ-тул у рабочего агента отклоняется; R-MCP-05 список тулов без админ-тулов проверяем. |
-| `components/memory/index.md` | А | — | — | — | ⏳ | f15f2c78 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `components/memory/index.md` | Р | — | — | — | ⏳ | f15f2c78 | текст изменён после решения «✅» от Claude, роль Разработчик |
+| `components/memory/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | f15f2c78 | Хранилища S4/S1 заданы, таблицы m4_fact и memory_m3 с полями и сроками хранения, чтение M1/M2/M5/M6 из ICPlan без дублирования; граница с ICPlan по D25 ясна. |
+| `components/memory/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | f15f2c78 | Четыре операции Memory API (GET /context, PUT /m3/:issueId, DELETE /records/:level/:id, POST /retention/run) с кодами и формой ответа, поля memory_m3 перечислены, задачи 2.5, 2.4, 2.3. |
 | `components/memory/m3-zadachnaya/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 3c9b9320 | M3 задачная: таблица memory_m3 в БД ICPlan, доступ только через Memory API (I11), владелец Memory, роль memory; ключ — задача и область; D20 для передачи. |
 | `components/memory/m3-zadachnaya/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 3c9b9320 | Дана schema memory_m3 (done, next, blockers, artifacts, questions, criteria_next, version), параметры m3_max_kb и retention, PUT /m3/:issueId и GET /context, задача 2.5. |
 | `components/memory/m3-zadachnaya/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 3c9b9320 | Сценарии: параллельная запись — остаётся последняя версия, прежняя в истории (R-MEM-04); запись с секретом или сверх m3_max_kb отклонена (R-MEM-15); сбой очистки описан. |
@@ -193,9 +193,9 @@
 | `components/sandbox/egress-proksi/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 07885620 | достаточно |
 | `components/sandbox/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | a6c9f995 | достаточно |
 | `components/sandbox/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | a6c9f995 | достаточно |
-| `components/sandbox/profil/index.md` | А | — | — | — | ⏳ | 3d710cf5 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `components/sandbox/profil/index.md` | Р | — | — | — | ⏳ | 3d710cf5 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `components/sandbox/profil/index.md` | Т | — | — | — | ⏳ | 3d710cf5 | текст изменён после решения «✅» от Claude, роль Тестировщик |
+| `components/sandbox/profil/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 3d710cf5 | Владелец sandbox_profile — Platform module указан явно (io I4, data чтение), Профиль только применяет ограничения; граница с Deploy Sandbox по изоляции обозначена в schema. |
+| `components/sandbox/profil/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 3d710cf5 | Параметры resources.cpu=1, memory_mb=1024, disk_gb=2, image, runtime=runc заданы со значениями; вход — профиль через Runner (I4), выход — SandboxProvider; задача 2.2. |
+| `components/sandbox/profil/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 3d710cf5 | failures: профиль не найден → отказ до создания контейнера (R-SBX-05), runsc недоступен → причина «runtime недоступен», превышение RAM; R-SBX-05 содержит проверяемый сценарий. |
 | `components/sandbox/sandboxprovider/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | f4bd6ecd | SandboxProvider: интерфейс create/claim/exec/destroy над Docker (этапы 1–3) и K8s (этап 4, I23), вход I6 от Runner, sandbox_profile читается через Runner. |
 | `components/sandbox/sandboxprovider/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | f4bd6ecd | Операции create/exec/destroy через Docker Engine API и Pod в namespace itsaplan-agents, параметры provider=docker, runtime=runc, задачи 2.2 и 4.6. |
 | `components/sandbox/sandboxprovider/index.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | f4bd6ecd | Сбой: API не ответил за 30 с — прерывание, повтор 1 раз, create не повторяется (R-SBX-10); R-SBX-01 изоляция запусков и R-SBX-13 пересоздание пула проверяемы. |
@@ -211,42 +211,42 @@
 | `data-by-component/harness/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 69b3bd65 | достаточно |
 | `data-by-component/harness/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 69b3bd65 | достаточно |
 | `data-by-component/harness/index.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | 69b3bd65 | достаточно |
-| `data-by-component/icplan/index.md` | А | — | — | — | ⏳ | 6b059210 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `data-by-component/icplan/index.md` | Р | — | — | — | ⏳ | 6b059210 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `data-by-component/icplan/index.md` | Д | — | — | — | ⏳ | 6b059210 | текст изменён после решения «✅» от Claude, роль DevOps-инженер |
+| `data-by-component/icplan/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 6b059210 | Эндпоинты помечены new/fork, таблицы agent_run, agent_chat_message, agent_chat_thread с хранением, хранилища S1/S7, задачи 1.2..3.9; связи с Memory и Registry согласованы. |
+| `data-by-component/icplan/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 6b059210 | Для POST /agent-runs/:runId/events, /result, /heartbeat, GET /issues/:issueId/agent-feed указаны коды и ошибки, таблицы fork/new помечены; есть 7 требований R-AP/R-ICP/R-OBS. |
+| `data-by-component/icplan/index.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-14 | ✅ | 6b059210 | Данные ICPlan в S1/S7, у таблиц agent_chat_message/thread есть правила хранения (chat.retention), миграции форка помечены; восстановление идёт по PITR S1, блокеров нет. |
 | `data-by-component/infrastructure/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | f1f26a81 | Блоки Traefik, PgBouncer, PostgreSQL 17, RustFS, бэкап S3 вне узла; хранилища S1–S7, S9 перечислены; вход только HTTPS, связи компонентов заданы |
 | `data-by-component/infrastructure/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | f1f26a81 | Для инфраструктурного компонента входы заданы: GET https://домен/ (web) и /api/* как api ICPlan, задачи 4.6, 4.7, 4.8; сервисных операций не требуется |
 | `data-by-component/infrastructure/index.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | f1f26a81 | Описано, где запущено (k3s один узел, Helm, CNPG, PgBouncer), бэкапы вне узла в S3, секреты и сетевые политики; задачи 4.6 развёртывание, 4.7, 4.8 нагрузка |
 | `data-by-component/llm-gateway/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | f2b3467e | Шлюз единственный выход к моделям, хранилище S6, таблицы LiteLLM_VerificationToken, BudgetTable, SpendLogs с полями; связи с G4 и fallback названы |
-| `data-by-component/llm-gateway/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ❌ | f2b3467e | POST /v1/chat/completions и POST /key/generate с ошибки: — , но R-LLM-01/03/05 требуют отказ по алиасу, run_id и лимиту → указать коды (400/429) и тело ошибки |
+| `data-by-component/llm-gateway/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | f2b3467e | Данные для старта есть: таблицы LiteLLM_VerificationToken, BudgetTable (max_budget, rpm_limit, tpm_limit), SpendLogs с полями, хранилище S6; операции и коды ошибок указаны. |
 | `data-by-component/llm-gateway/index.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | f2b3467e | Статус «развёрнут, не подключён», БД S6 (отдельная база litellm в том же кластере), задачи 1.1 и 4.5, mock-LLM для среды без ключей провайдера |
 | `data-by-component/mcp-tools/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 49fecc37 | Блоки R1–R7, itsaplan-core, git-провайдер; allowlist в MCP-прокси Runner вне sandbox (D19) — граница с Runner и sandbox совпадает с решением D19. |
 | `data-by-component/mcp-tools/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 49fecc37 | POST tools/list возвращает {tools: {name, description, inputSchema}[]}, tools/call даёт McpToolCall (result); вход и выход определены, задача 2.4. |
 | `data-by-component/mcp-tools/index.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | 49fecc37 | Единственное хранилище S1, задача 2.4; MCP-серверы stateless по карточке (tools/list, tools/call), восстановление сводится к перезапуску. |
-| `data-by-component/memory/index.md` | А | — | — | — | ⏳ | 1629d47c | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `data-by-component/memory/index.md` | Р | — | — | — | ⏳ | 1629d47c | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `data-by-component/memory/index.md` | Д | — | — | — | ⏳ | 1629d47c | текст изменён после решения «✅» от Claude, роль DevOps-инженер |
-| `data-by-component/observability/index.md` | А | — | — | — | ⏳ | 45e0fc10 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `data-by-component/observability/index.md` | Р | — | — | — | ⏳ | 45e0fc10 | текст изменён после решения «❌» от Claude, роль Разработчик |
-| `data-by-component/observability/index.md` | Д | — | — | — | ⏳ | 45e0fc10 | текст изменён после решения «✅» от Claude, роль DevOps-инженер |
-| `data-by-component/platform-module/index.md` | А | — | — | — | ⏳ | 0d334729 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `data-by-component/platform-module/index.md` | Р | — | — | — | ⏳ | 0d334729 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `data-by-component/platform-module/index.md` | Д | — | — | — | ⏳ | 0d334729 | текст изменён после решения «✅» от Claude, роль DevOps-инженер |
+| `data-by-component/memory/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 1629d47c | Те же таблицы memory_m3 и m4_fact в схеме platform/S4 с владельцем Memory, чтение ICPlan-таблиц без записи; хранилища S4, S1 и задачи 2.5, 2.4, 2.3 согласованы. |
+| `data-by-component/memory/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 1629d47c | Операции GET /context, PUT /m3/:issueId (409/403/422), DELETE, POST /retention/run с типами ответов и поля memory_m3 (issue_id, version, updated_at) достаточны для старта. |
+| `data-by-component/memory/index.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-14 | ✅ | 1629d47c | Хранение memory.retention для m4_fact и memory_m3 указано (до замены факта, до закрытия задачи), S4 — Postgres ICPlan; восстановление через базовые копии есть. |
+| `data-by-component/observability/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 45e0fc10 | run_event (S3) привязан к run_id и issue_id, хранилища S3/S6/S1 названы, retention_days=90 задан; соседа ICPlan граница не размывает. |
+| `data-by-component/observability/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 45e0fc10 | Есть поля таблицы run_event (run_id, seq, ts, type, event, issue_id), имя настройки retention_days=90 и R-OBS-05 с входами/выходами для затрат. |
+| `data-by-component/observability/index.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-14 | ✅ | 45e0fc10 | Срок хранения retention_days=90 вынесен в настройку observability, данные в S3; Langfuse/Prometheus в бэклоге, развёртывания не требуют. |
+| `data-by-component/platform-module/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 0d334729 | Восемь таблиц схемы platform (S2) перечислены, 25+ эндпоинтов /platform/*, владелец sandbox_profile/memory_profile — модуль; задача 4.4, статус todo честно. |
+| `data-by-component/platform-module/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 0d334729 | Эндпоинты settings, versions, rollback, kill-switch, sandbox-profiles, projects/:projectKey/* имеют методы и коды (200/204/403), таблицы access_policy, agent_settings, kill_switch заданы. |
+| `data-by-component/platform-module/index.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-14 | ✅ | 0d334729 | Все данные модуля в одном хранилище S2 (схема platform), таблицы agent_settings_version и audit дают историю и откат настроек; отдельных сервисов к развёртыванию нет. |
 | `data-by-component/sandbox/index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | dbcbfc2f | достаточно |
 | `data-by-component/sandbox/index.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | dbcbfc2f | достаточно |
 | `data-by-component/sandbox/index.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | dbcbfc2f | достаточно |
-| `docs/api/agent-runner.md` | А | — | — | — | ⏳ | 00089588 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `docs/api/agent-runner.md` | Р | — | — | — | ⏳ | 00089588 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/api/agent-runner.md` | Т | — | — | — | ⏳ | 00089588 | текст изменён после решения «✅» от Claude, роль Тестировщик |
+| `docs/api/agent-runner.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 00089588 | Граница ясна: Runner берёт из очереди ICPlan (R-RUN-01), sandbox из пула (R-SBX-02), хранилища S3,S5, ключи MCP по D19 вне sandbox. |
+| `docs/api/agent-runner.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 00089588 | Есть 5 операций с кодами и ответами (PUT/GET checkpoint, POST mcp/:server, POST deps, healthz), 10 блоков, задачи 2.1, 2.7, 2.6. |
+| `docs/api/agent-runner.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 00089588 | Для POST /runs/:runId/mcp/:server заданы 401/403/404/502, у checkpoint 503; 14 требований (R-RUN-09 отмена, R-RUN-07 статусы) проверяемы по своим карточкам. |
 | `docs/api/guardrails.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | c53af50f | G1–G4 привязаны к Runner, Harness, Sandbox, LiteLLM; хранилища S11, S8, S2, Rego в git и OPA — единый источник правил R-GRD-01. |
 | `docs/api/guardrails.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | c53af50f | POST /v1/data/agent/g1 (400, 500) и g2 возвращают PolicyDecision, GET /health?bundles; on_engine_error и policy_unavailable в R-GRD-07 — настройки названы. |
 | `docs/api/guardrails.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | c53af50f | R-GRD-02 и R-GRD-07 содержат проверяемые сценарии: limit_exceeded без создания sandbox, policy_unavailable при недоступном OPA, таймаут OPA. |
-| `docs/api/harness.md` | А | — | — | — | ⏳ | 5844b8dc | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `docs/api/harness.md` | Р | — | — | — | ⏳ | 5844b8dc | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/api/harness.md` | Т | — | — | — | ⏳ | 5844b8dc | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `docs/api/icplan.md` | А | — | — | — | ⏳ | ec31b345 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `docs/api/icplan.md` | Р | — | — | — | ⏳ | ec31b345 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/api/icplan.md` | Т | — | — | — | ⏳ | ec31b345 | текст изменён после решения «✅» от Claude, роль Тестировщик |
+| `docs/api/harness.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 5844b8dc | Harness отделён от Runner: запуск через POST /run, события NDJSON, пауза по G2 (R-HRN-05); хранилища S10, S5 названы, противоречий с D нет. |
+| `docs/api/harness.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 5844b8dc | Шесть операций (POST /run 202 {runId}, /run/events, /approval, /message, /cancel, GET /ready) с кодами; 8 блоков и задачи 1.3-1.7 дают старт. |
+| `docs/api/harness.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 5844b8dc | R-HRN-01, R-HRN-05, R-HRN-08 содержат сценарии «условие→результат» и сбой (падение процесса, gate_failed); у approval/message есть 409. |
+| `docs/api/icplan.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | ec31b345 | Контракты new/fork разделены, 30 требований R-AP, R-ICP, R-REG, R-OBS-05 привязаны к API; граница Registry/Platform module через R-REG-03/04 не пересекается с чужими данными. |
+| `docs/api/icplan.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | ec31b345 | POST /mcp, /agent-runs/:runId/heartbeat/events/result/stream/decisions, /issues/:issueId/agent-verdict имеют коды ответа и ошибки; хватает для реализации клиента Runner. |
+| `docs/api/icplan.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | ec31b345 | Каждому эндпоинту даны коды ошибок (404 для events, 204 для result), список из 30 требований включает R-ICP-13 отказы зависимостей и R-ICP-07 отмену — проверяемо. |
 | `docs/api/infrastructure.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | e5b694e2 | R-INF-04 фиксирует границу: наружу только web/api через Traefik, адрес LiteLLM даёт 404; R-SBX-05 связывает профиль sandbox с Runner; хранилища S1–S9 перечислены |
 | `docs/api/infrastructure.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | e5b694e2 | Входы GET https://домен/ и /api/* определены, задачи 4.6–4.8; реализация инфраструктуры идёт по Helm-задачам, сервисных операций не нужно |
 | `docs/api/infrastructure.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | e5b694e2 | R-INF-04: HTTP → редирект на HTTPS, запрос на LiteLLM → 404; R-SBX-05: превышение RAM → failed с причиной, несуществующий профиль → отказ до контейнера |
@@ -256,22 +256,22 @@
 | `docs/api/mcp-tools.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 301753b1 | Проверено: allowlist в MCP-прокси Runner вне sandbox (D19), блоки itsaplan-core, git-провайдер, memory, web-research, хранилище S1; граница с Runner и Harness разведена в R-MCP-02 и R-MCP-13. |
 | `docs/api/mcp-tools.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 301753b1 | отказ перепроверки отклонён оркестратором: timeout_s (30, 5–300) и max_result_kb (64, 8–256) заданы в interfaces.md tool-integration (R-MCP-03) |
 | `docs/api/mcp-tools.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 301753b1 | Проверено: R-MCP-02 (тул вне определения → вызов отклоняется), R-MCP-03 (таймаут → ошибка тула, цикл продолжается; ответ обрезается с пометкой), R-MCP-13 (смена колонки отклонена, остальные поля обновлены). |
-| `docs/api/memory.md` | А | — | — | — | ⏳ | 41b4adcc | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `docs/api/memory.md` | Р | — | — | — | ⏳ | 41b4adcc | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/api/memory.md` | Т | — | — | — | ⏳ | 41b4adcc | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `docs/api/observability.md` | А | — | — | — | ⏳ | 52da2a11 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `docs/api/observability.md` | Р | — | — | — | ⏳ | 52da2a11 | текст изменён после решения «❌» от Claude, роль Разработчик |
-| `docs/api/observability.md` | Т | — | — | — | ⏳ | 52da2a11 | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `docs/api/platform-module.md` | А | — | — | — | ⏳ | b80d0f60 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `docs/api/platform-module.md` | Р | — | — | — | ⏳ | b80d0f60 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/api/platform-module.md` | Т | — | — | — | ⏳ | b80d0f60 | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `docs/api/sandbox.md` | А | — | — | — | ⏳ | 01ffff54 | текст изменён после решения «✅» от Claude, роль Архитектор |
-| `docs/api/sandbox.md` | Р | — | — | — | ⏳ | 01ffff54 | текст изменён после решения «❌» от Claude, роль Разработчик |
-| `docs/api/sandbox.md` | Т | — | — | — | ⏳ | 01ffff54 | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `docs/rnd/agent-chain.md` | В | — | — | — | ⏳ | 34fcec4f | R&D |
-| `docs/rnd/agent-chain.md` | А | — | — | — | ⏳ | 34fcec4f | R&D |
-| `docs/rnd/agent-workspace.md` | В | — | — | — | ⏳ | 30a7763d | R&D |
-| `docs/rnd/agent-workspace.md` | А | — | — | — | ⏳ | 30a7763d | R&D |
+| `docs/api/memory.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 41b4adcc | Memory API ограничен чтением M1–M3/M5/M6 и записью M3, удаление строк ICPlan не делает (R-MEM-08: строки agent_run остаются); хранилища S4, S1 согласованы. |
+| `docs/api/memory.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 41b4adcc | GET /context возвращает {m1,m2,m3,m5,m6}, PUT /m3 с 409 при конфликте версии, R-MEM-15 задаёт причины отказа «секрет в записи» и «уровень не разрешён профилем». |
+| `docs/api/memory.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 41b4adcc | R-MEM-04, 05, 07, 08, 15 содержат сценарии: гонка записи M3 (последняя версия, история), N=3 из 10, истёкший срок, дубль run_id — результат каждого проверяем. |
+| `docs/api/observability.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 52da2a11 | Назначение и границы ясны: события запуска S3, аудит S6, агрегаты S1; Langfuse и Prometheus явно вынесены в бэклог; связан с R-OBS-05 и R-OBS-13. |
+| `docs/api/observability.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 52da2a11 | Своего API нет, и карточка это прямо говорит: затраты через I20, события запуска через I2 (API ICPlan); заданы требования R-OBS-05 и R-OBS-13 со сценариями, задача 3.3, хранилища S3/S6/S1. |
+| `docs/api/observability.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 52da2a11 | R-OBS-05 и R-OBS-13 содержат сценарии по модели, задаче и статистике, включая случай «у модели не задана цена» → стоимость «неизвестна». |
+| `docs/api/platform-module.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | b80d0f60 | Данные S2 заданы, настройки агента и профили принадлежат модулю, экспорт/импорт YAML связан с R-REG-04 и R-CP-05; противоречий с Registry нет, задача 4.4. |
+| `docs/api/platform-module.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | b80d0f60 | GET/PATCH /platform/agents/:agentId/settings, export, import, rollback, kill-switch перечислены с кодами; R-CP-01..07 дают поля и проверки, достаточно для старта 4.4. |
+| `docs/api/platform-module.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | b80d0f60 | R-CP-03 (активный запуск остаётся на прежнем профиле), R-CP-07 (участник без права → ошибка доступа), R-CP-05 импорт YAML — результат и отказ определены. |
+| `docs/api/sandbox.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 01ffff54 | Sandbox отделён: изоляция, пул, профиль и egress-прокси; хранилища S10/S7; провайдеры Docker/Kubernetes даны операциями, ключи подставляет прокси — граница с Runner ясна. |
+| `docs/api/sandbox.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 01ffff54 | Операции POST/DELETE Docker и POST Kubernetes с кодами 201/204/403/409/422, R-SBX-14 задаёт манифест /workspace/repo и /workspace/task; задачи 2.2, 4.1, 4.2. |
+| `docs/api/sandbox.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 01ffff54 | R-SBX-01, 04, 05, 14 содержат сценарии отказа: клон вне allowlist, push в защищённую ветку, несуществующий профиль, запись в папку с правом read — всё проверяемо. |
+| `docs/rnd/agent-chain.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 34fcec4f | Э1 привязан к запросу G1 от 13–14.10.2026, потребности П1.. с источниками (Э2), ценность и классы в Э5, спор Э8 и ограничения слоя 1 (каталог из 15) дают выбор владельцу. |
+| `docs/rnd/agent-chain.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 34fcec4f | Выбор оформлен как ADR D28 (следующий после D27), Э9 с опорой и силой, слой 2 шаги 1–7 и fitness-функции F1.. дают связи; противоречия решению D нет, права вынесены в настройки. |
+| `docs/rnd/agent-workspace.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 30a7763d | Э1 задаёт проблему: контейнер одноразовый, права не через промпт; Э9 сравнивает B с A, C, D по П1.., Э10 фиксирует внесение в R-SBX-14, так что владельцу ясно, что выбрано. |
+| `docs/rnd/agent-workspace.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 30a7763d | Э3 вариант B (D18) с функциями F1.. и привязкой к П2, П4; в 'Как встаёт в схему' стык I18 имеет тип И2, отсев Э7 M1–M3 пройден; граница с R-SBX-14 и R-RUN-17 определена. |
 | `docs/rnd/autopickup-rules.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | e0349a00 | цена 7.5-12 дн (3.1+3.6), выбор D17 с опровержением, бэклог зависимостей |
 | `docs/rnd/autopickup-rules.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | e0349a00 | стыки I1/I2/I20, переход делает ICPlan, Runner/Harness не меняются, порядок ICPlan vs слоты Runner разведён; ОВ-2 не блокирует |
 | `docs/rnd/config-storage.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | b220b4b1 | Выбор БД ICPlan + YAML (Э3, D9) закрывает П1 «админ без разработчика»; Э9 сравнивает с git и отдельным API, отложенное попало в бэклог (Э10) |
@@ -280,8 +280,8 @@
 | `docs/rnd/data-stores.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 09b858d0 | Э7 фиксирует I22 через PgBouncer в режиме transaction, проверенный по коду ICPlan и Prisma (D18); отсев по MUST M1–M3; решение согласовано с D18 |
 | `docs/rnd/db-roles-schemas.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | b08f9299 | Э9 сравнивает A–D по П1; выбор схемы на сервис оформлен как D22 (Э10), критерий числа ролей ≤ 4 и один бэкап удерживает стоимость |
 | `docs/rnd/db-roles-schemas.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | b08f9299 | Э6 переносит таблицы Runner и Memory в свои схемы, FK на public.agent_run и public.issue через GRANT REFERENCES; отклонён кластер на сервис как противоречащий D18 |
-| `docs/rnd/doc-automation.md` | В | — | — | — | ⏳ | 75904ffa | R&D |
-| `docs/rnd/doc-automation.md` | А | — | — | — | ⏳ | 75904ffa | R&D |
+| `docs/rnd/doc-automation.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 75904ffa | Э1 даёт масштаб (15 файлов, 232 КБ, 59 проверок), Э9 выбирает вариант D с покрытием П1–П6, Э10 отмечает внесённый doctool.py; затраты и польза для владельца понятны. |
+| `docs/rnd/doc-automation.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 75904ffa | Э6 раскладывает слои: doctool.py команды route/check/generated/rnd с источниками (doc-types.md, doc-work.md, build.py); Э7 отсев M1–M3 пройден вариантом D, генерируемое отделено. |
 | `docs/rnd/fork-run-retention.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 865e8bf3 | цена 7 ч (4.7.7 + 2.5.9), срок хранения и история/статистика сохранены, риск по ПДн с условием пересмотра |
 | `docs/rnd/fork-run-retention.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 865e8bf3 | удаляет владелец таблицы (D22), Memory только SELECT и фильтр, M3 через retention/run, границы сроков и FK к run_event учтены |
 | `docs/rnd/guardrails-engine.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | bfd39326 | OPA v1.21.1 выбран за один REST API для Go и Python (Э5, П1); Cedar/Casbin/OpenFGA сравнены в Э9; ошибка по Cedar исправлена (Э10) |
@@ -298,60 +298,60 @@
 | `docs/rnd/load-profile.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 521689a5 | Э6 ссылается на D15 и R-INF-01; восстановление через WAL вне узла (Э7 M3); различие оценок и замеров признано, лимиты планировщика зависят от профиля |
 | `docs/rnd/mcp-vs-direct.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | b9c3200f | Гибрид по R-MCP-04 даёт подключение систем без кода (П1) и без раздувания контекста; MCP-шлюз сведён к MCP-прокси Runner по D19, Э10 отмечено решённым |
 | `docs/rnd/mcp-vs-direct.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | b9c3200f | Э7 разводит прямой путь и MCP-прокси Runner; проверка allowlist и G2 для MCP вне sandbox закреплена в D19; секреты MCP остаются вне sandbox |
-| `docs/rnd/memory-model.md` | В | — | — | — | ⏳ | 04690285 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/rnd/memory-model.md` | А | — | — | — | ⏳ | 04690285 | текст изменён после решения «✅» от Claude, роль Архитектор |
+| `docs/rnd/memory-model.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 04690285 | Э9 сравнивает M0–M6 с Mem0, LangMem, Letta, Graphiti по потребности П1; Э10 фиксирует последствие «M4 в BACKLOG ✅», выбор — своя Memory API, свои сервисы не вводятся. |
+| `docs/rnd/memory-model.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 04690285 | Э7 показывает стык I11 Harness → Memory API через REST и запрет прямого доступа к БД (D18); решение опирается на D4 и D17, противоречий нет. |
 | `docs/rnd/observability.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | a3760256 | Таблица run_event (Э3 F1, D12) закрывает П1 таймлайн в задаче по R-OBS-02 без новых сервисов на MVP; Langfuse/Phoenix/Opik отложены, OTel GenAI внесено в Э10 |
 | `docs/rnd/observability.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | a3760256 | Э7: I2 события → ICPlan с seq, второй получатель допустим как экспорт; решение D12, R-OBS-01..06; хранение в схеме platform, маскирование на записи |
 | `docs/rnd/platform-module-screens.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 16d43b38 | 30 ч подзадач 4.4, раскладка по уровням, риск God mode и условия пересмотра названы |
 | `docs/rnd/platform-module-screens.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 16d43b38 | таблицы и эндпоинты по уровням, права ai_agents, @/cloud без правок, правки двух файлов форка и PR в upstream; ОВ-agent-registry-2 не блокирует |
-| `docs/rnd/rag.md` | В | — | — | — | ⏳ | 1d9772fa | R&D |
-| `docs/rnd/rag.md` | А | — | — | — | ⏳ | 1d9772fa | R&D |
-| `docs/rnd/rnd-methodology-choice.md` | В | — | — | — | ⏳ | 1ad6d93e | R&D |
-| `docs/rnd/rnd-methodology-choice.md` | А | — | — | — | ⏳ | 1ad6d93e | R&D |
-| `docs/rnd/run-view.md` | В | — | — | — | ⏳ | b4da9c90 | R&D |
-| `docs/rnd/run-view.md` | А | — | — | — | ⏳ | b4da9c90 | R&D |
-| `docs/rnd/runaway-protection.md` | В | — | — | — | ⏳ | 43cde392 | R&D |
-| `docs/rnd/runaway-protection.md` | А | — | — | — | ⏳ | 43cde392 | R&D |
-| `docs/rnd/runner-agent-definition.md` | В | — | — | — | ⏳ | 8add5d87 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/rnd/runner-agent-definition.md` | А | — | — | — | ⏳ | 8add5d87 | текст изменён после решения «✅» от Claude, роль Архитектор |
+| `docs/rnd/rag.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 1d9772fa | Э1 спрашивает про RAG на MVP без нового сервиса; Э9 по П1 сравнивает «Без RAG (MVP)» с pgvector и Qdrant, Э10 кладёт гибридный поиск в BACKLOG, опора R-MEM-01 (M6). |
+| `docs/rnd/rag.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 1d9772fa | Опорное F1 get_document (MCP ICPlan) закрывает П1 и П3, Э6 ссылается на R-MCP-13 и R-HRN-17, Э7 M1–M3 пройден; граница: M6 документы сейчас, M4 факты после MVP. |
+| `docs/rnd/rnd-methodology-choice.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 1ad6d93e | Э1 исходит из 18 R&D и замечаний владельца от 11.10.2026; Э9 сравнивает остаться на v2, одну методику и v3.1 по П1.., Э10 фиксирует внесение v3.1 в правило R&D. |
+| `docs/rnd/rnd-methodology-choice.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 1ad6d93e | Э3 разбирает функции v2 и недостающее, Э4 по пяти группам методик (Stage-Gate, Kano, IRL/SRL), Э6 переносит ворота G1–G10; обязательные П7, П8 в Э7 отсеяны; границы с правилом R&D ясны. |
+| `docs/rnd/run-view.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | b4da9c90 | Э1 опирается на замечание владельца про чат с этапами рассуждений; Э9 выбирает вариант C (AG-UI, D21) с полным покрытием П1–П8, а в Э8 учтено опасение 'лента длинная'. |
+| `docs/rnd/run-view.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | b4da9c90 | Э3 проверен по коду форка (коммит 28ea228f, OpenAPI 1.3.0), Э6 сопоставляет элементы ленты с событиями AG-UI, Э10 вносит D21 в design; события RunEvent и D18 events.level согласованы. |
+| `docs/rnd/runaway-protection.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 43cde392 | Э1 показывает риск трат (бюджет LiteLLM срабатывает поздно, судья стоит денег); Э5 и Э7 выбирают детерминированные проверки без затрат, Э10 добавляет подзадачу 1.6.5 с пересчётом оценки. |
+| `docs/rnd/runaway-protection.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 43cde392 | Э3 фиксирует проверки F1–F7 в Harness (loop.repeat_calls 3) и бюджеты LiteLLM, Э6 ссылается на D6, D18, R-GRD-09–15; Э9 по П1 уточняет цикл как тот же тул, аргументы и результат. |
+| `docs/rnd/runner-agent-definition.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 8add5d87 | Э1 ставит проблему: claim отдаёт только prompt/systemPrompt, а RunBundle.agent требует модель, навыки, MCP (П1, R-REG-02); Э9 сравнивает 0, A, B, C — выбор для владельца виден. |
+| `docs/rnd/runner-agent-definition.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 8add5d87 | Э3 опирается на код (runner/service.ts, buildSystemPrompt, класс А), Э4 на D3, D9, D18, D22 и спеки agent-registry, control-plane; Э7 держит MUST П1 и П4; граница claim и Registry определена. |
 | `docs/rnd/runner-and-scheduling.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 1c28186c | Выбор и последствия показаны |
 | `docs/rnd/runner-and-scheduling.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 1c28186c | Стыки I1-I3 разобраны |
 | `docs/rnd/sandbox-isolation.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 740292bf | достаточно |
 | `docs/rnd/sandbox-isolation.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-13 | ✅ | 740292bf | достаточно |
-| `docs/rnd/step-contract.md` | В | — | — | — | ⏳ | 140bc29a | R&D |
-| `docs/rnd/step-contract.md` | А | — | — | — | ⏳ | 140bc29a | R&D |
+| `docs/rnd/step-contract.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 140bc29a | Э1 передаёт замечание владельца о критериях от процесса и агентов, раздел подтверждения разбирает сценарии O1.. с оценкой настраиваемости; Э9 выбирает B (контракт шага), Э10 фиксирует D20. |
+| `docs/rnd/step-contract.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 140bc29a | Э3 исходит из R-AP-06 и D18 (чек-лист у человека), Э6 задаёт Контракт шага с колонками 'Кто задаёт' и 'Где хранится', Э7 M1–M3 включая происхождение пройден; D20 внесено по цепочке. |
 | `docs/rnd/tracker-choice.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-12 | ✅ | ed65e738 | повторная проверка: Z-ICP-52 закрыт; AGPL ждёт владельца |
 | `docs/rnd/tracker-choice.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-12 | ✅ | ed65e738 | повторная проверка: Z-ICP-52 закрыт; AGPL — решение владельца |
 | `docs/rnd/us-analogs-agent-tracker.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-12 | ✅ | f6b5a75d | повторная проверка: Z-ICP-53 закрыт |
 | `docs/rnd/us-analogs-agent-tracker.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-12 | ✅ | f6b5a75d | повторная проверка: Z-ICP-53 закрыт |
-| `docs/rules/api-methodology.md` | В | — | — | — | ⏳ | 7fcc3990 | Методология |
-| `docs/rules/api-methodology.md` | А | — | — | — | ⏳ | 7fcc3990 | Методология |
-| `docs/rules/approval-methodology.md` | В | — | — | — | ⏳ | 34d33a9c | Методология |
-| `docs/rules/approval-methodology.md` | А | — | — | — | ⏳ | 34d33a9c | Методология |
-| `docs/rules/architecture-methodology.md` | В | — | — | — | ⏳ | 03347175 | Методология |
-| `docs/rules/architecture-methodology.md` | А | — | — | — | ⏳ | 03347175 | Методология |
-| `docs/rules/block-methodology.md` | В | — | — | — | ⏳ | c89c4621 | Методология |
-| `docs/rules/block-methodology.md` | А | — | — | — | ⏳ | c89c4621 | Методология |
-| `docs/rules/data-methodology.md` | В | — | — | — | ⏳ | 39f457d2 | Методология |
-| `docs/rules/data-methodology.md` | А | — | — | — | ⏳ | 39f457d2 | Методология |
-| `docs/rules/decision-methodology.md` | В | — | — | — | ⏳ | 0af1d5d9 | Методология |
-| `docs/rules/decision-methodology.md` | А | — | — | — | ⏳ | 0af1d5d9 | Методология |
-| `docs/rules/review-methodology.md` | В | — | — | — | ⏳ | 00fb603f | Методология |
-| `docs/rules/review-methodology.md` | А | — | — | — | ⏳ | 00fb603f | Методология |
-| `docs/rules/rnd-methodology.md` | В | — | — | — | ⏳ | 129463cf | Методология |
-| `docs/rules/rnd-methodology.md` | А | — | — | — | ⏳ | 129463cf | Методология |
-| `docs/rules/sdd-methodology.md` | В | — | — | — | ⏳ | 56577938 | Методология |
-| `docs/rules/sdd-methodology.md` | А | — | — | — | ⏳ | 56577938 | Методология |
-| `docs/rules/structure-methodology.md` | В | — | — | — | ⏳ | 3236614f | Методология |
-| `docs/rules/structure-methodology.md` | А | — | — | — | ⏳ | 3236614f | Методология |
-| `docs/rules/support-docs-methodology.md` | В | — | — | — | ⏳ | ebbf9293 | Методология |
-| `docs/rules/support-docs-methodology.md` | А | — | — | — | ⏳ | ebbf9293 | Методология |
-| `docs/rules/task-methodology.md` | В | — | — | — | ⏳ | 54fbc54b | Методология |
-| `docs/rules/task-methodology.md` | А | — | — | — | ⏳ | 54fbc54b | Методология |
-| `docs/rules/tech-spec.md` | В | — | — | — | ⏳ | ca2d288e | Методология |
-| `docs/rules/tech-spec.md` | А | — | — | — | ⏳ | ca2d288e | Методология |
-| `docs/rules/us-methodology.md` | В | — | — | — | ⏳ | 2ab78054 | Методология |
-| `docs/rules/us-methodology.md` | А | — | — | — | ⏳ | 2ab78054 | Методология |
+| `docs/rules/api-methodology.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 7fcc3990 | Раздел «Назначение и читатель» отвечает на оценку объёма доработок форка ICPlan; статус 🛠 берётся из `icplan_openapi.json`, не по памяти. |
+| `docs/rules/api-methodology.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 7fcc3990 | Граница с данными: пути в `docs/api/<компонент>.md`, ошибки 403/404/409 в `ENDPOINT_IO` (Z-ICP-4); связь «Методология данных и интеграций» указана. |
+| `docs/rules/approval-methodology.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 34d33a9c | Раздел «Экономная проверка»: около 1,1 млн токенов на две проверки ICPlan; раздел «Готовность документа» — все роли ✅, это видно владельцу. |
+| `docs/rules/approval-methodology.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 34d33a9c | Таблица «Кто подтверждает какой документ»: `index.md` — А, В; реестр `docs/approvals.md` и `approvals.sync` описаны, границу с lint задаёт «Проверки в сборке». |
+| `docs/rules/architecture-methodology.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 03347175 | «Назначение и читатель»: новичок за 10 минут понимает платформу; чек-лист требует D-номер и ссылку на R&D у сквозного решения. |
+| `docs/rules/architecture-methodology.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 03347175 | Раздел «Из чего состоит»: C1/C2 по Simon Brown, одна схема — один уровень, стрелки с I-кодом; «Типичные ошибки» О-49, О-50 закрыты ссылками, не копиями. |
+| `docs/rules/block-methodology.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | c89c4621 | Раздел «Готовность блока к реализации»: карточка заполнена (`./tools/doc blocks`), нет открытых вопросов, роли подтвердили — видно на странице блока. |
+| `docs/rules/block-methodology.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | c89c4621 | Таблица «Блок, встроенный блок, компонент»: свой контракт наружу (I-код) — нет / iface / да; `block_check` проверяет ссылки на I-коды, таблицы и R-коды. |
+| `docs/rules/data-methodology.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 39f457d2 | «Типичные ошибки» О-45 (модель по замыслу, не по коду ICPlan: Run, RunResult) учтена; «Назначение и читатель» объясняет, что и почему хранится. |
+| `docs/rules/data-methodology.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 39f457d2 | «Правило имён»: camelCase как в OpenAPI 1.3.0 (`issueId`, `issueIdentifier`); `IG.check` сверяет I-коды с `interfaces.md` в обе стороны, `db_check` — схемы с DATABASES. |
+| `docs/rules/decision-methodology.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 0af1d5d9 | «Как вести» п.2: вопрос, решение, почему — кратко, без копий таблиц R&D; основа ADR Nygard (контекст → решение → последствия). |
+| `docs/rules/decision-methodology.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 0af1d5d9 | «Из чего состоит»: `### Dn. Название`, номера не переиспользуются; «Проверки в сборке» — строки Э10 со статусом и проверка якорей ссылок на D. |
+| `docs/rules/review-methodology.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 00fb603f | «Типичные ошибки» О-1 (сквозные замечания не попали в спеки); «Проверки в сборке»: потолок готовности 90 при открытом ревью виден владельцу. |
+| `docs/rules/review-methodology.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 00fb603f | «Как вести» п.1–2: у замечания ID и спека, «ни к чему не относится» = ошибка границ; ❓/📌 → `open-questions.md` спеки, findings в `docs/reviews/findings/<компонент>.md`. |
+| `docs/rules/rnd-methodology.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 129463cf | Шапка: версия 3.3 от 2026-10-14, решение владельца; раздел «Микропрезентация» требует слайд «Объём доработки», Э5 «Ценность» даёт основу выбора по стоимости. |
+| `docs/rules/rnd-methodology.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 129463cf | «Цепочка этапов» Э1 (G1) … Э10 «Последствия»: вход каждого этапа — выход предыдущего; раздел «Архитектурное решение» связывает R&D со слоем решения D. |
+| `docs/rules/sdd-methodology.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 56577938 | Таблица «Практики»: OpenSpec, Spec Kit, SDD 2026 с привязкой к `openspec/changes/*/specs/*/spec.md`; «Шаблоны EARS» с примером про LLM Gateway. |
+| `docs/rules/sdd-methodology.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 56577938 | Практики сопоставлены с артефактами (`validate --strict`, Requirement / Scenario, SHALL / MUST) — данные спеки определены; противоречий с решениями D в карточке нет. |
+| `docs/rules/structure-methodology.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 3236614f | «Как вести»: новый компонент — все 10 вкладок сразу (`data/components/<к>.yaml`, строка в `_order.yaml`), что исключает недоделки. |
+| `docs/rules/structure-methodology.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 3236614f | Таблица «Вкладки компонента и откуда они формируются»: источники `data/hosts.yaml`, `docs/how/<к>.md`, `data/blocks/<к>/*.yaml`; проверки `tooling_check`, `connectivity_check`. |
+| `docs/rules/support-docs-methodology.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | ebbf9293 | Основа Diátaxis: справка — путеводитель; «Как вести» п.2: технология — строка в `TECHNOLOGIES` с кольцом и ссылкой на R&D, отказ — Hold с причиной. |
+| `docs/rules/support-docs-methodology.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | ebbf9293 | «Из чего состоит»: источники страниц `html-view/home.md`, `architecture.md`, `docs/data-types.md`; чек-лист: в «Справке» нет страниц про наши компоненты (О-46). |
+| `docs/rules/task-methodology.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 54fbc54b | «Как вести» п.2: оценка диапазоном, сумма подзадач сходится с оценкой, нумерация N.M.1 (Z-ICP-60); таблица оценок: человек, агент, токены. |
+| `docs/rules/task-methodology.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 54fbc54b | «Проверки в сборке»: `check_req_tasks` — трассировка в обе стороны, `tasksmd.check` — tasks.md = Roadmap; «Типичные ошибки» О-2 (задача без требования). |
+| `docs/rules/tech-spec.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | ca2d288e | «Назначение и читатель»: правило появилось из отклонения О-17 (техника поставки не описана); читатель — Build & Release, DevOps, безопасность. |
+| `docs/rules/tech-spec.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | ca2d288e | «Типичные ошибки» О-52: порядок работы в Deploy не пишется, он в `docs/how/<компонент>.md`; «Проверки в сборке» — пять обязательных разделов, заголовок «Deploy: …». |
+| `docs/rules/us-methodology.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 2ab78054 | Шаг «7а. Фильтр необходимости» (три вопроса до записи истории) отсекает лишние истории; шаг «0. Идея компонента» задаёт ценность от JTBD. |
+| `docs/rules/us-methodology.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 2ab78054 | Шаг «7б. Сквозная трассировка»: история ICPlan проходит через истории других компонентов; шаг «8. Проверки покрытия» — матрица «персона × компонент». |
 | `docs/stories/agent-runner.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 59c7108a | Ценность историй ясна |
 | `docs/stories/agent-runner.md` | И | Claude, роль Аналитик историй | 🤖 | 2026-10-13 | ✅ | 59c7108a | Действия и сбои описаны |
 | `docs/stories/agent-runner.md` | П | Claude, роль Пользователь | 🤖 | 2026-10-13 | ✅ | 59c7108a | Задача пользователя решается |
@@ -361,9 +361,9 @@
 | `docs/stories/harness.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | d62dc5a0 | достаточно |
 | `docs/stories/harness.md` | И | Claude, роль Аналитик историй | 🤖 | 2026-10-13 | ✅ | d62dc5a0 | достаточно |
 | `docs/stories/harness.md` | П | Claude, роль Пользователь | 🤖 | 2026-10-13 | ✅ | d62dc5a0 | достаточно |
-| `docs/stories/icplan.md` | В | — | — | — | ⏳ | c3565bc5 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/stories/icplan.md` | И | — | — | — | ⏳ | c3565bc5 | текст изменён после решения «✅» от Claude, роль Аналитик историй |
-| `docs/stories/icplan.md` | П | — | — | — | ⏳ | c3565bc5 | текст изменён после решения «✅» от Claude, роль Пользователь |
+| `docs/stories/icplan.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ❌ | c3565bc5 | Открыто замечание Z-ICP-106 (В) к US-ICP-21: правка агента на этапе 4, создание — 1; решения владельца нет → получить решение и закрыть замечание. |
+| `docs/stories/icplan.md` | И | Claude, роль Аналитик историй | 🤖 | 2026-10-14 | ✅ | c3565bc5 | US-ICP-01..29 в формате «роль: действие → зачем» с ролями П, А, Э, Аг; требования R-AP-12 и R-HRN-05 покрывают сбои (отказ зависимостей, пауза). |
+| `docs/stories/icplan.md` | П | Claude, роль Пользователь | 🤖 | 2026-10-14 | ✅ | c3565bc5 | US-ICP-02, 03, 13, 14, 16 закрывают задачу пользователя: видеть работу агента, уведомление, принять/вернуть результат, остановить и повторить шаг. |
 | `docs/stories/infrastructure.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 26336d62 | US-INF-01 установка одной командой и US-INF-04 восстановление после потери сервера снижают операционные расходы; US-INF-03 профиль нагрузки подтверждён тестом |
 | `docs/stories/infrastructure.md` | И | Claude, роль Аналитик историй | 🤖 | 2026-10-13 | ✅ | 26336d62 | Семь историй, сбои покрыты: не хватает ресурсов → ошибка до установки (US-INF-01), неудачное обновление → откат (US-INF-05), бэкап не прошёл → уведомление (US-INF-04) |
 | `docs/stories/infrastructure.md` | П | Claude, роль Пользователь | 🤖 | 2026-10-13 | ✅ | 26336d62 | US-INF-02: ICPlan открывается по HTTPS с действующим сертификатом, HTTP перенаправляется, админки снаружи недоступны; пользователю безопасный доступ из браузера |
@@ -373,9 +373,9 @@
 | `docs/stories/mcp-tools.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 5bc875c3 | достаточно |
 | `docs/stories/mcp-tools.md` | И | Claude, роль Аналитик историй | 🤖 | 2026-10-13 | ✅ | 5bc875c3 | достаточно |
 | `docs/stories/mcp-tools.md` | П | Claude, роль Пользователь | 🤖 | 2026-10-13 | ✅ | 5bc875c3 | достаточно |
-| `docs/stories/memory.md` | В | — | — | — | ⏳ | 4f4fe9aa | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/stories/memory.md` | И | — | — | — | ⏳ | 4f4fe9aa | текст изменён после решения «✅» от Claude, роль Аналитик историй |
-| `docs/stories/memory.md` | П | — | — | — | ⏳ | 4f4fe9aa | текст изменён после решения «✅» от Claude, роль Пользователь |
+| `docs/stories/memory.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 4f4fe9aa | US-MEM-01..10 с приёмкой; US-MEM-09 явно: M4 после MVP, до MVP недоступен; US-MEM-10 сроки M1 30 д и M2 180 д — цена и границы MVP ясны. |
+| `docs/stories/memory.md` | И | Claude, роль Аналитик историй | 🤖 | 2026-10-14 | ✅ | 4f4fe9aa | Приёмка US-MEM-01 покрывает пустое M3 и конфликт записи, US-MEM-02 — память недоступна, US-MEM-08 — запись в документ запрещена, US-MEM-04 — чужой проект. |
+| `docs/stories/memory.md` | П | Claude, роль Пользователь | 🤖 | 2026-10-14 | ✅ | 4f4fe9aa | US-MEM-06 (агент помнит переписку), US-MEM-08 (опора на документы проекта) и US-MEM-03 (исправить ошибочную память) решают задачу пользователя и администратора. |
 | `docs/stories/observability.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 654a3dd3 | US-OBS-05: закрыто задач агентами, доля возвратов, затраты по периодам и разбивка по проектам оценивают пользу платформы; нет данных → нули |
 | `docs/stories/observability.md` | И | Claude, роль Аналитик историй | 🤖 | 2026-10-13 | ✅ | 654a3dd3 | US-OBS-03 маскирование не сработало → событие скрыто и помечено, US-OBS-04 трасса оборвалась → видно на каком компоненте, US-OBS-01 событий нет → причина |
 | `docs/stories/observability.md` | П | Claude, роль Пользователь | 🤖 | 2026-10-13 | ✅ | 654a3dd3 | US-OBS-01: чат запуска показывает шаги, тулы и итог в задаче, длинный вывод свёрнут; пользователь понимает, что делал агент |
@@ -412,24 +412,24 @@
 | `docs/tasks/2.2-sandbox-docker-oneshot.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 53d77597 | 3–5 дней, 2.1–4.2 M токенов; изоляция запусков в Docker (G3) нужна для безопасного исполнения кода, профили CPU/RAM управляют ресурсами хоста |
 | `docs/tasks/2.2-sandbox-docker-oneshot.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 53d77597 | Подзадачи 2.2.1–2.2.5: образ, SandboxProvider create/exec/destroy, профили CPU/RAM, сеть до LiteLLM/ICPlan/Memory; R-SBX-10 таймаут Docker API и 1 повтор |
 | `docs/tasks/2.2-sandbox-docker-oneshot.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 53d77597 | Приёмка: два параллельных запуска не видят файлы, превышение RAM → failed с причиной, контейнер не удалился → повтор и событие (R-RUN-10), нет ресурсов → queued (R-SBX-11) |
-| `docs/tasks/2.3-config-from-icplan.md` | В | — | — | — | ⏳ | c9adaf60 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/2.3-config-from-icplan.md` | Р | — | — | — | ⏳ | c9adaf60 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/tasks/2.3-config-from-icplan.md` | Т | — | — | — | ⏳ | c9adaf60 | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `docs/tasks/2.4-mcp-itsaplan-core.md` | В | — | — | — | ⏳ | 67c3ee42 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/2.4-mcp-itsaplan-core.md` | Р | — | — | — | ⏳ | 67c3ee42 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/tasks/2.4-mcp-itsaplan-core.md` | Т | — | — | — | ⏳ | 67c3ee42 | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `docs/tasks/2.5-memory-m2-m3.md` | В | — | — | — | ⏳ | 82641d8e | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/2.5-memory-m2-m3.md` | Р | — | — | — | ⏳ | 82641d8e | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/tasks/2.5-memory-m2-m3.md` | Т | — | — | — | ⏳ | 82641d8e | текст изменён после решения «✅» от Claude, роль Тестировщик |
+| `docs/tasks/2.3-config-from-icplan.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | c9adaf60 | Задача 2.3: 3–5 дн, 3–5 ч агента, 2.1–4.2 M токенов, зависит от 1.2 и 2.1; закрывает R-ICP-08, R-REG-02/06..10 — вклад и стоимость ясны. |
+| `docs/tasks/2.3-config-from-icplan.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | c9adaf60 | Подзадачи 2.3.1–2.3.6 с часами и критериями (AgentDefinition по D23, импорт YAML через POST /platform/agents/import, тест «изменил инструкцию») — можно начинать. |
+| `docs/tasks/2.3-config-from-icplan.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | c9adaf60 | Приёмка с привязкой к сценариям: смена agent.model и откат (R-REG-06), сохранение без agent.model → отказ с именем поля (R-REG-07), agent.enabled=false (R-ICP-08). |
+| `docs/tasks/2.4-mcp-itsaplan-core.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 67c3ee42 | Стоимость 1–2 дн и 0.8–1.5 M указана; открытые вопросы (MCP по умолчанию выключен, allowlist MVP) сформулированы как решения для владельца. |
+| `docs/tasks/2.4-mcp-itsaplan-core.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 67c3ee42 | Есть тул get_document, allowlist тулов, update_issue со сменой колонки, R-MCP-09 с таймаутом 30 с и повторами; ключ агента — открытый вопрос, но подзадача 2.4.2 его покрывает. |
+| `docs/tasks/2.4-mcp-itsaplan-core.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 67c3ee42 | Восемь пунктов приёмки с результатами: R-MCP-13 «MCP выключен в проекте», «Смена колонки в процессе», R-MCP-04 «Пакетная операция» и отказ записи в документ (R-MEM-01). |
+| `docs/tasks/2.5-memory-m2-m3.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 82641d8e | Задача 2.5: 5.5–7 дн, 3.5–6.5 M токенов, зависит от 2.1; закрывает 11 требований R-MEM; открытые вопросы (N запусков, формат M3) технические и не блокируют выбор. |
+| `docs/tasks/2.5-memory-m2-m3.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 82641d8e | Подзадачи 2.5.1–2.5.5: таблица memory_m3 в схеме memory, тул записи M3, подача M3 и M2 в контекст; R-MEM-09 m3_max_kb=16, R-MEM-11 таймаут 2 с и 2 повтора заданы. |
+| `docs/tasks/2.5-memory-m2-m3.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 82641d8e | Приёмка: агент записал M3 → следующий видит; тред пуст → раздел пуст (R-MEM-01); срок M2 истёк → строка agent_run остаётся (R-MEM-08, D25); R-MEM-15 отказ записи. |
 | `docs/tasks/2.6-e2e-icplan.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | d3f3b496 | Z-ICP-122 закрыто: приёмка по сценариям, 2.6.6-2.6.7, оценка 28 ч в 3-4 дн |
 | `docs/tasks/2.6-e2e-icplan.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | d3f3b496 | сценарии отказов разложены по подзадачам 2.6.6-2.6.7 с готовностью |
 | `docs/tasks/2.6-e2e-icplan.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | d3f3b496 | приёмка: сценарий -> результат по R-ICP-13, R-RUN-08, R-RUN-14 |
 | `docs/tasks/2.7-runner-scheduler.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | f28fd7ec | 3–4 дн, 2–4 M токенов; открытые вопросы (голодание, слот по запускам или TPM) сформулированы как выбор для владельца (R-RUN-02, R-RUN-06) |
 | `docs/tasks/2.7-runner-scheduler.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | f28fd7ec | Подзадачи 2.7.1–2.7.7, таблица scheduler_slot в Postgres, параметры scheduling.global_max и scheduling.aging_s (R-RUN-11), fifo/priority |
 | `docs/tasks/2.7-runner-scheduler.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | f28fd7ec | Сценарии: два Runner опросили очередь → выдан один (R-ICP-03), global_max: 4 и три запуска идут вместе, parallel:false не в два потока |
-| `docs/tasks/2.8-config-storage-interfaces-fmea.md` | В | — | — | — | ⏳ | 5a41f0e0 | Задача |
-| `docs/tasks/2.8-config-storage-interfaces-fmea.md` | Р | — | — | — | ⏳ | 5a41f0e0 | Задача |
-| `docs/tasks/2.8-config-storage-interfaces-fmea.md` | Т | — | — | — | ⏳ | 5a41f0e0 | Задача |
+| `docs/tasks/2.8-config-storage-interfaces-fmea.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 5a41f0e0 | 2–3 дн, 1.5–2.5 M; один резолвер для пяти модулей (R-HRN-10, R-MCP-07, R-MEM-09, R-RUN-11, R-SBX-08) — экономия на дублировании; вопрос кэша L1 один. |
+| `docs/tasks/2.8-config-storage-interfaces-fmea.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 5a41f0e0 | Заданы уровни L0–L3, потолок L0, параметры с умолчаниями (model.temperature 0.2, scheduling.aging_s 600, m3_max_kb 16) и вывод уровня-источника в RunBundle. |
+| `docs/tasks/2.8-config-storage-interfaces-fmea.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 5a41f0e0 | Три пункта приёмки: срез до потолка L0 с событием, нет обязательного параметра — ошибка с именем и уровнем; граничные значения в R-HRN-10 (>1.0) и R-RUN-11 (>3600). |
 | `docs/tasks/3.1-icplan-process-step-agent.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 99a7a101 | 4.5–7 дн, зависит от 2.6; риск слияния с upstream вынесен в ОВ-icplan-agent-autopickup-2, удаление процесса — ОВ-...-1 |
 | `docs/tasks/3.1-icplan-process-step-agent.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 99a7a101 | 3.1.1 миграция process/process_step/process_version, 3.1.2 API с кодом 400 и шагом, step.agent как настройка (R-AP-09), хранилище S1 |
 | `docs/tasks/3.1-icplan-process-step-agent.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 99a7a101 | Проверяемо: переход на несуществующий шаг/повтор колонки → отказ с шагом и причиной (R-AP-15); дубль перевода → один запуск (R-AP-05) |
@@ -445,33 +445,33 @@
 | `docs/tasks/3.5-icplan-type-actions-cost.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | e47aae72 | повторно: замечания Z-ICP-5/60/83/96 закрыты в тексте (3.5.1–3.5.5, приёмка по сценариям R-AP-03/R-LLM-02/R-OBS-05) |
 | `docs/tasks/3.5-icplan-type-actions-cost.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | e47aae72 | повторно: замечания Z-ICP-5/60/83/96 закрыты в тексте (3.5.1–3.5.5, приёмка по сценариям R-AP-03/R-LLM-02/R-OBS-05) |
 | `docs/tasks/3.5-icplan-type-actions-cost.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | e47aae72 | повторно: замечания Z-ICP-5/60/83/96 закрыты в тексте (3.5.1–3.5.5, приёмка по сценариям R-AP-03/R-LLM-02/R-OBS-05) |
-| `docs/tasks/3.6-icplan-process-engine.md` | В | — | — | — | ⏳ | b5fbf3ba | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/3.6-icplan-process-engine.md` | Р | — | — | — | ⏳ | b5fbf3ba | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/tasks/3.6-icplan-process-engine.md` | Т | — | — | — | ⏳ | b5fbf3ba | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `docs/tasks/3.7-icplan-task-control.md` | В | — | — | — | ⏳ | 5c302fd7 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/3.7-icplan-task-control.md` | Р | — | — | — | ⏳ | 5c302fd7 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/tasks/3.7-icplan-task-control.md` | Т | — | — | — | ⏳ | 5c302fd7 | текст изменён после решения «✅» от Claude, роль Тестировщик |
+| `docs/tasks/3.6-icplan-process-engine.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | b5fbf3ba | Задача 3.6: 6–9 дн, 4–7 M токенов, зависит от 3.1 и 3.2; закрывает R-AP-16, 17, 24, 25; открытый вопрос про владельца процесса по умолчанию имеет два варианта и не блокирует. |
+| `docs/tasks/3.6-icplan-process-engine.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | b5fbf3ba | Подзадачи 3.6.1–3.6.8 с часами и тестами (четыре итога, лимит 3 запуска, порядок очереди, истечение аренды, ProcessStep.transitions); входы/исходы определены. |
+| `docs/tasks/3.6-icplan-process-engine.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | b5fbf3ba | Приёмка включает исход вне transitions → «недопустимый исход», lease истёк → запуск первым в очереди, defect с returnTo/returnNote, лимит maxTotalRuns — сценарии проверяемы. |
+| `docs/tasks/3.7-icplan-task-control.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 5c302fd7 | Задача 3.7: 5–8 дн, 4–6 M токенов, зависит от 3.6, закрывает R-AP-18..22, 26; открытый вопрос «кто выносит вердикт по умолчанию» с двумя вариантами, MVP не блокирует. |
+| `docs/tasks/3.7-icplan-task-control.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 5c302fd7 | Подзадачи 3.7.1–3.7.8 (step.require_review, issue.review_with_me, вердикт с заметкой, пауза/возобновление, версии процесса) с часами и критериями результата. |
+| `docs/tasks/3.7-icplan-task-control.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 5c302fd7 | Приёмка: без вердикта задача не двигается, остановка отменяет активный запуск, удаление шага требует шаг переноса, «начать с шага SDD» сбрасывает счётчики (R-AP-21). |
 | `docs/tasks/3.8-agent-chat-control.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 38748459 | 3–5 дн, 2–4 M токенов, затрагивает ICPlan, Runner и Harness; риск совместимости heartbeat с upstream честно вынесен в открытое (R-ICP-17, R-HRN-16) |
 | `docs/tasks/3.8-agent-chat-control.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 38748459 | 3.8.1 колонка ai_agent.enabled с миграцией, 3.8.2 heartbeat отдаёт сообщения и отмену, 3.8.4 указания и «стоп» в цикле Harness |
 | `docs/tasks/3.8-agent-chat-control.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 38748459 | Проверяемо: сообщение во время тула учитывается после него (R-HRN-16), «доделать» против «отменить» при выключении (R-ICP-17), «стоп» даёт итог |
-| `docs/tasks/3.9-agent-summary-stats.md` | В | — | — | — | ⏳ | 9ef155e7 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/3.9-agent-summary-stats.md` | Р | — | — | — | ⏳ | 9ef155e7 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/tasks/3.9-agent-summary-stats.md` | Т | — | — | — | ⏳ | 9ef155e7 | текст изменён после решения «✅» от Claude, роль Тестировщик |
+| `docs/tasks/3.9-agent-summary-stats.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 9ef155e7 | Задача 3.9: 4.5–7 дн, 3.5–6 M токенов; R-OBS-13/14 дают стоимость на принятую задачу и затраты на обучение; открытый вопрос про виджеты/страницу — вопрос оформления. |
+| `docs/tasks/3.9-agent-summary-stats.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 9ef155e7 | Подзадачи 3.9.1–3.9.9: агрегаты из agent_run, затраты из LiteLLM, pass^k на фикстуре из 3 прогонов — входы (agent_run, LiteLLM) и критерии тестов заданы. |
+| `docs/tasks/3.9-agent-summary-stats.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 9ef155e7 | Приёмка: фильтры проект/пользователь/период, «LiteLLM недоступен → сводка без затрат с пометкой», pass^k при ≥3 прогонах, доля возвратов — сбой описан. |
 | `docs/tasks/4.1-sandbox-warm-pool.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 9395a03b | 3–4 дн; выгода измерима: запуск < 1 с (4.1.3); K8s-провайдер отложен и вынесен в открытое, на стоимость MVP не влияет |
 | `docs/tasks/4.1-sandbox-warm-pool.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 9395a03b | Подзадачи 4.1.1–4.1.5: размер пула в профиле, claim/destroy/долив, пустой пул создаёт на лету; закрывает R-SBX-02 и R-SBX-11 |
 | `docs/tasks/4.1-sandbox-warm-pool.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 9395a03b | Поведение при сбоях задано: пул пуст → создание заново, нет ресурсов → queued, образ недоступен → профиль недоступен (R-SBX-11), смена образа (R-SBX-02) |
 | `docs/tasks/4.2-egress-repo-access.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | ce72d242 | 4–6 дн, 3–5 M; открытые выборы Gitea или GitHub, тип токена и Squid или mitmproxy — решения владельца с влиянием на сроки (R-SBX-06, R-SBX-04) |
 | `docs/tasks/4.2-egress-repo-access.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | ce72d242 | Подзадачи 4.2.1–4.2.7: allowlist прокси, токены на запуск, ветка agent/<KEY>, защита main, sbx-setup для D19; требования R-SBX-04/06/07 заданы |
 | `docs/tasks/4.2-egress-repo-access.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | ce72d242 | Приёмка: запрещённый домен блокируется (R-SBX-06), push в main отклонён, диск переполнен → ошибка запуску (R-SBX-03), g3.enabled:false → предупреждение |
-| `docs/tasks/4.3-guardrails-opa.md` | В | — | — | — | ⏳ | 39509719 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/4.3-guardrails-opa.md` | Р | — | — | — | ⏳ | 39509719 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/tasks/4.3-guardrails-opa.md` | Т | — | — | — | ⏳ | 39509719 | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `docs/tasks/4.4-platform-module.md` | В | — | — | — | ⏳ | 070878f4 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/4.4-platform-module.md` | Р | — | — | — | ⏳ | 070878f4 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/tasks/4.4-platform-module.md` | Т | — | — | — | ⏳ | 070878f4 | текст изменён после решения «✅» от Claude, роль Тестировщик |
-| `docs/tasks/4.5-litellm-budgets-fallback-g4.md` | В | — | — | — | ⏳ | 2ce99cc8 | текст изменён после решения «✅» от Claude, роль Владелец продукта |
-| `docs/tasks/4.5-litellm-budgets-fallback-g4.md` | Р | — | — | — | ⏳ | 2ce99cc8 | текст изменён после решения «✅» от Claude, роль Разработчик |
-| `docs/tasks/4.5-litellm-budgets-fallback-g4.md` | Т | — | — | — | ⏳ | 2ce99cc8 | текст изменён после решения «✅» от Claude, роль Тестировщик |
+| `docs/tasks/4.3-guardrails-opa.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 39509719 | 6–7.5 дн, 3–6 M при 17 закрываемых R-GRD; открытые вопросы (минимальный набор правил MVP, латентность OPA) явно вынесены на решение. |
+| `docs/tasks/4.3-guardrails-opa.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 39509719 | Конфиг guardrails.gN.enabled (4.3.1), OPA в compose с bundle Rego (4.3.2), G1 в Runner и G2 в hooks Harness, opa test; входы и выходы по точкам различимы. |
+| `docs/tasks/4.3-guardrails-opa.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 39509719 | Приёмка с отказами: OPA недоступен → deny, бюджет исчерпан → limit_exceeded без sandbox, правило без точки G2 — сохранение отклонено (R-GRD-01), R-GRD-20 про сбои. |
+| `docs/tasks/4.4-platform-module.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 070878f4 | Задача 4.4: 17–25 дн, 12–20 M токенов, зависит от 2.3, закрывает 24 требования R-CP, R-GRD, R-MEM-16..18, R-REG; самая дорогая, объём и стоимость видны, открыт только PR в upstream. |
+| `docs/tasks/4.4-platform-module.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 070878f4 | Подзадачи 4.4.1 (8 таблиц схемы platform), 4.4.2 (GET/PATCH settings, значение выше потолка → 400 с названием поля), 4.4.3 (CRUD sandbox_profile) — реализуемо. |
+| `docs/tasks/4.4-platform-module.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 070878f4 | Приёмка: отрицательный бюджет или несуществующий профиль → отказ с полем и причиной, concurrency выше потолка L0 → отказ с названием потолка, сброс → значение по умолчанию. |
+| `docs/tasks/4.5-litellm-budgets-fallback-g4.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 2ce99cc8 | 4.5–7 дн, 3.5–5.5 M; бюджеты, fallback и G4 закрывают R-GRD-11, R-LLM-03/05/06; открытые вопросы — какие хуки G4 брать из коробки и реальный провайдер для fallback. |
+| `docs/tasks/4.5-litellm-budgets-fallback-g4.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-14 | ✅ | 2ce99cc8 | Подзадачи: бюджеты и rate limit на virtual key (4.5.1), fallback-модель, pre-call хук атрибуции по run_id (4.5.4), budget.issue в Runner (4.5.6); входы и поведение заданы. |
+| `docs/tasks/4.5-litellm-budgets-fallback-g4.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-14 | ✅ | 2ce99cc8 | Сценарии R-LLM-03: вызов без run_id отклонён, чужой ключ — затраты на агента ключа плюс событие в аудите; маскирование ключа в промпте и чистый промпт без изменений; R-LLM-11 про недоступного провайдера. |
 | `docs/tasks/4.6-k8s-helm-ingress.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-13 | ✅ | 7beb2faa | 5–7 дн, 3.5–5.5 M; закрывает 23 требования, включая развёртывания всех модулей; открытое — домен/ACME и клиентский сертификат админов |
 | `docs/tasks/4.6-k8s-helm-ingress.md` | Р | Claude, роль Разработчик | 🤖 | 2026-10-13 | ✅ | 7beb2faa | Подзадачи 4.6.1–4.6.5: k3s, чарт agent-platform, Traefik HTTPRoute, NetworkPolicy, Secret; параметры R-INF-13, интерфейсы R-INF-15 |
 | `docs/tasks/4.6-k8s-helm-ingress.md` | Т | Claude, роль Тестировщик | 🤖 | 2026-10-13 | ✅ | 7beb2faa | Приёмка: админки снаружи → 404, контейнер запуска не достучится до Postgres, сервис агента создаёт объект в itsaplan-core → отказ правами (R-INF-10, R-INF-04) |
@@ -484,15 +484,15 @@
 | `docs/techspec/agent-runner.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | b98a1154 | Образ agent-runner distroless nonroot 65532, порт 8080, /healthz, Secret runner-agents, вывод реплики US-RUN-06, точка PITR перед helm upgrade |
 | `docs/techspec/agent-runner.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-13 | ✅ | b98a1154 | Ключи агентов ITSAPLAN_AGENT_KEYS лежат в Secret runner-agents, не в values; distroless static, nonroot, базовые образы закреплены по digest (R-RUN-16) |
 | `docs/techspec/agent-runner.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-13 | ✅ | b98a1154 | Сборка в GitHub Actions по тегу vX.Y.Z, CGO_ENABLED=0 go build -trimpath, runner/Dockerfile, публикация в ghcr.io/demoningvi/agent-runner (R-RUN-16) |
-| `docs/techspec/guardrails.md` | Д | — | — | — | ⏳ | 917dcd94 | текст изменён после решения «✅» от Claude, роль DevOps-инженер |
-| `docs/techspec/guardrails.md` | Б | — | — | — | ⏳ | 917dcd94 | текст изменён после решения «✅» от Claude, роль Безопасность |
-| `docs/techspec/guardrails.md` | С | — | — | — | ⏳ | 917dcd94 | текст изменён после решения «✅» от Claude, роль Инженер сборки и поставки |
+| `docs/techspec/guardrails.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-14 | ✅ | 917dcd94 | Deploy: OPA 1.21.1-static, 2 реплики, /health?bundles, бандл с версией = sha коммита, опрос 30 с без рестарта (I16); откат правил через git описан. |
+| `docs/techspec/guardrails.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-14 | ✅ | 917dcd94 | Образ закреплён digest с копией в GHCR, пользователь nonroot; R-GRD-19: отказ токена bundle-сервера не повторяется, без бандла deny (on_engine_error). |
+| `docs/techspec/guardrails.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-14 | ✅ | 917dcd94 | Сборка: правила Rego в git с opa test обязательно, затем opa build в CI и публикация бандла; образ берётся из Docker Hub по digest, тег 1.21.1. |
 | `docs/techspec/harness.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | 107eb106 | Новый образ через HARNESS_IMAGE, активные запуски доделываются на прежнем (R-HRN-15), checkpoint в harness_ckpt пишет Runner, проверка mock-LLM |
 | `docs/techspec/harness.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-13 | ✅ | 107eb106 | RUN_TOKEN выдаётся Runner на запуск, внешнее только через прокси, python:3.12-slim закреплён digest; секретов в образе в карточке нет |
 | `docs/techspec/harness.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-13 | ✅ | 107eb106 | uv sync --frozen по uv.lock, версии LangGraph 1.2.14 и langchain[mcp] 1.4.4 закреплены, образ ghcr.io/demoningvi/agent-harness, TECHNOLOGIES.md |
-| `docs/techspec/icplan.md` | Д | — | — | — | ⏳ | 436dfb96 | текст изменён после решения «✅» от Claude, роль DevOps-инженер |
-| `docs/techspec/icplan.md` | Б | — | — | — | ⏳ | 436dfb96 | текст изменён после решения «✅» от Claude, роль Безопасность |
-| `docs/techspec/icplan.md` | С | — | — | — | ⏳ | 436dfb96 | текст изменён после решения «✅» от Claude, роль Инженер сборки и поставки |
+| `docs/techspec/icplan.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-14 | ✅ | 436dfb96 | Запуск: namespace itsaplan-core, реплики api 2/web 1–2/worker 1/bot 1; обновление: точка PITR CloudNativePG, миграции вперёд init-контейнером; проверка GET / api=200. |
+| `docs/techspec/icplan.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-14 | ✅ | 436dfb96 | Секреты в одном Secret itsaplan-secrets (existingSecret), образы из ghcr.io/demoningvi без встроенных postgresql/minio; R-ICP-19 задаёт очистку запусков по сроку. |
+| `docs/techspec/icplan.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-14 | ✅ | 436dfb96 | Образ api: oven/bun:1.4.0-alpine → alpine:3.23, bun install --frozen-lockfile по bun.lock, источник ghcr.io/demoningvi, чарт charts/itsaplan; что доработать — задача 4.6. |
 | `docs/techspec/infrastructure.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | 7659af2f | k3s v1.37.1+k3s1, порядок запуска CNPG→…→Runner, проверка свежей базовой копии перед обновлением, восстановление на тестовом узле (R-INF-06) |
 | `docs/techspec/infrastructure.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-13 | ✅ | 7659af2f | Секреты в Secret, values.yaml без секретов (R-INF-09), копии Postgres и RustFS вне площадки в S3; один узел как единая точка отказа назван |
 | `docs/techspec/infrastructure.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-13 | ✅ | 7659af2f | Установщик get.k3s.io с закреплённой версией, чарты в git, helm lint и values.schema.json в CI, сборка по тегу vX.Y.Z, образы по digest (R-INF-03) |
@@ -502,19 +502,19 @@
 | `docs/techspec/mcp-tools.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | da409342 | itsaplan-core живёт в itsaplan-api, обновление по одной реплике без перерыва больше переподключения (R-MCP-12), откат вместе с api ICPlan |
 | `docs/techspec/mcp-tools.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-13 | ✅ | da409342 | Секреты серверов по auth.secret_ref в Secret, в БД и git не хранятся (R-MCP-08); внешние MCP только через egress-прокси; тулы в allowlist агента |
 | `docs/techspec/mcp-tools.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-13 | ✅ | da409342 | Новый внешний сервер: строка в TECHNOLOGIES.md, проверка лицензии, копия образа в GHCR; сборка по тегу vX.Y.Z с базовыми по digest (R-MCP-12) |
-| `docs/techspec/memory.md` | Д | — | — | — | ⏳ | 69c1ca9a | текст изменён после решения «✅» от Claude, роль DevOps-инженер |
-| `docs/techspec/memory.md` | Б | — | — | — | ⏳ | 69c1ca9a | текст изменён после решения «✅» от Claude, роль Безопасность |
-| `docs/techspec/memory.md` | С | — | — | — | ⏳ | 69c1ca9a | текст изменён после решения «✅» от Claude, роль Инженер сборки и поставки |
+| `docs/techspec/memory.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-14 | ✅ | 69c1ca9a | memory-api 1–2 реплики в itsaplan-agents, GET /ready проверяет БД; порядок обновления: миграции схемы memory, затем образ; восстановление — базовые копии и WAL Postgres в S3. |
+| `docs/techspec/memory.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-14 | ✅ | 69c1ca9a | Роль memory — владелец схемы memory, строки agent_run/chat/issue_activity только по GRANT и без удаления (D25); DATABASE_URL из Secret memory-db; проверка: запись M3 с секретом отклонена. |
+| `docs/techspec/memory.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-14 | ✅ | 69c1ca9a | Раздел «Сборка и поставка»: шаг 1 сборка по тегу `vX.Y.Z`, образ `ghcr.io/demoningvi/memory-api`, `memory/Dockerfile` и `uv.lock`, базовые образы по digest. |
 | `docs/techspec/observability.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-13 | ✅ | 155a22e5 | Своего сервиса нет, run_event в БД ICPlan; миграция только добавлением колонок, чтобы прежний api писал события; CronJob очистки 90 дней (R-OBS-06) |
 | `docs/techspec/observability.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-13 | ✅ | 155a22e5 | MASK_PATTERNS в ConfigMap, секрет в аргументах и ответе тула маскируется даже без совпадения с шаблоном (R-OBS-04); срок хранения 90 дней |
 | `docs/techspec/observability.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-13 | ✅ | 155a22e5 | Код в составе itsaplan-api форка, миграции run_event в форке (задача 3.3.1), образ ghcr.io/demoningvi/itsaplan-api, сборка по тегу vX.Y.Z |
-| `docs/techspec/platform-module.md` | Д | — | — | — | ⏳ | c4e73003 | текст изменён после решения «✅» от Claude, роль DevOps-инженер |
-| `docs/techspec/platform-module.md` | Б | — | — | — | ⏳ | c4e73003 | текст изменён после решения «✅» от Claude, роль Безопасность |
-| `docs/techspec/platform-module.md` | С | — | — | — | ⏳ | c4e73003 | текст изменён после решения «✅» от Claude, роль Инженер сборки и поставки |
-| `docs/techspec/sandbox.md` | Д | — | — | — | ⏳ | 225366fd | текст изменён после решения «✅» от Claude, роль DevOps-инженер |
-| `docs/techspec/sandbox.md` | Б | — | — | — | ⏳ | 225366fd | текст изменён после решения «✅» от Claude, роль Безопасность |
-| `docs/techspec/sandbox.md` | С | — | — | — | ⏳ | 225366fd | текст изменён после решения «✅» от Claude, роль Инженер сборки и поставки |
-| `index.md` | В | — | — | — | ⏳ | 42b2b191 | Главная |
-| `index.md` | А | — | — | — | ⏳ | 42b2b191 | Главная |
-| `openspec/changes/define-agent-platform/design.md` | В | — | — | — | ⏳ | 9c11d730 | Решения (design) |
-| `openspec/changes/define-agent-platform/design.md` | А | — | — | — | ⏳ | 9c11d730 | Решения (design) |
+| `docs/techspec/platform-module.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-14 | ✅ | c4e73003 | Модуль в составе itsaplan-api, миграции platform_* до старта api (иначе api не стартует), данные S2 с версиями agent_settings_version; проверка: бюджет → ключ LiteLLM обновлён. |
+| `docs/techspec/platform-module.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-14 | ✅ | c4e73003 | LITELLM_MASTER_KEY и LITELLM_ADMIN_URL берутся из Secret litellm-admin, контейнер non-root, порт 3000; R-CP-11 при недоступном admin API — «не применено» с повтором, без тихой потери. |
+| `docs/techspec/platform-module.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-14 | ✅ | c4e73003 | Раздел «Сборка и поставка»: код в `apps/api/src/modules/platform`, миграции `packages/db/drizzle/platform_*`, образ `ghcr.io/demoningvi/itsaplan-api` из раздела «Образы». |
+| `docs/techspec/sandbox.md` | Д | Claude, роль DevOps-инженер | 🤖 | 2026-10-14 | ✅ | 225366fd | Новый HARNESS_IMAGE → пул пересоздаёт тёплые контейнеры (R-SBX-13); постоянных данных нет, /workspace удаляется; проверка: контейнер удалён после запуска. |
+| `docs/techspec/sandbox.md` | Б | Claude, роль Безопасность | 🤖 | 2026-10-14 | ✅ | 225366fd | Read-only rootfs, no-new-privileges, drop ALL capabilities, seccomp RuntimeDefault, NetworkPolicy deny all кроме прокси и Runner, RUN_TOKEN одноразовый; ключ подставляет прокси (R-SBX-07). |
+| `docs/techspec/sandbox.md` | С | Claude, роль Инженер сборки и поставки | 🤖 | 2026-10-14 | ✅ | 225366fd | Образ среды = образ Harness (ghcr.io/demoningvi/agent-harness, uid 10001, порт 8090, GET /ready Harness); allowlist Squid генерируется из политики доступа. |
+| `index.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 42b2b191 | Раздел «Сквозные решения» (Решение · Что выбрано · D · Подробно); «Развёртывание (C4 deployment)» привязано к D15, D16 — стоимость и объём ресурсов прослеживаются. |
+| `index.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 42b2b191 | «C1 — System Context»: Agent Runner — внешний раннер ICPlan, согласуется с D8; раздел «Порядок работы и сценарии» имеет колонки `I` и «Сценарий». |
+| `openspec/changes/define-agent-platform/design.md` | В | Claude, роль Владелец продукта | 🤖 | 2026-10-14 | ✅ | 9c11d730 | D15 (k3s на одном узле) и D16 (15 одновременных пользователей) задают ресурсы; D1–D28 содержат выбор и обоснование для владельца. |
+| `openspec/changes/define-agent-platform/design.md` | А | Claude, роль Архитектор | 🤖 | 2026-10-14 | ✅ | 9c11d730 | D8 (внешний раннер ICPlan), D9 (источник правды — БД ICPlan), D22 (базы, схемы и роли БД) задают границы; D13 стоит после D16, номера уникальны. |

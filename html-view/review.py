@@ -326,7 +326,10 @@ def card(page: str) -> str:
         body = [f"блок {u.get('title', '')} · {u.get('kind', '')} · {_clean(u.get('tech', ''))}"]
         body += [f"{k}: {_flat(v)}" for k, v in u.items() if k not in ("title", "kind", "tech", "reqs", "why", "rnd") and v not in ("", [], {}, None)]
     elif kind in ("Архитектура компонента", "Данные", "Интеграции"):
-        body = _comp_lines(comp) + _endpoint_lines(comp) + (_table_lines(comp) if kind != "Интеграции" else [])
+        eps = _endpoint_lines(comp)
+        # своих эндпоинтов нет (например, чтение через API соседа) — в карточку идёт текст документа, иначе роль видит пустой список
+        own_doc = (ROOT / page).read_text(encoding="utf-8") if page.endswith(".md") and (ROOT / page).exists() else text
+        body = _comp_lines(comp) + (eps or (_sections(own_doc, budget // 2) if own_doc else [])) + (_table_lines(comp) if kind != "Интеграции" else [])
         # только требования самого компонента (из его блоков): собранная страница несёт и чужие — из моделей и интеграций соседей
         own = {r for f in (ROOT / "data/blocks" / comp).glob("*.yaml") if not f.name.startswith("_") for r in ((_yaml(f) or {}).get("reqs") or [])}
         ids = [i for i in ids if i in own] if own else ids

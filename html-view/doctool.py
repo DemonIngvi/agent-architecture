@@ -320,6 +320,10 @@ def rnd(slug: str, title: str) -> Path:
     return p
 
 
+# проверенный факт в комментарии роли: ID (R-…, US-…, I3, D20), `код`, номер 2.5.3, раздел «…», метод или код ответа HTTP, #якорь
+FACT = r"[A-Z]{1,4}-?[A-Z]*-?\d|`|\b[IDS]\d+|\d+\.\d+|«[^»]{3,}»|\b(?:GET|POST|PUT|PATCH|DELETE)\b|\b[2-5]\d\d\b|#[a-z][\w-]+"
+
+
 def rnd_check(path) -> list:
     """Структура R&D v3.2 (rnd-methodology.md#gates, #gate-status, #layout): у каждого этапа Э1–Э10 — раздел,
     «Вывод этапа» и ворота ✅ или ⚠️ (у ⚠️ — 📌 и следующий шаг); раздел «Источники»: ссылка, дата, уровень."""
@@ -478,7 +482,7 @@ def main():
         dec = json.loads(Path(args[0]).read_text(encoding="utf-8"))
         # защита от шаблонных решений (approval-methodology.md#economy): у каждой пары — свой проверенный факт
         top = Counter(d.get("comment", "") for d in dec).most_common(1)
-        short = [f"{d.get('page')} × {d.get('role')}" for d in dec if len(d.get("comment", "")) < 40 or not re.search(r"[A-Z]{1,4}-?[A-Z]*-?\d|`|\b[IDS]\d+|\d+\.\d+", d.get("comment", ""))]
+        short = [f"{d.get('page')} × {d.get('role')}" for d in dec if len(d.get("comment", "")) < 40 or not re.search(FACT, d.get("comment", ""))]
         if len(dec) >= 5 and top and top[0][1] > max(2, len(dec) // 10):
             sys.exit(f"⛔ шаблонные решения: комментарий «{top[0][0][:60]}» у {top[0][1]} из {len(dec)} пар — у каждой пары свой проверенный факт; ничего не применено")
         if short:
