@@ -445,3 +445,15 @@ costs:
   calls: 36
   context: 123106
   note: 'актуализация архитектуры по R&D agent-chain: D27, R-AP-24..26, R-MEM-16, R-GRD-11, R-OBS-13, модели ProcessStep/RunResult/M3Record/Run, подзадачи 3.6/3.7/3.9/4.4/4.5, ROADMAP, BACKLOG'
+- date: '2026-10-14'
+  process: rules-change
+  methodology: change-process.md#rules-change
+  units: 1
+  unit: документ
+  tokens: 999243
+  model: sonnet-5-5
+  expected: [200000, 500000]
+  agents: [ae0bd350ab4170ad8, ae380e917c1de9188, a434d28bd9b27fe46]
+  calls: 21
+  context: 183360
+  note: 'rnd-methodology v3.3: второй слой «техническое решение» (дерево качества, сценарии с response measure, ATAM-lite, fitness, ADR), #no-method, #own-experiment, конструктивный спор; исследование и сверка методологии'
